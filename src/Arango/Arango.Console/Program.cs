@@ -22,7 +22,7 @@ namespace Arango.Console
             ArangoClient.Nodes.Add(node);
 
             ArangoDatabase database = new ArangoDatabase(alias);
-            string s = database.Document("10843274/12481674");
+            string s = database.Document("10843274/12481674", "x12481674");
 
             System.Console.WriteLine(s);
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Net;
+
 namespace Arango.Client
 {
     public class ArangoDatabase
@@ -16,7 +17,19 @@ namespace Arango.Client
 
         public string Document(string handle)
         {
-            return _node.Request("_api/document/" + handle, HttpMethod.GET);
+            return Document(handle, "");
+        }
+
+        public string Document(string handle, string revision)
+        {
+            WebHeaderCollection headers = new WebHeaderCollection();
+
+            if (!string.IsNullOrEmpty(revision))
+            {
+                headers.Add("If-None-Match", "\"" + revision + "\"");
+            }
+
+            return _node.Request("_api/document/" + handle, HttpMethod.GET, headers);
         }
     }
 }
