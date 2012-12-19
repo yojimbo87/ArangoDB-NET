@@ -41,14 +41,18 @@ namespace Arango.Client
             Credentials.Add(BaseUri, "Basic", new NetworkCredential(userName, password));
         }
 
-        internal string Request(string relativeUri, HttpMethod method)
+        internal string Request(string relativeUri, HttpMethod method, WebHeaderCollection headers)
         {
             var request = (HttpWebRequest)HttpWebRequest.Create(BaseUri + relativeUri);
             request.KeepAlive = true;
             request.Method = method.ToString();
             request.UserAgent = _userAgent;
             request.Credentials = Credentials;
-            //request.Headers.Add("Beone-Encoding: " + gwid + "\n");
+
+            if ((headers != null) && (headers.Count > 0))
+            {
+                request.Headers = headers;
+            }
 
             /*Stream stream1 = request.GetRequestStream();
             stream1.Write(data, 0, data.Length);
@@ -66,12 +70,19 @@ namespace Arango.Client
                 var response = (HttpWebResponse)webException.Response;
                 var reader = new StreamReader(response.GetResponseStream());
 
-                throw new ArangoException(
-                    response.StatusCode,
-                    reader.ReadToEnd(),
-                    webException.Message, 
-                    webException.InnerException
-                );
+                if (response.StatusCode != HttpStatusCode.NotModified)
+                {
+                    throw new ArangoException(
+                        response.StatusCode,
+                        reader.ReadToEnd(),
+                        webException.Message,
+                        webException.InnerException
+                    );
+                }
+                else
+                {
+                    return "{ etag: " + response.Headers.Get("etag") + "}";
+                }
             }
         }
     }
