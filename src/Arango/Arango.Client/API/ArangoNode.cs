@@ -54,10 +54,21 @@ namespace Arango.Client
             stream1.Write(data, 0, data.Length);
             stream1.Close();*/
 
-            var response = (HttpWebResponse)request.GetResponse();
-            var reader = new StreamReader(response.GetResponseStream());
+            try
+            {
+                var response = (HttpWebResponse)request.GetResponse();
+                var reader = new StreamReader(response.GetResponseStream());
 
-            return reader.ReadToEnd();
+                return reader.ReadToEnd();
+            }
+            catch (WebException webException)
+            {
+                throw new ArangoException(
+                    ((HttpWebResponse)webException.Response).StatusCode, 
+                    webException.Message, 
+                    webException.InnerException
+                );
+            }
         }
     }
 }

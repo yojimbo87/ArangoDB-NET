@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\ArangoDatabase.cs" />
+    <Compile Include="API\ArangoException.cs" />
     <Compile Include="API\ArangoNode.cs" />
     <Compile Include="API\HttpMethod.cs" />
     <Compile Include="ArangoClient.cs" />
