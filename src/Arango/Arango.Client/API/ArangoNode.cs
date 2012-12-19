@@ -63,8 +63,12 @@ namespace Arango.Client
             }
             catch (WebException webException)
             {
+                var response = (HttpWebResponse)webException.Response;
+                var reader = new StreamReader(response.GetResponseStream());
+
                 throw new ArangoException(
-                    ((HttpWebResponse)webException.Response).StatusCode, 
+                    response.StatusCode,
+                    reader.ReadToEnd(),
                     webException.Message, 
                     webException.InnerException
                 );
