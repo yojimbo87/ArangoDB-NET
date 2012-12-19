@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arango.Client", "Arango.Client\Arango.Client.csproj", "{46508269-ACA8-464D-BA1C-24CF1F92027A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arango.Console", "Arango.Console\Arango.Console.csproj", "{520575FB-E3E8-409E-9006-917165BA4077}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{46508269-ACA8-464D-BA1C-24CF1F92027A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46508269-ACA8-464D-BA1C-24CF1F92027A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46508269-ACA8-464D-BA1C-24CF1F92027A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46508269-ACA8-464D-BA1C-24CF1F92027A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{520575FB-E3E8-409E-9006-917165BA4077}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{520575FB-E3E8-409E-9006-917165BA4077}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{520575FB-E3E8-409E-9006-917165BA4077}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{520575FB-E3E8-409E-9006-917165BA4077}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
