@@ -88,7 +88,7 @@ namespace Arango.Client
                 {
                     responseData.StatusCode = response.StatusCode;
                     responseData.Headers = response.Headers;
-                    responseData.Content = reader.ReadToEnd();// "{ etag: " + response.Headers.Get("etag") + "}";
+                    responseData.Content = reader.ReadToEnd();
                 }
             }
 

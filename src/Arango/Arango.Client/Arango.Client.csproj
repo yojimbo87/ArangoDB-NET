@@ -50,7 +50,6 @@
     <Compile Include="Protocol\Document.cs" />
     <Compile Include="ArangoClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Protocol\RequestType.cs" />
     <Compile Include="Protocol\ResponseData.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
