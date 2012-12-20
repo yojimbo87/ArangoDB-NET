@@ -42,11 +42,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\ArangoDatabase.cs" />
+    <Compile Include="API\ArangoDocument.cs" />
     <Compile Include="API\ArangoException.cs" />
     <Compile Include="API\ArangoNode.cs" />
-    <Compile Include="API\HttpMethod.cs" />
+    <Compile Include="Protocol\RequestData.cs" />
+    <Compile Include="Protocol\RequestMethod.cs" />
+    <Compile Include="Protocol\Document.cs" />
     <Compile Include="ArangoClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Protocol\RequestType.cs" />
+    <Compile Include="Protocol\ResponseData.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Arango.Client.Protocol;
 
 namespace Arango.Client
 {
@@ -22,14 +23,14 @@ namespace Arango.Client
 
         public string GetDocument(string handle, string revision)
         {
-            WebHeaderCollection headers = new WebHeaderCollection();
+            Document document = new Document();
+            document.RequestMethod = RequestMethod.GET;
+            document.Handle = handle;
+            document.Revision = revision;
 
-            if (!string.IsNullOrEmpty(revision))
-            {
-                headers.Add("If-None-Match", "\"" + revision + "\"");
-            }
+            ResponseData response = document.Request(_node);
 
-            return _node.Request("_api/document/" + handle, HttpMethod.GET, headers);
+            return response.Content;
         }
     }
 }

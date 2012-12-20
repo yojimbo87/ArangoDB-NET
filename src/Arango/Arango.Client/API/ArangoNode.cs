@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using Arango.Client.Protocol;
 
 namespace Arango.Client
 {
@@ -41,29 +42,32 @@ namespace Arango.Client
             Credentials.Add(BaseUri, "Basic", new NetworkCredential(userName, password));
         }
 
-        internal string Request(string relativeUri, HttpMethod method, WebHeaderCollection headers)
+        internal ResponseData Process(RequestData requestData)
         {
-            var request = (HttpWebRequest)HttpWebRequest.Create(BaseUri + relativeUri);
+            var request = (HttpWebRequest)HttpWebRequest.Create(BaseUri + requestData.RelativeUri);
             request.KeepAlive = true;
-            request.Method = method.ToString();
+            request.Method = requestData.Method;
             request.UserAgent = _userAgent;
             request.Credentials = Credentials;
 
-            if ((headers != null) && (headers.Count > 0))
+            if ((requestData.Headers.Count > 0))
             {
-                request.Headers = headers;
+                request.Headers = requestData.Headers;
             }
 
             /*Stream stream1 = request.GetRequestStream();
             stream1.Write(data, 0, data.Length);
             stream1.Close();*/
 
+            var responseData = new ResponseData();
+
             try
             {
                 var response = (HttpWebResponse)request.GetResponse();
                 var reader = new StreamReader(response.GetResponseStream());
 
-                return reader.ReadToEnd();
+                responseData.StatusCode = response.StatusCode;
+                responseData.Content = reader.ReadToEnd();
             }
             catch (WebException webException)
             {
@@ -81,9 +85,12 @@ namespace Arango.Client
                 }
                 else
                 {
-                    return "{ etag: " + response.Headers.Get("etag") + "}";
+                    responseData.StatusCode = response.StatusCode;
+                    responseData.Content = "{ etag: " + response.Headers.Get("etag") + "}";
                 }
             }
+
+            return responseData;
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿
-namespace Arango.Client
+namespace Arango.Client.Protocol
 {
-    internal enum HttpMethod
+    internal enum RequestMethod
     {
         GET = 0,
         POST = 1,
