@@ -15,12 +15,12 @@ namespace Arango.Client
             _node = ArangoClient.GetNode(alias);
         }
 
-        public string Document(string handle)
+        public string GetDocument(string handle)
         {
-            return Document(handle, "");
+            return GetDocument(handle, "");
         }
 
-        public string Document(string handle, string revision)
+        public string GetDocument(string handle, string revision)
         {
             WebHeaderCollection headers = new WebHeaderCollection();
 
