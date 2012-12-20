@@ -16,21 +16,16 @@ namespace Arango.Client
             _node = ArangoClient.GetNode(alias);
         }
 
-        public string GetDocument(string handle)
+        public ArangoDocument GetDocument(string id)
         {
-            return GetDocument(handle, "");
+            return GetDocument(id, "");
         }
 
-        public string GetDocument(string handle, string revision)
+        public ArangoDocument GetDocument(string id, string revision)
         {
-            Document document = new Document();
-            document.RequestMethod = RequestMethod.GET;
-            document.Handle = handle;
-            document.Revision = revision;
+            Document document = new Document(_node);
 
-            ResponseData response = document.Request(_node);
-
-            return response.Content;
+            return document.Get(id, revision);
         }
     }
 }

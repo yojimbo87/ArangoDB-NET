@@ -67,6 +67,7 @@ namespace Arango.Client
                 var reader = new StreamReader(response.GetResponseStream());
 
                 responseData.StatusCode = response.StatusCode;
+                responseData.Headers = response.Headers;
                 responseData.Content = reader.ReadToEnd();
             }
             catch (WebException webException)
@@ -86,7 +87,8 @@ namespace Arango.Client
                 else
                 {
                     responseData.StatusCode = response.StatusCode;
-                    responseData.Content = "{ etag: " + response.Headers.Get("etag") + "}";
+                    responseData.Headers = response.Headers;
+                    responseData.Content = reader.ReadToEnd();// "{ etag: " + response.Headers.Get("etag") + "}";
                 }
             }
 

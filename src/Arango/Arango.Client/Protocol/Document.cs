@@ -1,26 +1,50 @@
-﻿
+﻿using System.Net;
+
 namespace Arango.Client.Protocol
 {
     internal class Document
     {
         private string ApiUri { get { return "_api/document/"; } }
+        private ArangoNode Node { get; set; }
 
-        internal RequestMethod RequestMethod { get; set; }
+        /*internal RequestMethod RequestMethod { get; set; }
         internal string Handle { get; set; }
-        internal string Revision { get; set; }
+        internal string Revision { get; set; }*/
 
-        internal ResponseData Request(ArangoNode node)
+        internal Document(ArangoNode node)
         {
-            RequestData requestData = new RequestData();
-            requestData.RelativeUri = ApiUri + Handle;
-            requestData.Method = RequestMethod.ToString();
+            Node = node;
+        }
 
-            if (!string.IsNullOrEmpty(Revision))
+        internal ArangoDocument Get(string id, string revision)
+        {
+            var requestData = new RequestData();
+            requestData.RelativeUri = ApiUri + id;
+            requestData.Method = RequestMethod.GET.ToString();
+
+            if (!string.IsNullOrEmpty(revision))
             {
-                requestData.Headers.Add("If-None-Match", "\"" + Revision + "\"");
+                requestData.Headers.Add("If-None-Match", "\"" + revision + "\"");
             }
 
-            return node.Process(requestData);
+            var responseData = Node.Process(requestData);
+            var document = new ArangoDocument();
+            document.ID = id;
+            document.Data = responseData.Content;
+
+            switch (responseData.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    document.Revision = responseData.Headers.Get("etag");
+                    break;
+                case HttpStatusCode.NotModified:
+                    document.Revision = responseData.Headers.Get("etag");
+                    break;
+                default:
+                    break;
+            }
+
+            return document;
         }
     }
 }
