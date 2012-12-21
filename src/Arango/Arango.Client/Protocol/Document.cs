@@ -7,10 +7,6 @@ namespace Arango.Client.Protocol
         private string ApiUri { get { return "_api/document/"; } }
         private ArangoNode Node { get; set; }
 
-        /*internal RequestMethod RequestMethod { get; set; }
-        internal string Handle { get; set; }
-        internal string Revision { get; set; }*/
-
         internal Document(ArangoNode node)
         {
             Node = node;
@@ -28,6 +24,7 @@ namespace Arango.Client.Protocol
             }
 
             var responseData = Node.Process(requestData);
+
             var document = new ArangoDocument();
             document.ID = id;
             document.Data = responseData.Content;
