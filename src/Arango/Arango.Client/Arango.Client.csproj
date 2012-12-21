@@ -41,10 +41,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\ArangoCollection.cs" />
     <Compile Include="API\ArangoDatabase.cs" />
     <Compile Include="API\ArangoDocument.cs" />
     <Compile Include="API\ArangoException.cs" />
     <Compile Include="API\ArangoNode.cs" />
+    <Compile Include="Protocol\Collection.cs" />
     <Compile Include="Protocol\RequestData.cs" />
     <Compile Include="Protocol\RequestMethod.cs" />
     <Compile Include="Protocol\Document.cs" />

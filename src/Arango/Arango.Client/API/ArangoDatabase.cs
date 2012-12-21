@@ -16,6 +16,19 @@ namespace Arango.Client
             _node = ArangoClient.GetNode(alias);
         }
 
+        #region Collection
+
+        public ArangoCollection GetCollection(int id)
+        {
+            var collection = new Collection(_node);
+
+            return collection.Get(id);
+        }
+
+        #endregion
+
+        #region Document
+
         public ArangoDocument GetDocument(string id)
         {
             return GetDocument(id, "");
@@ -23,9 +36,11 @@ namespace Arango.Client
 
         public ArangoDocument GetDocument(string id, string revision)
         {
-            Document document = new Document(_node);
+            var document = new Document(_node);
 
             return document.Get(id, revision);
         }
+
+        #endregion
     }
 }
