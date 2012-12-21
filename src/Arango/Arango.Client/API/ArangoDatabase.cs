@@ -29,16 +29,16 @@ namespace Arango.Client
 
         #region Document
 
-        public ArangoDocument GetDocument(string id)
+        public ArangoDocument GetDocument(string handle)
         {
-            return GetDocument(id, "");
+            return GetDocument(handle, "");
         }
 
-        public ArangoDocument GetDocument(string id, string revision)
+        public ArangoDocument GetDocument(string handle, string revision)
         {
             var document = new Document(_node);
 
-            return document.Get(id, revision);
+            return document.Get(handle, revision);
         }
 
         #endregion

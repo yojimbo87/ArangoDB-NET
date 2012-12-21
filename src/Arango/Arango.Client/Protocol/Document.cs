@@ -12,10 +12,10 @@ namespace Arango.Client.Protocol
             Node = node;
         }
 
-        internal ArangoDocument Get(string id, string revision)
+        internal ArangoDocument Get(string handle, string revision)
         {
             var requestData = new RequestData();
-            requestData.RelativeUri = ApiUri + id;
+            requestData.RelativeUri = ApiUri + handle;
             requestData.Method = RequestMethod.GET.ToString();
 
             if (!string.IsNullOrEmpty(revision))
@@ -26,7 +26,7 @@ namespace Arango.Client.Protocol
             var responseData = Node.Process(requestData);
 
             var document = new ArangoDocument();
-            document.ID = id;
+            document.Handle = handle;
             document.Data = responseData.Content;
 
             switch (responseData.StatusCode)
