@@ -15,11 +15,11 @@ namespace Arango.Client.Protocol
 
         internal ArangoCollection Get(int id)
         {
-            var requestData = new RequestData();
-            requestData.RelativeUri = ApiUri + id;
-            requestData.Method = RequestMethod.GET.ToString();
+            var request = new Request();
+            request.RelativeUri = ApiUri + id;
+            request.Method = RequestMethod.GET.ToString();
 
-            var responseData = Node.Process(requestData);
+            var responseData = Node.Process(request);
 
             var collection = new ArangoCollection();
             collection.ID = id;

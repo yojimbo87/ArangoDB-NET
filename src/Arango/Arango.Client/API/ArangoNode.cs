@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using ServiceStack.Text;
 using Arango.Client.Protocol;
 
 namespace Arango.Client
@@ -42,43 +44,44 @@ namespace Arango.Client
             Credentials.Add(BaseUri, "Basic", new NetworkCredential(userName, password));
         }
 
-        internal ResponseData Process(RequestData requestData)
+        internal Response Process(Request request)
         {
-            var request = (HttpWebRequest)HttpWebRequest.Create(BaseUri + requestData.RelativeUri);
-            request.KeepAlive = true;
-            request.Method = requestData.Method;
-            request.UserAgent = _userAgent;
-            request.Credentials = Credentials;
+            var httpRequest = (HttpWebRequest)HttpWebRequest.Create(BaseUri + request.RelativeUri);
+            httpRequest.KeepAlive = true;
+            httpRequest.Method = request.Method;
+            httpRequest.UserAgent = _userAgent;
+            httpRequest.Credentials = Credentials;
 
-            if ((requestData.Headers.Count > 0))
+            if ((request.Headers.Count > 0))
             {
-                request.Headers = requestData.Headers;
+                httpRequest.Headers = request.Headers;
             }
 
             /*Stream stream1 = request.GetRequestStream();
             stream1.Write(data, 0, data.Length);
             stream1.Close();*/
 
-            var responseData = new ResponseData();
+            var response = new Response();
 
             try
             {
-                var response = (HttpWebResponse)request.GetResponse();
-                var reader = new StreamReader(response.GetResponseStream());
+                var httpResponse = (HttpWebResponse)httpRequest.GetResponse();
+                var reader = new StreamReader(httpResponse.GetResponseStream());
 
-                responseData.StatusCode = response.StatusCode;
-                responseData.Headers = response.Headers;
-                responseData.Content = reader.ReadToEnd();
+                response.StatusCode = httpResponse.StatusCode;
+                response.Headers = httpResponse.Headers;
+                response.Content = reader.ReadToEnd();
+                response.Data = new JsonParser().Deserialize(response.Content);
             }
             catch (WebException webException)
             {
-                var response = (HttpWebResponse)webException.Response;
-                var reader = new StreamReader(response.GetResponseStream());
+                var httpResponse = (HttpWebResponse)webException.Response;
+                var reader = new StreamReader(httpResponse.GetResponseStream());
 
-                if (response.StatusCode != HttpStatusCode.NotModified)
+                if (httpResponse.StatusCode != HttpStatusCode.NotModified)
                 {
                     throw new ArangoException(
-                        response.StatusCode,
+                        httpResponse.StatusCode,
                         reader.ReadToEnd(),
                         webException.Message,
                         webException.InnerException
@@ -86,13 +89,14 @@ namespace Arango.Client
                 }
                 else
                 {
-                    responseData.StatusCode = response.StatusCode;
-                    responseData.Headers = response.Headers;
-                    responseData.Content = reader.ReadToEnd();
+                    response.StatusCode = httpResponse.StatusCode;
+                    response.Headers = httpResponse.Headers;
+                    response.Content = reader.ReadToEnd();
+                    response.Data = new JsonParser().Deserialize(response.Content);
                 }
             }
 
-            return responseData;
+            return response;
         }
     }
 }

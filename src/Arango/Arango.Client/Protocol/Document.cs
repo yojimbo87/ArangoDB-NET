@@ -14,16 +14,16 @@ namespace Arango.Client.Protocol
 
         internal ArangoDocument Get(string handle, string revision)
         {
-            var requestData = new RequestData();
-            requestData.RelativeUri = ApiUri + handle;
-            requestData.Method = RequestMethod.GET.ToString();
+            var request = new Request();
+            request.RelativeUri = ApiUri + handle;
+            request.Method = RequestMethod.GET.ToString();
 
             if (!string.IsNullOrEmpty(revision))
             {
-                requestData.Headers.Add("If-None-Match", "\"" + revision + "\"");
+                request.Headers.Add("If-None-Match", "\"" + revision + "\"");
             }
 
-            var responseData = Node.Process(requestData);
+            var responseData = Node.Process(request);
 
             var document = new ArangoDocument();
             document.Handle = handle;
