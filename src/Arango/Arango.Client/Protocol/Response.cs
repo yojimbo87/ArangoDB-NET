@@ -7,12 +7,12 @@ namespace Arango.Client.Protocol
     {
         internal HttpStatusCode StatusCode { get; set; }
         internal WebHeaderCollection Headers { get; set; }
-        internal string Content { get; set; }
-        internal dynamic Data { get; set; }
+        internal string Json { get; set; }
+        internal dynamic Object { get; set; }
 
         internal Response()
         {
-            Data = new ExpandoObject();
+            Object = new ExpandoObject();
         }
     }
 }

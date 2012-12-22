@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using ServiceStack.Text;
 using Arango.Client.Protocol;
 
 namespace Arango.Client
@@ -70,8 +69,8 @@ namespace Arango.Client
 
                 response.StatusCode = httpResponse.StatusCode;
                 response.Headers = httpResponse.Headers;
-                response.Content = reader.ReadToEnd();
-                response.Data = new JsonParser().Deserialize(response.Content);
+                response.Json = reader.ReadToEnd();
+                response.Object = new JsonParser().Deserialize(response.Json);
             }
             catch (WebException webException)
             {
@@ -91,8 +90,8 @@ namespace Arango.Client
                 {
                     response.StatusCode = httpResponse.StatusCode;
                     response.Headers = httpResponse.Headers;
-                    response.Content = reader.ReadToEnd();
-                    response.Data = new JsonParser().Deserialize(response.Content);
+                    response.Json = reader.ReadToEnd();
+                    response.Object = new JsonParser().Deserialize(response.Json);
                 }
             }
 

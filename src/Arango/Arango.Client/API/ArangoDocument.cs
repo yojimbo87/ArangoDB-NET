@@ -8,12 +8,12 @@ namespace Arango.Client
     {
         public string Handle { get; set; }
         public string Revision { get; set; }
-        public string Data { get; set; }
-        public dynamic Json { get; set; }
+        public string Json { get; set; }
+        public dynamic Object { get; set; }
 
         public ArangoDocument()
         {
-            Json = new ExpandoObject();
+            Object = new ExpandoObject();
         }
 
         public bool Has(string fieldName)
@@ -22,7 +22,7 @@ namespace Arango.Client
             {
                 var fields = fieldName.Split('.');
                 var iteration = 1;
-                var json = (IDictionary<string, object>)Json;
+                var json = (IDictionary<string, object>)Object;
 
                 foreach (var field in fields)
                 {
@@ -44,7 +44,7 @@ namespace Arango.Client
             }
             else
             {
-                return ((IDictionary<string, object>)Json).ContainsKey(fieldName);
+                return ((IDictionary<string, object>)Object).ContainsKey(fieldName);
             }
 
             return false;
