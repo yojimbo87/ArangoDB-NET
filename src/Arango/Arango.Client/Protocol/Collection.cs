@@ -19,15 +19,17 @@ namespace Arango.Client.Protocol
             request.RelativeUri = ApiUri + id;
             request.Method = RequestMethod.GET.ToString();
 
-            var responseData = Node.Process(request);
+            var response = Node.Process(request);
 
             var collection = new ArangoCollection();
-            collection.ID = id;
 
-            switch (responseData.StatusCode)
+            switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    collection.Name = responseData.Content;
+                    collection.ID = (int)response.Object.id;
+                    collection.Name = response.Object.name;
+                    collection.Status = (ArangoCollectionStatus)response.Object.status;
+                    collection.Type = (ArangoCollectionType)response.Object.type;
                     break;
                 default:
                     break;

@@ -23,19 +23,20 @@ namespace Arango.Client.Protocol
                 request.Headers.Add("If-None-Match", "\"" + revision + "\"");
             }
 
-            var responseData = Node.Process(request);
+            var response = Node.Process(request);
 
             var document = new ArangoDocument();
             document.Handle = handle;
-            document.Data = responseData.Content;
+            document.Json = response.Json;
+            document.Object = new JsonParser().Deserialize(document.Json);
 
-            switch (responseData.StatusCode)
+            switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    document.Revision = responseData.Headers.Get("etag");
+                    document.Revision = response.Headers.Get("etag");
                     break;
                 case HttpStatusCode.NotModified:
-                    document.Revision = responseData.Headers.Get("etag");
+                    document.Revision = response.Headers.Get("etag");
                     break;
                 default:
                     break;
