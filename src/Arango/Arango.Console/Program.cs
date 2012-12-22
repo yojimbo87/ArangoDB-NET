@@ -27,8 +27,9 @@ namespace Arango.Console
             ArangoDocument document = database.GetDocument("10843274/12481674", "x12481674");
             System.Console.WriteLine("Handle: {0}, Rev: {1}, Json: {2}", document.Handle, document.Revision, document.Json);
 
-            ArangoCollection collection = database.GetCollection(10843274);
-            System.Console.WriteLine("ID: {0}, Name: {1}, Status: {2}, Type: {3}", collection.ID, collection.Name, collection.Status, collection.Type);
+            //ArangoCollection collection = database.GetCollection(10843274);
+            ArangoCollection collection = database.GetCollection("Users");
+            System.Console.WriteLine("ID: {0}, Name: {1}, Status: {2}, Type: {3}, WaitForSync: {4}, JournalSize: {5}", collection.ID, collection.Name, collection.Status, collection.Type, collection.WaitForSync, collection.JournalSize);
 
             /*ArangoDocument doc = new ArangoDocument();
             doc.Json.foo = "abc";

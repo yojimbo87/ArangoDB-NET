@@ -16,7 +16,7 @@ namespace Arango.Client.Protocol
         internal ArangoCollection Get(int id)
         {
             var request = new Request();
-            request.RelativeUri = ApiUri + id;
+            request.RelativeUri = ApiUri + id + "/properties";
             request.Method = RequestMethod.GET.ToString();
 
             var response = Node.Process(request);
@@ -28,6 +28,36 @@ namespace Arango.Client.Protocol
                 case HttpStatusCode.OK:
                     collection.ID = (int)response.Object.id;
                     collection.Name = response.Object.name;
+                    collection.WaitForSync = response.Object.waitForSync;
+                    collection.JournalSize = (long)response.Object.journalSize;
+                    collection.Status = (ArangoCollectionStatus)response.Object.status;
+                    collection.Type = (ArangoCollectionType)response.Object.type;
+                    break;
+                default:
+                    break;
+            }
+
+            return collection;
+        }
+
+        // returns only ID, Name, Status and Type
+        internal ArangoCollection Get(string collectionName)
+        {
+            var request = new Request();
+            request.RelativeUri = ApiUri + collectionName + "/properties";
+            request.Method = RequestMethod.GET.ToString();
+
+            var response = Node.Process(request);
+
+            var collection = new ArangoCollection();
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    collection.ID = (int)response.Object.id;
+                    collection.Name = response.Object.name;
+                    collection.WaitForSync = response.Object.waitForSync;
+                    collection.JournalSize = (long)response.Object.journalSize;
                     collection.Status = (ArangoCollectionStatus)response.Object.status;
                     collection.Type = (ArangoCollectionType)response.Object.type;
                     break;

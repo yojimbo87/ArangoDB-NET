@@ -25,6 +25,13 @@ namespace Arango.Client
             return collection.Get(id);
         }
 
+        public ArangoCollection GetCollection(string collectionName)
+        {
+            var collection = new Collection(_node);
+
+            return collection.Get(collectionName);
+        }
+
         #endregion
 
         #region Document
