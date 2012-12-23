@@ -42,6 +42,14 @@ namespace Arango.Console
             System.Console.WriteLine("non: {0}", doc.Has("non"));
             System.Console.WriteLine("non.exist: {0}", doc.Has("non.exist"));*/
 
+            JsonParser parser = new JsonParser();
+            
+            dynamic expando = new ExpandoObject();
+            expando.foo = "foo";
+            expando.fooNum = 123;
+
+            System.Console.WriteLine(parser.Serialize(expando));
+
             System.Console.ReadLine();
         }
     }

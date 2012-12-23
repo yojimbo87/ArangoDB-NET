@@ -1,14 +1,17 @@
 ﻿// http://dotnet.uni.lodz.pl/whut/post/2010/02/19/JSON-parser-using-ExpandoObject.aspx
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Globalization;
 using System.Text;
 
-namespace Arango.Client.Protocol
+namespace Arango.Client
 {
-    internal class JsonParser
+    public class JsonParser
     {
+        #region Properties and variables
+
         private static readonly char[] whitespace = new char[] { ' ', '\t', '\n', '\r' };
         private const char BeginObject = '{';
         private const char EndObject = '}';
@@ -37,6 +40,157 @@ namespace Arango.Client.Protocol
             }
         }
 
+        #endregion
+
+        #region Serializer
+
+        public string Serialize(ExpandoObject expando)
+        {
+            StringBuilder json = new StringBuilder();
+
+            json.Append(SerializeObject(expando));
+
+            return json.ToString();
+        }
+
+        private string SerializeObject(IDictionary<string, object> dictionary)
+        {
+            StringBuilder json = new StringBuilder();
+            json.Append("{");
+
+            int index = 0;
+
+            foreach (var property in dictionary)
+            {
+                json.Append("\"" + property.Key + "\":");
+
+                Type valueType = property.Value.GetType();
+
+                switch (Type.GetTypeCode(valueType))
+                {
+                    // null
+                    case TypeCode.Empty:
+                        json.Append("null");
+                        break;
+                    // bool
+                    case TypeCode.Boolean:
+                        json.Append((bool)property.Value == true ? "true" : "false");
+                        break;
+                    // number
+                    case TypeCode.Byte:
+                    case TypeCode.Decimal:
+                    case TypeCode.Double:
+                    case TypeCode.Int16:
+                    case TypeCode.Int32:
+                    case TypeCode.Int64:
+                    case TypeCode.SByte:
+                    case TypeCode.Single:
+                    case TypeCode.UInt16:
+                    case TypeCode.UInt32:
+                    case TypeCode.UInt64:
+                        json.Append(property.Value);
+                        break;
+                    case TypeCode.Char:
+                    case TypeCode.String:
+                        json.Append("\"" + property.Value + "\"");
+                        break;
+                    case TypeCode.Object:
+                        if ((valueType.IsArray) || (valueType.IsGenericType))
+                        {
+                            json.Append(SerializeArray(property.Value));
+                        }
+                        else if (valueType.IsClass)
+                        {
+                            json.Append(SerializeObject((IDictionary<string, object>)property.Value));
+                        }
+                        break;
+                    default:
+                        json.Append(SerializeValue(property.Value, valueType));
+                        break;
+                }
+
+                index++;
+
+                if (index != dictionary.Count)
+                {
+                    json.Append(",");
+                }
+            }
+
+            json.Append("}");
+
+            return json.ToString();
+        }
+
+        private string SerializeValue(object value, Type type)
+        {
+            StringBuilder json = new StringBuilder();
+
+            switch (Type.GetTypeCode(type))
+            {
+                // null
+                case TypeCode.Empty:
+                    json.Append("null");
+                    break;
+                // bool
+                case TypeCode.Boolean:
+                    json.Append((bool)value == true ? "true" : "false");
+                    break;
+                // number
+                case TypeCode.Byte:
+                case TypeCode.Decimal:
+                case TypeCode.Double:
+                case TypeCode.Int16:
+                case TypeCode.Int32:
+                case TypeCode.Int64:
+                case TypeCode.SByte:
+                case TypeCode.Single:
+                case TypeCode.UInt16:
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                    json.Append(value);
+                    break;
+                // string
+                case TypeCode.Char:
+                case TypeCode.String:
+                    json.Append("\"" + value + "\"");
+                    break;
+                // everything else will be null to produce valid json string
+                default:
+                    json.Append("null");
+                    break;
+            }
+
+            return json.ToString();
+        }
+
+        private string SerializeArray(object array)
+        {
+            StringBuilder json = new StringBuilder();
+            json.Append("[");
+
+            IEnumerable collection = (IEnumerable)array;
+
+            foreach (object value in collection)
+            {
+                json.Append(SerializeValue(value, value.GetType()) + ",");
+            }
+
+            // remove last comma from currently parsed collection
+            if (json[json.Length - 1] == ',')
+            {
+                json.Remove(json.Length - 1, 1);
+            }
+
+            json.Append("]");
+
+            return json.ToString();
+        }
+
+        #endregion
+
+        #region Deserializer
+
         // Parse    ->  Object | Array
         /// <summary>
         /// Parse input as JSON. JSON array is converted to IList&lt;&gt;, JSON number to double.
@@ -46,7 +200,7 @@ namespace Arango.Client.Protocol
         /// </remarks>
         /// <param name="input">Valid JSON input.</param>
         /// <returns>ExpandObject filled with JSON data.</returns>
-        internal dynamic Deserialize(string input)
+        public dynamic Deserialize(string input)
         {
             this.input = input.ToCharArray();
             this.TrimWhiteSpace();
@@ -415,5 +569,7 @@ namespace Arango.Client.Protocol
                 this.NextChar();
             }
         }
+
+        #endregion
     }
 }
