@@ -7,6 +7,7 @@ namespace Arango.Client.Protocol
         internal string RelativeUri { get; set; }
         internal string Method { get; set; }
         internal WebHeaderCollection Headers { get; set; }
+        internal string Body { get; set; }
 
         internal Request()
         {
