@@ -18,6 +18,13 @@ namespace Arango.Client
 
         #region Collection
 
+        public ArangoCollection CreateCollection(string name, ArangoCollectionType type, bool waitForSync, long journalSize)
+        {
+            var collection = new Collection(_node);
+
+            return collection.Post(name, type, waitForSync, journalSize);
+        }
+
         public ArangoCollection GetCollection(int id)
         {
             var collection = new Collection(_node);

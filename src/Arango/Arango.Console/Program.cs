@@ -24,12 +24,12 @@ namespace Arango.Console
 
             ArangoDatabase database = new ArangoDatabase(alias);
 
-            ArangoDocument document = database.GetDocument("10843274/12481674", "x12481674");
-            System.Console.WriteLine("Handle: {0}, Rev: {1}, Json: {2}", document.Handle, document.Revision, document.Json);
+            //ArangoDocument document = database.GetDocument("10843274/12481674", "x12481674");
+            //System.Console.WriteLine("Handle: {0}, Rev: {1}, Json: {2}", document.Handle, document.Revision, document.JsonObject);
 
             //ArangoCollection collection = database.GetCollection(10843274);
-            ArangoCollection collection = database.GetCollection("Users");
-            System.Console.WriteLine("ID: {0}, Name: {1}, Status: {2}, Type: {3}, WaitForSync: {4}, JournalSize: {5}", collection.ID, collection.Name, collection.Status, collection.Type, collection.WaitForSync, collection.JournalSize);
+            //ArangoCollection collection = database.GetCollection("Users");
+            //System.Console.WriteLine("ID: {0}, Name: {1}, Status: {2}, Type: {3}, WaitForSync: {4}, JournalSize: {5}", collection.ID, collection.Name, collection.Status, collection.Type, collection.WaitForSync, collection.JournalSize);
 
             /*ArangoDocument doc = new ArangoDocument();
             doc.Json.foo = "abc";
@@ -42,13 +42,9 @@ namespace Arango.Console
             System.Console.WriteLine("non: {0}", doc.Has("non"));
             System.Console.WriteLine("non.exist: {0}", doc.Has("non.exist"));*/
 
-            JsonParser parser = new JsonParser();
-            
-            dynamic expando = new ExpandoObject();
-            expando.foo = "foo";
-            expando.fooNum = 123;
+            ArangoCollection collection = database.CreateCollection("tempTestCollection", ArangoCollectionType.Document, false, 1024 * 1024);
 
-            System.Console.WriteLine(parser.Serialize(expando));
+            System.Console.WriteLine(collection.Name);
 
             System.Console.ReadLine();
         }
