@@ -38,7 +38,7 @@ namespace Arango.Client.Protocol
                     collection.ID = (long)response.JsonObject.id;
                     collection.Name = response.JsonObject.name;
                     collection.WaitForSync = response.JsonObject.waitForSync;
-                    //collection.JournalSize = (long)response.JsonObject.journalSize;
+                    collection.JournalSize = journalSize;
                     collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
                     collection.Type = (ArangoCollectionType)response.JsonObject.type;
                     break;
