@@ -46,6 +46,10 @@ namespace Arango.Console
 
             System.Console.WriteLine(collection.Name);
 
+            bool delete = database.DeleteCollection(collection.ID);
+
+            System.Console.WriteLine(delete);
+
             System.Console.ReadLine();
         }
     }

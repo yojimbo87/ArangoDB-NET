@@ -14,6 +14,8 @@ namespace Arango.Client.Protocol
             _node = node;
         }
 
+        #region POST (create collection methods)
+
         internal ArangoCollection Post(string name, ArangoCollectionType type, bool waitForSync, long journalSize)
         {
             dynamic bodyObject = new ExpandoObject();
@@ -48,6 +50,44 @@ namespace Arango.Client.Protocol
 
             return collection;
         }
+
+        #endregion
+
+        #region DELETE (delete collection methods)
+
+        internal bool Delete(long id)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + id;
+            request.Method = RequestMethod.DELETE.ToString();
+
+            var response = _node.Process(request);
+
+            var isDeleted = false;
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    if ((response.JsonObject.error == false) && (response.JsonObject.id == id))
+                    {
+                        isDeleted = true;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return isDeleted;
+        }
+
+        /*internal bool Delete(string name)
+        {
+
+        }*/
+
+        #endregion
+
+        #region GET (read collection methods)
 
         internal ArangoCollection Get(int id)
         {
@@ -103,5 +143,7 @@ namespace Arango.Client.Protocol
 
             return collection;
         }
+
+        #endregion
     }
 }
