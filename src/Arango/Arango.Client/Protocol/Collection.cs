@@ -55,7 +55,7 @@ namespace Arango.Client.Protocol
 
         #region DELETE (delete collection methods)
 
-        internal bool Delete(long id)
+        internal long Delete(long id)
         {
             var request = new Request();
             request.RelativeUri = _apiUri + id;
@@ -64,7 +64,7 @@ namespace Arango.Client.Protocol
             return Delete(request);
         }
 
-        internal bool Delete(string name)
+        internal long Delete(string name)
         {
             var request = new Request();
             request.RelativeUri = _apiUri + name;
@@ -73,25 +73,25 @@ namespace Arango.Client.Protocol
             return Delete(request);
         }
 
-        private bool Delete(Request request)
+        private long Delete(Request request)
         {
             var response = _node.Process(request);
 
-            var isDeleted = false;
+            long collectionID = 0;
 
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
                     if (response.JsonObject.error == false)
                     {
-                        isDeleted = true;
+                        collectionID = (long)response.JsonObject.id;
                     }
                     break;
                 default:
                     break;
             }
 
-            return isDeleted;
+            return collectionID;
         }
 
         #endregion

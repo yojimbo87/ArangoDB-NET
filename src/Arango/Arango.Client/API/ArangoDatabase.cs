@@ -25,14 +25,14 @@ namespace Arango.Client
             return collection.Post(name, type, waitForSync, journalSize);
         }
 
-        public bool DeleteCollection(long id)
+        public long DeleteCollection(long id)
         {
             var collection = new Collection(_node);
 
             return collection.Delete(id);
         }
 
-        public bool DeleteCollection(string name)
+        public long DeleteCollection(string name)
         {
             var collection = new Collection(_node);
 

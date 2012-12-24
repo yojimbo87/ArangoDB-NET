@@ -42,14 +42,6 @@ namespace Arango.Console
             System.Console.WriteLine("non: {0}", doc.Has("non"));
             System.Console.WriteLine("non.exist: {0}", doc.Has("non.exist"));*/
 
-            ArangoCollection collection = database.CreateCollection("tempTestCollection", ArangoCollectionType.Document, false, 1024 * 1024);
-
-            System.Console.WriteLine(collection.Name);
-
-            bool delete = database.DeleteCollection(collection.ID);
-
-            System.Console.WriteLine(delete);
-
             System.Console.ReadLine();
         }
     }

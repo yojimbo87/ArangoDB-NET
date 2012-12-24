@@ -43,9 +43,9 @@ namespace Arango.Test
             Assert.AreEqual(testCollection.WaitForSync, newCollection.WaitForSync);
             Assert.AreEqual(testCollection.JournalSize, newCollection.JournalSize);
 
-            bool isDeleted = _database.DeleteCollection(newCollection.ID);
+            long deletedCollectionID = _database.DeleteCollection(newCollection.ID);
 
-            Assert.IsTrue(isDeleted);
+            Assert.AreEqual(newCollection.ID, deletedCollectionID);
         }
 
         [TestMethod]
@@ -64,9 +64,9 @@ namespace Arango.Test
             Assert.AreEqual(testCollection.WaitForSync, newCollection.WaitForSync);
             Assert.AreEqual(testCollection.JournalSize, newCollection.JournalSize);
 
-            bool isDeleted = _database.DeleteCollection(newCollection.Name);
+            long deletedCollectionID = _database.DeleteCollection(newCollection.Name);
 
-            Assert.IsTrue(isDeleted);
+            Assert.AreEqual(newCollection.ID, deletedCollectionID);
         }
     }
 }
