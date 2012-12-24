@@ -61,6 +61,20 @@ namespace Arango.Client.Protocol
             request.RelativeUri = _apiUri + id;
             request.Method = RequestMethod.DELETE.ToString();
 
+            return Delete(request);
+        }
+
+        internal bool Delete(string name)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + name;
+            request.Method = RequestMethod.DELETE.ToString();
+
+            return Delete(request);
+        }
+
+        private bool Delete(Request request)
+        {
             var response = _node.Process(request);
 
             var isDeleted = false;
@@ -68,7 +82,7 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    if ((response.JsonObject.error == false) && (response.JsonObject.id == id))
+                    if (response.JsonObject.error == false)
                     {
                         isDeleted = true;
                     }
@@ -79,11 +93,6 @@ namespace Arango.Client.Protocol
 
             return isDeleted;
         }
-
-        /*internal bool Delete(string name)
-        {
-
-        }*/
 
         #endregion
 

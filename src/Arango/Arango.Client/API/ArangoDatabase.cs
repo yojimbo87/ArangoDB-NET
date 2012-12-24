@@ -32,6 +32,13 @@ namespace Arango.Client
             return collection.Delete(id);
         }
 
+        public bool DeleteCollection(string name)
+        {
+            var collection = new Collection(_node);
+
+            return collection.Delete(name);
+        }
+
         public ArangoCollection GetCollection(int id)
         {
             var collection = new Collection(_node);
