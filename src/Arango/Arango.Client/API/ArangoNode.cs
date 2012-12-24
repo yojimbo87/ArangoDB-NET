@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using Arango.Client.Protocol;
 
 namespace Arango.Client
@@ -45,6 +46,7 @@ namespace Arango.Client
 
         internal Response Process(Request request)
         {
+            var parser = new JsonParser();
             var httpRequest = (HttpWebRequest)HttpWebRequest.Create(BaseUri + request.RelativeUri);
             httpRequest.KeepAlive = true;
             httpRequest.Method = request.Method;
@@ -56,9 +58,14 @@ namespace Arango.Client
                 httpRequest.Headers = request.Headers;
             }
 
-            /*Stream stream1 = request.GetRequestStream();
-            stream1.Write(data, 0, data.Length);
-            stream1.Close();*/
+            if (!string.IsNullOrEmpty(request.Body))
+            {
+                byte[] data = Encoding.UTF8.GetBytes(request.Body);
+
+                Stream stream = httpRequest.GetRequestStream();
+                stream.Write(data, 0, data.Length);
+                stream.Close();
+            }
 
             var response = new Response();
 
@@ -69,8 +76,8 @@ namespace Arango.Client
 
                 response.StatusCode = httpResponse.StatusCode;
                 response.Headers = httpResponse.Headers;
-                response.Json = reader.ReadToEnd();
-                response.Object = new JsonParser().Deserialize(response.Json);
+                response.JsonString = reader.ReadToEnd();
+                response.JsonObject = parser.Deserialize(response.JsonString);
             }
             catch (WebException webException)
             {
@@ -90,8 +97,8 @@ namespace Arango.Client
                 {
                     response.StatusCode = httpResponse.StatusCode;
                     response.Headers = httpResponse.Headers;
-                    response.Json = reader.ReadToEnd();
-                    response.Object = new JsonParser().Deserialize(response.Json);
+                    response.JsonString = reader.ReadToEnd();
+                    response.JsonObject = parser.Deserialize(response.JsonString);
                 }
             }
 
