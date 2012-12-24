@@ -86,9 +86,12 @@ namespace Arango.Client
 
                 if (httpResponse.StatusCode != HttpStatusCode.NotModified)
                 {
+                    dynamic jsonObject = parser.Deserialize(reader.ReadToEnd());
+                    string errorMessage = string.Format("ArangoDB responded with error code {0}:\n{1} [error number {2}]", jsonObject.code, jsonObject.errorMessage, jsonObject.errorNum);
+
                     throw new ArangoException(
                         httpResponse.StatusCode,
-                        reader.ReadToEnd(),
+                        errorMessage,
                         webException.Message,
                         webException.InnerException
                     );
