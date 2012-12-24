@@ -7,7 +7,7 @@ using Arango.Client;
 namespace Arango.Test
 {
     [TestClass]
-    public class JsonParsingTest
+    public class JsonParsingTests
     {
         private JsonParser _parser = new JsonParser();
 
