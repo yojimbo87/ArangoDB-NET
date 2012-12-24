@@ -27,8 +27,7 @@ namespace Arango.Client.Protocol
 
             var document = new ArangoDocument();
             document.Handle = handle;
-            document.Json = response.Json;
-            document.Object = new JsonParser().Deserialize(document.Json);
+            document.JsonObject = new JsonParser().Deserialize(response.JsonString);
 
             switch (response.StatusCode)
             {
