@@ -13,7 +13,111 @@ namespace Arango.Test
 
         #region Serialization
 
+        [TestMethod]
+        public void SerializeEmptyObject()
+        {
+            dynamic expando = new ExpandoObject();
 
+            string json = _parser.Serialize(expando);
+            Assert.AreEqual(json, "{}");
+        }
+
+        [TestMethod]
+        public void SerializeObjectOneMember()
+        {
+            dynamic expando = new ExpandoObject();
+            expando.Foo = 123;
+
+            string json = _parser.Serialize(expando);
+            Assert.AreEqual(json, "{\"Foo\":123}");
+        }
+
+        [TestMethod]
+        public void SerializeObjectStringMembers()
+        {
+            dynamic expando = new ExpandoObject();
+            expando.Foo = "foo";
+            expando._bar = "bar";
+
+            string json = _parser.Serialize(expando);
+            Assert.AreEqual(json, "{\"Foo\":\"foo\",\"_bar\":\"bar\"}");
+        }
+
+        [TestMethod]
+        public void SerializeObjectNumberMembers()
+        {
+            dynamic expando = new ExpandoObject();
+            expando.Foo = 123;
+            expando._bar = 456;
+
+            string json = _parser.Serialize(expando);
+            Assert.AreEqual(json, "{\"Foo\":123,\"_bar\":456}");
+        }
+
+        [TestMethod]
+        public void SerializeObjectArrayMembers()
+        {
+            dynamic expando = new ExpandoObject();
+            expando.Foo = new List<string> { "foo1", "foo2" };
+            expando._bar = new List<string> { "bar1" };
+
+            string json = _parser.Serialize(expando);
+            Assert.AreEqual(json, "{\"Foo\":[\"foo1\",\"foo2\"],\"_bar\":[\"bar1\"]}");
+        }
+
+        [TestMethod]
+        public void SerializeObjectInObject()
+        {
+            dynamic expando = new ExpandoObject();
+            expando.Foo = new ExpandoObject();
+            expando.Foo._bar = 123;
+
+            string json = _parser.Serialize(expando);
+            Assert.AreEqual(json, "{\"Foo\":{\"_bar\":123}}");
+        }
+
+        [TestMethod]
+        public void SerializeSpecialWords()
+        {
+            dynamic expando = new ExpandoObject();
+            expando.Foo = true;
+            expando._bar = false;
+            expando.fooBar = null;
+
+            string json = _parser.Serialize(expando);
+            Assert.AreEqual(json, "{\"Foo\":true,\"_bar\":false,\"fooBar\":null}");
+        }
+
+        [TestMethod]
+        public void SerializeNumbersCheck()
+        {
+            dynamic expando = new ExpandoObject();
+            expando.n1 = 123;
+            expando.n2 = -123;
+            expando.n3 = 123.5;
+            expando.n4 = -123.5;
+
+            string json = _parser.Serialize(expando);
+            Assert.AreEqual(json, "{\"n1\":123,\"n2\":-123,\"n3\":123.5,\"n4\":-123.5}");
+        }
+
+        [TestMethod]
+        public void SerializeRfc4627ExampleCheck()
+        {
+            dynamic expando = new ExpandoObject();
+            expando.Image = new ExpandoObject();
+            expando.Image.Width = 800;
+            expando.Image.Height = 600;
+            expando.Image.Title = "View from 15th Floor";
+            expando.Image.Thumbnail = new ExpandoObject();
+            expando.Image.Thumbnail.Url = "http://www.example.com/image/481989943";
+            expando.Image.Thumbnail.Width = 100;
+            expando.Image.Thumbnail.Height = 125;
+            expando.Image.IDs = new List<int> { 116, 943, 234, 38793 };
+
+            string json = _parser.Serialize(expando);
+            Assert.AreEqual(json, "{\"Image\":{\"Width\":800,\"Height\":600,\"Title\":\"View from 15th Floor\",\"Thumbnail\":{\"Url\":\"http://www.example.com/image/481989943\",\"Width\":100,\"Height\":125},\"IDs\":[116,943,234,38793]}}");
+        }
 
         #endregion
 
@@ -83,18 +187,6 @@ namespace Arango.Test
         {
             dynamic result = _parser.Deserialize("[123, \"Foo\", \"Bar\", 321]");
             CollectionAssert.AreEqual(new List<dynamic> { 123d, "Foo", "Bar", 321d }, result);
-        }
-
-        [TestMethod]
-        public void DeserializeObjectEmptyName()
-        {
-            dynamic result = _parser.Deserialize("{\"\" : 123 }");
-        }
-
-        [TestMethod]
-        public void DeserializeObjectEmptyNameAndEmptyString()
-        {
-            dynamic result = _parser.Deserialize("{\"\": \"\"}");
         }
 
         [TestMethod]

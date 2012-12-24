@@ -64,49 +64,62 @@ namespace Arango.Client
             {
                 json.Append("\"" + property.Key + "\":");
 
-                Type valueType = property.Value.GetType();
-
-                switch (Type.GetTypeCode(valueType))
+                if (property.Value != null)
                 {
-                    // null
-                    case TypeCode.Empty:
-                        json.Append("null");
-                        break;
-                    // bool
-                    case TypeCode.Boolean:
-                        json.Append((bool)property.Value == true ? "true" : "false");
-                        break;
-                    // number
-                    case TypeCode.Byte:
-                    case TypeCode.Decimal:
-                    case TypeCode.Double:
-                    case TypeCode.Int16:
-                    case TypeCode.Int32:
-                    case TypeCode.Int64:
-                    case TypeCode.SByte:
-                    case TypeCode.Single:
-                    case TypeCode.UInt16:
-                    case TypeCode.UInt32:
-                    case TypeCode.UInt64:
-                        json.Append(property.Value);
-                        break;
-                    case TypeCode.Char:
-                    case TypeCode.String:
-                        json.Append("\"" + property.Value + "\"");
-                        break;
-                    case TypeCode.Object:
-                        if ((valueType.IsArray) || (valueType.IsGenericType))
-                        {
-                            json.Append(SerializeArray(property.Value));
-                        }
-                        else if (valueType.IsClass)
-                        {
-                            json.Append(SerializeObject((IDictionary<string, object>)property.Value));
-                        }
-                        break;
-                    default:
-                        json.Append(SerializeValue(property.Value, valueType));
-                        break;
+                    Type valueType = property.Value.GetType();
+
+                    switch (Type.GetTypeCode(valueType))
+                    {
+                        // null
+                        case TypeCode.Empty:
+                            json.Append("null");
+                            break;
+                        // bool
+                        case TypeCode.Boolean:
+                            json.Append((bool)property.Value == true ? "true" : "false");
+                            break;
+                        // number
+                        case TypeCode.Byte:
+                        case TypeCode.SByte:
+                        case TypeCode.Int16:
+                        case TypeCode.Int32:
+                        case TypeCode.Int64:
+                        case TypeCode.UInt16:
+                        case TypeCode.UInt32:
+                        case TypeCode.UInt64:
+                            json.Append(property.Value.ToString());
+                            break;
+                        case TypeCode.Single:
+                            json.Append(((float)property.Value).ToString(CultureInfo.InvariantCulture));
+                            break;
+                        case TypeCode.Double:
+                            json.Append(((double)property.Value).ToString(CultureInfo.InvariantCulture));
+                            break;
+                        case TypeCode.Decimal:
+                            json.Append(((decimal)property.Value).ToString(CultureInfo.InvariantCulture));
+                            break;
+                        case TypeCode.Char:
+                        case TypeCode.String:
+                            json.Append("\"" + property.Value + "\"");
+                            break;
+                        case TypeCode.Object:
+                            if ((valueType.IsArray) || (valueType.IsGenericType))
+                            {
+                                json.Append(SerializeArray(property.Value));
+                            }
+                            else if (valueType.IsClass)
+                            {
+                                json.Append(SerializeObject((IDictionary<string, object>)property.Value));
+                            }
+                            break;
+                        default:
+                            json.Append(SerializeValue(property.Value, valueType));
+                            break;
+                    }
+                }
+                else
+                {
+                    json.Append("null");
                 }
 
                 index++;
