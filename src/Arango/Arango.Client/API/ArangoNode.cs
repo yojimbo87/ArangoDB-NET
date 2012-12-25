@@ -66,6 +66,10 @@ namespace Arango.Client
                 stream.Write(data, 0, data.Length);
                 stream.Close();
             }
+            else
+            {
+                httpRequest.ContentLength = 0;
+            }
 
             var response = new Response();
 
