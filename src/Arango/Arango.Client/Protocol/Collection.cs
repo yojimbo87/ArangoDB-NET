@@ -14,7 +14,7 @@ namespace Arango.Client.Protocol
             _node = node;
         }
 
-        #region POST (create collection methods)
+        #region POST
 
         internal ArangoCollection Post(string name, ArangoCollectionType type, bool waitForSync, long journalSize)
         {
@@ -93,7 +93,7 @@ namespace Arango.Client.Protocol
 
         #endregion
 
-        #region DELETE (delete collection methods)
+        #region DELETE
 
         internal long Delete(long id)
         {
@@ -136,9 +136,60 @@ namespace Arango.Client.Protocol
 
         #endregion
 
-        #region GET (read collection methods)
+        #region GET
 
-        internal ArangoCollection Get(int id)
+        // returns collection id, name, status, type
+        #region Get
+
+        internal ArangoCollection Get(long id)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + id;
+            request.Method = RequestMethod.GET.ToString();
+
+            var response = _node.Process(request);
+
+            return Get(request);
+        }
+
+        internal ArangoCollection Get(string collectionName)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + collectionName;
+            request.Method = RequestMethod.GET.ToString();
+
+            var response = _node.Process(request);
+
+            return Get(request);
+        }
+
+        private ArangoCollection Get(Request request)
+        {
+            var response = _node.Process(request);
+
+            var collection = new ArangoCollection();
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    collection.ID = (long)response.JsonObject.id;
+                    collection.Name = response.JsonObject.name;
+                    collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
+                    collection.Type = (ArangoCollectionType)response.JsonObject.type;
+                    break;
+                default:
+                    break;
+            }
+
+            return collection;
+        }
+
+        #endregion
+
+        // returns collection id, name, status, type, waitForSync, journalSize
+        #region GetProperties
+
+        internal ArangoCollection GetProperties(long id)
         {
             var request = new Request();
             request.RelativeUri = _apiUri + id + "/properties";
@@ -146,32 +197,22 @@ namespace Arango.Client.Protocol
 
             var response = _node.Process(request);
 
-            var collection = new ArangoCollection();
-
-            switch (response.StatusCode)
-            {
-                case HttpStatusCode.OK:
-                    collection.ID = (long)response.JsonObject.id;
-                    collection.Name = response.JsonObject.name;
-                    collection.WaitForSync = response.JsonObject.waitForSync;
-                    collection.JournalSize = (long)response.JsonObject.journalSize;
-                    collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
-                    collection.Type = (ArangoCollectionType)response.JsonObject.type;
-                    break;
-                default:
-                    break;
-            }
-
-            return collection;
+            return GetProperties(request);
         }
 
-        // returns only ID, Name, Status and Type
-        internal ArangoCollection Get(string collectionName)
+        internal ArangoCollection GetProperties(string collectionName)
         {
             var request = new Request();
             request.RelativeUri = _apiUri + collectionName + "/properties";
             request.Method = RequestMethod.GET.ToString();
 
+            var response = _node.Process(request);
+
+            return GetProperties(request);
+        }
+
+        private ArangoCollection GetProperties(Request request)
+        {
             var response = _node.Process(request);
 
             var collection = new ArangoCollection();
@@ -192,6 +233,8 @@ namespace Arango.Client.Protocol
 
             return collection;
         }
+
+        #endregion
 
         #endregion
     }

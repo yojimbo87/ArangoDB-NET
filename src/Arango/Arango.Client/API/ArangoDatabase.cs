@@ -18,12 +18,18 @@ namespace Arango.Client
 
         #region Collection
 
+        #region Create
+
         public ArangoCollection CreateCollection(string name, ArangoCollectionType type, bool waitForSync, long journalSize)
         {
             var collection = new Collection(_node);
 
             return collection.Post(name, type, waitForSync, journalSize);
         }
+
+        #endregion
+
+        #region Delete
 
         public long DeleteCollection(long id)
         {
@@ -39,19 +45,41 @@ namespace Arango.Client
             return collection.Delete(name);
         }
 
-        public ArangoCollection GetCollection(int id)
+        #endregion
+
+        #region Get
+
+        public ArangoCollection GetCollection(long id)
         {
             var collection = new Collection(_node);
 
             return collection.Get(id);
         }
 
-        public ArangoCollection GetCollection(string collectionName)
+        public ArangoCollection GetCollection(string name)
         {
             var collection = new Collection(_node);
 
-            return collection.Get(collectionName);
+            return collection.Get(name);
         }
+
+        public ArangoCollection GetCollectionProperties(long id)
+        {
+            var collection = new Collection(_node);
+
+            return collection.GetProperties(id);
+        }
+
+        public ArangoCollection GetCollectionProperties(string name)
+        {
+            var collection = new Collection(_node);
+
+            return collection.GetProperties(name);
+        }
+
+        #endregion
+
+        #region Truncate
 
         public bool TruncateCollection(long id)
         {
@@ -66,6 +94,8 @@ namespace Arango.Client
 
             return collection.TruncateCollection(name);
         }
+
+        #endregion
 
         #endregion
 
