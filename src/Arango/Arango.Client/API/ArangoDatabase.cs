@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using Arango.Client.Protocol;
 
 namespace Arango.Client
@@ -103,6 +104,13 @@ namespace Arango.Client
             var collection = new Collection(_node);
 
             return collection.GetFigures(name);
+        }
+
+        public List<ArangoCollection> GetCollections()
+        {
+            var collection = new Collection(_node);
+
+            return collection.GetAll();
         }
 
         #endregion

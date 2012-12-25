@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Arango.Client;
 
@@ -313,6 +315,29 @@ namespace Arango.Test
             Assert.IsTrue(collection.DataFilesSize >= 0);
             Assert.IsTrue(collection.JournalsCount >= 0);
             Assert.IsTrue(collection.JournalsFileSize >= 0);
+
+            _database.DeleteCollection(newCollection.Name);
+        }
+
+        [TestMethod]
+        public void CreateCollectionAndGetAllAndDeleteIt()
+        {
+            ArangoCollection testCollection = new ArangoCollection();
+            testCollection.Name = "tempUnitTestCollectionToBeRead001xyz";
+            testCollection.Type = ArangoCollectionType.Document;
+            testCollection.WaitForSync = false;
+            testCollection.JournalSize = 1024 * 1024; // 1 MB
+
+            ArangoCollection newCollection = _database.CreateCollection(testCollection.Name, testCollection.Type, testCollection.WaitForSync, testCollection.JournalSize);
+
+            List<ArangoCollection> collections = _database.GetCollections();
+
+            Assert.IsTrue(collections.Count >= 1);
+
+            ArangoCollection collection = collections.Where(col => col.ID == newCollection.ID).FirstOrDefault();
+            Assert.AreEqual(collection.ID, newCollection.ID);
+            Assert.AreEqual(collection.Name, newCollection.Name);
+            Assert.AreEqual(collection.Status, newCollection.Status);
 
             _database.DeleteCollection(newCollection.Name);
         }

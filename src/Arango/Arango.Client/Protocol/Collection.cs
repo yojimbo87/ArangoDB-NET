@@ -1,4 +1,5 @@
 ﻿using System.Dynamic;
+using System.Collections.Generic;
 using System.Net;
 
 namespace Arango.Client.Protocol
@@ -330,6 +331,38 @@ namespace Arango.Client.Protocol
         }
 
         #endregion
+
+        // returns list of collections where each item consists of id, name, waitForSync, status
+        internal List<ArangoCollection> GetAll()
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri;
+            request.Method = RequestMethod.GET.ToString();
+
+            var response = _node.Process(request);
+
+            var collections = new List<ArangoCollection>();
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    foreach (var item in response.JsonObject.collections)
+                    {
+                        ArangoCollection collection = new ArangoCollection();
+                        collection.ID = (long)item.id;
+                        collection.Name = item.name;
+                        collection.Status = (ArangoCollectionStatus)item.status;
+                        collection.Type = (ArangoCollectionType)item.type;
+
+                        collections.Add(collection);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return collections;
+        }
 
         #endregion
     }
