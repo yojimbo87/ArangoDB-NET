@@ -9,5 +9,6 @@ namespace Arango.Client
         public long JournalSize { get; set; }
         public ArangoCollectionStatus Status { get; set; }
         public ArangoCollectionType Type { get; set; }
+        public long DocumentsCount { get; set; }
     }
 }

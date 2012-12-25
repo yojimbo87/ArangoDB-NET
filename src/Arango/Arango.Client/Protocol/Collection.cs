@@ -236,6 +236,57 @@ namespace Arango.Client.Protocol
 
         #endregion
 
+        // returns collection id, name, status, type, waitForSync, count
+        #region GetCount
+
+        internal ArangoCollection GetCount(long id)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + id + "/count";
+            request.Method = RequestMethod.GET.ToString();
+
+            var response = _node.Process(request);
+
+            return GetProperties(request);
+        }
+
+        internal ArangoCollection GetCount(string name)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + name + "/count";
+            request.Method = RequestMethod.GET.ToString();
+
+            var response = _node.Process(request);
+
+            return GetProperties(request);
+        }
+
+        private ArangoCollection GetCount(Request request)
+        {
+            var response = _node.Process(request);
+
+            var collection = new ArangoCollection();
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    collection.ID = (long)response.JsonObject.id;
+                    collection.Name = response.JsonObject.name;
+                    collection.WaitForSync = response.JsonObject.waitForSync;
+                    collection.JournalSize = (long)response.JsonObject.journalSize;
+                    collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
+                    collection.Type = (ArangoCollectionType)response.JsonObject.type;
+                    collection.DocumentsCount = (long)response.JsonObject.count;
+                    break;
+                default:
+                    break;
+            }
+
+            return collection;
+        }
+
+        #endregion
+
         #endregion
     }
 }

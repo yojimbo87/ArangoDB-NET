@@ -77,6 +77,20 @@ namespace Arango.Client
             return collection.GetProperties(name);
         }
 
+        public ArangoCollection GetCollectionCount(long id)
+        {
+            var collection = new Collection(_node);
+
+            return collection.GetCount(id);
+        }
+
+        public ArangoCollection GetCollectionCount(string name)
+        {
+            var collection = new Collection(_node);
+
+            return collection.GetCount(name);
+        }
+
         #endregion
 
         #region Truncate

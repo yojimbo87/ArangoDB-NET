@@ -203,6 +203,54 @@ namespace Arango.Test
             _database.DeleteCollection(newCollection.Name);
         }
 
+        [TestMethod]
+        public void CreateCollectionAndGetCountByIdAndDeleteIt()
+        {
+            ArangoCollection testCollection = new ArangoCollection();
+            testCollection.Name = "tempUnitTestCollectionToBeRead001xyz";
+            testCollection.Type = ArangoCollectionType.Document;
+            testCollection.WaitForSync = false;
+            testCollection.JournalSize = 1024 * 1024; // 1 MB
+
+            ArangoCollection newCollection = _database.CreateCollection(testCollection.Name, testCollection.Type, testCollection.WaitForSync, testCollection.JournalSize);
+
+            ArangoCollection collection = _database.GetCollectionCount(newCollection.ID);
+
+            Assert.AreEqual(collection.ID, newCollection.ID);
+            Assert.AreEqual(collection.Name, newCollection.Name);
+            Assert.AreEqual(collection.Status, newCollection.Status);
+            Assert.AreEqual(collection.Type, newCollection.Type);
+            Assert.AreEqual(collection.WaitForSync, newCollection.WaitForSync);
+            Assert.AreEqual(collection.JournalSize, newCollection.JournalSize);
+            Assert.IsTrue(collection.DocumentsCount >= 0);
+
+            _database.DeleteCollection(newCollection.Name);
+        }
+
+        [TestMethod]
+        public void CreateCollectionAndGetCountByNameAndDeleteIt()
+        {
+            ArangoCollection testCollection = new ArangoCollection();
+            testCollection.Name = "tempUnitTestCollectionToBeRead001xyz";
+            testCollection.Type = ArangoCollectionType.Document;
+            testCollection.WaitForSync = false;
+            testCollection.JournalSize = 1024 * 1024; // 1 MB
+
+            ArangoCollection newCollection = _database.CreateCollection(testCollection.Name, testCollection.Type, testCollection.WaitForSync, testCollection.JournalSize);
+
+            ArangoCollection collection = _database.GetCollectionCount(newCollection.Name);
+
+            Assert.AreEqual(collection.ID, newCollection.ID);
+            Assert.AreEqual(collection.Name, newCollection.Name);
+            Assert.AreEqual(collection.Status, newCollection.Status);
+            Assert.AreEqual(collection.Type, newCollection.Type);
+            Assert.AreEqual(collection.WaitForSync, newCollection.WaitForSync);
+            Assert.AreEqual(collection.JournalSize, newCollection.JournalSize);
+            Assert.IsTrue(collection.DocumentsCount >= 0);
+
+            _database.DeleteCollection(newCollection.Name);
+        }
+
         #endregion
     }
 }
