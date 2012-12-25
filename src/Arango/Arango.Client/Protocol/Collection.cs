@@ -56,25 +56,27 @@ namespace Arango.Client.Protocol
 
         #region PUT
 
-        internal bool TruncateCollection(long id)
+        #region PutTruncate
+
+        internal bool PutTruncate(long id)
         {
             var request = new Request();
             request.RelativeUri = _apiUri + id + "/truncate";
             request.Method = RequestMethod.PUT.ToString();
 
-            return TruncateCollection(request);
+            return PutTruncate(request);
         }
 
-        internal bool TruncateCollection(string name)
+        internal bool PutTruncate(string name)
         {
             var request = new Request();
             request.RelativeUri = _apiUri + name + "/truncate";
             request.Method = RequestMethod.PUT.ToString();
 
-            return TruncateCollection(request);
+            return PutTruncate(request);
         }
 
-        private bool TruncateCollection(Request request)
+        private bool PutTruncate(Request request)
         {
             var response = _node.Process(request);
 
@@ -91,6 +93,52 @@ namespace Arango.Client.Protocol
 
             return isTruncated;
         }
+
+        #endregion
+
+        #region PutLoad
+
+        internal ArangoCollection PutLoad(long id)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + id + "/load";
+            request.Method = RequestMethod.PUT.ToString();
+
+            return PutLoad(request);
+        }
+
+        internal ArangoCollection PutLoad(string name)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + name + "/load";
+            request.Method = RequestMethod.PUT.ToString();
+
+            return PutLoad(request);
+        }
+
+        internal ArangoCollection PutLoad(Request request)
+        {
+            var response = _node.Process(request);
+
+            var collection = new ArangoCollection();
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    collection.ID = (long)response.JsonObject.id;
+                    collection.Name = response.JsonObject.name;
+                    collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
+                    collection.Type = (ArangoCollectionType)response.JsonObject.type;
+                    collection.DocumentsCount = (long)response.JsonObject.count;
+                    break;
+                default:
+                    break;
+            }
+
+            return collection;
+        }
+
+        #endregion
 
         #endregion
 
@@ -332,7 +380,7 @@ namespace Arango.Client.Protocol
 
         #endregion
 
-        // returns list of collections where each item consists of id, name, waitForSync, status
+        // returns list of collections where each item consists of id, name, status, type
         internal List<ArangoCollection> GetAll()
         {
             var request = new Request();

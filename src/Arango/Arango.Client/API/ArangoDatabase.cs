@@ -121,14 +121,32 @@ namespace Arango.Client
         {
             var collection = new Collection(_node);
 
-            return collection.TruncateCollection(id);
+            return collection.PutTruncate(id);
         }
 
         public bool TruncateCollection(string name)
         {
             var collection = new Collection(_node);
 
-            return collection.TruncateCollection(name);
+            return collection.PutTruncate(name);
+        }
+
+        #endregion
+
+        #region Load
+
+        public ArangoCollection LoadCollection(long id)
+        {
+            var collection = new Collection(_node);
+
+            return collection.PutLoad(id);
+        }
+
+        public ArangoCollection LoadCollection(string name)
+        {
+            var collection = new Collection(_node);
+
+            return collection.PutLoad(name);
         }
 
         #endregion
