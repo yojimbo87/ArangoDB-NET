@@ -169,6 +169,24 @@ namespace Arango.Client
 
         #endregion
 
+        #region Update properties
+
+        public ArangoCollection UpdateCollectionProperties(long id, bool waitForSync)
+        {
+            var collection = new Collection(_node);
+
+            return collection.PutProperties(id, waitForSync);
+        }
+
+        public ArangoCollection UpdateCollectionProperties(string name, bool waitForSync)
+        {
+            var collection = new Collection(_node);
+
+            return collection.PutProperties(name, waitForSync);
+        }
+
+        #endregion
+
         #endregion
 
         #region Document

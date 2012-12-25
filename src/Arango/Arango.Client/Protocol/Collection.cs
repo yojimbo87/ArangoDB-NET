@@ -183,6 +183,59 @@ namespace Arango.Client.Protocol
 
         #endregion
 
+        #region PutProperties
+
+        internal ArangoCollection PutProperties(long id, bool waitForSync)
+        {
+            dynamic bodyObject = new ExpandoObject();
+            bodyObject.waitForSync = waitForSync;
+
+            var request = new Request();
+            request.RelativeUri = _apiUri + id + "/properties";
+            request.Method = RequestMethod.PUT.ToString();
+            request.Body = _parser.Serialize(bodyObject);
+
+            return PutProperties(request);
+        }
+
+        internal ArangoCollection PutProperties(string name, bool waitForSync)
+        {
+            dynamic bodyObject = new ExpandoObject();
+            bodyObject.waitForSync = waitForSync;
+
+            var request = new Request();
+            request.RelativeUri = _apiUri + name + "/properties";
+            request.Method = RequestMethod.PUT.ToString();
+            request.Body = _parser.Serialize(bodyObject);
+
+            return PutProperties(request);
+        }
+
+        internal ArangoCollection PutProperties(Request request)
+        {
+            var response = _node.Process(request);
+
+            var collection = new ArangoCollection();
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    collection.ID = (long)response.JsonObject.id;
+                    collection.Name = response.JsonObject.name;
+                    collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
+                    collection.Type = (ArangoCollectionType)response.JsonObject.type;
+                    collection.JournalSize = (long)response.JsonObject.journalSize;
+                    collection.WaitForSync = response.JsonObject.waitForSync;
+                    break;
+                default:
+                    break;
+            }
+
+            return collection;
+        }
+
+        #endregion
+
         #endregion
 
         #region DELETE
