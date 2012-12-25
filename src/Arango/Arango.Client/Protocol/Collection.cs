@@ -140,6 +140,49 @@ namespace Arango.Client.Protocol
 
         #endregion
 
+        #region PutUnload
+
+        internal ArangoCollection PutUnload(long id)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + id + "/unload";
+            request.Method = RequestMethod.PUT.ToString();
+
+            return PutUnload(request);
+        }
+
+        internal ArangoCollection PutUnload(string name)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + name + "/unload";
+            request.Method = RequestMethod.PUT.ToString();
+
+            return PutUnload(request);
+        }
+
+        internal ArangoCollection PutUnload(Request request)
+        {
+            var response = _node.Process(request);
+
+            var collection = new ArangoCollection();
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    collection.ID = (long)response.JsonObject.id;
+                    collection.Name = response.JsonObject.name;
+                    collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
+                    collection.Type = (ArangoCollectionType)response.JsonObject.type;
+                    break;
+                default:
+                    break;
+            }
+
+            return collection;
+        }
+
+        #endregion
+
         #endregion
 
         #region DELETE

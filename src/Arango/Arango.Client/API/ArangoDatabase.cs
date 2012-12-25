@@ -151,6 +151,24 @@ namespace Arango.Client
 
         #endregion
 
+        #region Unload
+
+        public ArangoCollection UnloadCollection(long id)
+        {
+            var collection = new Collection(_node);
+
+            return collection.PutUnload(id);
+        }
+
+        public ArangoCollection UnloadCollection(string name)
+        {
+            var collection = new Collection(_node);
+
+            return collection.PutUnload(name);
+        }
+
+        #endregion
+
         #endregion
 
         #region Document
