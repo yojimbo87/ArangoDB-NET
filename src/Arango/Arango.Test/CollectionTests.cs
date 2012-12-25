@@ -68,5 +68,41 @@ namespace Arango.Test
 
             Assert.AreEqual(newCollection.ID, deletedCollectionID);
         }
+
+        [TestMethod]
+        public void CreateCollectionAndTruncateItByIdAndDeleteIt()
+        {
+            ArangoCollection testCollection = new ArangoCollection();
+            testCollection.Name = "tempUnitTestCollectionToBeTruncated001xyz";
+            testCollection.Type = ArangoCollectionType.Document;
+            testCollection.WaitForSync = false;
+            testCollection.JournalSize = 1024 * 1024; // 1 MB
+
+            ArangoCollection newCollection = _database.CreateCollection(testCollection.Name, testCollection.Type, testCollection.WaitForSync, testCollection.JournalSize);
+
+            bool isTruncated = _database.TruncateCollection(newCollection.ID);
+
+            Assert.AreEqual(isTruncated, true);
+
+            _database.DeleteCollection(newCollection.ID);
+        }
+
+        [TestMethod]
+        public void CreateCollectionAndTruncateItByNameAndDeleteIt()
+        {
+            ArangoCollection testCollection = new ArangoCollection();
+            testCollection.Name = "tempUnitTestCollectionToBeTruncated002xyz";
+            testCollection.Type = ArangoCollectionType.Document;
+            testCollection.WaitForSync = false;
+            testCollection.JournalSize = 1024 * 1024; // 1 MB
+
+            ArangoCollection newCollection = _database.CreateCollection(testCollection.Name, testCollection.Type, testCollection.WaitForSync, testCollection.JournalSize);
+
+            bool isTruncated = _database.TruncateCollection(newCollection.Name);
+
+            Assert.AreEqual(isTruncated, true);
+
+            _database.DeleteCollection(newCollection.Name);
+        }
     }
 }

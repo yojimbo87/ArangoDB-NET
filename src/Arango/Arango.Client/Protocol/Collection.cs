@@ -53,6 +53,46 @@ namespace Arango.Client.Protocol
 
         #endregion
 
+        #region PUT
+
+        internal bool TruncateCollection(long id)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + id + "/truncate";
+            request.Method = RequestMethod.PUT.ToString();
+
+            return TruncateCollection(request);
+        }
+
+        internal bool TruncateCollection(string name)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + name + "/truncate";
+            request.Method = RequestMethod.PUT.ToString();
+
+            return TruncateCollection(request);
+        }
+
+        private bool TruncateCollection(Request request)
+        {
+            var response = _node.Process(request);
+
+            bool isTruncated = false;
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    isTruncated = true;
+                    break;
+                default:
+                    break;
+            }
+
+            return isTruncated;
+        }
+
+        #endregion
+
         #region DELETE (delete collection methods)
 
         internal long Delete(long id)

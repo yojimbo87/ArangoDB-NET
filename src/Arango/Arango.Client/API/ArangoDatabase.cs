@@ -53,6 +53,20 @@ namespace Arango.Client
             return collection.Get(collectionName);
         }
 
+        public bool TruncateCollection(long id)
+        {
+            var collection = new Collection(_node);
+
+            return collection.TruncateCollection(id);
+        }
+
+        public bool TruncateCollection(string name)
+        {
+            var collection = new Collection(_node);
+
+            return collection.TruncateCollection(name);
+        }
+
         #endregion
 
         #region Document
