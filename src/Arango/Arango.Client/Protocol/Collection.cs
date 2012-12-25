@@ -236,6 +236,57 @@ namespace Arango.Client.Protocol
 
         #endregion
 
+        #region PutRename
+
+        internal ArangoCollection PutRename(long id, string newName)
+        {
+            dynamic bodyObject = new ExpandoObject();
+            bodyObject.name = newName;
+
+            var request = new Request();
+            request.RelativeUri = _apiUri + id + "/rename";
+            request.Method = RequestMethod.PUT.ToString();
+            request.Body = _parser.Serialize(bodyObject);
+
+            return PutRename(request);
+        }
+
+        internal ArangoCollection PutRename(string name, string newName)
+        {
+            dynamic bodyObject = new ExpandoObject();
+            bodyObject.name = newName;
+
+            var request = new Request();
+            request.RelativeUri = _apiUri + name + "/rename";
+            request.Method = RequestMethod.PUT.ToString();
+            request.Body = _parser.Serialize(bodyObject);
+
+            return PutRename(request);
+        }
+
+        internal ArangoCollection PutRename(Request request)
+        {
+            var response = _node.Process(request);
+
+            var collection = new ArangoCollection();
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    collection.ID = (long)response.JsonObject.id;
+                    collection.Name = response.JsonObject.name;
+                    collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
+                    collection.Type = (ArangoCollectionType)response.JsonObject.type;
+                    break;
+                default:
+                    break;
+            }
+
+            return collection;
+        }
+
+        #endregion
+
         #endregion
 
         #region DELETE

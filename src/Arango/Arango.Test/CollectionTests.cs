@@ -161,6 +161,10 @@ namespace Arango.Test
             _database.DeleteCollection(newCollection.Name);
         }
 
+        #endregion
+
+        #region Create, unload, delete
+
         [TestMethod]
         public void CreateCollectionAndUnloadByIdAndDeleteIt()
         {
@@ -204,6 +208,10 @@ namespace Arango.Test
 
             _database.DeleteCollection(newCollection.Name);
         }
+
+        #endregion
+
+        #region Create, update properties, delete
 
         [TestMethod]
         public void CreateCollectionAndUpdatePropertiesByIdAndDeleteIt()
@@ -249,6 +257,54 @@ namespace Arango.Test
             Assert.AreEqual(collection.WaitForSync, true);
 
             _database.DeleteCollection(newCollection.Name);
+        }
+
+        #endregion
+
+        #region Create, update name, delete
+
+        [TestMethod]
+        public void CreateCollectionAndUpdateNameByIdAndDeleteIt()
+        {
+            ArangoCollection testCollection = new ArangoCollection();
+            testCollection.Name = "tempUnitTestCollectionToBeRead001xyz";
+            testCollection.Type = ArangoCollectionType.Document;
+            testCollection.WaitForSync = false;
+            testCollection.JournalSize = 1024 * 1024; // 1 MB
+
+            ArangoCollection newCollection = _database.CreateCollection(testCollection.Name, testCollection.Type, testCollection.WaitForSync, testCollection.JournalSize);
+
+            string newName = "tempUnitTestCollectionToBeRead001xyzNewName";
+            ArangoCollection collection = _database.UpdateCollectionName(newCollection.ID, newName);
+
+            Assert.AreEqual(collection.ID, newCollection.ID);
+            Assert.AreEqual(collection.Name, newName);
+            Assert.AreEqual(collection.Status, newCollection.Status);
+            Assert.AreEqual(collection.Type, newCollection.Type);
+
+            _database.DeleteCollection(collection.ID);
+        }
+
+        [TestMethod]
+        public void CreateCollectionAndUpdateNameByNameAndDeleteIt()
+        {
+            ArangoCollection testCollection = new ArangoCollection();
+            testCollection.Name = "tempUnitTestCollectionToBeRead002xyz";
+            testCollection.Type = ArangoCollectionType.Document;
+            testCollection.WaitForSync = false;
+            testCollection.JournalSize = 1024 * 1024; // 1 MB
+
+            ArangoCollection newCollection = _database.CreateCollection(testCollection.Name, testCollection.Type, testCollection.WaitForSync, testCollection.JournalSize);
+
+            string newName = "tempUnitTestCollectionToBeRead002xyzNewName";
+            ArangoCollection collection = _database.UpdateCollectionName(newCollection.Name, newName);
+
+            Assert.AreEqual(collection.ID, newCollection.ID);
+            Assert.AreEqual(collection.Name, newName);
+            Assert.AreEqual(collection.Status, newCollection.Status);
+            Assert.AreEqual(collection.Type, newCollection.Type);
+
+            _database.DeleteCollection(collection.ID);
         }
 
         #endregion

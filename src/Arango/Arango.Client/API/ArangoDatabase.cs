@@ -187,6 +187,24 @@ namespace Arango.Client
 
         #endregion
 
+        #region Update name
+
+        public ArangoCollection UpdateCollectionName(long id, string newName)
+        {
+            var collection = new Collection(_node);
+
+            return collection.PutRename(id, newName);
+        }
+
+        public ArangoCollection UpdateCollectionName(string name, string newName)
+        {
+            var collection = new Collection(_node);
+
+            return collection.PutRename(name, newName);
+        }
+
+        #endregion
+
         #endregion
 
         #region Document
