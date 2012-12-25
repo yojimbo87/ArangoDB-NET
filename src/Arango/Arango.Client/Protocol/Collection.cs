@@ -147,8 +147,6 @@ namespace Arango.Client.Protocol
             request.RelativeUri = _apiUri + id;
             request.Method = RequestMethod.GET.ToString();
 
-            var response = _node.Process(request);
-
             return Get(request);
         }
 
@@ -157,8 +155,6 @@ namespace Arango.Client.Protocol
             var request = new Request();
             request.RelativeUri = _apiUri + collectionName;
             request.Method = RequestMethod.GET.ToString();
-
-            var response = _node.Process(request);
 
             return Get(request);
         }
@@ -195,8 +191,6 @@ namespace Arango.Client.Protocol
             request.RelativeUri = _apiUri + id + "/properties";
             request.Method = RequestMethod.GET.ToString();
 
-            var response = _node.Process(request);
-
             return GetProperties(request);
         }
 
@@ -205,8 +199,6 @@ namespace Arango.Client.Protocol
             var request = new Request();
             request.RelativeUri = _apiUri + collectionName + "/properties";
             request.Method = RequestMethod.GET.ToString();
-
-            var response = _node.Process(request);
 
             return GetProperties(request);
         }
@@ -236,7 +228,7 @@ namespace Arango.Client.Protocol
 
         #endregion
 
-        // returns collection id, name, status, type, waitForSync, count
+        // returns collection id, name, status, type, waitForSync, journalSize, count
         #region GetCount
 
         internal ArangoCollection GetCount(long id)
@@ -245,9 +237,7 @@ namespace Arango.Client.Protocol
             request.RelativeUri = _apiUri + id + "/count";
             request.Method = RequestMethod.GET.ToString();
 
-            var response = _node.Process(request);
-
-            return GetProperties(request);
+            return GetCount(request);
         }
 
         internal ArangoCollection GetCount(string name)
@@ -256,9 +246,7 @@ namespace Arango.Client.Protocol
             request.RelativeUri = _apiUri + name + "/count";
             request.Method = RequestMethod.GET.ToString();
 
-            var response = _node.Process(request);
-
-            return GetProperties(request);
+            return GetCount(request);
         }
 
         private ArangoCollection GetCount(Request request)
@@ -277,6 +265,62 @@ namespace Arango.Client.Protocol
                     collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
                     collection.Type = (ArangoCollectionType)response.JsonObject.type;
                     collection.DocumentsCount = (long)response.JsonObject.count;
+                    break;
+                default:
+                    break;
+            }
+
+            return collection;
+        }
+
+        #endregion
+
+        // returns collection id, name, status, type, waitForSync, journalSize, count, figures
+        #region GetFigures
+
+        internal ArangoCollection GetFigures(long id)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + id + "/figures";
+            request.Method = RequestMethod.GET.ToString();
+
+            return GetFigures(request);
+        }
+
+        internal ArangoCollection GetFigures(string name)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + name + "/figures";
+            request.Method = RequestMethod.GET.ToString();
+
+            return GetFigures(request);
+        }
+
+        private ArangoCollection GetFigures(Request request)
+        {
+            var response = _node.Process(request);
+
+            var collection = new ArangoCollection();
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    collection.ID = (long)response.JsonObject.id;
+                    collection.Name = response.JsonObject.name;
+                    collection.WaitForSync = response.JsonObject.waitForSync;
+                    collection.JournalSize = (long)response.JsonObject.journalSize;
+                    collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
+                    collection.Type = (ArangoCollectionType)response.JsonObject.type;
+                    collection.DocumentsCount = (long)response.JsonObject.count;
+                    collection.AliveDocumentsCount = (long)response.JsonObject.figures.alive.count;
+                    collection.AliveDocumentsSize = (long)response.JsonObject.figures.alive.size;
+                    collection.DeadDocumentsCount = (long)response.JsonObject.figures.dead.count;
+                    collection.DeadDocumentsSize = (long)response.JsonObject.figures.dead.size;
+                    collection.DeadDeletetionCount = (long)response.JsonObject.figures.dead.deletion;
+                    collection.DataFilesCount = (long)response.JsonObject.figures.datafiles.count;
+                    collection.DataFilesSize = (long)response.JsonObject.figures.datafiles.fileSize;
+                    collection.JournalsCount = (long)response.JsonObject.figures.journals.count;
+                    collection.JournalsFileSize = (long)response.JsonObject.figures.journals.fileSize;
                     break;
                 default:
                     break;

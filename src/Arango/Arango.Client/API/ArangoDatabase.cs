@@ -91,6 +91,20 @@ namespace Arango.Client
             return collection.GetCount(name);
         }
 
+        public ArangoCollection GetCollectionFigures(long id)
+        {
+            var collection = new Collection(_node);
+
+            return collection.GetFigures(id);
+        }
+
+        public ArangoCollection GetCollectionFigures(string name)
+        {
+            var collection = new Collection(_node);
+
+            return collection.GetFigures(name);
+        }
+
         #endregion
 
         #region Truncate
