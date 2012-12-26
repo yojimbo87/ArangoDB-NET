@@ -5,7 +5,14 @@ namespace Arango.Client
 {
     public class ArangoException : Exception
     {
+        /// <summary>
+        /// HTTP status code which caused the exception.
+        /// </summary>
         public HttpStatusCode HttpStatusCode { get; set; }
+
+        /// <summary>
+        /// Exception message of the web request object.
+        /// </summary>
         public string WebExceptionMessage { get; set; }
 
         public ArangoException()

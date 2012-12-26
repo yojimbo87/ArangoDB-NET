@@ -1,6 +1,9 @@
 ﻿
 namespace Arango.Client
 {
+    /// <summary>
+    /// Status of the Arango collection.
+    /// </summary>
     public enum ArangoCollectionStatus
     {
         New = 1,

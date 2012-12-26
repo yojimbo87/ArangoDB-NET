@@ -17,6 +17,9 @@ namespace Arango.Client
             get { return "Alpha 1.0"; }
         }
 
+        /// <summary>
+        /// Collection of ArangoDB nodes which consists of database connection parameters identified by unique alias string.
+        /// </summary>
         public static List<ArangoNode> Nodes { get; set; }
 
         #endregion

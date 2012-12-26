@@ -14,22 +14,45 @@ namespace Arango.Client
 
         #region Properties
 
+        /// <summary>
+        /// Node host name or IP address (without http(s) prefix, e.g. arango.example.com).
+        /// </summary>
         public string Server { get; set; }
 
+        /// <summary>
+        /// Node port number.
+        /// </summary>
         public int Port { get; set; }
 
+        /// <summary>
+        /// Name of the user which will be used for authentication.
+        /// </summary>
         public string Username { get; set; }
 
+        /// <summary>
+        /// Password which will be used for authentication.
+        /// </summary>
         public string Password { get; set; }
 
+        /// <summary>
+        /// Alias which will uniquely identify specified database connection.
+        /// </summary>
         public string Alias { get; set; }
 
-        public Uri BaseUri { get; set; }
+        internal Uri BaseUri { get; set; }
 
-        public CredentialCache Credentials { get; set; }
+        internal CredentialCache Credentials { get; set; }
 
         #endregion
 
+        /// <summary>
+        /// Creates instance of ArangoDB node object which holds database connection parameters identified by unique alias string.
+        /// </summary>
+        /// <param name="server">Node host name or IP address (without http(s) prefix, e.g. arango.example.com).</param>
+        /// <param name="port">Node port number.</param>
+        /// <param name="userName">Name of the user which will be used for authentication.</param>
+        /// <param name="password">Password which will be used for authentication.</param>
+        /// <param name="alias">Alias which will uniquely identify specified database connection.</param>
         public ArangoNode(string server, int port, string userName, string password, string alias)
         {
             Server = server;
