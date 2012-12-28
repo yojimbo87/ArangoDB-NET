@@ -4,29 +4,89 @@ namespace Arango.Client.Protocol
 {
     internal class Document
     {
-        private string ApiUri { get { return "_api/document/"; } }
-        private ArangoNode Node { get; set; }
+        private string _apiUri { get { return "_api/document"; } }
+        private JsonParser _parser = new JsonParser();
+        private ArangoNode _node { get; set; }
 
         internal Document(ArangoNode node)
         {
-            Node = node;
+            _node = node;
         }
+
+        #region POST
+
+        internal ArangoDocument Post(long collectionID, dynamic jsonObject, bool waitForSync)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + "?collection=" + collectionID;
+            request.Method = RequestMethod.POST.ToString();
+            request.Body = _parser.Serialize(jsonObject);
+
+            if (waitForSync)
+            {
+                request.RelativeUri += "&waitForSync=true";
+            }
+
+            return Post(request);
+        }
+
+        internal ArangoDocument Post(string collectionName, bool createCollection,  dynamic jsonObject, bool waitForSync)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + "?collection=" + collectionName;
+            request.Method = RequestMethod.POST.ToString();
+            request.Body = _parser.Serialize(jsonObject);
+
+            if (createCollection)
+            {
+                request.RelativeUri += "&createCollection=true";
+            }
+
+            if (waitForSync)
+            {
+                request.RelativeUri += "&waitForSync=true";
+            }
+
+            return Post(request);
+        }
+
+        private ArangoDocument Post(Request request)
+        {
+            var response = _node.Process(request);
+
+            var document = new ArangoDocument();
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.Created:
+                case HttpStatusCode.Accepted:
+                    document.ID = response.JsonObject._id;
+                    document.Revision = ((long)response.JsonObject._rev).ToString();
+                    break;
+                default:
+                    break;
+            }
+
+            return document;
+        }
+
+        #endregion
 
         #region GET
 
-        internal ArangoDocument Get(string handle)
+        internal ArangoDocument Get(string id)
         {
             var request = new Request();
-            request.RelativeUri = ApiUri + handle;
+            request.RelativeUri = _apiUri + "/" + id;
             request.Method = RequestMethod.GET.ToString();
 
             return Get(request);
         }
 
-        internal ArangoDocument Get(string handle, string revision)
+        internal ArangoDocument Get(string id, string revision)
         {
             var request = new Request();
-            request.RelativeUri = ApiUri + handle;
+            request.RelativeUri = _apiUri + "/" + id;
             request.Method = RequestMethod.GET.ToString();
 
             if (!string.IsNullOrEmpty(revision))
@@ -39,19 +99,19 @@ namespace Arango.Client.Protocol
 
         private ArangoDocument Get(Request request)
         {
-            var response = Node.Process(request);
+            var response = _node.Process(request);
 
             var document = new ArangoDocument();
 
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    document.JsonObject = new JsonParser().Deserialize(response.JsonString);
-                    document.Handle = document.JsonObject._id;
-                    document.Revision = response.Headers.Get("etag");
+                    document.JsonObject = _parser.Deserialize(response.JsonString);
+                    document.ID = document.JsonObject._id;
+                    document.Revision = response.Headers.Get("etag").Replace("\"", "");
                     break;
                 case HttpStatusCode.NotModified:
-                    document.Revision = response.Headers.Get("etag");
+                    document.Revision = response.Headers.Get("etag").Replace("\"", "");
                     break;
                 default:
                     break;

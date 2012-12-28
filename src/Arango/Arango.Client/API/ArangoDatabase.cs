@@ -329,6 +329,39 @@ namespace Arango.Client
 
         #region Document
 
+        #region Create
+
+        /// <summary>
+        /// Creates new document in specified collection.
+        /// </summary>
+        /// <param name="collectionID">Identifier of the collection.</param>
+        /// <param name="jsonObject">JSON object which will be created in specified collection.</param>
+        /// <param name="waitForSync">If true forces synchronisation.</param>
+        /// <returns>ArangoDocument object with assigned handle and revision.</returns>
+        public ArangoDocument CreateDocument(long collectionID, dynamic jsonObject, bool waitForSync)
+        {
+            var document = new Document(_node);
+
+            return document.Post(collectionID, jsonObject, waitForSync);
+        }
+
+        /// <summary>
+        /// Creates new document in specified collection.
+        /// </summary>
+        /// <param name="collectionName">Name of the collection.</param>
+        /// <param name="createCollection">Determines if the collection should be created if it does not exist.</param>
+        /// <param name="jsonObject">JSON object which will be created in specified collection.</param>
+        /// <param name="waitForSync">If true forces synchronisation.</param>
+        /// <returns>ArangoDocument object with assigned handle and revision.</returns>
+        public ArangoDocument CreateDocument(string collectionName, bool createCollection, dynamic jsonObject, bool waitForSync)
+        {
+            var document = new Document(_node);
+
+            return document.Post(collectionName, createCollection, jsonObject, waitForSync);
+        }
+
+        #endregion
+
         #region Get
 
         public ArangoDocument GetDocument(string handle)
