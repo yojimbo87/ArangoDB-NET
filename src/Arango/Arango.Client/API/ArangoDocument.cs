@@ -6,7 +6,7 @@ namespace Arango.Client
 {
     public class ArangoDocument
     {
-        public string Handle { get; set; }
+        public string ID { get; set; }
         public string Revision { get; set; }
         public dynamic JsonObject { get; set; }
 
