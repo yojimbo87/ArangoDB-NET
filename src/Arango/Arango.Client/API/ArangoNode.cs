@@ -128,7 +128,11 @@ namespace Arango.Client
                     response.StatusCode = httpResponse.StatusCode;
                     response.Headers = httpResponse.Headers;
                     response.JsonString = reader.ReadToEnd();
-                    response.JsonObject = parser.Deserialize(response.JsonString);
+                    
+                    if (!string.IsNullOrEmpty(response.JsonString))
+                    {
+                        response.JsonObject = parser.Deserialize(response.JsonString);
+                    }
                 }
             }
 

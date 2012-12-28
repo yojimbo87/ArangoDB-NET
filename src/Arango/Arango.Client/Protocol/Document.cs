@@ -12,6 +12,17 @@ namespace Arango.Client.Protocol
             Node = node;
         }
 
+        #region GET
+
+        internal ArangoDocument Get(string handle)
+        {
+            var request = new Request();
+            request.RelativeUri = ApiUri + handle;
+            request.Method = RequestMethod.GET.ToString();
+
+            return Get(request);
+        }
+
         internal ArangoDocument Get(string handle, string revision)
         {
             var request = new Request();
@@ -23,15 +34,20 @@ namespace Arango.Client.Protocol
                 request.Headers.Add("If-None-Match", "\"" + revision + "\"");
             }
 
+            return Get(request);
+        }
+
+        private ArangoDocument Get(Request request)
+        {
             var response = Node.Process(request);
 
             var document = new ArangoDocument();
-            document.Handle = handle;
-            document.JsonObject = new JsonParser().Deserialize(response.JsonString);
 
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
+                    document.JsonObject = new JsonParser().Deserialize(response.JsonString);
+                    document.Handle = document.JsonObject._id;
                     document.Revision = response.Headers.Get("etag");
                     break;
                 case HttpStatusCode.NotModified:
@@ -43,5 +59,7 @@ namespace Arango.Client.Protocol
 
             return document;
         }
+
+        #endregion
     }
 }

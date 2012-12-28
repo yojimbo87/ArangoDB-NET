@@ -329,9 +329,13 @@ namespace Arango.Client
 
         #region Document
 
+        #region Get
+
         public ArangoDocument GetDocument(string handle)
         {
-            return GetDocument(handle, "");
+            var document = new Document(_node);
+
+            return document.Get(handle);
         }
 
         public ArangoDocument GetDocument(string handle, string revision)
@@ -340,6 +344,8 @@ namespace Arango.Client
 
             return document.Get(handle, revision);
         }
+
+        #endregion
 
         #endregion
     }
