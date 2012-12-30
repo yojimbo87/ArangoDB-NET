@@ -140,6 +140,35 @@ namespace Arango.Test
 
         #endregion
 
+        #region Create, replace
+
+        [TestMethod]
+        public void CreateDocument_AND_ReplaceWithDefaultPolicy()
+        {
+            dynamic jsonObject = new ExpandoObject();
+            jsonObject.foo = "bravo";
+            jsonObject.Bar = 12345;
+            jsonObject.baz = "test";
+
+            ArangoDocument document = _database.CreateDocument(_collection.ID, jsonObject, false);
+            Assert.IsTrue(!string.IsNullOrEmpty(document.ID));
+            Assert.IsTrue(!string.IsNullOrEmpty(document.Revision));
+
+            dynamic newJsonObject = new ExpandoObject();
+            newJsonObject.Foo = "Johny";
+            newJsonObject.Bar = 54321;
+
+            string revision = _database.ReplaceDocument(document.ID, document.Revision, ArangoDocumentPolicy.Default, newJsonObject, false);
+            Assert.AreNotEqual(revision, document.Revision);
+
+            ArangoDocument loadedDocument = _database.GetDocument(document.ID);
+            Assert.AreEqual(loadedDocument.Revision, revision);
+            Assert.AreEqual(loadedDocument.JsonObject.Foo, newJsonObject.Foo);
+            Assert.AreEqual(loadedDocument.JsonObject.Bar, newJsonObject.Bar);
+        }
+
+        #endregion
+
         public void Dispose()
         {
             _database.DeleteCollection(_collection.ID);

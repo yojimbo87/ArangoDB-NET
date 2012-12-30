@@ -362,6 +362,17 @@ namespace Arango.Client
 
         #endregion
 
+        #region Replace
+
+        public string ReplaceDocument(string documentID, string revision, ArangoDocumentPolicy policy, dynamic jsonObject, bool waitForSync)
+        {
+            var document = new Document(_node);
+
+            return document.Put(documentID, revision, policy, jsonObject, waitForSync);
+        }
+
+        #endregion
+
         #region Get
 
         public ArangoDocument GetDocument(string handle)
