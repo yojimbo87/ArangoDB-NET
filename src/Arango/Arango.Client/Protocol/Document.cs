@@ -18,13 +18,14 @@ namespace Arango.Client.Protocol
         internal ArangoDocument Post(long collectionID, dynamic jsonObject, bool waitForSync)
         {
             var request = new Request();
-            request.RelativeUri = _apiUri + "?collection=" + collectionID;
+            request.RelativeUri = _apiUri;
+            request.QueryString.Add("collection", collectionID.ToString());
             request.Method = RequestMethod.POST.ToString();
             request.Body = _parser.Serialize(jsonObject);
 
             if (waitForSync)
             {
-                request.RelativeUri += "&waitForSync=true";
+                request.QueryString.Add("waitForSync", "true");
             }
 
             return Post(request);
@@ -33,18 +34,19 @@ namespace Arango.Client.Protocol
         internal ArangoDocument Post(string collectionName, bool createCollection,  dynamic jsonObject, bool waitForSync)
         {
             var request = new Request();
-            request.RelativeUri = _apiUri + "?collection=" + collectionName;
+            request.RelativeUri = _apiUri;
+            request.QueryString.Add("collection", collectionName);
             request.Method = RequestMethod.POST.ToString();
             request.Body = _parser.Serialize(jsonObject);
 
             if (createCollection)
             {
-                request.RelativeUri += "&createCollection=true";
+                request.QueryString.Add("createCollection", "true");
             }
 
             if (waitForSync)
             {
-                request.RelativeUri += "&waitForSync=true";
+                request.QueryString.Add("waitForSync", "true");
             }
 
             return Post(request);
@@ -60,6 +62,42 @@ namespace Arango.Client.Protocol
             {
                 case HttpStatusCode.Created:
                 case HttpStatusCode.Accepted:
+                    document.ID = response.JsonObject._id;
+                    document.Revision = ((long)response.JsonObject._rev).ToString();
+                    break;
+                default:
+                    break;
+            }
+
+            return document;
+        }
+
+        #endregion
+
+        #region PUT
+
+        internal ArangoDocument Put(string documentID, string revision, dynamic jsonObject, bool waitForSync)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + "/" + documentID;
+            request.Method = RequestMethod.PUT.ToString();
+
+            if (!string.IsNullOrEmpty(revision))
+            {
+                request.QueryString.Add("_rev", revision);
+            }
+
+            if (waitForSync)
+            {
+                request.QueryString.Add("waitForSync", "true");
+            }
+
+            var response = _node.Process(request);
+            var document = new ArangoDocument();
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
                     document.ID = response.JsonObject._id;
                     document.Revision = ((long)response.JsonObject._rev).ToString();
                     break;
