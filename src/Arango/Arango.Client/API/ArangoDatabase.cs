@@ -364,6 +364,15 @@ namespace Arango.Client
 
         #region Replace
 
+        /// <summary>
+        /// Replaces specified document with new data.
+        /// </summary>
+        /// <param name="documentID">Identifier of the document to be replaced.</param>
+        /// <param name="revision">Document revision string.</param>
+        /// <param name="policy">Document replacement policy to be used.</param>
+        /// <param name="jsonObject">JSON object which holds new data.</param>
+        /// <param name="waitForSync">If true forces synchronisation.</param>
+        /// <returns>New revision string of the document.</returns>
         public string ReplaceDocument(string documentID, string revision, ArangoDocumentPolicy policy, dynamic jsonObject, bool waitForSync)
         {
             var document = new Document(_node);
