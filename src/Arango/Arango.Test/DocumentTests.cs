@@ -169,6 +169,59 @@ namespace Arango.Test
 
         #endregion
 
+        #region Create, update
+
+        [TestMethod]
+        public void CreateDocument_AND_UpdateWithKeepNullValues()
+        {
+            dynamic jsonObject = new ExpandoObject();
+            jsonObject.foo = "bravo";
+            jsonObject.Bar = 12345;
+
+            ArangoDocument document = _database.CreateDocument(_collection.ID, jsonObject, false);
+            Assert.IsTrue(!string.IsNullOrEmpty(document.ID));
+            Assert.IsTrue(!string.IsNullOrEmpty(document.Revision));
+
+            dynamic update = new ExpandoObject();
+            update.baz = "new field";
+
+            string revision = _database.UpdateDocument(document.ID, document.Revision, ArangoDocumentPolicy.Default, update, true, false);
+            Assert.AreNotEqual(revision, document.Revision);
+
+            ArangoDocument loadedDocument = _database.GetDocument(document.ID);
+            Assert.AreEqual(loadedDocument.Revision, revision);
+            Assert.AreEqual(loadedDocument.JsonObject.foo, jsonObject.foo);
+            Assert.AreEqual(loadedDocument.JsonObject.Bar, jsonObject.Bar);
+            Assert.AreEqual(loadedDocument.JsonObject.baz, update.baz);
+        }
+
+        [TestMethod]
+        public void CreateDocument_AND_UpdateWithoutKeepNullValues()
+        {
+            dynamic jsonObject = new ExpandoObject();
+            jsonObject.foo = "bravo";
+            jsonObject.Bar = 12345;
+
+            ArangoDocument document = _database.CreateDocument(_collection.ID, jsonObject, false);
+            Assert.IsTrue(!string.IsNullOrEmpty(document.ID));
+            Assert.IsTrue(!string.IsNullOrEmpty(document.Revision));
+
+            dynamic update = new ExpandoObject();
+            update.Bar = null;
+            update.baz = "new field";
+
+            string revision = _database.UpdateDocument(document.ID, document.Revision, ArangoDocumentPolicy.Default, update, false, false);
+            Assert.AreNotEqual(revision, document.Revision);
+
+            ArangoDocument loadedDocument = _database.GetDocument(document.ID);
+            Assert.AreEqual(loadedDocument.Revision, revision);
+            Assert.AreEqual(loadedDocument.JsonObject.foo, jsonObject.foo);
+            Assert.AreEqual(loadedDocument.Has("Bar"), false);
+            Assert.AreEqual(loadedDocument.JsonObject.baz, update.baz);
+        }
+
+        #endregion
+
         public void Dispose()
         {
             _database.DeleteCollection(_collection.ID);

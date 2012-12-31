@@ -382,6 +382,27 @@ namespace Arango.Client
 
         #endregion
 
+        #region Update
+
+        /// <summary>
+        /// Updates specified document data.
+        /// </summary>
+        /// <param name="documentID">Identifier of the document to be updated.</param>
+        /// <param name="revision">Document revision string.</param>
+        /// <param name="policy">Document replacement policy to be used.</param>
+        /// <param name="jsonObject">JSON object which holds new data.</param>
+        /// <param name="keepNullFields">If the intention is to delete existing fields this parameter can be used with a value of false.</param>
+        /// <param name="waitForSync">If true forces synchronisation.</param>
+        /// <returns>New revision string of the document.</returns>
+        public string UpdateDocument(string documentID, string revision, ArangoDocumentPolicy policy, dynamic jsonObject, bool keepNullFields, bool waitForSync)
+        {
+            var document = new Document(_node);
+
+            return document.Patch(documentID, revision, policy, jsonObject, keepNullFields, waitForSync);
+        }
+
+        #endregion
+
         #region Get
 
         public ArangoDocument GetDocument(string handle)

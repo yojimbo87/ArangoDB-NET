@@ -111,8 +111,59 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                case HttpStatusCode.Created:
-                case HttpStatusCode.Accepted:
+                    newRevision = ((long)response.JsonObject._rev).ToString();
+                    break;
+                default:
+                    break;
+            }
+
+            return newRevision;
+        }
+
+        #endregion
+
+        #region PATCH
+
+        internal string Patch(string documentID, string revision, ArangoDocumentPolicy policy, dynamic jsonObject, bool keepNullFields, bool waitForSync)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + "/" + documentID;
+            request.Method = RequestMethod.PATCH.ToString();
+            request.Body = _parser.Serialize(jsonObject);
+
+            if (!string.IsNullOrEmpty(revision))
+            {
+                request.QueryString.Add("_rev", revision);
+            }
+
+            switch (policy)
+            {
+                case ArangoDocumentPolicy.Error:
+                    request.QueryString.Add("policy", "error");
+                    break;
+                case ArangoDocumentPolicy.Last:
+                    request.QueryString.Add("policy", "last");
+                    break;
+                default:
+                    break;
+            }
+
+            if (!keepNullFields)
+            {
+                request.QueryString.Add("keepNull", "false");
+            }
+
+            if (waitForSync)
+            {
+                request.QueryString.Add("waitForSync", "true");
+            }
+
+            var response = _node.Process(request);
+            var newRevision = "";
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
                     newRevision = ((long)response.JsonObject._rev).ToString();
                     break;
                 default:
