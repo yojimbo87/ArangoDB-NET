@@ -46,7 +46,7 @@
     <Compile Include="API\ArangoCollectionType.cs" />
     <Compile Include="API\ArangoDatabase.cs" />
     <Compile Include="API\ArangoDocument.cs" />
-    <Compile Include="API\ArangoDocumentPolicy.cs" />
+    <Compile Include="API\DocumentUpdatePolicy.cs" />
     <Compile Include="API\ArangoException.cs" />
     <Compile Include="API\ArangoNode.cs" />
     <Compile Include="Protocol\Collection.cs" />

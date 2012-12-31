@@ -158,7 +158,7 @@ namespace Arango.Test
             newJsonObject.Foo = "Johny";
             newJsonObject.Bar = 54321;
 
-            string revision = _database.ReplaceDocument(document.ID, document.Revision, ArangoDocumentPolicy.Default, newJsonObject, false);
+            string revision = _database.ReplaceDocument(document.ID, document.Revision, DocumentUpdatePolicy.Default, newJsonObject, false);
             Assert.AreNotEqual(revision, document.Revision);
 
             ArangoDocument loadedDocument = _database.GetDocument(document.ID);
@@ -185,7 +185,7 @@ namespace Arango.Test
             dynamic update = new ExpandoObject();
             update.baz = "new field";
 
-            string revision = _database.UpdateDocument(document.ID, document.Revision, ArangoDocumentPolicy.Default, update, true, false);
+            string revision = _database.UpdateDocument(document.ID, document.Revision, DocumentUpdatePolicy.Default, update, true, false);
             Assert.AreNotEqual(revision, document.Revision);
 
             ArangoDocument loadedDocument = _database.GetDocument(document.ID);
@@ -210,7 +210,7 @@ namespace Arango.Test
             update.Bar = null;
             update.baz = "new field";
 
-            string revision = _database.UpdateDocument(document.ID, document.Revision, ArangoDocumentPolicy.Default, update, false, false);
+            string revision = _database.UpdateDocument(document.ID, document.Revision, DocumentUpdatePolicy.Default, update, false, false);
             Assert.AreNotEqual(revision, document.Revision);
 
             ArangoDocument loadedDocument = _database.GetDocument(document.ID);

@@ -76,7 +76,7 @@ namespace Arango.Client.Protocol
 
         #region PUT
 
-        internal string Put(string documentID, string revision, ArangoDocumentPolicy policy, dynamic jsonObject, bool waitForSync)
+        internal string Put(string documentID, string revision, DocumentUpdatePolicy policy, dynamic jsonObject, bool waitForSync)
         {
             var request = new Request();
             request.RelativeUri = _apiUri + "/" + documentID;
@@ -90,10 +90,10 @@ namespace Arango.Client.Protocol
 
             switch (policy)
             {
-                case ArangoDocumentPolicy.Error:
+                case DocumentUpdatePolicy.Error:
                     request.QueryString.Add("policy", "error");
                     break;
-                case ArangoDocumentPolicy.Last:
+                case DocumentUpdatePolicy.Last:
                     request.QueryString.Add("policy", "last");
                     break;
                 default:
@@ -124,7 +124,7 @@ namespace Arango.Client.Protocol
 
         #region PATCH
 
-        internal string Patch(string documentID, string revision, ArangoDocumentPolicy policy, dynamic jsonObject, bool keepNullFields, bool waitForSync)
+        internal string Patch(string documentID, string revision, DocumentUpdatePolicy policy, dynamic jsonObject, bool keepNullFields, bool waitForSync)
         {
             var request = new Request();
             request.RelativeUri = _apiUri + "/" + documentID;
@@ -138,10 +138,10 @@ namespace Arango.Client.Protocol
 
             switch (policy)
             {
-                case ArangoDocumentPolicy.Error:
+                case DocumentUpdatePolicy.Error:
                     request.QueryString.Add("policy", "error");
                     break;
-                case ArangoDocumentPolicy.Last:
+                case DocumentUpdatePolicy.Last:
                     request.QueryString.Add("policy", "last");
                     break;
                 default:
