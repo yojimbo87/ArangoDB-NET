@@ -104,17 +104,40 @@ namespace Arango.Client
                 response.StatusCode = httpResponse.StatusCode;
                 response.Headers = httpResponse.Headers;
                 response.JsonString = reader.ReadToEnd();
-                response.JsonObject = parser.Deserialize(response.JsonString);
+
+                if (!string.IsNullOrEmpty(response.JsonString))
+                {
+                    response.JsonObject = parser.Deserialize(response.JsonString);
+                }
             }
             catch (WebException webException)
             {
                 var httpResponse = (HttpWebResponse)webException.Response;
                 var reader = new StreamReader(httpResponse.GetResponseStream());
 
-                if (httpResponse.StatusCode != HttpStatusCode.NotModified)
+                if ((httpResponse.StatusCode == HttpStatusCode.NotModified) ||
+                    ((httpResponse.StatusCode == HttpStatusCode.NotFound) && (request.Method == RequestMethod.HEAD.ToString())))
                 {
-                    dynamic jsonObject = parser.Deserialize(reader.ReadToEnd());
-                    string errorMessage = string.Format("ArangoDB responded with error code {0}:\n{1} [error number {2}]", jsonObject.code, jsonObject.errorMessage, jsonObject.errorNum);
+                    response.StatusCode = httpResponse.StatusCode;
+                    response.Headers = httpResponse.Headers;
+                    response.JsonString = reader.ReadToEnd();
+
+                    if (!string.IsNullOrEmpty(response.JsonString))
+                    {
+                        response.JsonObject = parser.Deserialize(response.JsonString);
+                    }
+                }
+                else
+                {
+                    var jsonString = reader.ReadToEnd();
+                    dynamic jsonObject;
+                    string errorMessage = "";
+
+                    if (!string.IsNullOrEmpty(jsonString))
+                    {
+                        jsonObject = parser.Deserialize(reader.ReadToEnd());
+                        errorMessage = string.Format("ArangoDB responded with error code {0}:\n{1} [error number {2}]", jsonObject.code, jsonObject.errorMessage, jsonObject.errorNum);
+                    }
 
                     throw new ArangoException(
                         httpResponse.StatusCode,
@@ -122,17 +145,6 @@ namespace Arango.Client
                         webException.Message,
                         webException.InnerException
                     );
-                }
-                else
-                {
-                    response.StatusCode = httpResponse.StatusCode;
-                    response.Headers = httpResponse.Headers;
-                    response.JsonString = reader.ReadToEnd();
-                    
-                    if (!string.IsNullOrEmpty(response.JsonString))
-                    {
-                        response.JsonObject = parser.Deserialize(response.JsonString);
-                    }
                 }
             }
 
