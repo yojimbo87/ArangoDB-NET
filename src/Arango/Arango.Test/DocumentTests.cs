@@ -241,6 +241,42 @@ namespace Arango.Test
 
         #endregion
 
+        #region Create, check
+
+        [TestMethod]
+        public void CreateDocument_AND_CheckExisting()
+        {
+            dynamic jsonObject = new ExpandoObject();
+            jsonObject.foo = "bravo";
+            jsonObject.Bar = 12345;
+
+            ArangoDocument document = _database.CreateDocument(_collection.ID, jsonObject, false);
+            Assert.IsTrue(!string.IsNullOrEmpty(document.ID));
+            Assert.IsTrue(!string.IsNullOrEmpty(document.Revision));
+
+            ArangoDocument checkedDocument = _database.CheckDocument(document.ID);
+            Assert.AreEqual(checkedDocument.ID, document.ID);
+            Assert.AreEqual(checkedDocument.Revision, document.Revision);
+        }
+
+        [TestMethod]
+        public void CreateDocument_AND_CheckNotExisting()
+        {
+            dynamic jsonObject = new ExpandoObject();
+            jsonObject.foo = "bravo";
+            jsonObject.Bar = 12345;
+
+            ArangoDocument document = _database.CreateDocument(_collection.ID, jsonObject, false);
+            Assert.IsTrue(!string.IsNullOrEmpty(document.ID));
+            Assert.IsTrue(!string.IsNullOrEmpty(document.Revision));
+
+            ArangoDocument checkedDocument = _database.CheckDocument("whoa" + document.ID);
+            Assert.IsTrue(string.IsNullOrEmpty(checkedDocument.ID));
+            Assert.IsTrue(string.IsNullOrEmpty(checkedDocument.Revision));
+        }
+
+        #endregion
+
         public void Dispose()
         {
             _database.DeleteCollection(_collection.ID);

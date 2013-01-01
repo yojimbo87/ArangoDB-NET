@@ -222,6 +222,32 @@ namespace Arango.Client.Protocol
 
         #endregion
 
+        #region HEAD
+
+        internal ArangoDocument Head(string documentID)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + "/" + documentID;
+            request.Method = RequestMethod.HEAD.ToString();
+
+            var response = _node.Process(request);
+            var document = new ArangoDocument();
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    document.ID = documentID;
+                    document.Revision = response.Headers.Get("etag").Replace("\"", "");
+                    break;
+                default:
+                    break;
+            }
+
+            return document;
+        }
+
+        #endregion
+
         #region GET
 
         internal ArangoDocument Get(string id)
@@ -256,9 +282,9 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    document.JsonObject = _parser.Deserialize(response.JsonString);
-                    document.ID = document.JsonObject._id;
+                    document.ID = response.JsonObject._id;
                     document.Revision = response.Headers.Get("etag").Replace("\"", "");
+                    document.JsonObject = response.JsonObject;
                     break;
                 case HttpStatusCode.NotModified:
                     document.Revision = response.Headers.Get("etag").Replace("\"", "");

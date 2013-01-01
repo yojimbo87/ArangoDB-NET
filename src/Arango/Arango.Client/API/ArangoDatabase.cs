@@ -337,7 +337,7 @@ namespace Arango.Client
         /// <param name="collectionID">Identifier of the collection.</param>
         /// <param name="jsonObject">JSON object which will be created in specified collection.</param>
         /// <param name="waitForSync">If true forces synchronisation.</param>
-        /// <returns>ArangoDocument object with assigned handle and revision.</returns>
+        /// <returns>ArangoDocument object with assigned document ID and revision.</returns>
         public ArangoDocument CreateDocument(long collectionID, dynamic jsonObject, bool waitForSync)
         {
             var document = new Document(_node);
@@ -418,6 +418,22 @@ namespace Arango.Client
             var document = new Document(_node);
 
             return document.Patch(documentID, revision, policy, jsonObject, keepNullFields, waitForSync);
+        }
+
+        #endregion
+
+        #region Check
+
+        /// <summary>
+        /// Checks existence of specified document.
+        /// </summary>
+        /// <param name="documentID">Identifier of the document.</param>
+        /// <returns>ArangoDocument object with assigned document ID and revision.</returns>
+        public ArangoDocument CheckDocument(string documentID)
+        {
+            var document = new Document(_node);
+
+            return document.Head(documentID);
         }
 
         #endregion
