@@ -222,6 +222,25 @@ namespace Arango.Test
 
         #endregion
 
+        #region Create, delete
+
+        [TestMethod]
+        public void CreateDocument_AND_Delete()
+        {
+            dynamic jsonObject = new ExpandoObject();
+            jsonObject.foo = "bravo";
+            jsonObject.Bar = 12345;
+
+            ArangoDocument document = _database.CreateDocument(_collection.ID, jsonObject, false);
+            Assert.IsTrue(!string.IsNullOrEmpty(document.ID));
+            Assert.IsTrue(!string.IsNullOrEmpty(document.Revision));
+
+            string deleteDocumentID = _database.DeleteDocument(document.ID, document.Revision, DocumentUpdatePolicy.Default, false);
+            Assert.IsTrue(!string.IsNullOrEmpty(deleteDocumentID));
+        }
+
+        #endregion
+
         public void Dispose()
         {
             _database.DeleteCollection(_collection.ID);

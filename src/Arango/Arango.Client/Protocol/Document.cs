@@ -175,6 +175,53 @@ namespace Arango.Client.Protocol
 
         #endregion
 
+        #region DELETE
+
+        internal string Delete(string documentID, string revision, DocumentUpdatePolicy policy, bool waitForSync)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + "/" + documentID;
+            request.Method = RequestMethod.DELETE.ToString();
+
+            if (!string.IsNullOrEmpty(revision))
+            {
+                request.QueryString.Add("_rev", revision);
+            }
+
+            switch (policy)
+            {
+                case DocumentUpdatePolicy.Error:
+                    request.QueryString.Add("policy", "error");
+                    break;
+                case DocumentUpdatePolicy.Last:
+                    request.QueryString.Add("policy", "last");
+                    break;
+                default:
+                    break;
+            }
+
+            if (waitForSync)
+            {
+                request.QueryString.Add("waitForSync", "true");
+            }
+
+            var response = _node.Process(request);
+            var deletedDocumentID = "";
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    deletedDocumentID = response.JsonObject._id;
+                    break;
+                default:
+                    break;
+            }
+
+            return deletedDocumentID;
+        }
+
+        #endregion
+
         #region GET
 
         internal ArangoDocument Get(string id)

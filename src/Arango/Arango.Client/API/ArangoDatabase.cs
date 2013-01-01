@@ -362,6 +362,25 @@ namespace Arango.Client
 
         #endregion
 
+        #region Delete
+
+        /// <summary>
+        /// Deletes specified document.
+        /// </summary>
+        /// <param name="documentID">Identifier of the document to be deleted.</param>
+        /// <param name="revision">Document revision string.</param>
+        /// <param name="policy">Document update policy to be used.</param>
+        /// <param name="waitForSync">If true forces synchronisation.</param>
+        /// <returns>Identified of the document which was deleted.</returns>
+        public string DeleteDocument(string documentID, string revision, DocumentUpdatePolicy policy, bool waitForSync)
+        {
+            var document = new Document(_node);
+
+            return document.Delete(documentID, revision, policy, waitForSync);
+        }
+
+        #endregion
+
         #region Replace
 
         /// <summary>
