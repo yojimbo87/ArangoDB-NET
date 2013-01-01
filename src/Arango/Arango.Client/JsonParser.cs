@@ -215,26 +215,33 @@ namespace Arango.Client
         /// <returns>ExpandObject filled with JSON data.</returns>
         public dynamic Deserialize(string input)
         {
-            this.input = input.ToCharArray();
-            this.TrimWhiteSpace();
-            switch (this.CurrentChar)
+            if (!string.IsNullOrEmpty(input))
             {
-                case BeginObject:
-                    this.ParseObject();
-                    break;
-                case BeginArray:
-                    this.ParseArray();
-                    break;
-                default:
-                    throw new FormatException("Array or object expected.");
-            }
+                this.input = input.ToCharArray();
+                this.TrimWhiteSpace();
+                switch (this.CurrentChar)
+                {
+                    case BeginObject:
+                        this.ParseObject();
+                        break;
+                    case BeginArray:
+                        this.ParseArray();
+                        break;
+                    default:
+                        throw new FormatException("Array or object expected.");
+                }
 
-            if (this.stack.Count != 1 || this.currentIndex != this.input.Length)
+                if (this.stack.Count != 1 || this.currentIndex != this.input.Length)
+                {
+                    throw new FormatException("Malformed input.");
+                }
+
+                return this.stack.Pop();
+            }
+            else
             {
-                throw new FormatException("Malformed input.");
+                return new ExpandoObject();
             }
-
-            return this.stack.Pop();
         }
 
         // Array   ->  [ ] | [ Elements ]
