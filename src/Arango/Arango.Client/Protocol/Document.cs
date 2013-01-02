@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 
 namespace Arango.Client.Protocol
 {
@@ -250,6 +251,8 @@ namespace Arango.Client.Protocol
 
         #region GET
 
+        #region Get
+
         internal ArangoDocument Get(string id)
         {
             var request = new Request();
@@ -295,6 +298,59 @@ namespace Arango.Client.Protocol
 
             return document;
         }
+
+        #endregion
+
+        #region GetAll
+
+        internal List<ArangoDocument> GetAll(long collectionID)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri;
+            request.Method = RequestMethod.GET.ToString();
+
+            request.QueryString.Add("collection", collectionID.ToString());
+
+            return GetAll(request);
+        }
+
+        internal List<ArangoDocument> GetAll(string collectionName)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri;
+            request.Method = RequestMethod.GET.ToString();
+
+            request.QueryString.Add("collection", collectionName);
+
+            return GetAll(request);
+        }
+
+        private List<ArangoDocument> GetAll(Request request)
+        {
+            var response = _node.Process(request);
+
+            var documents = new List<ArangoDocument>();
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    foreach (string item in response.JsonObject.documents)
+                    {
+                        var document = new ArangoDocument();
+                        var lastSlashIndex = item.LastIndexOf('/') - 1;
+                        document.ID = item.Substring(item.LastIndexOf('/', lastSlashIndex) + 1);
+
+                        documents.Add(document);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return documents;
+        }
+
+        #endregion
 
         #endregion
     }

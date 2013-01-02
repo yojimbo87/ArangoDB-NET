@@ -140,6 +140,42 @@ namespace Arango.Test
 
         #endregion
 
+        #region Create, get all
+
+        [TestMethod]
+        public void CreateDocument_AND_GetAllDocumentsByCollectionID()
+        {
+            dynamic jsonObject = new ExpandoObject();
+            jsonObject.foo = "bravo";
+            jsonObject.Bar = 12345;
+
+            ArangoDocument document1 = _database.CreateDocument(_collection.ID, jsonObject, false);
+            ArangoDocument document2 = _database.CreateDocument(_collection.ID, jsonObject, false);
+
+            List<ArangoDocument> documents = _database.GetAllDocuments(_collection.ID);
+            Assert.IsTrue(documents.Count == 2);
+            Assert.AreEqual(documents.Where(doc => doc.ID == document1.ID).First().ID, document1.ID);
+            Assert.AreEqual(documents.Where(doc => doc.ID == document2.ID).First().ID, document2.ID);
+        }
+
+        [TestMethod]
+        public void CreateDocument_AND_GetAllDocumentsByCollectionName()
+        {
+            dynamic jsonObject = new ExpandoObject();
+            jsonObject.foo = "bravo";
+            jsonObject.Bar = 12345;
+
+            ArangoDocument document1 = _database.CreateDocument(_collection.ID, jsonObject, false);
+            ArangoDocument document2 = _database.CreateDocument(_collection.ID, jsonObject, false);
+
+            List<ArangoDocument> documents = _database.GetAllDocuments(_collection.Name);
+            Assert.IsTrue(documents.Count == 2);
+            Assert.AreEqual(documents.Where(doc => doc.ID == document1.ID).First().ID, document1.ID);
+            Assert.AreEqual(documents.Where(doc => doc.ID == document2.ID).First().ID, document2.ID);
+        }
+
+        #endregion
+
         #region Create, replace
 
         [TestMethod]

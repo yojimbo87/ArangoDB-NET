@@ -454,6 +454,20 @@ namespace Arango.Client
             return document.Get(handle, revision);
         }
 
+        public List<ArangoDocument> GetAllDocuments(long collectionID)
+        {
+            var document = new Document(_node);
+
+            return document.GetAll(collectionID);
+        }
+
+        public List<ArangoDocument> GetAllDocuments(string collectionName)
+        {
+            var document = new Document(_node);
+
+            return document.GetAll(collectionName);
+        }
+
         #endregion
 
         #endregion
