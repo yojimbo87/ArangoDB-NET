@@ -135,7 +135,7 @@ namespace Arango.Client
 
                     if (!string.IsNullOrEmpty(jsonString))
                     {
-                        jsonObject = parser.Deserialize(reader.ReadToEnd());
+                        jsonObject = parser.Deserialize(jsonString);
                         errorMessage = string.Format("ArangoDB responded with error code {0}:\n{1} [error number {2}]", jsonObject.code, jsonObject.errorMessage, jsonObject.errorNum);
                     }
 
