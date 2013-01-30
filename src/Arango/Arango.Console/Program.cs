@@ -54,7 +54,7 @@ namespace Arango.Console
 
         static void TestQuery()
         {
-            List<ArangoDocument> documents = _database.Query("FOR k IN Kiosks RETURN k");
+            List<ArangoDocument> documents = _database.Query("FOR k IN Kiosks RETURN k", false, 2, null);
 
             documents.ForEach(d => System.Console.WriteLine(d.ID));
         }

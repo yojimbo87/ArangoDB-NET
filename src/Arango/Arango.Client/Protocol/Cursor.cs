@@ -61,6 +61,46 @@ namespace Arango.Client.Protocol
 
                     if (response.JsonObject.hasMore)
                     {
+                        documents.AddRange(Put((long)response.JsonObject.id));
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return documents;
+        }
+
+        #endregion
+
+        #region PUT
+
+        internal List<ArangoDocument> Put(long cursor)
+        {
+            var request = new Request();
+            request.RelativeUri = _apiUri + cursor;
+            request.Method = RequestMethod.PUT.ToString();
+
+            var response = _node.Process(request);
+
+            List<ArangoDocument> documents = new List<ArangoDocument>();
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    foreach (var jsonDocument in response.JsonObject.result)
+                    {
+                        ArangoDocument document = new ArangoDocument();
+                        document.ID = jsonDocument._id;
+                        document.Revision = jsonDocument._rev.ToString();
+                        document.JsonObject = jsonDocument;
+
+                        documents.Add(document);
+                    }
+
+                    if (response.JsonObject.hasMore)
+                    {
+                        documents.AddRange(Put(cursor));
                     }
                     break;
                 default:

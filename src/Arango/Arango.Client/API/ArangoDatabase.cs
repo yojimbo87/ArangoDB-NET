@@ -472,13 +472,18 @@ namespace Arango.Client
 
         #endregion
 
-        #region Cursor
+        #region Query (cursor)
 
         public List<ArangoDocument> Query(string query)
         {
+            return Query(query, false, 0, null);
+        }
+
+        public List<ArangoDocument> Query(string query, bool count, int batchSize, Dictionary<string, string> bindValues)
+        {
             Cursor cursor = new Cursor(_node);
 
-            return cursor.Post(query, false, 0, null);
+            return cursor.Post(query, count, batchSize, bindValues);
         }
 
         #endregion
