@@ -62,9 +62,12 @@ namespace Arango.Client
             Alias = alias;
 
             BaseUri = new Uri("http://" + server + ":" + port + "/");
-            
-            Credentials = new CredentialCache();
-            Credentials.Add(BaseUri, "Basic", new NetworkCredential(userName, password));
+
+            if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
+            {
+                Credentials = new CredentialCache();
+                Credentials.Add(BaseUri, "Basic", new NetworkCredential(userName, password));
+            }
         }
 
         internal Response Process(Request request)
@@ -74,7 +77,11 @@ namespace Arango.Client
             httpRequest.KeepAlive = true;
             httpRequest.Method = request.Method;
             httpRequest.UserAgent = _userAgent;
-            httpRequest.Credentials = Credentials;
+
+            if (Credentials != null)
+            {
+                httpRequest.Credentials = Credentials;
+            }
 
             if ((request.Headers.Count > 0))
             {
