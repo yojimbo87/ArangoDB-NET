@@ -51,6 +51,7 @@
     <Compile Include="API\ArangoNode.cs" />
     <Compile Include="Protocol\Collection.cs" />
     <Compile Include="JsonParser.cs" />
+    <Compile Include="Protocol\Cursor.cs" />
     <Compile Include="Protocol\Request.cs" />
     <Compile Include="Protocol\RequestMethod.cs" />
     <Compile Include="Protocol\Document.cs" />

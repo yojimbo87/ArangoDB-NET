@@ -1,12 +1,16 @@
 ﻿using System;
-using System.IO;
-using Arango.Client;
+using System.Collections.Generic;
 using System.Dynamic;
+using System.IO;
+using System.Linq;
+using Arango.Client;
 
 namespace Arango.Console
 {
     class Program
     {
+        static ArangoDatabase _database;
+
         static void Main(string[] args)
         {
             
@@ -22,11 +26,11 @@ namespace Arango.Console
             );
             ArangoClient.Nodes.Add(node);
 
-            ArangoDatabase database = new ArangoDatabase(alias);
+            _database = new ArangoDatabase(alias);
 
             //database.GetCollections();
-            ArangoDocument document = database.GetDocument("10843274/12481674");
-            System.Console.WriteLine("Handle: {0}, Rev: {1}, Json: {2}", document.ID, document.Revision, document.JsonObject);
+            //ArangoDocument document = database.GetDocument("10843274/12481674");
+            //System.Console.WriteLine("Handle: {0}, Rev: {1}, Json: {2}", document.ID, document.Revision, document.JsonObject);
 
             //ArangoCollection collection = database.GetCollection(10843274);
             //ArangoCollection collection = database.GetCollection("Users");
@@ -43,7 +47,16 @@ namespace Arango.Console
             System.Console.WriteLine("non: {0}", doc.Has("non"));
             System.Console.WriteLine("non.exist: {0}", doc.Has("non.exist"));*/
 
+            TestQuery();
+
             System.Console.ReadLine();
+        }
+
+        static void TestQuery()
+        {
+            List<ArangoDocument> documents = _database.Query("FOR k IN Kiosks RETURN k");
+
+            documents.ForEach(d => System.Console.WriteLine(d.ID));
         }
     }
 }

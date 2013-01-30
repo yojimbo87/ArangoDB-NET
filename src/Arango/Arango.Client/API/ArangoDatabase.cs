@@ -471,5 +471,16 @@ namespace Arango.Client
         #endregion
 
         #endregion
+
+        #region Cursor
+
+        public List<ArangoDocument> Query(string query)
+        {
+            Cursor cursor = new Cursor(_node);
+
+            return cursor.Post(query, false, 0, null);
+        }
+
+        #endregion
     }
 }
