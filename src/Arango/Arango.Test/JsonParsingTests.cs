@@ -55,6 +55,18 @@ namespace Arango.Test
         }
 
         [TestMethod]
+        public void SerializeObjectDictionary()
+        {
+            dynamic expando = new ExpandoObject();
+            expando.Foo = 123;
+            expando._bar = new Dictionary<string, object>();
+            expando._bar.Add("foo", "bar");
+
+            string json = _parser.Serialize(expando);
+            Assert.AreEqual(json, "{\"Foo\":123,\"_bar\":{\"foo\":\"bar\"}}");
+        }
+
+        [TestMethod]
         public void SerializeObjectArrayMembers()
         {
             dynamic expando = new ExpandoObject();

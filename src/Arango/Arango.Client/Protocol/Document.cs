@@ -6,7 +6,6 @@ namespace Arango.Client.Protocol
     internal class Document
     {
         private string _apiUri { get { return "_api/document"; } }
-        private JsonParser _parser = new JsonParser();
         private ArangoNode _node { get; set; }
 
         internal Document(ArangoNode node)
@@ -16,13 +15,13 @@ namespace Arango.Client.Protocol
 
         #region POST
 
-        internal ArangoDocument Post(long collectionID, dynamic jsonObject, bool waitForSync)
+        internal ArangoDocument Post(long collectionID, Json jsonObject, bool waitForSync)
         {
             var request = new Request();
             request.RelativeUri = _apiUri;
             request.QueryString.Add("collection", collectionID.ToString());
             request.Method = RequestMethod.POST.ToString();
-            request.Body = _parser.Serialize(jsonObject);
+            request.Body = jsonObject.Stringify();
 
             if (waitForSync)
             {
@@ -32,13 +31,13 @@ namespace Arango.Client.Protocol
             return Post(request);
         }
 
-        internal ArangoDocument Post(string collectionName, bool createCollection,  dynamic jsonObject, bool waitForSync)
+        internal ArangoDocument Post(string collectionName, bool createCollection,  Json jsonObject, bool waitForSync)
         {
             var request = new Request();
             request.RelativeUri = _apiUri;
             request.QueryString.Add("collection", collectionName);
             request.Method = RequestMethod.POST.ToString();
-            request.Body = _parser.Serialize(jsonObject);
+            request.Body = jsonObject.Stringify();
 
             if (createCollection)
             {
@@ -63,8 +62,8 @@ namespace Arango.Client.Protocol
             {
                 case HttpStatusCode.Created:
                 case HttpStatusCode.Accepted:
-                    document.ID = response.JsonObject._id;
-                    document.Revision = ((long)response.JsonObject._rev).ToString();
+                    document.ID = response.JsonObject.Get("_id");
+                    document.Revision = response.JsonObject.Get("_rev");
                     break;
                 default:
                     break;
@@ -77,12 +76,12 @@ namespace Arango.Client.Protocol
 
         #region PUT
 
-        internal string Put(string documentID, string revision, DocumentUpdatePolicy policy, dynamic jsonObject, bool waitForSync)
+        internal string Put(string documentID, string revision, DocumentUpdatePolicy policy, Json jsonObject, bool waitForSync)
         {
             var request = new Request();
             request.RelativeUri = _apiUri + "/" + documentID;
             request.Method = RequestMethod.PUT.ToString();
-            request.Body = _parser.Serialize(jsonObject);
+            request.Body = jsonObject.Stringify();
 
             if (!string.IsNullOrEmpty(revision))
             {
@@ -112,7 +111,7 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    newRevision = ((long)response.JsonObject._rev).ToString();
+                    newRevision = response.JsonObject.Get("_rev");
                     break;
                 default:
                     break;
@@ -125,12 +124,12 @@ namespace Arango.Client.Protocol
 
         #region PATCH
 
-        internal string Patch(string documentID, string revision, DocumentUpdatePolicy policy, dynamic jsonObject, bool keepNullFields, bool waitForSync)
+        internal string Patch(string documentID, string revision, DocumentUpdatePolicy policy, Json jsonObject, bool keepNullFields, bool waitForSync)
         {
             var request = new Request();
             request.RelativeUri = _apiUri + "/" + documentID;
             request.Method = RequestMethod.PATCH.ToString();
-            request.Body = _parser.Serialize(jsonObject);
+            request.Body = jsonObject.Stringify();
 
             if (!string.IsNullOrEmpty(revision))
             {
@@ -165,7 +164,7 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    newRevision = ((long)response.JsonObject._rev).ToString();
+                    newRevision = response.JsonObject.Get("_rev");
                     break;
                 default:
                     break;
@@ -212,7 +211,7 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    deletedDocumentID = response.JsonObject._id;
+                    deletedDocumentID = response.JsonObject.Get("_id");
                     break;
                 default:
                     break;
@@ -285,7 +284,7 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    document.ID = response.JsonObject._id;
+                    document.ID = response.JsonObject.Get("_id");
                     document.Revision = response.Headers.Get("etag").Replace("\"", "");
                     document.JsonObject = response.JsonObject;
                     break;
@@ -334,7 +333,7 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    foreach (string item in response.JsonObject.documents)
+                    foreach (string item in response.JsonObject.Get<List<string>>("documents"))
                     {
                         var document = new ArangoDocument();
                         var lastSlashIndex = item.LastIndexOf('/') - 1;

@@ -7,7 +7,6 @@ namespace Arango.Client.Protocol
     internal class Collection
     {
         private string _apiUri { get { return "_api/collection/"; } }
-        private JsonParser _parser = new JsonParser();
         private ArangoNode _node;
 
         internal Collection(ArangoNode node)
@@ -19,17 +18,17 @@ namespace Arango.Client.Protocol
 
         internal ArangoCollection Post(string name, ArangoCollectionType type, bool waitForSync, long journalSize)
         {
-            dynamic bodyObject = new ExpandoObject();
-            bodyObject.name = name;
-            bodyObject.type = (int)type;
-            bodyObject.waitForSync = waitForSync;
-            bodyObject.journalSize = journalSize;
-            bodyObject.isSystem = false;
+            Json bodyObject = new Json();
+            bodyObject.Set("name", name);
+            bodyObject.Set("type", type);
+            bodyObject.Set("waitForSync", waitForSync);
+            bodyObject.Set("journalSize", journalSize);
+            bodyObject.Set("isSystem", false);
 
             var request = new Request();
             request.RelativeUri = _apiUri;
             request.Method = RequestMethod.POST.ToString();
-            request.Body = _parser.Serialize(bodyObject);
+            request.Body = bodyObject.Stringify();
 
             var response = _node.Process(request);
 
@@ -38,12 +37,12 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    collection.ID = (long)response.JsonObject.id;
-                    collection.Name = response.JsonObject.name;
-                    collection.WaitForSync = response.JsonObject.waitForSync;
+                    collection.ID = response.JsonObject.Get<long>("id");
+                    collection.Name = response.JsonObject.Get("name");
+                    collection.WaitForSync = response.JsonObject.Get<bool>("waitForSync");
                     collection.JournalSize = journalSize;
-                    collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
-                    collection.Type = (ArangoCollectionType)response.JsonObject.type;
+                    collection.Status = response.JsonObject.Get<ArangoCollectionStatus>("status");
+                    collection.Type = response.JsonObject.Get<ArangoCollectionType>("type");
                     break;
                 default:
                     break;
@@ -125,11 +124,11 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    collection.ID = (long)response.JsonObject.id;
-                    collection.Name = response.JsonObject.name;
-                    collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
-                    collection.Type = (ArangoCollectionType)response.JsonObject.type;
-                    collection.DocumentsCount = (long)response.JsonObject.count;
+                    collection.ID = response.JsonObject.Get<long>("id");
+                    collection.Name = response.JsonObject.Get("name");
+                    collection.Status = response.JsonObject.Get<ArangoCollectionStatus>("status");
+                    collection.Type = response.JsonObject.Get<ArangoCollectionType>("type");
+                    collection.DocumentsCount = response.JsonObject.Get<long>("count");
                     break;
                 default:
                     break;
@@ -169,10 +168,10 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    collection.ID = (long)response.JsonObject.id;
-                    collection.Name = response.JsonObject.name;
-                    collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
-                    collection.Type = (ArangoCollectionType)response.JsonObject.type;
+                    collection.ID = response.JsonObject.Get<long>("id");
+                    collection.Name = response.JsonObject.Get("name");
+                    collection.Status = response.JsonObject.Get<ArangoCollectionStatus>("status");
+                    collection.Type = response.JsonObject.Get<ArangoCollectionType>("type");
                     break;
                 default:
                     break;
@@ -187,26 +186,26 @@ namespace Arango.Client.Protocol
 
         internal ArangoCollection PutProperties(long id, bool waitForSync)
         {
-            dynamic bodyObject = new ExpandoObject();
-            bodyObject.waitForSync = waitForSync;
+            Json bodyObject = new Json();
+            bodyObject.Set("waitForSync", waitForSync);
 
             var request = new Request();
             request.RelativeUri = _apiUri + id + "/properties";
             request.Method = RequestMethod.PUT.ToString();
-            request.Body = _parser.Serialize(bodyObject);
+            request.Body = bodyObject.Stringify();
 
             return PutProperties(request);
         }
 
         internal ArangoCollection PutProperties(string name, bool waitForSync)
         {
-            dynamic bodyObject = new ExpandoObject();
-            bodyObject.waitForSync = waitForSync;
+            Json bodyObject = new Json();
+            bodyObject.Set("waitForSync", waitForSync);
 
             var request = new Request();
             request.RelativeUri = _apiUri + name + "/properties";
             request.Method = RequestMethod.PUT.ToString();
-            request.Body = _parser.Serialize(bodyObject);
+            request.Body = bodyObject.Stringify();
 
             return PutProperties(request);
         }
@@ -220,12 +219,12 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    collection.ID = (long)response.JsonObject.id;
-                    collection.Name = response.JsonObject.name;
-                    collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
-                    collection.Type = (ArangoCollectionType)response.JsonObject.type;
-                    collection.JournalSize = (long)response.JsonObject.journalSize;
-                    collection.WaitForSync = response.JsonObject.waitForSync;
+                    collection.ID = response.JsonObject.Get<long>("id");
+                    collection.Name = response.JsonObject.Get("name");
+                    collection.Status = response.JsonObject.Get<ArangoCollectionStatus>("status");
+                    collection.Type = response.JsonObject.Get<ArangoCollectionType>("type");
+                    collection.JournalSize = response.JsonObject.Get<long>("journalSize");
+                    collection.WaitForSync = response.JsonObject.Get<bool>("waitForSync");
                     break;
                 default:
                     break;
@@ -240,26 +239,26 @@ namespace Arango.Client.Protocol
 
         internal ArangoCollection PutRename(long id, string newName)
         {
-            dynamic bodyObject = new ExpandoObject();
-            bodyObject.name = newName;
+            Json bodyObject = new Json();
+            bodyObject.Set("name", newName);
 
             var request = new Request();
             request.RelativeUri = _apiUri + id + "/rename";
             request.Method = RequestMethod.PUT.ToString();
-            request.Body = _parser.Serialize(bodyObject);
+            request.Body = bodyObject.Stringify();
 
             return PutRename(request);
         }
 
         internal ArangoCollection PutRename(string name, string newName)
         {
-            dynamic bodyObject = new ExpandoObject();
-            bodyObject.name = newName;
+            Json bodyObject = new Json();
+            bodyObject.Set("name", newName);
 
             var request = new Request();
             request.RelativeUri = _apiUri + name + "/rename";
             request.Method = RequestMethod.PUT.ToString();
-            request.Body = _parser.Serialize(bodyObject);
+            request.Body = bodyObject.Stringify();
 
             return PutRename(request);
         }
@@ -273,10 +272,10 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    collection.ID = (long)response.JsonObject.id;
-                    collection.Name = response.JsonObject.name;
-                    collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
-                    collection.Type = (ArangoCollectionType)response.JsonObject.type;
+                    collection.ID = response.JsonObject.Get<long>("id");
+                    collection.Name = response.JsonObject.Get("name");
+                    collection.Status = response.JsonObject.Get<ArangoCollectionStatus>("status");
+                    collection.Type = response.JsonObject.Get<ArangoCollectionType>("type");
                     break;
                 default:
                     break;
@@ -318,9 +317,9 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    if (response.JsonObject.error == false)
+                    if (response.JsonObject.Get<bool>("error") == false)
                     {
-                        collectionID = (long)response.JsonObject.id;
+                        collectionID = response.JsonObject.Get<long>("id");
                     }
                     break;
                 default:
@@ -364,10 +363,10 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    collection.ID = (long)response.JsonObject.id;
-                    collection.Name = response.JsonObject.name;
-                    collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
-                    collection.Type = (ArangoCollectionType)response.JsonObject.type;
+                    collection.ID = response.JsonObject.Get<long>("id");
+                    collection.Name = response.JsonObject.Get("name");
+                    collection.Status = response.JsonObject.Get<ArangoCollectionStatus>("status");
+                    collection.Type = response.JsonObject.Get<ArangoCollectionType>("type");
                     break;
                 default:
                     break;
@@ -408,12 +407,12 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    collection.ID = (long)response.JsonObject.id;
-                    collection.Name = response.JsonObject.name;
-                    collection.WaitForSync = response.JsonObject.waitForSync;
-                    collection.JournalSize = (long)response.JsonObject.journalSize;
-                    collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
-                    collection.Type = (ArangoCollectionType)response.JsonObject.type;
+                    collection.ID = response.JsonObject.Get<long>("id");
+                    collection.Name = response.JsonObject.Get("name");
+                    collection.Status = response.JsonObject.Get<ArangoCollectionStatus>("status");
+                    collection.Type = response.JsonObject.Get<ArangoCollectionType>("type");
+                    collection.WaitForSync = response.JsonObject.Get<bool>("waitForSync");
+                    collection.JournalSize = response.JsonObject.Get<long>("journalSize");
                     break;
                 default:
                     break;
@@ -454,13 +453,13 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    collection.ID = (long)response.JsonObject.id;
-                    collection.Name = response.JsonObject.name;
-                    collection.WaitForSync = response.JsonObject.waitForSync;
-                    collection.JournalSize = (long)response.JsonObject.journalSize;
-                    collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
-                    collection.Type = (ArangoCollectionType)response.JsonObject.type;
-                    collection.DocumentsCount = (long)response.JsonObject.count;
+                    collection.ID = response.JsonObject.Get<long>("id");
+                    collection.Name = response.JsonObject.Get("name");
+                    collection.Status = response.JsonObject.Get<ArangoCollectionStatus>("status");
+                    collection.Type = response.JsonObject.Get<ArangoCollectionType>("type");
+                    collection.WaitForSync = response.JsonObject.Get<bool>("waitForSync");
+                    collection.JournalSize = response.JsonObject.Get<long>("journalSize");
+                    collection.DocumentsCount = response.JsonObject.Get<long>("count");
                     break;
                 default:
                     break;
@@ -501,22 +500,23 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    collection.ID = (long)response.JsonObject.id;
-                    collection.Name = response.JsonObject.name;
-                    collection.WaitForSync = response.JsonObject.waitForSync;
-                    collection.JournalSize = (long)response.JsonObject.journalSize;
-                    collection.Status = (ArangoCollectionStatus)response.JsonObject.status;
-                    collection.Type = (ArangoCollectionType)response.JsonObject.type;
-                    collection.DocumentsCount = (long)response.JsonObject.count;
-                    collection.AliveDocumentsCount = (long)response.JsonObject.figures.alive.count;
-                    collection.AliveDocumentsSize = (long)response.JsonObject.figures.alive.size;
-                    collection.DeadDocumentsCount = (long)response.JsonObject.figures.dead.count;
-                    collection.DeadDocumentsSize = (long)response.JsonObject.figures.dead.size;
-                    collection.DeadDeletetionCount = (long)response.JsonObject.figures.dead.deletion;
-                    collection.DataFilesCount = (long)response.JsonObject.figures.datafiles.count;
-                    collection.DataFilesSize = (long)response.JsonObject.figures.datafiles.fileSize;
-                    collection.JournalsCount = (long)response.JsonObject.figures.journals.count;
-                    collection.JournalsFileSize = (long)response.JsonObject.figures.journals.fileSize;
+                    collection.ID = response.JsonObject.Get<long>("id");
+                    collection.Name = response.JsonObject.Get("name");
+                    collection.Status = response.JsonObject.Get<ArangoCollectionStatus>("status");
+                    collection.Type = response.JsonObject.Get<ArangoCollectionType>("type");
+                    collection.WaitForSync = response.JsonObject.Get<bool>("waitForSync");
+                    collection.JournalSize = response.JsonObject.Get<long>("journalSize");
+                    collection.DocumentsCount = response.JsonObject.Get<long>("count");
+
+                    collection.AliveDocumentsCount = response.JsonObject.Get<long>("figures.alive.count");
+                    collection.AliveDocumentsSize = response.JsonObject.Get<long>("figures.alive.size");
+                    collection.DeadDocumentsCount = response.JsonObject.Get<long>("figures.dead.count");
+                    collection.DeadDocumentsSize = response.JsonObject.Get<long>("figures.dead.size");
+                    collection.DeadDeletetionCount = response.JsonObject.Get<long>("figures.dead.deletion");
+                    collection.DataFilesCount = response.JsonObject.Get<long>("figures.datafiles.count");
+                    collection.DataFilesSize = response.JsonObject.Get<long>("figures.datafiles.fileSize");
+                    collection.JournalsCount = response.JsonObject.Get<long>("figures.journals.count");
+                    collection.JournalsFileSize = response.JsonObject.Get<long>("figures.journals.fileSize");
                     break;
                 default:
                     break;
@@ -541,13 +541,13 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    foreach (var item in response.JsonObject.collections)
+                    foreach (var item in response.JsonObject.Get<List<Json>>("collections"))
                     {
                         ArangoCollection collection = new ArangoCollection();
-                        collection.ID = (long)item.id;
-                        collection.Name = item.name;
-                        collection.Status = (ArangoCollectionStatus)item.status;
-                        collection.Type = (ArangoCollectionType)item.type;
+                        collection.ID = item.Get<long>("id");
+                        collection.Name = item.Get("name");
+                        collection.Status = item.Get<ArangoCollectionStatus>("status");
+                        collection.Type = item.Get<ArangoCollectionType>("type");
 
                         collections.Add(collection);
                     }

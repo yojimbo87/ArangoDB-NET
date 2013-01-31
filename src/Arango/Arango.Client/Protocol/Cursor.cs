@@ -7,7 +7,6 @@ namespace Arango.Client.Protocol
     internal class Cursor
     {
         private string _apiUri { get { return "_api/cursor/"; } }
-        private JsonParser _parser = new JsonParser();
         private ArangoNode _node;
 
         internal Cursor(ArangoNode node)
@@ -19,28 +18,28 @@ namespace Arango.Client.Protocol
 
         internal List<ArangoDocument> Post(string query, bool count, int batchSize, Dictionary<string, string> bindVars)
         {
-            dynamic bodyObject = new ExpandoObject();
-            bodyObject.query = query;
+            Json bodyObject = new Json();
+            bodyObject.Set("query", query);
 
             if (count)
             {
-                bodyObject.count = count;
+                bodyObject.Set("count", count);
             }
 
             if (batchSize > 0)
             {
-                bodyObject.batchSize = batchSize;
+                bodyObject.Set("batchSize", batchSize);
             }
 
             if ((bindVars != null) && (bindVars.Count > 0))
             {
-                bodyObject.bindVars = bindVars;
+                bodyObject.Set("bindVars", bindVars);
             }
 
             var request = new Request();
             request.RelativeUri = _apiUri;
             request.Method = RequestMethod.POST.ToString();
-            request.Body = _parser.Serialize(bodyObject);
+            request.Body = bodyObject.Stringify();
 
             var response = _node.Process(request);
 
@@ -49,19 +48,19 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.Created:
-                    foreach (var jsonDocument in response.JsonObject.result)
+                    foreach (var jsonDocument in response.JsonObject.Get<List<Json>>("result"))
                     {
                         ArangoDocument document = new ArangoDocument();
-                        document.ID = jsonDocument._id;
-                        document.Revision = jsonDocument._rev.ToString();
+                        document.ID = jsonDocument.Get("_id");
+                        document.Revision = jsonDocument.Get("_rev");
                         document.JsonObject = jsonDocument;
 
                         documents.Add(document);
                     }
 
-                    if (response.JsonObject.hasMore)
+                    if (response.JsonObject.Get<bool>("hasMore"))
                     {
-                        documents.AddRange(Put((long)response.JsonObject.id));
+                        documents.AddRange(Put(response.JsonObject.Get<long>("id")));
                     }
                     break;
                 default:
@@ -88,17 +87,17 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    foreach (var jsonDocument in response.JsonObject.result)
+                    foreach (var jsonDocument in response.JsonObject.Get<List<Json>>("result"))
                     {
                         ArangoDocument document = new ArangoDocument();
-                        document.ID = jsonDocument._id;
-                        document.Revision = jsonDocument._rev.ToString();
+                        document.ID = jsonDocument.Get("_id");
+                        document.Revision = jsonDocument.Get("_rev");
                         document.JsonObject = jsonDocument;
 
                         documents.Add(document);
                     }
 
-                    if (response.JsonObject.hasMore)
+                    if (response.JsonObject.Get<bool>("hasMore"))
                     {
                         documents.AddRange(Put(cursor));
                     }

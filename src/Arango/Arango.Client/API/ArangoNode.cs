@@ -72,7 +72,6 @@ namespace Arango.Client
 
         internal Response Process(Request request)
         {
-            var parser = new JsonParser();
             var httpRequest = (HttpWebRequest)HttpWebRequest.Create(BaseUri + request.RelativeUri);
             httpRequest.KeepAlive = true;
             httpRequest.Method = request.Method;
@@ -114,7 +113,7 @@ namespace Arango.Client
 
                 if (!string.IsNullOrEmpty(response.JsonString))
                 {
-                    response.JsonObject = parser.Deserialize(response.JsonString);
+                    response.JsonObject.Load(response.JsonString);
                 }
             }
             catch (WebException webException)
@@ -131,19 +130,24 @@ namespace Arango.Client
 
                     if (!string.IsNullOrEmpty(response.JsonString))
                     {
-                        response.JsonObject = parser.Deserialize(response.JsonString);
+                        response.JsonObject.Load(response.JsonString);
                     }
                 }
                 else
                 {
                     var jsonString = reader.ReadToEnd();
-                    dynamic jsonObject;
+                    Json jsonObject = new Json();
                     string errorMessage = "";
 
                     if (!string.IsNullOrEmpty(jsonString))
                     {
-                        jsonObject = parser.Deserialize(jsonString);
-                        errorMessage = string.Format("ArangoDB responded with error code {0}:\n{1} [error number {2}]", jsonObject.code, jsonObject.errorMessage, jsonObject.errorNum);
+                        jsonObject.Load(jsonString);
+                        errorMessage = string.Format(
+                            "ArangoDB responded with error code {0}:\n{1} [error number {2}]", 
+                            jsonObject.Get("code"), 
+                            jsonObject.Get("errorMessage"),
+                            jsonObject.Get("errorNum")
+                        );
                     }
 
                     throw new ArangoException(
