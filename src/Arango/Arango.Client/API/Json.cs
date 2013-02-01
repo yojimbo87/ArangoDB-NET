@@ -78,7 +78,7 @@ namespace Arango.Client
             return obj;
         }
 
-        public void Set(string fieldName, object value)
+        public void Set<T>(string fieldName, T value)
         {
             if (fieldName.Contains("."))
             {
@@ -94,11 +94,11 @@ namespace Arango.Client
                     {
                         if (innerObject.ContainsKey(field))
                         {
-                            innerObject[field] = value.ToJson();
+                            innerObject[field] = ToJson<T>(value);
                         }
                         else
                         {
-                            innerObject.Add(field, value.ToJson());
+                            innerObject.Add(field, ToJson<T>(value));
                         }
                         break;
                     }
@@ -115,12 +115,12 @@ namespace Arango.Client
                     if (iteration > 0)
                     {
                         JsonObject obj = innerObjects[iteration - 1];
-                        obj[fields[iteration - 1]] = innerObjects[iteration].ToJson();
+                        obj[fields[iteration - 1]] = ToJson(innerObjects[iteration]);
                     }
                     else
                     {
                         JsonObject obj = innerObjects[0];
-                        obj[fields[0]] = innerObjects[1].ToJson();
+                        obj[fields[0]] = ToJson(innerObjects[1]);
                     }
 
                     iteration--;
@@ -130,11 +130,11 @@ namespace Arango.Client
             {
                 if (_jsonObject.ContainsKey(fieldName))
                 {
-                    _jsonObject[fieldName] = value.ToJson();
+                    _jsonObject[fieldName] = ToJson<T>(value);
                 }
                 else
                 {
-                    _jsonObject.Add(fieldName, value.ToJson());
+                    _jsonObject.Add(fieldName, ToJson<T>(value));
                 }
             }
         }
@@ -176,6 +176,19 @@ namespace Arango.Client
         public string Stringify()
         {
             return _jsonObject.ToJson();
+        }
+
+        private string ToJson<T>(T value)
+        {
+            // prevent double quoting string value
+            if (value is string)
+            {
+                return value.ToString();
+            }
+            else
+            {
+                return value.ToJson<T>();
+            }
         }
     }
 }
