@@ -4,7 +4,7 @@ using ServiceStack.Text;
 
 namespace Arango.Client
 {
-    public class Json : JsonObject
+    public class Json : Dictionary<string, string>
     {
         public Json() { }
 
@@ -13,7 +13,7 @@ namespace Arango.Client
             Load(json);
         }
 
-        public string GetValue(string fieldPath)
+        public string Get(string fieldPath)
         {
             string obj = null;
 
@@ -21,29 +21,32 @@ namespace Arango.Client
             {
                 var fields = fieldPath.Split('.');
                 int iteration = 1;
-                JsonObject innerObject = null;
+                Dictionary<string, string> innerObject = this;
 
                 foreach (var field in fields)
                 {
+                    JsonObject json = ToJsonObject(innerObject);
+
                     if (iteration == fields.Length)
                     {
-                        obj = innerObject.Get(field);
+                        obj = json.Get(field);
                         break;
                     }
 
-                    innerObject = this.Get<JsonObject>(field);
+                    innerObject = ToDictionary(json.GetUnescaped(field));
                     iteration++;
                 }
             }
             else
             {
-                obj = this.Get(fieldPath);
+                JsonObject json = ToJsonObject(this);
+                obj = json.Get(fieldPath);
             }
 
             return obj;
         }
 
-        public T GetValue<T>(string fieldPath) where T : new()
+        public T Get<T>(string fieldPath) where T : new()
         {
             T obj = new T();
 
@@ -51,36 +54,39 @@ namespace Arango.Client
             {
                 var fields = fieldPath.Split('.');
                 int iteration = 1;
-                JsonObject innerObject = this;
+                Dictionary<string, string> innerObject = this;
 
                 foreach (var field in fields)
                 {
+                    JsonObject json = ToJsonObject(innerObject);
+
                     if (iteration == fields.Length)
                     {
-                        obj = innerObject.Get<T>(field);
+                        obj = json.Get<T>(field);
                         break;
                     }
 
-                    innerObject = innerObject.Get<JsonObject>(field);
+                    innerObject = json.GetUnescaped(field).ToStringDictionary();
                     iteration++;
                 }
             }
             else
             {
-                obj = this.Get<T>(fieldPath);
+                JsonObject json = ToJsonObject(this);
+                obj = json.Get<T>(fieldPath);
             }
 
             return obj;
         }
 
-        public void SetValue<T>(string fieldPath, T value)
+        public void Set<T>(string fieldPath, T value)
         {
             if (fieldPath.Contains("."))
             {
                 var fields = fieldPath.Split('.');
                 int iteration = 1;
-                List<JsonObject> innerObjects = new List<JsonObject>();
-                JsonObject innerObject = this;
+                List<Dictionary<string, string>> innerObjects = new List<Dictionary<string, string>>();
+                Dictionary<string, string> innerObject = this;
                 innerObjects.Add(innerObject);
 
                 foreach (var field in fields)
@@ -98,7 +104,8 @@ namespace Arango.Client
                         break;
                     }
 
-                    innerObject = innerObject.Get<JsonObject>(field);
+                    JsonObject json = ToJsonObject(innerObject);
+                    innerObject = json.GetUnescaped(field).ToStringDictionary();
                     innerObjects.Add(innerObject);
                     iteration++;
                 }
@@ -109,12 +116,12 @@ namespace Arango.Client
                 {
                     if (iteration > 0)
                     {
-                        JsonObject obj = innerObjects[iteration - 1];
+                        Dictionary<string, string> obj = innerObjects[iteration - 1];
                         obj[fields[iteration - 1]] = ToJson(innerObjects[iteration]);
                     }
                     else
                     {
-                        JsonObject obj = innerObjects[0];
+                        Dictionary<string, string> obj = innerObjects[0];
                         obj[fields[0]] = ToJson(innerObjects[1]);
                     }
 
@@ -142,7 +149,7 @@ namespace Arango.Client
             {
                 var fields = fieldPath.Split('.');
                 int iteration = 1;
-                JsonObject innerObject = null;
+                Dictionary<string, string> innerObject = null;
 
                 foreach (var field in fields)
                 {
@@ -151,7 +158,8 @@ namespace Arango.Client
                         contains = innerObject.ContainsKey(field);
                     }
 
-                    innerObject = this.Get<JsonObject>(field);
+                    JsonObject json = ToJsonObject(innerObject);
+                    innerObject = json.GetUnescaped(field).ToStringDictionary();
                     iteration++;
                 }
             }
@@ -165,17 +173,42 @@ namespace Arango.Client
 
         public void Load(string json)
         {
-            JsonObject obj = JsonObject.Parse(json);
+            Dictionary<string, string> obj = JsonObject.Parse(json).ToStringDictionary();
 
             foreach(string key in obj.Keys)
             {
-                this.Add(key, obj.GetUnescaped(key));
+                this.Add(key, obj[key]);
             }
         }
 
         public string Stringify()
         {
-            return this.ToJson<JsonObject>();
+            return ToJsonObject(this).ToJson<JsonObject>();
+        }
+
+        private JsonObject ToJsonObject(Dictionary<string, string> dictionary)
+        {
+            JsonObject obj = new JsonObject();
+
+            foreach (KeyValuePair<string, string> kv in dictionary)
+            {
+                obj.Add(kv.Key, kv.Value);
+            }
+
+            return obj;
+        }
+
+        private Dictionary<string, string> ToDictionary(string json)
+        {
+            JsonObject obj = JsonObject.Parse(json);
+            Dictionary<string, string> dictionary = new Dictionary<string, string>();
+
+            foreach (var kv in obj)
+            {
+                dictionary.Add(kv.Key, obj.GetUnescaped(kv.Key));
+            }
+
+            return dictionary;
         }
 
         private string ToJson<T>(T value)

@@ -62,8 +62,8 @@ namespace Arango.Client.Protocol
             {
                 case HttpStatusCode.Created:
                 case HttpStatusCode.Accepted:
-                    document.ID = response.JsonObject.GetValue("_id");
-                    document.Revision = response.JsonObject.GetValue("_rev");
+                    document.ID = response.JsonObject.Get("_id");
+                    document.Revision = response.JsonObject.Get("_rev");
                     break;
                 default:
                     break;
@@ -111,7 +111,7 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    newRevision = response.JsonObject.GetValue("_rev");
+                    newRevision = response.JsonObject.Get("_rev");
                     break;
                 default:
                     break;
@@ -164,7 +164,7 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    newRevision = response.JsonObject.GetValue("_rev");
+                    newRevision = response.JsonObject.Get("_rev");
                     break;
                 default:
                     break;
@@ -211,7 +211,7 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    deletedDocumentID = response.JsonObject.GetValue("_id");
+                    deletedDocumentID = response.JsonObject.Get("_id");
                     break;
                 default:
                     break;
@@ -284,7 +284,7 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    document.ID = response.JsonObject.GetValue("_id");
+                    document.ID = response.JsonObject.Get("_id");
                     document.Revision = response.Headers.Get("etag").Replace("\"", "");
                     document.JsonObject = response.JsonObject;
                     break;
@@ -333,7 +333,7 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    foreach (string item in response.JsonObject.GetValue<List<string>>("documents"))
+                    foreach (string item in response.JsonObject.Get<List<string>>("documents"))
                     {
                         var document = new ArangoDocument();
                         var lastSlashIndex = item.LastIndexOf('/') - 1;

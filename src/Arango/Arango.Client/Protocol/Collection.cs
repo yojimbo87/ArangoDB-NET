@@ -20,11 +20,11 @@ namespace Arango.Client.Protocol
         internal ArangoCollection Post(string name, ArangoCollectionType type, bool waitForSync, long journalSize)
         {
             Json bodyObject = new Json();
-            bodyObject.SetValue("name", name);
-            bodyObject.SetValue("type", (int)type);
-            bodyObject.SetValue("waitForSync", waitForSync);
-            bodyObject.SetValue("journalSize", journalSize);
-            bodyObject.SetValue("isSystem", false);
+            bodyObject.Set("name", name);
+            bodyObject.Set("type", (int)type);
+            bodyObject.Set("waitForSync", waitForSync);
+            bodyObject.Set("journalSize", journalSize);
+            bodyObject.Set("isSystem", false);
 
             var request = new Request();
             request.RelativeUri = _apiUri;
@@ -188,7 +188,7 @@ namespace Arango.Client.Protocol
         internal ArangoCollection PutProperties(long id, bool waitForSync)
         {
             Json bodyObject = new Json();
-            bodyObject.SetValue("waitForSync", waitForSync);
+            bodyObject.Set("waitForSync", waitForSync);
 
             var request = new Request();
             request.RelativeUri = _apiUri + id + "/properties";
@@ -201,7 +201,7 @@ namespace Arango.Client.Protocol
         internal ArangoCollection PutProperties(string name, bool waitForSync)
         {
             Json bodyObject = new Json();
-            bodyObject.SetValue("waitForSync", waitForSync);
+            bodyObject.Set("waitForSync", waitForSync);
 
             var request = new Request();
             request.RelativeUri = _apiUri + name + "/properties";
@@ -241,7 +241,7 @@ namespace Arango.Client.Protocol
         internal ArangoCollection PutRename(long id, string newName)
         {
             Json bodyObject = new Json();
-            bodyObject.SetValue("name", newName);
+            bodyObject.Set("name", newName);
 
             var request = new Request();
             request.RelativeUri = _apiUri + id + "/rename";
@@ -254,7 +254,7 @@ namespace Arango.Client.Protocol
         internal ArangoCollection PutRename(string name, string newName)
         {
             Json bodyObject = new Json();
-            bodyObject.SetValue("name", newName);
+            bodyObject.Set("name", newName);
 
             var request = new Request();
             request.RelativeUri = _apiUri + name + "/rename";

@@ -89,10 +89,10 @@ namespace Arango.Console
 
             System.Console.WriteLine(json.Get<List<string>>("foo.baz")[1]);*/
 
-            json.Load("{\"foo\":[{\"bar\":123},{\"bar\":456}]}");
+            json.Load("{\"foo\":{\"bar\":[{\"baz\":123},{\"baz\":456}]}}");
             //json.Load("{\"foo\":[\"bar1\",\"bar2\"]}");
-            List<Json> foo = json.GetValue<List<Json>>("foo");
-            System.Console.WriteLine(foo[1].GetValue<int>("bar"));
+            List<Json> bar = json.Get<List<Json>>("foo.bar");
+            System.Console.WriteLine(bar[1].Get<int>("baz"));
             System.Console.WriteLine(json.Stringify());
         }
     }
