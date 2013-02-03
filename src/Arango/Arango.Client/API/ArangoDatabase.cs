@@ -338,7 +338,7 @@ namespace Arango.Client
         /// <param name="jsonObject">JSON object which will be created in specified collection.</param>
         /// <param name="waitForSync">If true forces synchronisation.</param>
         /// <returns>ArangoDocument object with assigned document ID and revision.</returns>
-        public ArangoDocument CreateDocument(long collectionID, dynamic jsonObject, bool waitForSync)
+        public ArangoDocument CreateDocument(long collectionID, Json jsonObject, bool waitForSync)
         {
             var document = new Document(_node);
 
@@ -353,7 +353,7 @@ namespace Arango.Client
         /// <param name="jsonObject">JSON object which will be created in specified collection.</param>
         /// <param name="waitForSync">If true forces synchronisation.</param>
         /// <returns>ArangoDocument object with assigned handle and revision.</returns>
-        public ArangoDocument CreateDocument(string collectionName, bool createCollection, dynamic jsonObject, bool waitForSync)
+        public ArangoDocument CreateDocument(string collectionName, bool createCollection, Json jsonObject, bool waitForSync)
         {
             var document = new Document(_node);
 
@@ -392,7 +392,7 @@ namespace Arango.Client
         /// <param name="jsonObject">JSON object which holds new data.</param>
         /// <param name="waitForSync">If true forces synchronisation.</param>
         /// <returns>New revision string of the document.</returns>
-        public string ReplaceDocument(string documentID, string revision, DocumentUpdatePolicy policy, dynamic jsonObject, bool waitForSync)
+        public string ReplaceDocument(string documentID, string revision, DocumentUpdatePolicy policy, Json jsonObject, bool waitForSync)
         {
             var document = new Document(_node);
 
@@ -413,7 +413,7 @@ namespace Arango.Client
         /// <param name="keepNullFields">If the intention is to delete existing fields this parameter can be used with a value of false.</param>
         /// <param name="waitForSync">If true forces synchronisation.</param>
         /// <returns>New revision string of the document.</returns>
-        public string UpdateDocument(string documentID, string revision, DocumentUpdatePolicy policy, dynamic jsonObject, bool keepNullFields, bool waitForSync)
+        public string UpdateDocument(string documentID, string revision, DocumentUpdatePolicy policy, Json jsonObject, bool keepNullFields, bool waitForSync)
         {
             var document = new Document(_node);
 

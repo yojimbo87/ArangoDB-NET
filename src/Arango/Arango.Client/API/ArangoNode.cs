@@ -143,10 +143,10 @@ namespace Arango.Client
                     {
                         jsonObject.Load(jsonString);
                         errorMessage = string.Format(
-                            "ArangoDB responded with error code {0}:\n{1} [error number {2}]", 
-                            jsonObject.Get("code"), 
-                            jsonObject.Get("errorMessage"),
-                            jsonObject.Get("errorNum")
+                            "ArangoDB responded with error code {0}:\n{1} [error number {2}]",
+                            jsonObject.GetValue("code"),
+                            jsonObject.GetValue("errorMessage"),
+                            jsonObject.GetValue("errorNum")
                         );
                     }
 

@@ -54,7 +54,7 @@ namespace Arango.Console
         {
             ArangoDocument document = _database.GetDocument("10843274/12481674");
             
-            System.Console.WriteLine("Handle: {0}, Rev: {1}, Json: {2}", document.ID, document.Revision, document.JsonObject);
+            //System.Console.WriteLine("Handle: {0}, Rev: {1}, Json: {2}", document.ID, document.Revision, document.JsonObject.Stringify());
         }
 
         static void TestQuery()
@@ -81,14 +81,24 @@ namespace Arango.Console
             o.Add("bar", b);*/
 
             Json json = new Json();
-            json.Load("{\"_id\":123,\"foo\":{\"bar\":{\"_baz\":456},\"baz\":[\"a\",\"bbb\"]}}");
+            /*json.Load("{\"_id\":123,\"foo\":{\"bar\":{\"_baz\":456},\"baz\":[\"a\",\"bbb\"]}}");
 
             System.Console.WriteLine(json.Get<int>("foo.bar._baz"));
             json.Set("foo.bar._baz", new List<string>() { "w", "a", "o" });
             System.Console.WriteLine(json.Get<List<string>>("foo.bar._baz")[0]);
 
-            System.Console.WriteLine(json.Get<List<string>>("foo.baz")[1]);
+            System.Console.WriteLine(json.Get<List<string>>("foo.baz")[1]);*/
+
+            json.Load("{\"foo\":[{\"bar\":123},{\"bar\":456}]}");
+            //json.Load("{\"foo\":[\"bar1\",\"bar2\"]}");
+            List<Json> foo = json.GetValue<List<Json>>("foo");
+            System.Console.WriteLine(foo[1].GetValue<int>("bar"));
             System.Console.WriteLine(json.Stringify());
         }
+    }
+
+    public class Foo
+    {
+        public int bar { get; set; }
     }
 }

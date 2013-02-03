@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using ServiceStack.Text;
 
 namespace Arango.Client
 {

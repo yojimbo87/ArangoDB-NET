@@ -4,7 +4,6 @@ using System.Dynamic;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ServiceStack.Text;
 using Arango.Client;
 
 namespace Arango.Test
@@ -42,14 +41,14 @@ namespace Arango.Test
             _collection = _database.CreateCollection(testCollection.Name, testCollection.Type, testCollection.WaitForSync, testCollection.JournalSize);
         }
 
-        //#region Create, get
+        #region Create, get
 
         [TestMethod]
         public void CreateDocumentUsingCollectionID_AND_GetDocumentByID()
         {
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.Add("foo", "bravo");
-            jsonObject.Add("Bar", "12345");
+            Json jsonObject = new Json();
+            jsonObject.SetValue("foo", "bravo");
+            jsonObject.SetValue("bar", 12345);
 
             ArangoDocument document = _database.CreateDocument(_collection.ID, jsonObject, false);
             Assert.IsTrue(!string.IsNullOrEmpty(document.ID));
@@ -58,16 +57,16 @@ namespace Arango.Test
             ArangoDocument loadedDocument = _database.GetDocument(document.ID);
             Assert.AreEqual(loadedDocument.ID, document.ID);
             Assert.AreEqual(loadedDocument.Revision, document.Revision);
-            Assert.AreEqual(loadedDocument.JsonObject.Get("foo"), jsonObject.Get("foo"));
-            Assert.AreEqual(loadedDocument.JsonObject.Get("Bar"), jsonObject.Get("Bar"));
+            Assert.AreEqual(loadedDocument.JsonObject.GetValue("foo"), jsonObject.GetValue("foo"));
+            Assert.AreEqual(loadedDocument.JsonObject.GetValue<int>("bar"), jsonObject.GetValue<int>("bar"));
         }
 
-        /*[TestMethod]
+        [TestMethod]
         public void CreateDocumentUsingCollectionID_AND_GetDocumentByIDAndOutdatedRevision()
         {
-            dynamic jsonObject = new ExpandoObject();
-            jsonObject.foo = "bravo";
-            jsonObject.Bar = 12345;
+            Json jsonObject = new Json();
+            jsonObject.SetValue("foo", "bravo");
+            jsonObject.SetValue("bar", 12345);
 
             ArangoDocument document = _database.CreateDocument(_collection.ID, jsonObject, false);
             Assert.IsTrue(!string.IsNullOrEmpty(document.ID));
@@ -76,16 +75,16 @@ namespace Arango.Test
             ArangoDocument loadedDocument = _database.GetDocument(document.ID, "whoa");
             Assert.AreEqual(loadedDocument.ID, document.ID);
             Assert.AreEqual(loadedDocument.Revision, document.Revision);
-            Assert.AreEqual(loadedDocument.JsonObject.foo, jsonObject.foo);
-            Assert.AreEqual(loadedDocument.JsonObject.Bar, jsonObject.Bar);
+            Assert.AreEqual(loadedDocument.JsonObject.GetValue("foo"), jsonObject.GetValue("foo"));
+            Assert.AreEqual(loadedDocument.JsonObject.GetValue<int>("bar"), jsonObject.GetValue<int>("bar"));
         }
 
         [TestMethod]
         public void CreateDocumentUsingCollectionID_AND_GetDocumentByIDAndActualRevision()
         {
-            dynamic jsonObject = new ExpandoObject();
-            jsonObject.foo = "bravo";
-            jsonObject.Bar = 12345;
+            Json jsonObject = new Json();
+            jsonObject.SetValue("foo", "bravo");
+            jsonObject.SetValue("bar", 12345);
 
             ArangoDocument document = _database.CreateDocument(_collection.ID, jsonObject, false);
             Assert.IsTrue(!string.IsNullOrEmpty(document.ID));
@@ -99,9 +98,9 @@ namespace Arango.Test
         [TestMethod]
         public void CreateDocumentUsingCollectionNameWithoutCreateProcess_AND_GetDocumentByID()
         {
-            dynamic jsonObject = new ExpandoObject();
-            jsonObject.foo = "bravo";
-            jsonObject.Bar = 12345;
+            Json jsonObject = new Json();
+            jsonObject.SetValue("foo", "bravo");
+            jsonObject.SetValue("bar", 12345);
 
             ArangoDocument document = _database.CreateDocument(_collection.Name, false, jsonObject, false);
             Assert.IsTrue(!string.IsNullOrEmpty(document.ID));
@@ -110,16 +109,16 @@ namespace Arango.Test
             ArangoDocument loadedDocument = _database.GetDocument(document.ID);
             Assert.AreEqual(loadedDocument.ID, document.ID);
             Assert.AreEqual(loadedDocument.Revision, document.Revision);
-            Assert.AreEqual(loadedDocument.JsonObject.foo, jsonObject.foo);
-            Assert.AreEqual(loadedDocument.JsonObject.Bar, jsonObject.Bar);
+            Assert.AreEqual(loadedDocument.JsonObject.GetValue("foo"), jsonObject.GetValue("foo"));
+            Assert.AreEqual(loadedDocument.JsonObject.GetValue<int>("bar"), jsonObject.GetValue<int>("bar"));
         }
 
         [TestMethod]
         public void CreateDocumentUsingCollectionNameWithCreateProcess_AND_GetDocumentByID()
         {
-            dynamic jsonObject = new ExpandoObject();
-            jsonObject.foo = "bravo";
-            jsonObject.Bar = 12345;
+            Json jsonObject = new Json();
+            jsonObject.SetValue("foo", "bravo");
+            jsonObject.SetValue("bar", 12345);
 
             string tempCollection = "tempUnitTestCollectionForDocumentTests002xyz";
 
@@ -133,8 +132,8 @@ namespace Arango.Test
             ArangoDocument loadedDocument = _database.GetDocument(document.ID);
             Assert.AreEqual(loadedDocument.ID, document.ID);
             Assert.AreEqual(loadedDocument.Revision, document.Revision);
-            Assert.AreEqual(loadedDocument.JsonObject.foo, jsonObject.foo);
-            Assert.AreEqual(loadedDocument.JsonObject.Bar, jsonObject.Bar);
+            Assert.AreEqual(loadedDocument.JsonObject.GetValue("foo"), jsonObject.GetValue("foo"));
+            Assert.AreEqual(loadedDocument.JsonObject.GetValue<int>("bar"), jsonObject.GetValue<int>("bar"));
 
             _database.DeleteCollection(tempCollection);
         }
@@ -146,9 +145,9 @@ namespace Arango.Test
         [TestMethod]
         public void CreateDocument_AND_GetAllDocumentsByCollectionID()
         {
-            dynamic jsonObject = new ExpandoObject();
-            jsonObject.foo = "bravo";
-            jsonObject.Bar = 12345;
+            Json jsonObject = new Json();
+            jsonObject.SetValue("foo", "bravo");
+            jsonObject.SetValue("bar", 12345);
 
             ArangoDocument document1 = _database.CreateDocument(_collection.ID, jsonObject, false);
             ArangoDocument document2 = _database.CreateDocument(_collection.ID, jsonObject, false);
@@ -162,9 +161,9 @@ namespace Arango.Test
         [TestMethod]
         public void CreateDocument_AND_GetAllDocumentsByCollectionName()
         {
-            dynamic jsonObject = new ExpandoObject();
-            jsonObject.foo = "bravo";
-            jsonObject.Bar = 12345;
+            Json jsonObject = new Json();
+            jsonObject.SetValue("foo", "bravo");
+            jsonObject.SetValue("bar", 12345);
 
             ArangoDocument document1 = _database.CreateDocument(_collection.ID, jsonObject, false);
             ArangoDocument document2 = _database.CreateDocument(_collection.ID, jsonObject, false);
@@ -182,26 +181,26 @@ namespace Arango.Test
         [TestMethod]
         public void CreateDocument_AND_ReplaceWithDefaultPolicy()
         {
-            dynamic jsonObject = new ExpandoObject();
-            jsonObject.foo = "bravo";
-            jsonObject.Bar = 12345;
-            jsonObject.baz = "test";
+            Json jsonObject = new Json();
+            jsonObject.SetValue("foo", "bravo");
+            jsonObject.SetValue("bar", 12345);
+            jsonObject.SetValue("baz", "new field");
 
             ArangoDocument document = _database.CreateDocument(_collection.ID, jsonObject, false);
             Assert.IsTrue(!string.IsNullOrEmpty(document.ID));
             Assert.IsTrue(!string.IsNullOrEmpty(document.Revision));
 
-            dynamic newJsonObject = new ExpandoObject();
-            newJsonObject.Foo = "Johny";
-            newJsonObject.Bar = 54321;
+            Json newJsonObject = new Json();
+            newJsonObject.SetValue("foo", "new johny");
+            newJsonObject.SetValue("bar", 67890);
 
             string revision = _database.ReplaceDocument(document.ID, document.Revision, DocumentUpdatePolicy.Default, newJsonObject, false);
             Assert.AreNotEqual(revision, document.Revision);
 
             ArangoDocument loadedDocument = _database.GetDocument(document.ID);
             Assert.AreEqual(loadedDocument.Revision, revision);
-            Assert.AreEqual(loadedDocument.JsonObject.Foo, newJsonObject.Foo);
-            Assert.AreEqual(loadedDocument.JsonObject.Bar, newJsonObject.Bar);
+            Assert.AreEqual(loadedDocument.JsonObject.GetValue("foo"), newJsonObject.GetValue("foo"));
+            Assert.AreEqual(loadedDocument.JsonObject.GetValue<int>("bar"), newJsonObject.GetValue<int>("bar"));
         }
 
         #endregion
@@ -211,50 +210,49 @@ namespace Arango.Test
         [TestMethod]
         public void CreateDocument_AND_UpdateWithKeepNullValues()
         {
-            dynamic jsonObject = new ExpandoObject();
-            jsonObject.foo = "bravo";
-            jsonObject.Bar = 12345;
+            Json jsonObject = new Json();
+            jsonObject.SetValue("foo", "bravo");
+            jsonObject.SetValue("bar", 12345);
 
             ArangoDocument document = _database.CreateDocument(_collection.ID, jsonObject, false);
             Assert.IsTrue(!string.IsNullOrEmpty(document.ID));
             Assert.IsTrue(!string.IsNullOrEmpty(document.Revision));
 
-            dynamic update = new ExpandoObject();
-            update.baz = "new field";
+            Json update = new Json();
+            update.SetValue("baz", "new field");
 
             string revision = _database.UpdateDocument(document.ID, document.Revision, DocumentUpdatePolicy.Default, update, true, false);
             Assert.AreNotEqual(revision, document.Revision);
 
             ArangoDocument loadedDocument = _database.GetDocument(document.ID);
             Assert.AreEqual(loadedDocument.Revision, revision);
-            Assert.AreEqual(loadedDocument.JsonObject.foo, jsonObject.foo);
-            Assert.AreEqual(loadedDocument.JsonObject.Bar, jsonObject.Bar);
-            Assert.AreEqual(loadedDocument.JsonObject.baz, update.baz);
+            Assert.AreEqual(loadedDocument.JsonObject.GetValue("foo"), jsonObject.GetValue("foo"));
+            Assert.AreEqual(loadedDocument.JsonObject.GetValue<int>("bar"), jsonObject.GetValue<int>("bar"));
+            Assert.AreEqual(loadedDocument.JsonObject.GetValue("baz"), update.GetValue("baz"));
         }
 
         [TestMethod]
         public void CreateDocument_AND_UpdateWithoutKeepNullValues()
         {
-            dynamic jsonObject = new ExpandoObject();
-            jsonObject.foo = "bravo";
-            jsonObject.Bar = 12345;
+            Json jsonObject = new Json();
+            jsonObject.SetValue("foo", "bravo");
+            jsonObject.SetValue("bar", 12345);
 
             ArangoDocument document = _database.CreateDocument(_collection.ID, jsonObject, false);
             Assert.IsTrue(!string.IsNullOrEmpty(document.ID));
             Assert.IsTrue(!string.IsNullOrEmpty(document.Revision));
 
-            dynamic update = new ExpandoObject();
-            update.Bar = null;
-            update.baz = "new field";
+            Json update = new Json();
+            update.SetValue("baz", "new field");
 
             string revision = _database.UpdateDocument(document.ID, document.Revision, DocumentUpdatePolicy.Default, update, false, false);
             Assert.AreNotEqual(revision, document.Revision);
 
             ArangoDocument loadedDocument = _database.GetDocument(document.ID);
             Assert.AreEqual(loadedDocument.Revision, revision);
-            Assert.AreEqual(loadedDocument.JsonObject.foo, jsonObject.foo);
+            Assert.AreEqual(loadedDocument.JsonObject.GetValue("foo"), jsonObject.GetValue("foo"));
             Assert.AreEqual(loadedDocument.Has("Bar"), false);
-            Assert.AreEqual(loadedDocument.JsonObject.baz, update.baz);
+            Assert.AreEqual(loadedDocument.JsonObject.GetValue("baz"), update.GetValue("baz"));
         }
 
         #endregion
@@ -264,9 +262,9 @@ namespace Arango.Test
         [TestMethod]
         public void CreateDocument_AND_Delete()
         {
-            dynamic jsonObject = new ExpandoObject();
-            jsonObject.foo = "bravo";
-            jsonObject.Bar = 12345;
+            Json jsonObject = new Json();
+            jsonObject.SetValue("foo", "bravo");
+            jsonObject.SetValue("bar", 12345);
 
             ArangoDocument document = _database.CreateDocument(_collection.ID, jsonObject, false);
             Assert.IsTrue(!string.IsNullOrEmpty(document.ID));
@@ -283,9 +281,9 @@ namespace Arango.Test
         [TestMethod]
         public void CreateDocument_AND_CheckExisting()
         {
-            dynamic jsonObject = new ExpandoObject();
-            jsonObject.foo = "bravo";
-            jsonObject.Bar = 12345;
+            Json jsonObject = new Json();
+            jsonObject.SetValue("foo", "bravo");
+            jsonObject.SetValue("bar", 12345);
 
             ArangoDocument document = _database.CreateDocument(_collection.ID, jsonObject, false);
             Assert.IsTrue(!string.IsNullOrEmpty(document.ID));
@@ -299,9 +297,9 @@ namespace Arango.Test
         [TestMethod]
         public void CreateDocument_AND_CheckNotExisting()
         {
-            dynamic jsonObject = new ExpandoObject();
-            jsonObject.foo = "bravo";
-            jsonObject.Bar = 12345;
+            Json jsonObject = new Json();
+            jsonObject.SetValue("foo", "bravo");
+            jsonObject.SetValue("bar", 12345);
 
             ArangoDocument document = _database.CreateDocument(_collection.ID, jsonObject, false);
             Assert.IsTrue(!string.IsNullOrEmpty(document.ID));
@@ -312,7 +310,7 @@ namespace Arango.Test
             Assert.IsTrue(string.IsNullOrEmpty(checkedDocument.Revision));
         }
 
-        #endregion*/
+        #endregion
 
         public void Dispose()
         {

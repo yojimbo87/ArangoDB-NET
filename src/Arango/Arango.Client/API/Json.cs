@@ -4,27 +4,22 @@ using ServiceStack.Text;
 
 namespace Arango.Client
 {
-    public class Json
+    public class Json : JsonObject
     {
-        private JsonObject _jsonObject;
-
-        public Json()
-        {
-            _jsonObject = new JsonObject();
-        }
+        public Json() { }
 
         public Json(string json)
         {
             Load(json);
         }
 
-        public string Get(string fieldName)
+        public string GetValue(string fieldPath)
         {
             string obj = null;
 
-            if (fieldName.Contains("."))
+            if (fieldPath.Contains("."))
             {
-                var fields = fieldName.Split('.');
+                var fields = fieldPath.Split('.');
                 int iteration = 1;
                 JsonObject innerObject = null;
 
@@ -36,27 +31,27 @@ namespace Arango.Client
                         break;
                     }
 
-                    innerObject = _jsonObject.Get<JsonObject>(field);
+                    innerObject = this.Get<JsonObject>(field);
                     iteration++;
                 }
             }
             else
             {
-                obj = _jsonObject.Get(fieldName);
+                obj = this.Get(fieldPath);
             }
 
             return obj;
         }
 
-        public T Get<T>(string fieldName) where T : new()
+        public T GetValue<T>(string fieldPath) where T : new()
         {
             T obj = new T();
 
-            if (fieldName.Contains("."))
+            if (fieldPath.Contains("."))
             {
-                var fields = fieldName.Split('.');
+                var fields = fieldPath.Split('.');
                 int iteration = 1;
-                JsonObject innerObject = _jsonObject;
+                JsonObject innerObject = this;
 
                 foreach (var field in fields)
                 {
@@ -72,20 +67,20 @@ namespace Arango.Client
             }
             else
             {
-                obj = _jsonObject.Get<T>(fieldName);
+                obj = this.Get<T>(fieldPath);
             }
 
             return obj;
         }
 
-        public void Set<T>(string fieldName, T value)
+        public void SetValue<T>(string fieldPath, T value)
         {
-            if (fieldName.Contains("."))
+            if (fieldPath.Contains("."))
             {
-                var fields = fieldName.Split('.');
+                var fields = fieldPath.Split('.');
                 int iteration = 1;
                 List<JsonObject> innerObjects = new List<JsonObject>();
-                JsonObject innerObject = _jsonObject;
+                JsonObject innerObject = this;
                 innerObjects.Add(innerObject);
 
                 foreach (var field in fields)
@@ -128,24 +123,24 @@ namespace Arango.Client
             }
             else
             {
-                if (_jsonObject.ContainsKey(fieldName))
+                if (this.ContainsKey(fieldPath))
                 {
-                    _jsonObject[fieldName] = ToJson<T>(value);
+                    this[fieldPath] = ToJson<T>(value);
                 }
                 else
                 {
-                    _jsonObject.Add(fieldName, ToJson<T>(value));
+                    this.Add(fieldPath, ToJson<T>(value));
                 }
             }
         }
 
-        public bool Has(string fieldName)
+        public bool Has(string fieldPath)
         {
             bool contains = false;
 
-            if (fieldName.Contains("."))
+            if (fieldPath.Contains("."))
             {
-                var fields = fieldName.Split('.');
+                var fields = fieldPath.Split('.');
                 int iteration = 1;
                 JsonObject innerObject = null;
 
@@ -156,13 +151,13 @@ namespace Arango.Client
                         contains = innerObject.ContainsKey(field);
                     }
 
-                    innerObject = _jsonObject.Get<JsonObject>(field);
+                    innerObject = this.Get<JsonObject>(field);
                     iteration++;
                 }
             }
             else
             {
-                contains = _jsonObject.ContainsKey(fieldName);
+                contains = this.ContainsKey(fieldPath);
             }
 
             return contains;
@@ -170,12 +165,17 @@ namespace Arango.Client
 
         public void Load(string json)
         {
-            _jsonObject = JsonObject.Parse(json);
+            JsonObject obj = JsonObject.Parse(json);
+
+            foreach(string key in obj.Keys)
+            {
+                this.Add(key, obj.GetUnescaped(key));
+            }
         }
 
         public string Stringify()
         {
-            return _jsonObject.ToJson();
+            return this.ToJson<JsonObject>();
         }
 
         private string ToJson<T>(T value)
