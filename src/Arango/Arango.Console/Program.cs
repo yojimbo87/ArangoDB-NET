@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using ServiceStack.Text;
 using Arango.Client;
 
 namespace Arango.Console
@@ -45,7 +46,8 @@ namespace Arango.Console
 
             //TestGet();
             //TestQuery();
-            TestText();
+            //TestText();
+            TestDictionary();
 
             System.Console.ReadLine();
         }
@@ -68,37 +70,61 @@ namespace Arango.Console
 
         static void TestText()
         {
-            /*string json = "{\"_id\":123,\"foo\":{\"bar\":456}}";
-            JsonObject obj = JsonObject.Parse(json);
-            System.Console.WriteLine(obj.Dump());
-            System.Console.WriteLine(obj.Get<JsonObject>("foo").Get("bar"));*/
+            /*JsonObject json = "{\"foo\":{\"bar\":[{\"baz\":123},{\"baz\":456}]}}".ToJson();
 
-            /*Dictionary<string, object> o = new Dictionary<string, object>();
-            o.Add("foo", 123);
+            List<Json> bar = json.Get<JsonObject>("foo").Get<List<Json>>("bar");
+            System.Console.WriteLine(bar[0].Get<int>("baz"));
+            
+            JsonObject baz = new JsonObject();
+            baz.Add("baz", );
+            bar.Add(
+            
+            System.Console.WriteLine(json.Stringify());*/
+        }
 
-            Dictionary<string, string> b = new Dictionary<string, string>();
-            b.Add("bar", "bbbb");
-            o.Add("bar", b);*/
+        static void TestDictionary()
+        {
+            /*Foo json = new Foo();
+            json.Add("stringKey", "string value");
+            json.Add("numericKey", 12321);
 
-            Json json = new Json();
-            /*json.Load("{\"_id\":123,\"foo\":{\"bar\":{\"_baz\":456},\"baz\":[\"a\",\"bbb\"]}}");
+            Foo embeddedJson = new Foo();
+            embeddedJson.Add("stringKey", "string value");
+            embeddedJson.Add("numericKey", 12321);
 
-            System.Console.WriteLine(json.Get<int>("foo.bar._baz"));
-            json.Set("foo.bar._baz", new List<string>() { "w", "a", "o" });
-            System.Console.WriteLine(json.Get<List<string>>("foo.bar._baz")[0]);
+            json.Add("innerObjectKey", embeddedJson);
 
-            System.Console.WriteLine(json.Get<List<string>>("foo.baz")[1]);*/
+            List<Foo> arrayKey = new List<Foo>();
+            arrayKey.Add(embeddedJson);
+            arrayKey.Add(embeddedJson);
 
-            json.Load("{\"foo\":{\"bar\":[{\"baz\":123},{\"baz\":456}]}}");
-            //json.Load("{\"foo\":[\"bar1\",\"bar2\"]}");
-            List<Json> bar = json.Get<List<Json>>("foo.bar");
-            System.Console.WriteLine(bar[1].Get<int>("baz"));
-            System.Console.WriteLine(json.Stringify());
+            json.Add("arrayKey", arrayKey);
+
+            Foo embeddedJson2 = new Foo();
+            embeddedJson2.Add("stringKey", "string value");
+            embeddedJson2.Add("numericKey", 12321);
+            embeddedJson2.Add("arrayKey", arrayKey);
+
+            json.Add("embeddedKey", embeddedJson2);
+
+            System.Console.WriteLine(json.ToJson());*/
+
+            string s = "{\"stringKey\":\"string value\",\"numericKey\":12321,\"arrayEmptyKey\":[],\"arrayKey\":[1,2,3],\"arrayEmbeddedKey\":[{\"foo\":123},{\"foo\":456}],\"embeddedKey\":{\"numeric\":321,\"array\":[3,2,1]}}";
+            string s2 = "{\"array\":[\"whoa\",123]}";
+            string s3 = "[\"a\",\"b\"]";
+            //Foo json = s2.FromJson<Foo>();
+
+            Json foo = new Json();
+
+            foo.Load(s);
+
+            foo.PrintDump();
+            System.Console.WriteLine(foo.Stringify());
         }
     }
 
-    public class Foo
+    public class Foo : Dictionary<string, object>
     {
-        public int bar { get; set; }
+        //public int bar { get; set; }
     }
 }

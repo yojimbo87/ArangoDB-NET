@@ -55,7 +55,7 @@ namespace Arango.Test
         [TestMethod]
         public void JsonDeserialization()
         {
-            string jsonString = "{\"stringKey\":\"string value\",\"numericKey\":12321,\"objectKey\":{\"stringKey\":\"string value 2\",\"numericKey\":123,\"arrayKey\":[{\"foo\":123},{\"foo\":456}],\"innerObjectKey\":{\"bar\":\"wh\\\"o\\\"a\"}}}";
+            string jsonString = "{\"stringKey\":\"string value\",\"numericKey\":12321,\"objectKey\":{\"stringKey\":\"string value 2\",\"numericKey\":123,\"arrayKey\":[{\"foo\":123},{\"foo\":456}],\"innerObjectKey\":{\"bar\":\"wh\\\"o\\\"a\",\"baz\":123}}}";
 
             Json json = new Json(jsonString);
 
@@ -69,10 +69,34 @@ namespace Arango.Test
             Assert.AreEqual(arrayKeys[0].Get<int>("foo"), 123);
             Assert.AreEqual(arrayKeys[1].Get<int>("foo"), 456);
 
-            // TODO: check generic version of Get method and think about parsing everything during the load process
             Assert.AreEqual(json.Get("objectKey.innerObjectKey.bar"), "wh\"o\"a");
+            Assert.AreEqual(json.Get<int>("objectKey.innerObjectKey.baz"), 123);
 
             Assert.AreEqual(json.Stringify(), jsonString);
+        }
+
+        [TestMethod]
+        public void JsonSerialization()
+        {
+            string jsonString = "{\"stringKey\":\"string value\",\"numericKey\":12321,\"arrayKey\":[{\"foo\":123},{\"foo\":456}]}";
+
+            Json json = new Json();
+            json.Set("stringKey", "string value");
+            json.Set("numericKey", 12321);
+
+            List<Json> arrayKey = new List<Json>();
+            Json temp1 = new Json();
+            temp1.Set<int>("foo", 123);
+            arrayKey.Add(temp1);
+            Json temp2 = new Json();
+            temp2.Set<int>("foo", 456);
+            arrayKey.Add(temp2);
+
+            json.Set<List<Json>>("arrayKey", arrayKey);
+
+            string serialized = json.Stringify();
+
+            Assert.AreEqual(serialized, jsonString);
         }
 
         #endregion

@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using ServiceStack.Text;
 
 namespace Arango.Client
 {
-    public class Json : Dictionary<string, string>
+    public class Json : Dictionary<string, object>
     {
         public Json() { }
 
@@ -17,7 +18,7 @@ namespace Arango.Client
         {
             string obj = null;
 
-            if (fieldPath.Contains("."))
+            /*if (fieldPath.Contains("."))
             {
                 var fields = fieldPath.Split('.');
                 int iteration = 1;
@@ -41,7 +42,7 @@ namespace Arango.Client
             {
                 JsonObject json = ToJsonObject(this);
                 obj = json.Get(fieldPath);
-            }
+            }*/
 
             return obj;
         }
@@ -50,7 +51,7 @@ namespace Arango.Client
         {
             T obj = new T();
 
-            if (fieldPath.Contains("."))
+            /*if (fieldPath.Contains("."))
             {
                 var fields = fieldPath.Split('.');
                 int iteration = 1;
@@ -66,7 +67,8 @@ namespace Arango.Client
                         break;
                     }
 
-                    innerObject = json.GetUnescaped(field).ToStringDictionary();
+                    //innerObject = json.GetUnescaped(field).ToStringDictionary();
+                    innerObject = ToDictionary(json.GetUnescaped(field));
                     iteration++;
                 }
             }
@@ -74,14 +76,14 @@ namespace Arango.Client
             {
                 JsonObject json = ToJsonObject(this);
                 obj = json.Get<T>(fieldPath);
-            }
+            }*/
 
             return obj;
         }
 
         public void Set<T>(string fieldPath, T value)
         {
-            if (fieldPath.Contains("."))
+            /*if (fieldPath.Contains("."))
             {
                 var fields = fieldPath.Split('.');
                 int iteration = 1;
@@ -138,14 +140,14 @@ namespace Arango.Client
                 {
                     this.Add(fieldPath, ToJson<T>(value));
                 }
-            }
+            }*/
         }
 
         public bool Has(string fieldPath)
         {
             bool contains = false;
 
-            if (fieldPath.Contains("."))
+            /*if (fieldPath.Contains("."))
             {
                 var fields = fieldPath.Split('.');
                 int iteration = 1;
@@ -166,62 +168,89 @@ namespace Arango.Client
             else
             {
                 contains = this.ContainsKey(fieldPath);
-            }
+            }*/
 
             return contains;
         }
 
         public void Load(string json)
         {
-            Dictionary<string, string> obj = JsonObject.Parse(json).ToStringDictionary();
-
-            foreach(string key in obj.Keys)
+            foreach (var item in ParseObject(json))
             {
-                this.Add(key, obj[key]);
+                this.Add(item.Key, item.Value);
             }
         }
 
         public string Stringify()
         {
-            return ToJsonObject(this).ToJson<JsonObject>();
+            return this.ToJson();
         }
 
-        private JsonObject ToJsonObject(Dictionary<string, string> dictionary)
+        private Json ParseObject(string json)
         {
-            JsonObject obj = new JsonObject();
+            Json embeddedObject = new Json();
+            JsonObject jsonObject = JsonObject.Parse(json);
 
-            foreach (KeyValuePair<string, string> kv in dictionary)
+            foreach (var item in jsonObject)
             {
-                obj.Add(kv.Key, kv.Value);
+                string value = jsonObject.GetUnescaped(item.Key);
+
+                if (value.Length >= 2)
+                {
+                    // array
+                    if ((value[0] =='[') && (value[value.Length - 1] == ']'))
+                    {
+                        // array of embedded objects
+                        if ((value[1] == '{') && (value[value.Length - 2] == '}'))
+                        {
+                            JsonArrayObjects objects = value.FromJson<JsonArrayObjects>();
+                            List<Json> jsonArray = new List<Json>();
+
+                            foreach (JsonObject j in objects)
+                            {
+                                jsonArray.Add(ParseObject(j.SerializeToString()));
+                            }
+
+                            embeddedObject.Add(item.Key, jsonArray);
+                        }
+                        // array of primitive values or empty array
+                        else
+                        {
+                            embeddedObject.Add(item.Key, ParseArray(value));
+                        }
+                    }
+                    // embedded object
+                    else if ((value[0] == '{') && (value[value.Length - 1] == '}'))
+                    {
+                        embeddedObject.Add(item.Key, ParseObject(value));
+                    }
+                    // primitive value
+                    else
+                    {
+                        embeddedObject.Add(item.Key, value.FromJson<object>());
+                    }
+                }
+                // primitive value
+                else
+                {
+                    embeddedObject.Add(item.Key, value.FromJson<object>());
+                }
             }
 
-            return obj;
+            return embeddedObject;
         }
 
-        private Dictionary<string, string> ToDictionary(string json)
+        private List<object> ParseArray(string array)
         {
-            JsonObject obj = JsonObject.Parse(json);
-            Dictionary<string, string> dictionary = new Dictionary<string, string>();
+            List<object> collection = new List<object>();
 
-            foreach (var kv in obj)
+            // when parsing data from json string - everything field value will be string by default
+            foreach (var item in array.FromJson<List<object>>())
             {
-                dictionary.Add(kv.Key, obj.GetUnescaped(kv.Key));
+                collection.Add(item);
             }
 
-            return dictionary;
-        }
-
-        private string ToJson<T>(T value)
-        {
-            // prevent double quoting string value
-            if (value is string)
-            {
-                return value.ToString();
-            }
-            else
-            {
-                return value.ToJson<T>();
-            }
+            return collection;
         }
     }
 }
