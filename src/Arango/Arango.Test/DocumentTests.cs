@@ -55,47 +55,72 @@ namespace Arango.Test
         [TestMethod]
         public void JsonDeserialization()
         {
-            string jsonString = "{\"stringKey\":\"string value\",\"numericKey\":12321,\"objectKey\":{\"stringKey\":\"string value 2\",\"numericKey\":123,\"arrayKey\":[{\"foo\":123},{\"foo\":456}],\"innerObjectKey\":{\"bar\":\"wh\\\"o\\\"a\",\"baz\":123}}}";
+            string jsonString = "{\"stringKey\":\"string value\",\"numericKey\":12321,\"arrayEmptyKey\":[],\"arrayKey\":[1,2,3],\"arrayEmbeddedKey\":[{\"foo\":123},{\"foo\":456}],\"embeddedKey\":{\"stringKey\":\"string value\",\"numericKey\":321,\"numericArray\":[3,2,1]}}";
 
             Json json = new Json(jsonString);
 
             Assert.AreEqual(json.Get("stringKey"), "string value");
             Assert.AreEqual(json.Get<int>("numericKey"), 12321);
-            Assert.AreEqual(json.Get("stringKey"), "string value");
-            Assert.AreEqual(json.Get("objectKey.stringKey"), "string value 2");
-            Assert.AreEqual(json.Get<int>("objectKey.numericKey"), 123);
+            Assert.AreEqual(json.Get<List<string>>("arrayEmptyKey").Count, 0);
 
-            List<Json> arrayKeys = json.Get<List<Json>>("objectKey.arrayKey");
-            Assert.AreEqual(arrayKeys[0].Get<int>("foo"), 123);
-            Assert.AreEqual(arrayKeys[1].Get<int>("foo"), 456);
+            List<string> arrayKey = json.Get<List<string>>("arrayKey");
+            Assert.AreEqual(arrayKey.Count, 3);
+            Assert.AreEqual(int.Parse(arrayKey[0]), 1);
+            Assert.AreEqual(int.Parse(arrayKey[1]), 2);
+            Assert.AreEqual(int.Parse(arrayKey[2]), 3);
 
-            Assert.AreEqual(json.Get("objectKey.innerObjectKey.bar"), "wh\"o\"a");
-            Assert.AreEqual(json.Get<int>("objectKey.innerObjectKey.baz"), 123);
+            List<Json> arrayEmbeddedKey = json.Get<List<Json>>("arrayEmbeddedKey");
+            Assert.AreEqual(arrayEmbeddedKey.Count, 2);
+            Assert.AreEqual(arrayEmbeddedKey[0].Get<int>("foo"), 123);
+            Assert.AreEqual(arrayEmbeddedKey[1].Get<int>("foo"), 456);
 
-            Assert.AreEqual(json.Stringify(), jsonString);
+            Assert.AreEqual(json.Get("embeddedKey.stringKey"), "string value");
+            Assert.AreEqual(json.Get<int>("embeddedKey.numericKey"), 321);
+
+            List<string> numericArray = json.Get<List<string>>("embeddedKey.numericArray");
+            Assert.AreEqual(numericArray.Count, 3);
+            Assert.AreEqual(int.Parse(numericArray[0]), 3);
+            Assert.AreEqual(int.Parse(numericArray[1]), 2);
+            Assert.AreEqual(int.Parse(numericArray[2]), 1);
         }
 
         [TestMethod]
         public void JsonSerialization()
         {
-            string jsonString = "{\"stringKey\":\"string value\",\"numericKey\":12321,\"arrayKey\":[{\"foo\":123},{\"foo\":456}]}";
-
             Json json = new Json();
+
             json.Set("stringKey", "string value");
             json.Set("numericKey", 12321);
+            json.Set<List<string>>("arrayEmptyKey", new List<string>());
 
-            List<Json> arrayKey = new List<Json>();
-            Json temp1 = new Json();
-            temp1.Set<int>("foo", 123);
-            arrayKey.Add(temp1);
-            Json temp2 = new Json();
-            temp2.Set<int>("foo", 456);
-            arrayKey.Add(temp2);
+            List<int> arrayKey = new List<int>();
+            arrayKey.Add(1);
+            arrayKey.Add(2);
+            arrayKey.Add(3);
+            json.Set("arrayKey", arrayKey);
 
-            json.Set<List<Json>>("arrayKey", arrayKey);
+            Json foo1 = new Json();
+            foo1.Set("foo", 123);
+            Json foo2 = new Json();
+            foo2.Set("foo", 456);
+            List<Json> arrayEmbeddedKey = new List<Json>();
+            arrayEmbeddedKey.Add(foo1);
+            arrayEmbeddedKey.Add(foo2);
+            json.Set("arrayEmbeddedKey", arrayEmbeddedKey);
+
+            Json embeddedKey = new Json();
+            embeddedKey.Set("stringKey", "string value");
+            embeddedKey.Set("numericKey", 321);
+
+            List<int> numericArray = new List<int>();
+            numericArray.Add(3);
+            numericArray.Add(2);
+            numericArray.Add(1);
+            embeddedKey.Set("numericArray", numericArray);
+            json.Set<Json>("embeddedKey", embeddedKey);
 
             string serialized = json.Stringify();
-
+            string jsonString = "{\"stringKey\":\"string value\",\"numericKey\":12321,\"arrayEmptyKey\":[],\"arrayKey\":[1,2,3],\"arrayEmbeddedKey\":[{\"foo\":123},{\"foo\":456}],\"embeddedKey\":{\"stringKey\":\"string value\",\"numericKey\":321,\"numericArray\":[3,2,1]}}";
             Assert.AreEqual(serialized, jsonString);
         }
 
