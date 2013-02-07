@@ -260,12 +260,11 @@ namespace Arango.Client
             return embeddedObject;
         }
 
-        private List<object> ParseArray(string array)
+        private List<string> ParseArray(string array)
         {
-            List<object> collection = new List<object>();
+            List<string> collection = new List<string>();
 
-            // when parsing data from json string - everything field value will be string by default
-            foreach (var item in array.FromJson<List<object>>())
+            foreach (var item in array.FromJson<List<string>>())
             {
                 collection.Add(item);
             }
