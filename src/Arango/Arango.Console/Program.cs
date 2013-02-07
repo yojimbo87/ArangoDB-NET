@@ -109,7 +109,7 @@ namespace Arango.Console
 
             System.Console.WriteLine(json.ToJson());*/
 
-            string s = "{\"stringKey\":\"string value\",\"numericKey\":12321,\"arrayEmptyKey\":[],\"arrayKey\":[1,2,3],\"arrayEmbeddedKey\":[{\"foo\":123},{\"foo\":456}],\"embeddedKey\":{\"numeric\":321,\"array\":[3,2,1]}}";
+            string s = "{\"stringKey\":\"string value\",\"numericKey\":12321,\"arrayEmptyKey\":[],\"arrayKey\":[1,2,3],\"arrayEmbeddedKey\":[{\"foo\":123},{\"foo\":456}],\"embeddedKey\":{\"stringKey\":\"string value\",\"numeric\":321,\"array\":[3,2,1]}}";
             string s2 = "{\"array\":[\"whoa\",123]}";
             string s3 = "[\"a\",\"b\"]";
             //Foo json = s2.FromJson<Foo>();
@@ -119,6 +119,16 @@ namespace Arango.Console
             foo.Load(s);
 
             foo.PrintDump();
+            System.Console.WriteLine(foo.Has("embeddedKey.numeric"));
+            System.Console.WriteLine(foo.Has("bbb.aaa"));
+            System.Console.WriteLine(foo.Get("embeddedKey.stringKey"));
+            System.Console.WriteLine(foo.Get("aaa"));
+            System.Console.WriteLine(foo.Get<int>("embeddedKey.numeric"));
+
+            foo.Set("embeddedKey.numeric", 456);
+            System.Console.WriteLine(foo.Get<int>("embeddedKey.numeric"));
+
+            System.Console.WriteLine(foo.Get<int>("aaa"));
             System.Console.WriteLine(foo.Stringify());
         }
     }

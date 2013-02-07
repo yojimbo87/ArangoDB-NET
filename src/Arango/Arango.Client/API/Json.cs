@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using ServiceStack.Text;
 
 namespace Arango.Client
@@ -16,80 +17,105 @@ namespace Arango.Client
 
         public string Get(string fieldPath)
         {
-            string obj = null;
+            string value = null;
 
-            /*if (fieldPath.Contains("."))
+            if (fieldPath.Contains("."))
             {
                 var fields = fieldPath.Split('.');
                 int iteration = 1;
-                Dictionary<string, string> innerObject = this;
+                Json innerObject = this;
 
                 foreach (var field in fields)
                 {
-                    JsonObject json = ToJsonObject(innerObject);
-
                     if (iteration == fields.Length)
                     {
-                        obj = json.Get(field);
+                        value = innerObject[field].ToString();
                         break;
                     }
 
-                    innerObject = ToDictionary(json.GetUnescaped(field));
-                    iteration++;
+                    if (innerObject.ContainsKey(field))
+                    {
+                        innerObject = (Json)innerObject[field];
+                        iteration++;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
             else
             {
-                JsonObject json = ToJsonObject(this);
-                obj = json.Get(fieldPath);
-            }*/
+                if (this.ContainsKey(fieldPath))
+                {
+                    value = this[fieldPath].ToString();
+                }
+            }
 
-            return obj;
+            return value;
         }
 
         public T Get<T>(string fieldPath) where T : new()
         {
-            T obj = new T();
+            T value = new T();
 
-            /*if (fieldPath.Contains("."))
+            if (fieldPath.Contains("."))
             {
                 var fields = fieldPath.Split('.');
                 int iteration = 1;
-                Dictionary<string, string> innerObject = this;
+                Json innerObject = this;
 
                 foreach (var field in fields)
                 {
-                    JsonObject json = ToJsonObject(innerObject);
-
                     if (iteration == fields.Length)
                     {
-                        obj = json.Get<T>(field);
+                        if (innerObject[field] is string)
+                        {
+                            value = TConverter.ChangeType<T>(innerObject[field]);
+                        }
+                        else
+                        {
+                            value = (T)innerObject[field];
+                        }
                         break;
                     }
 
-                    //innerObject = json.GetUnescaped(field).ToStringDictionary();
-                    innerObject = ToDictionary(json.GetUnescaped(field));
-                    iteration++;
+                    if (innerObject.ContainsKey(field))
+                    {
+                        innerObject = (Json)innerObject[field];
+                        iteration++;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
             else
             {
-                JsonObject json = ToJsonObject(this);
-                obj = json.Get<T>(fieldPath);
-            }*/
+                if (this.ContainsKey(fieldPath))
+                {
+                    if (this[fieldPath] is string)
+                    {
+                        value = TConverter.ChangeType<T>(this[fieldPath]);
+                    }
+                    else
+                    {
+                        value = (T)this[fieldPath];
+                    }
+                }
+            }
 
-            return obj;
+            return value;
         }
 
         public void Set<T>(string fieldPath, T value)
         {
-            /*if (fieldPath.Contains("."))
+            if (fieldPath.Contains("."))
             {
                 var fields = fieldPath.Split('.');
                 int iteration = 1;
-                List<Dictionary<string, string>> innerObjects = new List<Dictionary<string, string>>();
-                Dictionary<string, string> innerObject = this;
-                innerObjects.Add(innerObject);
+                Json innerObject = this;
 
                 foreach (var field in fields)
                 {
@@ -97,78 +123,72 @@ namespace Arango.Client
                     {
                         if (innerObject.ContainsKey(field))
                         {
-                            innerObject[field] = ToJson<T>(value);
+                            innerObject[field] = value;
                         }
                         else
                         {
-                            innerObject.Add(field, ToJson<T>(value));
+                            innerObject.Add(field, value);
                         }
                         break;
                     }
 
-                    JsonObject json = ToJsonObject(innerObject);
-                    innerObject = json.GetUnescaped(field).ToStringDictionary();
-                    innerObjects.Add(innerObject);
-                    iteration++;
-                }
-
-                iteration--;
-
-                foreach (var field in fields)
-                {
-                    if (iteration > 0)
+                    if (innerObject.ContainsKey(field))
                     {
-                        Dictionary<string, string> obj = innerObjects[iteration - 1];
-                        obj[fields[iteration - 1]] = ToJson(innerObjects[iteration]);
+                        innerObject = (Json)innerObject[field];
+                        iteration++;
                     }
                     else
                     {
-                        Dictionary<string, string> obj = innerObjects[0];
-                        obj[fields[0]] = ToJson(innerObjects[1]);
+                        break;
                     }
-
-                    iteration--;
                 }
             }
             else
             {
                 if (this.ContainsKey(fieldPath))
                 {
-                    this[fieldPath] = ToJson<T>(value);
+                    this[fieldPath] = value;
                 }
                 else
                 {
-                    this.Add(fieldPath, ToJson<T>(value));
+                    this.Add(fieldPath, value);
                 }
-            }*/
+            }
         }
 
         public bool Has(string fieldPath)
         {
             bool contains = false;
 
-            /*if (fieldPath.Contains("."))
+            if (fieldPath.Contains("."))
             {
                 var fields = fieldPath.Split('.');
                 int iteration = 1;
-                Dictionary<string, string> innerObject = null;
+                Json innerObject = this;
 
                 foreach (var field in fields)
                 {
                     if (iteration == fields.Length)
                     {
                         contains = innerObject.ContainsKey(field);
+                        break;
                     }
 
-                    JsonObject json = ToJsonObject(innerObject);
-                    innerObject = json.GetUnescaped(field).ToStringDictionary();
-                    iteration++;
+                    if (innerObject.ContainsKey(field))
+                    {
+                        innerObject = (Json)innerObject[field];
+                        iteration++;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
             else
             {
                 contains = this.ContainsKey(fieldPath);
-            }*/
+            }
 
             return contains;
         }
@@ -251,6 +271,24 @@ namespace Arango.Client
             }
 
             return collection;
+        }
+    }
+
+    internal static class TConverter
+    {
+        internal static T ChangeType<T>(object value)
+        {
+            return (T)ChangeType(typeof(T), value);
+        }
+        internal static object ChangeType(Type t, object value)
+        {
+            TypeConverter tc = TypeDescriptor.GetConverter(t);
+            return tc.ConvertFrom(value);
+        }
+        internal static void RegisterTypeConverter<T, TC>() where TC : TypeConverter
+        {
+
+            TypeDescriptor.AddAttributes(typeof(T), new TypeConverterAttribute(typeof(TC)));
         }
     }
 }
