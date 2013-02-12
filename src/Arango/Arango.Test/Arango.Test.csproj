@@ -54,6 +54,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CollectionTests.cs" />
     <Compile Include="DocumentTests.cs" />
+    <Compile Include="CursorTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Arango.Client\Arango.Client.csproj">
