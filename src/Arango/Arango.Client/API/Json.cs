@@ -73,10 +73,21 @@ namespace Arango.Client
                         {
                             value = TConverter.ChangeType<T>(innerObject[field]);
                         }
+                        else if (innerObject[field] is List<string>)
+                        {
+                            // there might be a special case where empty json arry is
+                            // parsed into a list of strings so do type conversion only
+                            // if the array is not empty
+                            if (((List<string>)innerObject[field]).Count != 0)
+                            {
+                                value = (T)innerObject[field];
+                            }
+                        }
                         else
                         {
                             value = (T)innerObject[field];
                         }
+
                         break;
                     }
 
@@ -98,6 +109,16 @@ namespace Arango.Client
                     if (this[fieldPath] is string)
                     {
                         value = TConverter.ChangeType<T>(this[fieldPath]);
+                    }
+                    else if (this[fieldPath] is List<string>)
+                    {
+                        // there might be a special case where empty json arry is
+                        // parsed into a list of strings so do type conversion only
+                        // if the array is not empty
+                        if (((List<string>)this[fieldPath]).Count != 0)
+                        {
+                            value = (T)this[fieldPath];
+                        }
                     }
                     else
                     {
