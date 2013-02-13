@@ -56,7 +56,7 @@ namespace Arango.Test
             doc = new Json();
             doc.Set("Name", "Frankie");
             doc.Set("Surname", "Hoover");
-            doc.Set("Age", 25);
+            doc.Set("Age", 18);
             _database.CreateDocument(_collection.ID, doc, false);
 
             doc = new Json();
@@ -78,6 +78,16 @@ namespace Arango.Test
             List<ArangoDocument> documents = _database.Query("FOR u IN " + _collection.Name + " RETURN u");
 
             Assert.AreEqual(documents.Count, 4);
+        }
+
+        [TestMethod]
+        public void BacisCursorQueryWithBindVars()
+        {
+            Dictionary<string, object> values = new Dictionary<string, object>();
+            values.Add("age", 18);
+            List<ArangoDocument> documents = _database.Query("FOR u IN " + _collection.Name + " FILTER u.Age == @age RETURN u", values);
+
+            Assert.AreEqual(documents.Count, 2);
         }
 
         public void Dispose()
