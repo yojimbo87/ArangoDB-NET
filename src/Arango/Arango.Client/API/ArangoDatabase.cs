@@ -479,7 +479,12 @@ namespace Arango.Client
             return Query(query, false, 0, null);
         }
 
-        public List<ArangoDocument> Query(string query, bool count, int batchSize, Dictionary<string, string> bindValues)
+        public List<ArangoDocument> Query(string query, Dictionary<string, object> bindValues)
+        {
+            return Query(query, false, 0, bindValues);
+        }
+
+        public List<ArangoDocument> Query(string query, bool count, int batchSize, Dictionary<string, object> bindValues)
         {
             Cursor cursor = new Cursor(_node);
 
