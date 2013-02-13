@@ -16,7 +16,7 @@ namespace Arango.Client.Protocol
 
         #region POST
 
-        internal List<ArangoDocument> Post(string query, bool count, int batchSize, Dictionary<string, string> bindVars)
+        internal List<ArangoDocument> Post(string query, bool count, int batchSize, Dictionary<string, object> bindVars)
         {
             Json bodyObject = new Json();
             bodyObject.Set("query", query);
@@ -48,6 +48,7 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.Created:
+                    //response.JsonObject.Get<List<object>>("")
                     foreach (var jsonDocument in response.JsonObject.Get<List<Json>>("result"))
                     {
                         ArangoDocument document = new ArangoDocument();
