@@ -60,7 +60,7 @@ namespace Arango.Console
 
         static void TestQuery()
         {
-            Dictionary<string, string> values = new Dictionary<string, string>();
+            Dictionary<string, object> values = new Dictionary<string, object>();
             values.Add("title", "Test kiosk number 5");
             List<ArangoDocument> documents = _database.Query("FOR k IN Kiosks FILTER k.Title == @title RETURN k", false, 2, values);
 
