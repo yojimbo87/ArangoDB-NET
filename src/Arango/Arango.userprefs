@@ -1,0 +1,54 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" ActiveRuntime="Mono 3.0.10" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Arango.Console\Program.cs">
+    <Files>
+      <File FileName="Arango.Tests\Json\Serialization.cs" Line="69" Column="2" />
+      <File FileName="Arango.Client\Public\ADocument.cs" Line="298" Column="29" />
+      <File FileName="Arango.Console\Program.cs" Line="64" Column="10" />
+      <File FileName="Arango.Tests\Json\Deserialization.cs" Line="13" Column="13" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Arango.Client" expanded="True">
+            <Node name="Public" expanded="True" />
+          </Node>
+          <Node name="Arango.Console" expanded="True">
+            <Node name="Program.cs" selected="True" />
+          </Node>
+          <Node name="Arango.Tests" expanded="True">
+            <Node name="Json" expanded="True" />
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
+      <Pad Id="MonoDevelop.NUnit.TestPad">
+        <State expanded="True">
+          <Node name="Arango.Tests" expanded="True" selected="True">
+            <Node name="Arango" expanded="True">
+              <Node name="Tests" expanded="True">
+                <Node name="Json" expanded="True">
+                  <Node name="Deserialization" expanded="True" />
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="D:\Programming\_Github\ArangoDB-NET\src\Arango\Arango.Client\Protocol\Connection.cs" line="98" column="35" />
+      <Breakpoint file="D:\Programming\_Github\ArangoDB-NET\src\Arango\Arango.Console\Program.cs" line="63" column="1" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches>
+    <Watch file="Arango.Client\Protocol\Connection.cs" line="95" offsetX="984" offsetY="1504" expression="foo" liveUpdate="False" />
+  </MonoDevelop.Ide.DebuggingService.PinnedWatches>
+</Properties>
