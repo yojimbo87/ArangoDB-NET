@@ -119,7 +119,7 @@ namespace Arango.Client.Protocol
 
                     if (!string.IsNullOrEmpty(jsonString))
                     {
-                        var document = new ArangoDocument(jsonString);
+                        var document = new Document(jsonString);
                         
                         errorMessage = string.Format(
                             "ArangoDB responded with error code {0}:\n{1} [error number {2}]",

@@ -3,7 +3,7 @@ namespace Arango.Client
 {
     public enum ArangoKeyGeneratorType
     {
-        Traditional,
-        Autoincrement
+        Traditional = 1,
+        Autoincrement = 2
     }
 }

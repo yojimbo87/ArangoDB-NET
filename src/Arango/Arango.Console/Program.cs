@@ -27,16 +27,17 @@ namespace Arango.Console
             System.Console.WriteLine(document.Key);
             System.Console.WriteLine(document.Revision);*/
             
-            ArangoCollection collection = db.Collection.Get("Users");
+            /*ArangoCollection collection = db.Collection.Get("Users");
 
             System.Console.WriteLine(collection.Id);
             System.Console.WriteLine(collection.Name);
             System.Console.WriteLine(collection.Status);
-            System.Console.WriteLine(collection.Type);
+            System.Console.WriteLine(collection.Type);*/
             
             ArangoCollection col1 = new ArangoCollection();
             col1.Name = "latif";
             col1.Type = ArangoCollectionType.Edge;
+            col1.JournalSize = 64000;
             
             db.Collection.Create(col1);
             
@@ -44,6 +45,8 @@ namespace Arango.Console
             System.Console.WriteLine(col1.Name);
             System.Console.WriteLine(col1.Status);
             System.Console.WriteLine(col1.Type);
+            
+            System.Console.WriteLine(db.Collection.Delete(col1.Name));
             
             /*string json = @"{
                 ""integer"": 12345,

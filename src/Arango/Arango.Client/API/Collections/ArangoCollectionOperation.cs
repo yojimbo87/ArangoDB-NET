@@ -20,5 +20,10 @@ namespace Arango.Client
         {
             _collectionOperation.Post(collection);
         }
+        
+        public bool Delete(string name)
+        {
+            return _collectionOperation.Delete(name);
+        }
     }
 }
