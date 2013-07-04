@@ -58,13 +58,15 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="API\DocumentTests\SerializationTests.cs" />
-    <Compile Include="API\DocumentTests\DeserializationTests.cs" />
+    <Compile Include="ArangoCollectionTests\ArangoCollectionTests.cs" />
+    <Compile Include="Database.cs" />
+    <Compile Include="DocumentTests\SerializationTests.cs" />
+    <Compile Include="DocumentTests\DeserializationTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Folder Include="API\DocumentTests" />
-    <Folder Include="API" />
+    <Folder Include="DocumentTests" />
+    <Folder Include="ArangoCollectionTests" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Arango.Client\Arango.Client.csproj">
