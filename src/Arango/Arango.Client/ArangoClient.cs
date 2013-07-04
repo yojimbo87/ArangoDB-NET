@@ -18,9 +18,9 @@ namespace Arango.Client
             get { return "1.0.0"; }
         }
 
-        public static void AddConnection(string server, int port, bool isSecured, string userName, string password, string alias)
+        public static void AddDatabase(string hostname, int port, bool isSecured, string userName, string password, string alias)
         {
-            var connection = new Connection(server, port, isSecured, userName, password, alias);
+            var connection = new Connection(hostname, port, isSecured, userName, password, alias);
 
             _connections.Add(connection);
         }

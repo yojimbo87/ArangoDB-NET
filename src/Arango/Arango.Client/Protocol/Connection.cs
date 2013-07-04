@@ -13,7 +13,7 @@ namespace Arango.Client.Protocol
     {
         #region Properties
 
-        public string Server { get; set; }
+        public string Hostname { get; set; }
 
         public int Port { get; set; }
 
@@ -31,16 +31,16 @@ namespace Arango.Client.Protocol
 
         #endregion
 
-        internal Connection(string server, int port, bool isSecured, string userName, string password, string alias)
+        internal Connection(string hostname, int port, bool isSecured, string userName, string password, string alias)
         {
-            Server = server;
+            Hostname = hostname;
             Port = port;
             IsSecured = isSecured;
             Username = userName;
             Password = password;
             Alias = alias;
 
-            BaseUri = new Uri((isSecured ? "https" : "http") + "://" + server + ":" + port + "/");
+            BaseUri = new Uri((isSecured ? "https" : "http") + "://" + hostname + ":" + port + "/");
 
             if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
             {
