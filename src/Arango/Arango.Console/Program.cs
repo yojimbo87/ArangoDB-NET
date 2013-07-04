@@ -10,7 +10,7 @@ namespace Arango.Console
     {
         public static void Main(string[] args)
         {
-            ArangoClient.AddConnection(
+            ArangoClient.AddDatabase(
                 "localhost",
                 8529,
                 false,
@@ -37,6 +37,7 @@ namespace Arango.Console
             ArangoCollection col1 = new ArangoCollection();
             col1.Name = "latif";
             col1.Type = ArangoCollectionType.Edge;
+            col1.WaitForSync = true;
             col1.JournalSize = 64000;
             
             db.Collection.Create(col1);
