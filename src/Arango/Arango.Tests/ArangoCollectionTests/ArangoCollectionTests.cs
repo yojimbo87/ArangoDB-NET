@@ -68,10 +68,8 @@ namespace Arango.Tests.ArangoCollectionTests
             // check if the collection was deleted from database
             Assert.AreEqual(true, isDeleted);
         }
-        
-        // TODO: pending test - clear crashes the server
-        // https://groups.google.com/forum/#!topic/arangodb/kOKU8nFFvhU
-        /*[Test()]
+
+        [Test()]
         public void Should_create_and_clear_and_delete_collection()
         {
             Database.DeleteTestCollection();
@@ -94,6 +92,6 @@ namespace Arango.Tests.ArangoCollectionTests
             
             // check if the collection was deleted from database
             Assert.AreEqual(true, isDeleted);
-        }*/
+        }
     }
 }
