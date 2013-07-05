@@ -21,11 +21,11 @@ namespace Arango.Console
 
             ArangoDatabase db = new ArangoDatabase("test");
 
-            /*ArangoDocument document = db.Document.Get("Users/21857976");
+            ArangoDocument document = db.Document.Get("Usersasfd/21857976");
 
             System.Console.WriteLine(document.Id);
             System.Console.WriteLine(document.Key);
-            System.Console.WriteLine(document.Revision);*/
+            System.Console.WriteLine(document.Revision);
             
             /*ArangoCollection collection = db.Collection.Get("Users");
 
@@ -34,7 +34,7 @@ namespace Arango.Console
             System.Console.WriteLine(collection.Status);
             System.Console.WriteLine(collection.Type);*/
             
-            ArangoCollection col1 = new ArangoCollection();
+            /*ArangoCollection col1 = new ArangoCollection();
             col1.Name = "latif";
             col1.Type = ArangoCollectionType.Edge;
             col1.WaitForSync = true;
@@ -47,7 +47,7 @@ namespace Arango.Console
             System.Console.WriteLine(col1.Status);
             System.Console.WriteLine(col1.Type);
             
-            System.Console.WriteLine(db.Collection.Delete(col1.Name));
+            System.Console.WriteLine(db.Collection.Delete(col1.Name));*/
             
             /*string json = @"{
                 ""integer"": 12345,

@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using Arango.Client.Protocol;
 
@@ -17,8 +18,7 @@ namespace Arango.Client.Protocol
 
         internal ArangoDocument Get(string id)
         {
-            var request = new Request();
-            request.Method = HttpMethod.Get;
+            var request = new Request(RequestType.Document, HttpMethod.Get);
             request.RelativeUri = string.Join("/", _apiUri, id);
 
             return Get(request);
@@ -37,7 +37,19 @@ namespace Arango.Client.Protocol
                 case HttpStatusCode.NotModified:
                     document.Revision = response.Headers.Get("etag").Replace("\"", "");
                     break;
+                case HttpStatusCode.NotFound:
+                    document = null;
+                    break;
                 default:
+                    if (response.IsException)
+                    {
+                        throw new ArangoException(
+                            response.StatusCode,
+                            response.Document.GetField<string>("driverErrorMessage"),
+                            response.Document.GetField<string>("driverExceptionMessage"),
+                            response.Document.GetField<Exception>("driverInnerException")
+                        );
+                    }
                     break;
             }
 
@@ -50,8 +62,7 @@ namespace Arango.Client.Protocol
         
         internal void Post(string collection, ArangoDocument arangoDocument, bool waitForSync, bool createCollection)
         {
-            var request = new Request();
-            request.Method = HttpMethod.Post;
+            var request = new Request(RequestType.Document, HttpMethod.Post);
             request.RelativeUri = _apiUri;
             request.Body = arangoDocument.Serialize();
             
@@ -81,6 +92,15 @@ namespace Arango.Client.Protocol
                     arangoDocument.Revision = response.Document.GetField<string>("_rev");
                     break;
                 default:
+                    if (response.IsException)
+                    {
+                        throw new ArangoException(
+                            response.StatusCode,
+                            response.Document.GetField<string>("driverErrorMessage"),
+                            response.Document.GetField<string>("driverExceptionMessage"),
+                            response.Document.GetField<Exception>("driverInnerException")
+                        );
+                    }
                     break;
             }
         }
@@ -91,9 +111,8 @@ namespace Arango.Client.Protocol
         
         internal bool Delete(string id)
         {
-            var request = new Request();
+            var request = new Request(RequestType.Document, HttpMethod.Delete);
             request.RelativeUri = string.Join("/", _apiUri, id);
-            request.Method = HttpMethod.Delete;
             
             var response = _connection.Process(request);
             var isRemoved = false;
@@ -105,6 +124,15 @@ namespace Arango.Client.Protocol
                     isRemoved = true;
                     break;
                 default:
+                    if (response.IsException)
+                    {
+                        throw new ArangoException(
+                            response.StatusCode,
+                            response.Document.GetField<string>("driverErrorMessage"),
+                            response.Document.GetField<string>("driverExceptionMessage"),
+                            response.Document.GetField<Exception>("driverInnerException")
+                        );
+                    }
                     break;
             }
             

@@ -52,6 +52,7 @@
     <Compile Include="Protocol\Connection.cs" />
     <Compile Include="Protocol\Operations\CollectionOperation.cs" />
     <Compile Include="Protocol\Request.cs" />
+    <Compile Include="Protocol\RequestType.cs" />
     <Compile Include="Protocol\Response.cs" />
     <Compile Include="Protocol\HttpMethod.cs" />
     <Compile Include="API\ArangoException.cs" />

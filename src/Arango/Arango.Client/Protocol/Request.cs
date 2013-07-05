@@ -43,15 +43,17 @@ namespace Arango.Client.Protocol
             }
 
         }
-        internal Dictionary<string, string> QueryString { get; set; }
+        
+        internal RequestType Type { get; set; }
         internal string Method { get; set; }
-        internal WebHeaderCollection Headers { get; set; }
+        internal WebHeaderCollection Headers = new WebHeaderCollection();
+        internal Dictionary<string, string> QueryString = new Dictionary<string, string>();
         internal string Body { get; set; }
 
-        internal Request()
+        internal Request(RequestType requestType, string method)
         {
-            QueryString = new Dictionary<string, string>();
-            Headers = new WebHeaderCollection();
+            Type = requestType;
+            Method = method;
         }
     }
 }

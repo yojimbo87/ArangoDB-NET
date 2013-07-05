@@ -99,8 +99,31 @@ namespace Arango.Client.Protocol
             {
                 var httpResponse = (HttpWebResponse)webException.Response;
                 var reader = new StreamReader(httpResponse.GetResponseStream());
+                var errorMessage = "";
 
-                if ((httpResponse.StatusCode == HttpStatusCode.NotModified) ||
+                response.IsException = true;
+                response.StatusCode = httpResponse.StatusCode;
+                response.Headers = httpResponse.Headers;
+                response.JsonString = reader.ReadToEnd();
+                
+                if (!string.IsNullOrEmpty(response.JsonString))
+                {
+                    response.Document.Deserialize(response.JsonString);
+                    
+                    errorMessage = string.Format(
+                            "ArangoDB responded with error code {0}:\n{1} [error number {2}]",
+                            response.Document.GetField<string>("code"),
+                            response.Document.GetField<string>("errorMessage"),
+                            response.Document.GetField<string>("errorNum")
+                        );
+                }
+                
+                response.Document.SetField("driverErrorMessage", errorMessage);
+                response.Document.SetField("driverExceptionMessage", webException.Message);
+                response.Document.SetField("driverInnerException", webException.InnerException);
+                
+                // TODO: if 404 then it should pass in some cases
+                /*if ((httpResponse.StatusCode == HttpStatusCode.NotModified) ||
                     ((httpResponse.StatusCode == HttpStatusCode.NotFound) && (request.Method == HttpMethod.Head)))
                 {
                     response.StatusCode = httpResponse.StatusCode;
@@ -135,7 +158,7 @@ namespace Arango.Client.Protocol
                         webException.Message,
                         webException.InnerException
                     );
-                }
+                }*/
             }
 
             return response;

@@ -8,6 +8,7 @@ namespace Arango.Client.Protocol
         internal WebHeaderCollection Headers { get; set; }
         internal string JsonString { get; set; }
         internal Document Document { get; set; }
+        internal bool IsException { get; set; }
 
         internal Response()
         {

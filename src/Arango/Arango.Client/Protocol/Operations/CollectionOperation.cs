@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using Arango.Client.Protocol;
 
 namespace Arango.Client.Protocol
@@ -17,9 +18,8 @@ namespace Arango.Client.Protocol
 
         internal ArangoCollection Get(string name)
         {
-            var request = new Request();
+            var request = new Request(RequestType.Collection, HttpMethod.Get);
             request.RelativeUri = string.Join("/", _apiUri, name);
-            request.Method = HttpMethod.Get;
 
             return Get(request);
         }
@@ -37,7 +37,19 @@ namespace Arango.Client.Protocol
                     collection.Status = response.Document.GetField<ArangoCollectionStatus>("status");
                     collection.Type = response.Document.GetField<ArangoCollectionType>("type");
                     break;
+                case HttpStatusCode.NotFound:
+                    collection = null;
+                    break;
                 default:
+                    if (response.IsException)
+                    {
+                        throw new ArangoException(
+                            response.StatusCode,
+                            response.Document.GetField<string>("driverErrorMessage"),
+                            response.Document.GetField<string>("driverExceptionMessage"),
+                            response.Document.GetField<Exception>("driverInnerException")
+                        );
+                    }
                     break;
             }
 
@@ -50,9 +62,8 @@ namespace Arango.Client.Protocol
         
         internal void Post(ArangoCollection collection)
         {
-            var request = new Request();
+            var request = new Request(RequestType.Collection, HttpMethod.Post);
             request.RelativeUri = _apiUri;
-            request.Method = HttpMethod.Post;
             
             var document = new Document();
             
@@ -132,6 +143,15 @@ namespace Arango.Client.Protocol
                     collection.IsSystem = response.Document.GetField<bool>("isSystem");
                     break;
                 default:
+                    if (response.IsException)
+                    {
+                        throw new ArangoException(
+                            response.StatusCode,
+                            response.Document.GetField<string>("driverErrorMessage"),
+                            response.Document.GetField<string>("driverExceptionMessage"),
+                            response.Document.GetField<Exception>("driverInnerException")
+                        );
+                    }
                     break;
             }
         }
@@ -142,9 +162,8 @@ namespace Arango.Client.Protocol
         
         internal bool Delete(string name)
         {
-            var request = new Request();
+            var request = new Request(RequestType.Collection, HttpMethod.Delete);
             request.RelativeUri = string.Join("/", _apiUri, name);
-            request.Method = HttpMethod.Delete;
             
             var response = _connection.Process(request);
             var collectionId = "";
@@ -155,6 +174,15 @@ namespace Arango.Client.Protocol
                     collectionId = response.Document.GetField<string>("id");
                     break;
                 default:
+                    if (response.IsException)
+                    {
+                        throw new ArangoException(
+                            response.StatusCode,
+                            response.Document.GetField<string>("driverErrorMessage"),
+                            response.Document.GetField<string>("driverExceptionMessage"),
+                            response.Document.GetField<Exception>("driverInnerException")
+                        );
+                    }
                     break;
             }
             
