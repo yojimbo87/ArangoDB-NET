@@ -25,6 +25,16 @@ namespace Arango.Client
         {
             return _documentOperation.Delete(id);
         }
+        
+        public bool Replace(string id, ArangoDocument arangoDocument, bool waitForSync = false, string revision = null)
+        {
+            return _documentOperation.Put(id, arangoDocument, waitForSync, revision);
+        }
+        
+        public bool Update(ArangoDocument arangoDocument, bool waitForSync = false, string revision = null)
+        {
+            return _documentOperation.Patch(arangoDocument, waitForSync, revision);
+        }
     }
 }
 

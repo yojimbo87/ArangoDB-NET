@@ -20,18 +20,16 @@ namespace Arango.Client.Protocol
         {
             var request = new Request(RequestType.Document, HttpMethod.Get);
             request.RelativeUri = string.Join("/", _apiUri, id);
-
-            return Get(request);
-        }
-
-        private ArangoDocument Get(Request request)
-        {
+            
             var response = _connection.Process(request);
             ArangoDocument document = new ArangoDocument();
 
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
+                    document.Id = response.Document.GetField<string>("_id");
+                    document.Key = response.Document.GetField<string>("_key");
+                    document.Revision = response.Document.GetField<string>("_rev");
                     document.Document = response.Document;
                     break;
                 case HttpStatusCode.NotModified:
@@ -137,6 +135,106 @@ namespace Arango.Client.Protocol
             }
             
             return isRemoved;
+        }
+        
+        #endregion
+        
+        #region PUT
+        
+        internal bool Put(string id, ArangoDocument arangoDocument, bool waitForSync, string revision)
+        {
+            var request = new Request(RequestType.Document, HttpMethod.Put);
+            request.RelativeUri = string.Join("/", _apiUri, id);
+            request.Body = arangoDocument.Serialize();
+            
+            // (optional)
+            if (waitForSync)
+            {
+                request.QueryString.Add("waitForSync", "true");
+            }
+            
+            // (optional)
+            if (!string.IsNullOrEmpty(revision))
+            {
+                request.QueryString.Add("rev", revision);
+            }
+            
+            var response = _connection.Process(request);
+            var isReplaced = false;
+            
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.Created:
+                case HttpStatusCode.Accepted:
+                    isReplaced = true;
+                    arangoDocument.Id = response.Document.GetField<string>("_id");
+                    arangoDocument.Key = response.Document.GetField<string>("_key");
+                    arangoDocument.Revision = response.Document.GetField<string>("_rev");
+                    break;
+                default:
+                    if (response.IsException)
+                    {
+                        throw new ArangoException(
+                            response.StatusCode,
+                            response.Document.GetField<string>("driverErrorMessage"),
+                            response.Document.GetField<string>("driverExceptionMessage"),
+                            response.Document.GetField<Exception>("driverInnerException")
+                        );
+                    }
+                    break;
+            }
+            
+            return isReplaced;
+        }
+        
+        #endregion
+        
+        #region PATCH
+        
+        internal bool Patch(ArangoDocument arangoDocument, bool waitForSync, string revision)
+        {
+            var request = new Request(RequestType.Document, HttpMethod.Put);
+            request.RelativeUri = string.Join("/", _apiUri, arangoDocument.Id);
+            request.Body = arangoDocument.Serialize();
+            
+            // (optional)
+            if (waitForSync)
+            {
+                request.QueryString.Add("waitForSync", "true");
+            }
+            
+            // (optional)
+            if (!string.IsNullOrEmpty(revision))
+            {
+                request.QueryString.Add("rev", revision);
+            }
+            
+            var response = _connection.Process(request);
+            var isUpdated = false;
+            
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.Created:
+                case HttpStatusCode.Accepted:
+                    isUpdated = true;
+                    arangoDocument.Id = response.Document.GetField<string>("_id");
+                    arangoDocument.Key = response.Document.GetField<string>("_key");
+                    arangoDocument.Revision = response.Document.GetField<string>("_rev");
+                    break;
+                default:
+                    if (response.IsException)
+                    {
+                        throw new ArangoException(
+                            response.StatusCode,
+                            response.Document.GetField<string>("driverErrorMessage"),
+                            response.Document.GetField<string>("driverExceptionMessage"),
+                            response.Document.GetField<Exception>("driverInnerException")
+                        );
+                    }
+                    break;
+            }
+            
+            return isUpdated;
         }
         
         #endregion
