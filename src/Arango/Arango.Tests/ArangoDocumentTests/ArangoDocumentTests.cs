@@ -131,5 +131,32 @@ namespace Arango.Tests.ArangoDocumentTests
             Assert.AreEqual(arangoDocument.HasField("baz.foo"), returnedArangoDocument.HasField("baz.foo"));
             Assert.AreEqual(arangoDocument.GetField<string>("baz.foo"), returnedArangoDocument.GetField<string>("baz.foo"));
         }
+        
+        [Test()]
+        public void Should_create_and_check_for_document_existence()
+        {
+            Database.CreateTestCollection();
+            var db = Database.GetTestDatabase();
+            
+            // create some test document
+            var arangoDocument = new ArangoDocument()
+                .SetField("foo", "foo string value")
+                .SetField("bar", 12345);
+            
+            db.Document.Create(Database.TestCollectionName, arangoDocument);
+            
+            // check if the created document exists in database        
+            var exists = db.Document.Exists(arangoDocument.Id);
+            
+            Assert.AreEqual(true, exists);
+            
+            // delete document
+            db.Document.Delete(arangoDocument.Id);
+            
+            // check if the document was deleted
+            exists = db.Document.Exists(arangoDocument.Id);
+            
+            Assert.AreEqual(false, exists);
+        }
     }
 }

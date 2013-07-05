@@ -35,6 +35,11 @@ namespace Arango.Client
         {
             return _documentOperation.Patch(arangoDocument, waitForSync, revision);
         }
+        
+        public bool Exists(string id)
+        {
+            return _documentOperation.Head(id);
+        }
     }
 }
 

@@ -238,6 +238,41 @@ namespace Arango.Client.Protocol
         }
         
         #endregion
+        
+        #region HEAD
+        
+        internal bool Head(string id)
+        {
+            var request = new Request(RequestType.Document, HttpMethod.Head);
+            request.RelativeUri = string.Join("/", _apiUri, id);
+            
+            var response = _connection.Process(request);
+            var exists = false;
+            
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    exists = true;
+                    break;
+                case HttpStatusCode.NotFound:
+                    break;
+                default:
+                    if (response.IsException)
+                    {
+                        throw new ArangoException(
+                            response.StatusCode,
+                            response.Document.GetField<string>("driverErrorMessage"),
+                            response.Document.GetField<string>("driverExceptionMessage"),
+                            response.Document.GetField<Exception>("driverInnerException")
+                        );
+                    }
+                    break;
+            }
+            
+            return exists;
+        }
+        
+        #endregion
     }
 }
 
