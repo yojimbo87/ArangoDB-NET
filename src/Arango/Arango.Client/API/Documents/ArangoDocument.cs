@@ -9,53 +9,24 @@ using Arango.Client.Protocol;
 namespace Arango.Client
 {
     public class ArangoDocument
-    {
-        public Document Document { get; set; }
+    {        
+        public string Id { get; set; }
+        public string Key { get; set; }
+        public string Revision { get; set; }
+        public Document Document = new Document();
         
-        public string Id 
-        { 
-            get
-            {
-                return Document.GetField<string>("_id");
-            }
-            
-            set 
-            {
-                Document.SetField("_id", value);
-            }
+        public ArangoDocument() 
+        {
         }
-        
-        public string Key
-        { 
-            get
-            {
-                return Document.GetField<string>("_key");
-            }
-            
-            set 
-            {
-                Document.SetField("_key", value);
-            }
-        }
-        
-        public string Revision
-        { 
-            get
-            {
-                return Document.GetField<string>("_rev");
-            }
-            
-            set 
-            {
-                Document.SetField("_rev", value);
-            }
-        }
-        
-        public ArangoDocument() {}
         
         public ArangoDocument(string jsonString)
         {
             Document.Deserialize(jsonString);
+        }
+        
+        public string Serialize()
+        {
+            return Document.Serialize(Document);
         }
         
         public T GetField<T>(string fieldPath)
@@ -66,6 +37,13 @@ namespace Arango.Client
         public ArangoDocument SetField<T>(string fieldPath, T value)
         {
             Document.SetField(fieldPath, value);
+            
+            return this;
+        }
+        
+        public ArangoDocument RemoveField(string fieldPath)
+        {
+            Document.RemoveField(fieldPath);
             
             return this;
         }
