@@ -38,5 +38,26 @@ namespace Arango.Tests
         {
             return new ArangoDatabase(Alias);
         }
+        
+        public static void CreateTestCollection()
+        {
+            ArangoDatabase db = GetTestDatabase();
+            
+            // TODO: if collection exists - truncate it
+            //ArangoCollection existingCollection = db.Collection.Get(Database.TestCollectionName);
+            
+            //if (exis
+            ArangoCollection collection = new ArangoCollection();
+            collection.Name = TestCollectionName;
+            
+            db.Collection.Create(collection);
+        }
+        
+        public static void DeleteTestCollection()
+        {
+            ArangoDatabase db = GetTestDatabase();
+            
+            db.Collection.Delete(TestCollectionName);
+        }
     }
 }
