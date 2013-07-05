@@ -25,5 +25,10 @@ namespace Arango.Client
         {
             return _collectionOperation.Delete(name);
         }
+        
+        public bool Clear(string name)
+        {
+            return _collectionOperation.PutTruncate(name);
+        }
     }
 }

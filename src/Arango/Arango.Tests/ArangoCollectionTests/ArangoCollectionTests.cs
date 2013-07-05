@@ -10,6 +10,8 @@ namespace Arango.Tests.ArangoCollectionTests
         [Test()]
         public void Should_create_and_delete_collection()
         {
+            Database.DeleteTestCollection();
+            
             ArangoDatabase db = Database.GetTestDatabase();
             
             // set collection data
@@ -36,5 +38,62 @@ namespace Arango.Tests.ArangoCollectionTests
             // check if the collection was deleted from database
             Assert.AreEqual(true, isDeleted);
         }
+        
+        [Test()]
+        public void Should_create_and_get_and_delete_collection()
+        {
+            Database.DeleteTestCollection();
+            
+            ArangoDatabase db = Database.GetTestDatabase();
+            
+            // set collection data
+            ArangoCollection collection = new ArangoCollection();
+            collection.Name = Database.TestCollectionName;
+            
+            // create collection in database
+            db.Collection.Create(collection);
+            
+            // get collection from database
+            ArangoCollection returnedCollection = db.Collection.Get(Database.TestCollectionName);
+            
+            // check collection data retrieved from server
+            Assert.AreEqual(collection.Id, returnedCollection.Id);
+            Assert.AreEqual(collection.Name, returnedCollection.Name);
+            Assert.AreEqual(collection.Type, returnedCollection.Type);
+            Assert.AreEqual(collection.Status, returnedCollection.Status);
+            
+            // delete collection from database
+            bool isDeleted = db.Collection.Delete(collection.Name);
+            
+            // check if the collection was deleted from database
+            Assert.AreEqual(true, isDeleted);
+        }
+        
+        // TODO: pending test - clear crashes the server
+        // https://groups.google.com/forum/#!topic/arangodb/kOKU8nFFvhU
+        /*[Test()]
+        public void Should_create_and_clear_and_delete_collection()
+        {
+            Database.DeleteTestCollection();
+            
+            ArangoDatabase db = Database.GetTestDatabase();
+            
+            // set collection data
+            ArangoCollection collection = new ArangoCollection();
+            collection.Name = Database.TestCollectionName;
+            
+            // create collection in database
+            db.Collection.Create(collection);
+            
+            // clear collection data
+            var isCleared = db.Collection.Clear(Database.TestCollectionName);
+            Assert.AreEqual(true, isCleared);
+            
+            // delete collection from database
+            bool isDeleted = db.Collection.Delete(collection.Name);
+            
+            // check if the collection was deleted from database
+            Assert.AreEqual(true, isDeleted);
+        }*/
     }
 }

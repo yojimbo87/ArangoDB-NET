@@ -15,17 +15,12 @@ namespace Arango.Client.Protocol
         }
         
         #region GET
-
+        
         internal ArangoCollection Get(string name)
         {
             var request = new Request(RequestType.Collection, HttpMethod.Get);
             request.RelativeUri = string.Join("/", _apiUri, name);
-
-            return Get(request);
-        }
-        
-        private ArangoCollection Get(Request request)
-        {
+            
             var response = _connection.Process(request);
             ArangoCollection collection = new ArangoCollection();
 
@@ -166,12 +161,13 @@ namespace Arango.Client.Protocol
             request.RelativeUri = string.Join("/", _apiUri, name);
             
             var response = _connection.Process(request);
-            var collectionId = "";
+            bool isDeleted = false;
 
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    collectionId = response.Document.GetField<string>("id");
+                case HttpStatusCode.NotFound:
+                    isDeleted = true;
                     break;
                 default:
                     if (response.IsException)
@@ -186,14 +182,40 @@ namespace Arango.Client.Protocol
                     break;
             }
             
-            if (string.IsNullOrEmpty(collectionId))
+            return isDeleted;
+        }
+        
+        #endregion
+        
+        #region PUT
+        
+        internal bool PutTruncate(string name)
+        {
+            var request = new Request(RequestType.Collection, HttpMethod.Put);
+            request.RelativeUri = string.Join("/", _apiUri, name, "truncate");
+            
+            var response = _connection.Process(request);
+            var isTruncated = false;
+
+            switch (response.StatusCode)
             {
-                return false;
+                case HttpStatusCode.OK:
+                    isTruncated = true;
+                    break;
+                default:
+                    if (response.IsException)
+                    {
+                        throw new ArangoException(
+                            response.StatusCode,
+                            response.Document.GetField<string>("driverErrorMessage"),
+                            response.Document.GetField<string>("driverExceptionMessage"),
+                            response.Document.GetField<Exception>("driverInnerException")
+                        );
+                    }
+                    break;
             }
-            else
-            {
-                return true;
-            }
+            
+            return isTruncated;
         }
         
         #endregion

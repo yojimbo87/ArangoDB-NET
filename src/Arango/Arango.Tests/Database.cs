@@ -43,10 +43,13 @@ namespace Arango.Tests
         {
             ArangoDatabase db = GetTestDatabase();
             
-            // TODO: if collection exists - truncate it
-            //ArangoCollection existingCollection = db.Collection.Get(Database.TestCollectionName);
+            if (db.Collection.Get(Database.TestCollectionName) != null)
+            {
+                // delet collection if it exists
+                db.Collection.Delete(Database.TestCollectionName);
+            }
             
-            //if (exis
+            // create new test collection
             ArangoCollection collection = new ArangoCollection();
             collection.Name = TestCollectionName;
             
