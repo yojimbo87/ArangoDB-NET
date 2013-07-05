@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Arango.Client;
 
 namespace Arango.Tests.ArangoDocumentTests
 {
     [TestFixture()]
-    public class ArangoDocumentTests
+    public class ArangoDocumentTests : IDisposable
     {
         [Test()]
         public void Should_create_and_delete_document()
@@ -157,6 +158,11 @@ namespace Arango.Tests.ArangoDocumentTests
             exists = db.Document.Exists(arangoDocument.Id);
             
             Assert.AreEqual(false, exists);
+        }
+        
+        public void Dispose()
+        {
+            Database.DeleteTestCollection();
         }
     }
 }
