@@ -240,6 +240,47 @@ namespace Arango.Client
 
             return this;
         }
+        
+        public Document RemoveField(string fieldPath)
+        {
+            if (fieldPath.Contains("."))
+            {
+                var fields = fieldPath.Split('.');
+                int iteration = 1;
+                Document embeddedDocument = this;
+
+                foreach (var field in fields)
+                {
+                    if (iteration == fields.Length)
+                    {
+                        if (embeddedDocument.ContainsKey(field))
+                        {
+                            embeddedDocument.Remove(field);
+                        }
+                        break;
+                    }
+
+                    if (embeddedDocument.ContainsKey(field))
+                    {
+                        embeddedDocument = (Document)embeddedDocument[field];
+                        iteration++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                if (this.ContainsKey(fieldPath))
+                {
+                    this.Remove(fieldPath);
+                }
+            }
+            
+            return this;
+        }
 
         public bool HasField(string fieldPath)
         {
