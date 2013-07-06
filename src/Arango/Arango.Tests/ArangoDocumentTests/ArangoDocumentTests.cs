@@ -11,7 +11,7 @@ namespace Arango.Tests.ArangoDocumentTests
         [Test()]
         public void Should_create_and_delete_document()
         {
-            Database.CreateTestCollection();
+            Database.CreateTestCollection(Database.TestDocumentCollectionName);
             var db = Database.GetTestDatabase();
             
             // create some test document
@@ -19,7 +19,7 @@ namespace Arango.Tests.ArangoDocumentTests
                 .SetField("foo", "foo string value")
                 .SetField("bar", 12345);
             
-            db.Document.Create(Database.TestCollectionName, arangoDocument);
+            db.Document.Create(Database.TestDocumentCollectionName, arangoDocument);
             
             // check if it contains data after creation
             Assert.AreEqual(false, string.IsNullOrEmpty(arangoDocument.Id));
@@ -37,7 +37,7 @@ namespace Arango.Tests.ArangoDocumentTests
         [Test()]
         public void Should_create_and_get_document()
         {
-            Database.CreateTestCollection();
+            Database.CreateTestCollection(Database.TestDocumentCollectionName);
             var db = Database.GetTestDatabase();
             
             // create some test document
@@ -45,7 +45,7 @@ namespace Arango.Tests.ArangoDocumentTests
                 .SetField("foo", "foo string value")
                 .SetField("bar", 12345);
             
-            db.Document.Create(Database.TestCollectionName, arangoDocument);
+            db.Document.Create(Database.TestDocumentCollectionName, arangoDocument);
             
             // get the very same document from database
             var returnedArangoDocument = db.Document.Get(arangoDocument.Id);
@@ -63,7 +63,7 @@ namespace Arango.Tests.ArangoDocumentTests
         [Test()]
         public void Should_create_and_replace_and_get_document()
         {
-            Database.CreateTestCollection();
+            Database.CreateTestCollection(Database.TestDocumentCollectionName);
             var db = Database.GetTestDatabase();
             
             // create some test document
@@ -71,7 +71,7 @@ namespace Arango.Tests.ArangoDocumentTests
                 .SetField("foo", "foo string value")
                 .SetField("bar", 12345);
             
-            db.Document.Create(Database.TestCollectionName, arangoDocument);
+            db.Document.Create(Database.TestDocumentCollectionName, arangoDocument);
             
             // change data in that document and replaced it in database
             ArangoDocument newArangoDocument = new ArangoDocument()
@@ -101,7 +101,7 @@ namespace Arango.Tests.ArangoDocumentTests
         [Test()]
         public void Should_create_and_update_and_get_document()
         {
-            Database.CreateTestCollection();
+            Database.CreateTestCollection(Database.TestDocumentCollectionName);
             var db = Database.GetTestDatabase();
             
             // create some test document
@@ -109,7 +109,7 @@ namespace Arango.Tests.ArangoDocumentTests
                 .SetField("foo", "foo string value")
                 .SetField("bar", 12345);
             
-            db.Document.Create(Database.TestCollectionName, arangoDocument);
+            db.Document.Create(Database.TestDocumentCollectionName, arangoDocument);
             
             // update data in that document and update it in database
             arangoDocument.SetField("baz.foo", "bar string value");
@@ -136,7 +136,7 @@ namespace Arango.Tests.ArangoDocumentTests
         [Test()]
         public void Should_create_and_check_for_document_existence()
         {
-            Database.CreateTestCollection();
+            Database.CreateTestCollection(Database.TestDocumentCollectionName);
             var db = Database.GetTestDatabase();
             
             // create some test document
@@ -144,7 +144,7 @@ namespace Arango.Tests.ArangoDocumentTests
                 .SetField("foo", "foo string value")
                 .SetField("bar", 12345);
             
-            db.Document.Create(Database.TestCollectionName, arangoDocument);
+            db.Document.Create(Database.TestDocumentCollectionName, arangoDocument);
             
             // check if the created document exists in database        
             var exists = db.Document.Exists(arangoDocument.Id);
@@ -162,7 +162,7 @@ namespace Arango.Tests.ArangoDocumentTests
         
         public void Dispose()
         {
-            Database.DeleteTestCollection();
+            Database.DeleteTestCollection(Database.TestDocumentCollectionName);
         }
     }
 }

@@ -11,7 +11,8 @@ namespace Arango.Tests
         public static string Password { get; set; }
         public static string Alias { get; set; }
         
-        public static string TestCollectionName { get; set; }
+        public static string TestDocumentCollectionName { get; set; }
+        public static string TestEdgeCollectionName { get; set; }
         
         static Database()
         {
@@ -22,7 +23,8 @@ namespace Arango.Tests
             Password = "";
             Alias = "test";
             
-            TestCollectionName = "testCollection001xyzLatif";
+            TestDocumentCollectionName = "testDocumentCollection001xyzLatif";
+            TestEdgeCollectionName = "testEdgeCollection001xyzLatif";
             
             ArangoClient.AddDatabase(
                 Hostname,
@@ -39,28 +41,32 @@ namespace Arango.Tests
             return new ArangoDatabase(Alias);
         }
         
-        public static void CreateTestCollection()
+        public static void CreateTestCollection(string collectionName, ArangoCollectionType collectionType = ArangoCollectionType.Document)
         {
             ArangoDatabase db = GetTestDatabase();
             
-            if (db.Collection.Get(Database.TestCollectionName) != null)
+            if (db.Collection.Get(collectionName) != null)
             {
                 // delet collection if it exists
-                db.Collection.Delete(Database.TestCollectionName);
+                db.Collection.Delete(collectionName);
             }
             
             // create new test collection
             ArangoCollection collection = new ArangoCollection();
-            collection.Name = TestCollectionName;
+            collection.Name = collectionName;
+            collection.Type = collectionType;
             
             db.Collection.Create(collection);
         }
         
-        public static void DeleteTestCollection()
+        public static void DeleteTestCollection(string collectionName)
         {
             ArangoDatabase db = GetTestDatabase();
             
-            db.Collection.Delete(TestCollectionName);
+            if (db.Collection.Get(collectionName) != null)
+            {
+                db.Collection.Delete(collectionName);
+            }
         }
     }
 }

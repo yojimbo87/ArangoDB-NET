@@ -4,6 +4,7 @@ namespace Arango.Client.Protocol
     public enum RequestType
     {
         Collection,
-        Document
+        Document,
+        Edge
     }
 }

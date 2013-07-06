@@ -10,13 +10,13 @@ namespace Arango.Tests.ArangoCollectionTests
         [Test()]
         public void Should_create_and_delete_collection()
         {
-            Database.DeleteTestCollection();
+            Database.DeleteTestCollection(Database.TestEdgeCollectionName);
             
             ArangoDatabase db = Database.GetTestDatabase();
             
             // set collection data
             ArangoCollection collection = new ArangoCollection();
-            collection.Name = Database.TestCollectionName;
+            collection.Name = Database.TestEdgeCollectionName;
             collection.Type = ArangoCollectionType.Edge;
             collection.WaitForSync = true;
             
@@ -25,7 +25,7 @@ namespace Arango.Tests.ArangoCollectionTests
             
             // check collection data retrieved from server
             Assert.AreEqual(false, string.IsNullOrEmpty(collection.Id));
-            Assert.AreEqual(Database.TestCollectionName, collection.Name);
+            Assert.AreEqual(Database.TestEdgeCollectionName, collection.Name);
             Assert.AreEqual(ArangoCollectionType.Edge, collection.Type);
             Assert.AreEqual(ArangoCollectionStatus.Loaded, collection.Status);
             Assert.AreEqual(true, collection.WaitForSync);
@@ -42,19 +42,19 @@ namespace Arango.Tests.ArangoCollectionTests
         [Test()]
         public void Should_create_and_get_and_delete_collection()
         {
-            Database.DeleteTestCollection();
+            Database.DeleteTestCollection(Database.TestDocumentCollectionName);
             
             ArangoDatabase db = Database.GetTestDatabase();
             
             // set collection data
             ArangoCollection collection = new ArangoCollection();
-            collection.Name = Database.TestCollectionName;
+            collection.Name = Database.TestDocumentCollectionName;
             
             // create collection in database
             db.Collection.Create(collection);
             
             // get collection from database
-            ArangoCollection returnedCollection = db.Collection.Get(Database.TestCollectionName);
+            ArangoCollection returnedCollection = db.Collection.Get(Database.TestDocumentCollectionName);
             
             // check collection data retrieved from server
             Assert.AreEqual(collection.Id, returnedCollection.Id);
@@ -72,19 +72,19 @@ namespace Arango.Tests.ArangoCollectionTests
         [Test()]
         public void Should_create_and_clear_and_delete_collection()
         {
-            Database.DeleteTestCollection();
+            Database.DeleteTestCollection(Database.TestDocumentCollectionName);
             
             ArangoDatabase db = Database.GetTestDatabase();
             
             // set collection data
             ArangoCollection collection = new ArangoCollection();
-            collection.Name = Database.TestCollectionName;
+            collection.Name = Database.TestDocumentCollectionName;
             
             // create collection in database
             db.Collection.Create(collection);
             
             // clear collection data
-            var isCleared = db.Collection.Clear(Database.TestCollectionName);
+            var isCleared = db.Collection.Clear(Database.TestDocumentCollectionName);
             Assert.AreEqual(true, isCleared);
             
             // delete collection from database

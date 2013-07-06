@@ -6,6 +6,14 @@ namespace Arango.Client
     {
         private Connection _connection;
 
+        public ArangoCollectionOperation Collection
+        {
+            get
+            {
+                return new ArangoCollectionOperation(new CollectionOperation(_connection));
+            }
+        }
+        
         public ArangoDocumentOperation Document
         {
             get
@@ -14,11 +22,11 @@ namespace Arango.Client
             }
         }
         
-        public ArangoCollectionOperation Collection
+        public ArangoEdgeOperation Edge
         {
             get
             {
-                return new ArangoCollectionOperation(new CollectionOperation(_connection));
+                return new ArangoEdgeOperation(new EdgeOperation(_connection));
             }
         }
 
