@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -317,6 +318,21 @@ namespace Arango.Client
             }
 
             return contains;
+        }
+        
+        public Document Except(params string[] fields)
+        {
+            Document document = new Document();
+            
+            foreach (KeyValuePair<string, object> field in this)
+            {
+                if (!fields.Contains(field.Key))
+                {
+                    document.Add(field.Key, field.Value);
+                }
+            }
+            
+            return document;
         }
 
         public static string Serialize<T>(T obj)
