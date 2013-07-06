@@ -30,7 +30,7 @@ namespace Arango.Client.Protocol
                     document.Id = response.Document.GetField<string>("_id");
                     document.Key = response.Document.GetField<string>("_key");
                     document.Revision = response.Document.GetField<string>("_rev");
-                    document.Document = response.Document;
+                    document.Document = response.Document.Except("_id", "_key", "_rev");
                     break;
                 case HttpStatusCode.NotModified:
                     document.Revision = response.Headers.Get("etag").Replace("\"", "");

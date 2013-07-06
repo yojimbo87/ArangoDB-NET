@@ -33,7 +33,7 @@ namespace Arango.Client.Protocol
                     edge.Revision = response.Document.GetField<string>("_rev");
                     edge.From = response.Document.GetField<string>("_from");
                     edge.To = response.Document.GetField<string>("_to");
-                    edge.Document = response.Document;
+                    edge.Document = response.Document.Except("_id", "_key", "_rev", "_from", "_to");
                     break;
                 case HttpStatusCode.NotModified:
                     edge.Revision = response.Headers.Get("etag").Replace("\"", "");
@@ -82,9 +82,7 @@ namespace Arango.Client.Protocol
                         edge.Revision = document.GetField<string>("_rev");
                         edge.From = document.GetField<string>("_from");
                         edge.To = document.GetField<string>("_to");
-                        
-                        // TODO: remove arango specific fields
-                        edge.Document = document;
+                        edge.Document = document.Except("_id", "_key", "_rev", "_from", "_to");
                         
                         edges.Add(edge);
                     }
