@@ -47,9 +47,72 @@ namespace Arango.Tests.QueryTests
                 "FOR x IN " + Database.TestDocumentCollectionName + " " +
                 "RETURN x";
             
-            List<Document> documents = db.Query(aql, false, 2);
+            List<Document> documents = db.Query(aql, 2);
             
             Assert.AreEqual(5, documents.Count);
+            
+            foreach (Document document in documents)
+            {
+                ArangoDocument doc = docs.Where(x => x.Id == document.GetField<string>("_id")).First();
+                
+                Assert.AreEqual(doc.Id, document.GetField<string>("_id"));
+                Assert.AreEqual(doc.Key, document.GetField<string>("_key"));
+                Assert.AreEqual(doc.Revision, document.GetField<string>("_rev"));
+                Assert.AreEqual(doc.HasField("foo"), document.HasField("foo"));
+                Assert.AreEqual(doc.GetField<string>("foo"), document.GetField<string>("foo"));
+                Assert.AreEqual(doc.HasField("bar"), document.HasField("bar"));
+                Assert.AreEqual(doc.GetField<string>("bar"), document.GetField<string>("bar"));
+            }
+        }
+        
+        [Test()]
+        public void Should_return_list_through_AQL_and_return_count()
+        {
+            List<ArangoDocument> docs = CreateDummyDocuments();
+            var db = Database.GetTestDatabase();
+            
+            var aql = 
+                "FOR x IN " + Database.TestDocumentCollectionName + " " +
+                "RETURN x";
+            
+            int count = 0;
+            
+            List<Document> documents = db.Query(aql, out count);
+            
+            Assert.AreEqual(5, documents.Count);
+            Assert.AreEqual(5, count);
+            
+            foreach (Document document in documents)
+            {
+                ArangoDocument doc = docs.Where(x => x.Id == document.GetField<string>("_id")).First();
+                
+                Assert.AreEqual(doc.Id, document.GetField<string>("_id"));
+                Assert.AreEqual(doc.Key, document.GetField<string>("_key"));
+                Assert.AreEqual(doc.Revision, document.GetField<string>("_rev"));
+                Assert.AreEqual(doc.HasField("foo"), document.HasField("foo"));
+                Assert.AreEqual(doc.GetField<string>("foo"), document.GetField<string>("foo"));
+                Assert.AreEqual(doc.HasField("bar"), document.HasField("bar"));
+                Assert.AreEqual(doc.GetField<string>("bar"), document.GetField<string>("bar"));
+            }
+        }
+        
+        [Test()]
+        public void Should_return_list_through_AQL_with_limit_and_return_count()
+        {
+            List<ArangoDocument> docs = CreateDummyDocuments();
+            var db = Database.GetTestDatabase();
+            
+            var aql = 
+                "FOR x IN " + Database.TestDocumentCollectionName + " " +
+                "LIMIT 2 " +
+                "RETURN x";
+            
+            int count = 0;
+            
+            List<Document> documents = db.Query(aql, out count);
+            
+            Assert.AreEqual(2, documents.Count);
+            Assert.AreEqual(2, count);
             
             foreach (Document document in documents)
             {

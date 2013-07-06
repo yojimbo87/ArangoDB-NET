@@ -36,11 +36,19 @@ namespace Arango.Client
             _connection = ArangoClient.GetConnection(alias);
         }
         
-        public List<Document> Query(string aql, bool count = false, int batchSize = 0)
+        public List<Document> Query(string aql, int batchSize = 0)
+        {
+            CursorOperation cursorOperation = new CursorOperation(_connection);
+            int count = 0;
+            
+            return cursorOperation.Post(aql, false, out count, batchSize);
+        }
+        
+        public List<Document> Query(string aql, out int count, int batchSize = 0)
         {
             CursorOperation cursorOperation = new CursorOperation(_connection);
             
-            return cursorOperation.Post(aql, count, batchSize);
+            return cursorOperation.Post(aql, true, out count, batchSize);
         }
     }
 }

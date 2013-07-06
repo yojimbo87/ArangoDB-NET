@@ -19,7 +19,7 @@ namespace Arango.Client.Protocol
         
         // TODO: bindVars optional parameter
         // http://www.arangodb.org/manuals/current/HttpCursor.html#HttpCursorPost
-        internal List<Document> Post(string query, bool count, int batchSize)
+        internal List<Document> Post(string query, bool returnCount, out int count, int batchSize)
         {
             var request = new Request(RequestType.Cursor, HttpMethod.Post);
             request.RelativeUri = _apiUri;
@@ -30,9 +30,9 @@ namespace Arango.Client.Protocol
             bodyDocument.SetField("query", query);
                 
             // (optional) set number of found documents
-            if (count)
+            if (returnCount)
             {
-                bodyDocument.SetField("count", count);
+                bodyDocument.SetField("count", returnCount);
             }
             
             // (optional) set how much documents should be returned
@@ -45,7 +45,7 @@ namespace Arango.Client.Protocol
             
             var response = _connection.Process(request);
             List<Document> documents = new List<Document>();
-            int resultCount = 0;
+            count = 0;
             
             switch (response.StatusCode)
             {
@@ -53,10 +53,9 @@ namespace Arango.Client.Protocol
                     documents.AddRange(response.Document.GetField<List<Document>>("result"));
                     
                     // get count of returned document if present
-                    if (count)
+                    if (returnCount)
                     {
-                        // TODO: process count if present
-                        resultCount = response.Document.GetField<int>("count");
+                        count = response.Document.GetField<int>("count");
                     }
                    
                     // get more results if present
