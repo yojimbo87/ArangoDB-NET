@@ -5,6 +5,7 @@ namespace Arango.Client.Protocol
     {
         Collection,
         Document,
-        Edge
+        Edge,
+        Cursor
     }
 }

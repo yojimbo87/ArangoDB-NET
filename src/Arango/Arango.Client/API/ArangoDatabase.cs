@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Arango.Client.Protocol;
 
 namespace Arango.Client
@@ -33,6 +34,13 @@ namespace Arango.Client
         public ArangoDatabase(string alias)
         {
             _connection = ArangoClient.GetConnection(alias);
+        }
+        
+        public List<Document> Query(string aql, bool count = false, int batchSize = 0)
+        {
+            CursorOperation cursorOperation = new CursorOperation(_connection);
+            
+            return cursorOperation.Post(aql, count, batchSize);
         }
     }
 }
