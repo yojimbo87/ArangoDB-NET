@@ -65,6 +65,7 @@
     <Compile Include="DocumentTests\DocumentTests.cs" />
     <Compile Include="DocumentTests\SerializationTests.cs" />
     <Compile Include="DocumentTests\DeserializationTests.cs" />
+    <Compile Include="DummyObjects\Person.cs" />
     <Compile Include="QueryTests\CursorTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -73,6 +74,7 @@
     <Folder Include="ArangoCollectionTests" />
     <Folder Include="ArangoDocumentTests" />
     <Folder Include="ArangoEdgeTests" />
+    <Folder Include="DummyObjects" />
     <Folder Include="QueryTests" />
   </ItemGroup>
   <ItemGroup>
