@@ -37,6 +37,11 @@ namespace Arango.Client
             return _edgeOperation.Put(id, arangoEdge, waitForSync, revision);
         }
         
+        public bool Update(ArangoEdge arangoEdge, bool waitForSync = false, string revision = null)
+        {
+            return _edgeOperation.Patch(arangoEdge, waitForSync, revision);
+        }
+        
         public bool Exists(string id)
         {
             return _edgeOperation.Head(id);

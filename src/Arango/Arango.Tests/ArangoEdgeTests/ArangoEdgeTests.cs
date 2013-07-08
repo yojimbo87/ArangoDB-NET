@@ -150,6 +150,57 @@ namespace Arango.Tests.ArangoEdgeTests
         }
         
         [Test()]
+        public void Should_create_and_update_and_get_edge()
+        {
+            Database.CreateTestCollection(Database.TestDocumentCollectionName);
+            Database.CreateTestCollection(Database.TestEdgeCollectionName, ArangoCollectionType.Edge);
+            var db = Database.GetTestDatabase();
+            
+             // create test documents
+            var doc1 = new ArangoDocument()
+                .SetField("foo", "foo string value 1")
+                .SetField("bar", 12345);
+            
+            var doc2 = new ArangoDocument()
+                .SetField("foo", "foo string value 2")
+                .SetField("bar", 54321);
+            
+            db.Document.Create(Database.TestDocumentCollectionName, doc1);
+            db.Document.Create(Database.TestDocumentCollectionName, doc2);
+            
+            // create test edge
+            var edge = new ArangoEdge()
+                .SetField("edgeFoo", "foo string value")
+                .SetField("edgeBar", 12345);
+            
+            edge.From = doc1.Id;
+            edge.To = doc2.Id;
+            
+            db.Edge.Create(Database.TestEdgeCollectionName, edge);
+            
+            // update data in that document and update it in database
+            edge.SetField("baz.foo", "bar string value");
+            
+            var isUpdated = db.Edge.Update(edge);
+            
+            Assert.AreEqual(true, isUpdated);
+            
+            // get the very same document from database
+            var returnedEdge = db.Edge.Get(edge.Id);
+            
+            // check if the data of updated and returned document are equal
+            Assert.AreEqual(edge.Id, returnedEdge.Id);
+            Assert.AreEqual(edge.Key, returnedEdge.Key);
+            Assert.AreEqual(edge.Revision, returnedEdge.Revision);
+            Assert.AreEqual(edge.HasField("foo"), returnedEdge.HasField("foo"));
+            Assert.AreEqual(edge.GetField<string>("foo"), returnedEdge.GetField<string>("foo"));
+            Assert.AreEqual(edge.HasField("bar"), returnedEdge.HasField("bar"));
+            Assert.AreEqual(edge.GetField<int>("bar"), returnedEdge.GetField<int>("bar"));
+            Assert.AreEqual(edge.HasField("baz.foo"), returnedEdge.HasField("baz.foo"));
+            Assert.AreEqual(edge.GetField<string>("baz.foo"), returnedEdge.GetField<string>("baz.foo"));
+        }
+        
+        [Test()]
         public void Should_create_and_check_for_edge_existence()
         {
             Database.CreateTestCollection(Database.TestDocumentCollectionName);

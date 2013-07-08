@@ -244,6 +244,56 @@ namespace Arango.Client.Protocol
         
         #endregion
         
+        #region PATCH
+        
+        internal bool Patch(ArangoEdge arangoEdge, bool waitForSync, string revision)
+        {
+            var request = new Request(RequestType.Edge, HttpMethod.Patch);
+            request.RelativeUri = string.Join("/", _apiUri, arangoEdge.Id);
+            request.Body = arangoEdge.Serialize();
+            
+            // (optional)
+            if (waitForSync)
+            {
+                request.QueryString.Add("waitForSync", "true");
+            }
+            
+            // (optional)
+            if (!string.IsNullOrEmpty(revision))
+            {
+                request.QueryString.Add("rev", revision);
+            }
+            
+            var response = _connection.Process(request);
+            var isUpdated = false;
+            
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.Created:
+                case HttpStatusCode.Accepted:
+                    isUpdated = true;
+                    arangoEdge.Id = response.Document.GetField<string>("_id");
+                    arangoEdge.Key = response.Document.GetField<string>("_key");
+                    arangoEdge.Revision = response.Document.GetField<string>("_rev");
+                    break;
+                default:
+                    if (response.IsException)
+                    {
+                        throw new ArangoException(
+                            response.StatusCode,
+                            response.Document.GetField<string>("driverErrorMessage"),
+                            response.Document.GetField<string>("driverExceptionMessage"),
+                            response.Document.GetField<Exception>("driverInnerException")
+                        );
+                    }
+                    break;
+            }
+            
+            return isUpdated;
+        }
+        
+        #endregion
+        
         #region HEAD
         
         internal bool Head(string id)
