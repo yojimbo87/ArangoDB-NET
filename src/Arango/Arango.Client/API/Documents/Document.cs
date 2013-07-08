@@ -766,5 +766,42 @@ namespace Arango.Client
         }
         
         #endregion
+    
+        public void MapAttributesTo<T>(T genericObject)
+        {
+            // get arango specific fields to generic object if it has properties flagged with attributes
+            foreach (PropertyInfo propertyInfo in genericObject.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                var arangoProperty = propertyInfo.GetCustomAttribute<ArangoProperty>();
+                
+                if (arangoProperty != null)
+                {
+                    if (arangoProperty.Identity)
+                    {
+                        propertyInfo.SetValue(genericObject, GetField<string>("_id"), null);
+                    }
+                    
+                    if (arangoProperty.Key)
+                    {
+                        propertyInfo.SetValue(genericObject, GetField<string>("_key"), null);
+                    }
+                    
+                    if (arangoProperty.Revision)
+                    {
+                        propertyInfo.SetValue(genericObject, GetField<string>("_rev"), null);
+                    }
+                    
+                    if (arangoProperty.From)
+                    {
+                        propertyInfo.SetValue(genericObject, GetField<string>("_from"), null);
+                    }
+                    
+                    if (arangoProperty.To)
+                    {
+                        propertyInfo.SetValue(genericObject, GetField<string>("_to"), null);
+                    }
+                }
+            }
+        }
     }
 }
