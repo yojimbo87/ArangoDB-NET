@@ -41,7 +41,7 @@ namespace Arango.Client
             var arangoDocument = new ArangoDocument();
             arangoDocument.Document.From(genericObject);
             
-            _documentOperation.Post(collection, arangoDocument, waitForSync, createCollection);
+            Create(collection, arangoDocument, waitForSync, createCollection);
             
             arangoDocument.MapAttributes(genericObject);
         }
@@ -65,7 +65,7 @@ namespace Arango.Client
             var arangoDocument = new ArangoDocument();
             arangoDocument.Document.From(genericObject);
             
-            var isReplaced = _documentOperation.Put(id, arangoDocument, waitForSync, revision);
+            var isReplaced = Replace(id, arangoDocument, waitForSync, revision);
             arangoDocument.MapAttributes(genericObject);
             
             return isReplaced;
@@ -85,7 +85,7 @@ namespace Arango.Client
             var arangoDocument = new ArangoDocument();
             arangoDocument.Document.From(genericObject);
             
-            var isUpdated = _documentOperation.Patch(id, arangoDocument, waitForSync, revision);
+            var isUpdated = Update(id, arangoDocument, waitForSync, revision);
             arangoDocument.MapAttributes(genericObject);
             
             return isUpdated;
