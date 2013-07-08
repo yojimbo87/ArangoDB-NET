@@ -327,7 +327,7 @@ namespace Arango.Tests.ArangoDocumentTests
             Assert.AreEqual(person.FirstName, returnedPerson.FirstName);
             Assert.AreEqual(person.LastName, returnedPerson.LastName);
             Assert.AreEqual(person.Age, returnedPerson.Age);
-            Assert.AreEqual(person.Aliased, returnedPerson.Aliased);;
+            Assert.AreEqual(person.Aliased, returnedPerson.Aliased);
         }
         
         public void Dispose()

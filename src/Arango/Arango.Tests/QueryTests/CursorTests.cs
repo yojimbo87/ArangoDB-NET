@@ -128,6 +128,32 @@ namespace Arango.Tests.QueryTests
             }
         }
         
+        [Test()]
+        public void Should_return_generic_list_through_AQL()
+        {
+            List<Person> people = CreateDummyPeople();
+            var db = Database.GetTestDatabase();
+            
+            var aql = 
+                "FOR x IN " + Database.TestDocumentCollectionName + " " +
+                "RETURN x";
+            
+            List<Person> returnedPeople = db.Query<Person>(aql);
+            
+            Assert.AreEqual(5, returnedPeople.Count);
+            
+            foreach (Person person in returnedPeople)
+            {
+                Person per = people.Where(x => x.ThisIsId == person.ThisIsId).First();
+                
+                Assert.AreEqual(per.ThisIsId, person.ThisIsId);
+                Assert.AreEqual(per.ThisIsKey, person.ThisIsKey);
+                Assert.AreEqual(per.ThisIsRevision, person.ThisIsRevision);
+                Assert.AreEqual(per.FirstName, person.FirstName);
+                Assert.AreEqual(per.LastName, person.LastName);
+            }
+        }
+        
         private List<ArangoDocument> CreateDummyDocuments()
         {
             Database.CreateTestCollection(Database.TestDocumentCollectionName);
@@ -169,6 +195,49 @@ namespace Arango.Tests.QueryTests
             db.Document.Create(Database.TestDocumentCollectionName, doc5);
             
             return docs;
+        }
+        
+        private List<Person> CreateDummyPeople()
+        {
+            Database.CreateTestCollection(Database.TestDocumentCollectionName);
+            var db = Database.GetTestDatabase();
+            
+            var people = new List<Person>();
+            
+            // create test documents
+            var p1 = new Person();
+            p1.FirstName = "Johny";
+            p1.LastName = "Bravo";
+            
+            var p2 = new Person();
+            p2.FirstName = "Larry";
+            p2.LastName = "Bravo";
+            
+            var p3 = new Person();
+            p3.FirstName = "Sergei";
+            p3.LastName = "Fitt";
+            
+            var p4 = new Person();
+            p4.FirstName = "Lucy";
+            p4.LastName = "Fox";
+            
+            var p5 = new Person();
+            p5.FirstName = "Tom";
+            p5.LastName = "Tall";
+            
+            people.Add(p1);
+            people.Add(p2);
+            people.Add(p3);
+            people.Add(p4);
+            people.Add(p5);
+            
+            db.Document.Create(Database.TestDocumentCollectionName, p1);
+            db.Document.Create(Database.TestDocumentCollectionName, p2);
+            db.Document.Create(Database.TestDocumentCollectionName, p3);
+            db.Document.Create(Database.TestDocumentCollectionName, p4);
+            db.Document.Create(Database.TestDocumentCollectionName, p5);
+            
+            return people;
         }
         
         public void Dispose()

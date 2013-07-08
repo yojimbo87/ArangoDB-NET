@@ -36,6 +36,15 @@ namespace Arango.Client
             _connection = ArangoClient.GetConnection(alias);
         }
         
+        #region Query
+        
+        public List<Document> Query(string aql, out int count, int batchSize = 0)
+        {
+            CursorOperation cursorOperation = new CursorOperation(_connection);
+            
+            return cursorOperation.Post(aql, true, out count, batchSize);
+        }
+        
         public List<Document> Query(string aql, int batchSize = 0)
         {
             CursorOperation cursorOperation = new CursorOperation(_connection);
@@ -44,12 +53,23 @@ namespace Arango.Client
             return cursorOperation.Post(aql, false, out count, batchSize);
         }
         
-        public List<Document> Query(string aql, out int count, int batchSize = 0)
+        public List<T> Query<T>(string aql, int batchSize = 0) where T : class, new()
         {
-            CursorOperation cursorOperation = new CursorOperation(_connection);
+            List<Document> documents = Query(aql, batchSize);
+            List<T> genericCollection = new List<T>();
             
-            return cursorOperation.Post(aql, true, out count, batchSize);
+            foreach (Document document in documents)
+            {
+                T genericObject = document.To<T>();
+                document.MapAttributesTo(genericObject);
+                
+                genericCollection.Add(genericObject);
+            }
+            
+            return genericCollection;
         }
+        
+        #endregion
     }
 }
 
