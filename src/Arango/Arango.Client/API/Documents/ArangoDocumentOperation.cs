@@ -22,7 +22,7 @@ namespace Arango.Client
         {
             var arangoDocument = Get(id);
             var obj = (T)arangoDocument.Document.To<T>();
-            arangoDocument.MapAttributes(obj);
+            arangoDocument.MapAttributesTo(obj);
             
             return obj;
         }
@@ -43,7 +43,7 @@ namespace Arango.Client
             
             Create(collection, arangoDocument, waitForSync, createCollection);
             
-            arangoDocument.MapAttributes(genericObject);
+            arangoDocument.MapAttributesTo(genericObject);
         }
         
         #endregion
@@ -55,18 +55,19 @@ namespace Arango.Client
         
         #region Replace
         
-        public bool Replace(string id, ArangoDocument arangoDocument, bool waitForSync = false, string revision = null)
+        public bool Replace(ArangoDocument arangoDocument, bool waitForSync = false, string revision = null)
         {
-            return _documentOperation.Put(id, arangoDocument, waitForSync, revision);
+            return _documentOperation.Put(arangoDocument, waitForSync, revision);
         }
         
-        public bool Replace<T>(string id, T genericObject, bool waitForSync = false, string revision = null)
+        public bool Replace<T>(T genericObject, bool waitForSync = false, string revision = null)
         {
             var arangoDocument = new ArangoDocument();
+            arangoDocument.MapAttributesFrom(genericObject);
             arangoDocument.Document.From(genericObject);
             
-            var isReplaced = Replace(id, arangoDocument, waitForSync, revision);
-            arangoDocument.MapAttributes(genericObject);
+            var isReplaced = Replace(arangoDocument, waitForSync, revision);
+            arangoDocument.MapAttributesTo(genericObject);
             
             return isReplaced;
         }
@@ -75,18 +76,19 @@ namespace Arango.Client
         
         #region Update
         
-        public bool Update(string id, ArangoDocument arangoDocument, bool waitForSync = false, string revision = null)
+        public bool Update(ArangoDocument arangoDocument, bool waitForSync = false, string revision = null)
         {
-            return _documentOperation.Patch(id, arangoDocument, waitForSync, revision);
+            return _documentOperation.Patch(arangoDocument, waitForSync, revision);
         }
         
-        public bool Update<T>(string id, T genericObject, bool waitForSync = false, string revision = null)
+        public bool Update<T>(T genericObject, bool waitForSync = false, string revision = null)
         {
             var arangoDocument = new ArangoDocument();
+            arangoDocument.MapAttributesFrom(genericObject);
             arangoDocument.Document.From(genericObject);
             
-            var isUpdated = Update(id, arangoDocument, waitForSync, revision);
-            arangoDocument.MapAttributes(genericObject);
+            var isUpdated = Update(arangoDocument, waitForSync, revision);
+            arangoDocument.MapAttributesTo(genericObject);
             
             return isUpdated;
         }
