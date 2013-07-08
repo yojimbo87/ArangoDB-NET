@@ -181,7 +181,7 @@ namespace Arango.Tests.ArangoEdgeTests
             // update data in that document and update it in database
             edge.SetField("baz.foo", "bar string value");
             
-            var isUpdated = db.Edge.Update(edge);
+            var isUpdated = db.Edge.Update(edge.Id, edge);
             
             Assert.AreEqual(true, isUpdated);
             

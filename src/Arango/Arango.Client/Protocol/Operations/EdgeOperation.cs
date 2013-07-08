@@ -246,10 +246,10 @@ namespace Arango.Client.Protocol
         
         #region PATCH
         
-        internal bool Patch(ArangoEdge arangoEdge, bool waitForSync, string revision)
+        internal bool Patch(string id, ArangoEdge arangoEdge, bool waitForSync, string revision)
         {
             var request = new Request(RequestType.Edge, HttpMethod.Patch);
-            request.RelativeUri = string.Join("/", _apiUri, arangoEdge.Id);
+            request.RelativeUri = string.Join("/", _apiUri, id);
             request.Body = arangoEdge.Serialize();
             
             // (optional)

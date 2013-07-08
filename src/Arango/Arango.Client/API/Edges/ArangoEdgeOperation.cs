@@ -37,9 +37,9 @@ namespace Arango.Client
             return _edgeOperation.Put(id, arangoEdge, waitForSync, revision);
         }
         
-        public bool Update(ArangoEdge arangoEdge, bool waitForSync = false, string revision = null)
+        public bool Update(string id, ArangoEdge arangoEdge, bool waitForSync = false, string revision = null)
         {
-            return _edgeOperation.Patch(arangoEdge, waitForSync, revision);
+            return _edgeOperation.Patch(id, arangoEdge, waitForSync, revision);
         }
         
         public bool Exists(string id)
