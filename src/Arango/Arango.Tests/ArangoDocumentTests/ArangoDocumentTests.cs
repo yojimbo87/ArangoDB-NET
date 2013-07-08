@@ -114,7 +114,7 @@ namespace Arango.Tests.ArangoDocumentTests
             // update data in that document and update it in database
             arangoDocument.SetField("baz.foo", "bar string value");
             
-            var isUpdated = db.Document.Update(arangoDocument);
+            var isUpdated = db.Document.Update(arangoDocument.Id, arangoDocument);
             
             Assert.AreEqual(true, isUpdated);
             
@@ -192,6 +192,7 @@ namespace Arango.Tests.ArangoDocumentTests
             
             Assert.AreEqual(true, exists);
             
+            // retrieve the very same document from database
             var returnedPerson = db.Document.Get<Person>(person.ThisIsId);
             
             // check if the data from created and returned document are equal
@@ -201,8 +202,6 @@ namespace Arango.Tests.ArangoDocumentTests
             Assert.AreEqual(false, string.IsNullOrEmpty(returnedPerson.ThisIsId));
             Assert.AreEqual(false, string.IsNullOrEmpty(returnedPerson.ThisIsKey));
             Assert.AreEqual(false, string.IsNullOrEmpty(returnedPerson.ThisIsRevision));
-            Assert.AreEqual(person.ThisIsKey, returnedPerson.ThisIsKey);
-            Assert.AreEqual(person.ThisIsRevision, returnedPerson.ThisIsRevision);
             Assert.AreEqual(person.ThisIsId, returnedPerson.ThisIsId);
             Assert.AreEqual(person.ThisIsKey, returnedPerson.ThisIsKey);
             Assert.AreEqual(person.ThisIsRevision, returnedPerson.ThisIsRevision);
@@ -236,6 +235,102 @@ namespace Arango.Tests.ArangoDocumentTests
             Assert.AreEqual(person.Followers[1].Interests.Count, returnedPerson.Followers[1].Interests.Count);
             Assert.AreEqual(person.Followers[1].Interests[0], returnedPerson.Followers[1].Interests[0]);
             Assert.AreEqual(person.Followers[1].Interests[1], returnedPerson.Followers[1].Interests[1]);
+        }
+        
+        [Test()]
+        public void Should_create_document_from_generic_object_and_replace_it_and_get_it_back()
+        {
+            Database.CreateTestCollection(Database.TestDocumentCollectionName);
+            var db = Database.GetTestDatabase();
+            
+            // create some test document
+            var arangoDocument = new ArangoDocument()
+                .SetField("foo", "foo string value")
+                .SetField("bar", 12345);
+            
+            var person = new Person();
+            person.FirstName = "Johny";
+            person.LastName = "Bravo";
+            person.Age = 25;
+            person.Aliased = "aliased string";
+            
+            db.Document.Create(Database.TestDocumentCollectionName, person);
+            
+            // check if the created document exists in database        
+            var exists = db.Document.Exists(person.ThisIsId);
+            
+            Assert.AreEqual(true, exists);
+            
+            var replacedPerson = new Person();
+            replacedPerson.FirstName = "Robert";
+            replacedPerson.LastName = "Pizza";
+            replacedPerson.Age = 14;
+            
+            // replace original document with new one
+            var isReplaced = db.Document.Replace(person.ThisIsId, replacedPerson);
+            
+            Assert.AreEqual(true, isReplaced);
+            
+            // retrieve the very same document from database
+            var returnedPerson = db.Document.Get<Person>(person.ThisIsId);
+            
+            // check if the data from created and returned document are equal
+            Assert.AreEqual(false, string.IsNullOrEmpty(replacedPerson.ThisIsId));
+            Assert.AreEqual(false, string.IsNullOrEmpty(replacedPerson.ThisIsKey));
+            Assert.AreEqual(false, string.IsNullOrEmpty(replacedPerson.ThisIsRevision));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedPerson.ThisIsId));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedPerson.ThisIsKey));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedPerson.ThisIsRevision));
+            Assert.AreEqual(replacedPerson.ThisIsId, returnedPerson.ThisIsId);
+            Assert.AreEqual(replacedPerson.ThisIsKey, returnedPerson.ThisIsKey);
+            Assert.AreEqual(replacedPerson.ThisIsRevision, returnedPerson.ThisIsRevision);
+            
+            Assert.AreEqual(replacedPerson.FirstName, returnedPerson.FirstName);
+            Assert.AreEqual(replacedPerson.LastName, returnedPerson.LastName);
+            Assert.AreEqual(replacedPerson.Age, returnedPerson.Age);
+            
+            Assert.AreEqual(true, string.IsNullOrEmpty(returnedPerson.Aliased));
+        }
+        
+        [Test()]
+        public void Should_create_document_from_generic_object_and_update_it_and_get_it_back()
+        {
+            Database.CreateTestCollection(Database.TestDocumentCollectionName);
+            var db = Database.GetTestDatabase();
+            
+            var person = new Person();
+            person.FirstName = "Johny";
+            person.LastName = "Bravo";
+            person.Age = 25;
+            
+            db.Document.Create(Database.TestDocumentCollectionName, person);
+            
+            // update data in that document and update it in database
+            person.FirstName = "Robert";
+            person.Aliased = "aliased string";
+            
+            var isUpdated = db.Document.Update(person.ThisIsId, person);
+            
+            Assert.AreEqual(true, isUpdated);
+            
+            /// retrieve the very same document from database
+            var returnedPerson = db.Document.Get<Person>(person.ThisIsId);
+            
+            // check if the data from created and returned document are equal
+            Assert.AreEqual(false, string.IsNullOrEmpty(person.ThisIsId));
+            Assert.AreEqual(false, string.IsNullOrEmpty(person.ThisIsKey));
+            Assert.AreEqual(false, string.IsNullOrEmpty(person.ThisIsRevision));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedPerson.ThisIsId));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedPerson.ThisIsKey));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedPerson.ThisIsRevision));
+            Assert.AreEqual(person.ThisIsId, returnedPerson.ThisIsId);
+            Assert.AreEqual(person.ThisIsKey, returnedPerson.ThisIsKey);
+            Assert.AreEqual(person.ThisIsRevision, returnedPerson.ThisIsRevision);
+            
+            Assert.AreEqual(person.FirstName, returnedPerson.FirstName);
+            Assert.AreEqual(person.LastName, returnedPerson.LastName);
+            Assert.AreEqual(person.Age, returnedPerson.Age);
+            Assert.AreEqual(person.Aliased, returnedPerson.Aliased);;
         }
         
         public void Dispose()

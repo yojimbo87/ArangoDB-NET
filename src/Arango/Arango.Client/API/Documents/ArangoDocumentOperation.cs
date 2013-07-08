@@ -20,9 +20,8 @@ namespace Arango.Client
         
         public T Get<T>(string id) where T : class, new()
         {
-            ArangoDocument arangoDocument = Get(id);
-            
-            T obj = (T)arangoDocument.Document.To<T>();
+            var arangoDocument = Get(id);
+            var obj = (T)arangoDocument.Document.To<T>();
             arangoDocument.MapAttributes(obj);
             
             return obj;
@@ -54,15 +53,45 @@ namespace Arango.Client
             return _documentOperation.Delete(id);
         }
         
+        #region Replace
+        
         public bool Replace(string id, ArangoDocument arangoDocument, bool waitForSync = false, string revision = null)
         {
             return _documentOperation.Put(id, arangoDocument, waitForSync, revision);
         }
         
-        public bool Update(ArangoDocument arangoDocument, bool waitForSync = false, string revision = null)
+        public bool Replace<T>(string id, T genericObject, bool waitForSync = false, string revision = null)
         {
-            return _documentOperation.Patch(arangoDocument, waitForSync, revision);
+            var arangoDocument = new ArangoDocument();
+            arangoDocument.Document.From(genericObject);
+            
+            var isReplaced = _documentOperation.Put(id, arangoDocument, waitForSync, revision);
+            arangoDocument.MapAttributes(genericObject);
+            
+            return isReplaced;
         }
+        
+        #endregion
+        
+        #region Update
+        
+        public bool Update(string id, ArangoDocument arangoDocument, bool waitForSync = false, string revision = null)
+        {
+            return _documentOperation.Patch(id, arangoDocument, waitForSync, revision);
+        }
+        
+        public bool Update<T>(string id, T genericObject, bool waitForSync = false, string revision = null)
+        {
+            var arangoDocument = new ArangoDocument();
+            arangoDocument.Document.From(genericObject);
+            
+            var isUpdated = _documentOperation.Patch(id, arangoDocument, waitForSync, revision);
+            arangoDocument.MapAttributes(genericObject);
+            
+            return isUpdated;
+        }
+        
+        #endregion
         
         public bool Exists(string id)
         {
