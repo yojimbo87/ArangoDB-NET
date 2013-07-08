@@ -185,14 +185,27 @@ namespace Arango.Tests.ArangoDocumentTests
             
             person.Followers = new List<Person> { follower1, follower2 };
             
-            string id = db.Document.Create(Database.TestDocumentCollectionName, person);
+            db.Document.Create(Database.TestDocumentCollectionName, person);
             
             // check if the created document exists in database        
-            var exists = db.Document.Exists(id);
+            var exists = db.Document.Exists(person.ThisIsId);
             
             Assert.AreEqual(true, exists);
             
-            var returnedPerson = db.Document.Get<Person>(id);
+            var returnedPerson = db.Document.Get<Person>(person.ThisIsId);
+            
+            // check if the data from created and returned document are equal
+            Assert.AreEqual(false, string.IsNullOrEmpty(person.ThisIsId));
+            Assert.AreEqual(false, string.IsNullOrEmpty(person.ThisIsKey));
+            Assert.AreEqual(false, string.IsNullOrEmpty(person.ThisIsRevision));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedPerson.ThisIsId));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedPerson.ThisIsKey));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedPerson.ThisIsRevision));
+            Assert.AreEqual(person.ThisIsKey, returnedPerson.ThisIsKey);
+            Assert.AreEqual(person.ThisIsRevision, returnedPerson.ThisIsRevision);
+            Assert.AreEqual(person.ThisIsId, returnedPerson.ThisIsId);
+            Assert.AreEqual(person.ThisIsKey, returnedPerson.ThisIsKey);
+            Assert.AreEqual(person.ThisIsRevision, returnedPerson.ThisIsRevision);
             
             Assert.AreEqual(person.FirstName, returnedPerson.FirstName);
             Assert.AreEqual(person.LastName, returnedPerson.LastName);

@@ -22,9 +22,10 @@ namespace Arango.Client
         {
             ArangoDocument arangoDocument = Get(id);
             
-            // TODO: convert also ArangoDocument specific properties
+            T obj = (T)arangoDocument.Document.To<T>();
+            arangoDocument.MapAttributes(obj);
             
-            return (T)arangoDocument.Document.To<T>();
+            return obj;
         }
         
         #endregion
@@ -36,15 +37,14 @@ namespace Arango.Client
             _documentOperation.Post(collection, arangoDocument, waitForSync, createCollection);
         }
         
-        public string Create<T>(string collection, T genericObject, bool waitForSync = false, bool createCollection = false)
+        public void Create<T>(string collection, T genericObject, bool waitForSync = false, bool createCollection = false)
         {
-            ArangoDocument arangoDocument = new ArangoDocument();
+            var arangoDocument = new ArangoDocument();
             arangoDocument.Document.From(genericObject);
             
             _documentOperation.Post(collection, arangoDocument, waitForSync, createCollection);
             
-            // TODO: convert ArangoDocument specific properties which were added after create process
-            return arangoDocument.Id;
+            arangoDocument.MapAttributes(genericObject);
         }
         
         #endregion
