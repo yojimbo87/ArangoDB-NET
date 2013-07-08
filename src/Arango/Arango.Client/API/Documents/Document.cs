@@ -646,7 +646,14 @@ namespace Arango.Client
 
                 if (arangoProperty != null)
                 {
-                    if (!arangoProperty.Serializable)
+                    // do not convert properties which are not flagged for serialization or
+                    // represent arango specific fields
+                    if (!arangoProperty.Serializable ||
+                        arangoProperty.Identity ||
+                        arangoProperty.Key ||
+                        arangoProperty.Revision ||
+                        arangoProperty.From ||
+                        arangoProperty.To)
                     {
                         continue;
                     }
