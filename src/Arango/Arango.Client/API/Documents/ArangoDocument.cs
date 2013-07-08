@@ -47,7 +47,7 @@ namespace Arango.Client
             return Document.HasField(fieldPath);
         }
         
-        public void MapAttributes<T>(T genericObject)
+        public void MapAttributesTo<T>(T genericObject)
         {
             // get arango specific fields to generic object if it has properties flagged with attributes
             foreach (PropertyInfo propertyInfo in genericObject.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
@@ -69,6 +69,33 @@ namespace Arango.Client
                     if (arangoProperty.Revision)
                     {
                         propertyInfo.SetValue(genericObject, Revision, null);
+                    }
+                }
+            }
+        }
+        
+        public void MapAttributesFrom<T>(T genericObject)
+        {
+            // get arango specific fields to generic object if it has properties flagged with attributes
+            foreach (PropertyInfo propertyInfo in genericObject.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                var arangoProperty = propertyInfo.GetCustomAttribute<ArangoProperty>();
+                
+                if (arangoProperty != null)
+                {
+                    if (arangoProperty.Identity)
+                    {
+                        Id = (string)propertyInfo.GetValue(genericObject);
+                    }
+                    
+                    if (arangoProperty.Key)
+                    {
+                        Key = (string)propertyInfo.GetValue(genericObject);
+                    }
+                    
+                    if (arangoProperty.Revision)
+                    {
+                        Revision = (string)propertyInfo.GetValue(genericObject);
                     }
                 }
             }
