@@ -141,10 +141,10 @@ namespace Arango.Client.Protocol
         
         #region PUT
         
-        internal bool Put(string id, ArangoDocument arangoDocument, bool waitForSync, string revision)
+        internal bool Put(ArangoDocument arangoDocument, bool waitForSync, string revision)
         {
             var request = new Request(RequestType.Document, HttpMethod.Put);
-            request.RelativeUri = string.Join("/", _apiUri, id);
+            request.RelativeUri = string.Join("/", _apiUri, arangoDocument.Id);
             request.Body = arangoDocument.Serialize();
             
             // (optional)
@@ -191,10 +191,10 @@ namespace Arango.Client.Protocol
         
         #region PATCH
         
-        internal bool Patch(string id, ArangoDocument arangoDocument, bool waitForSync, string revision)
+        internal bool Patch(ArangoDocument arangoDocument, bool waitForSync, string revision)
         {
             var request = new Request(RequestType.Document, HttpMethod.Patch);
-            request.RelativeUri = string.Join("/", _apiUri, id);
+            request.RelativeUri = string.Join("/", _apiUri, arangoDocument.Id);
             request.Body = arangoDocument.Serialize();
             
             // (optional)
