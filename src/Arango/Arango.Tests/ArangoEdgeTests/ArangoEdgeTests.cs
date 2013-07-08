@@ -125,10 +125,11 @@ namespace Arango.Tests.ArangoEdgeTests
             db.Edge.Create(Database.TestEdgeCollectionName, edge);
             
             // change data in that edge and replaced it in database
-            ArangoEdge newEdge = new ArangoEdge()
-                .SetField("baz.foo", "bar string value");
+            var newEdge = new ArangoEdge();
+            newEdge.Id = edge.Id;
+            newEdge.SetField("baz.foo", "bar string value");
             
-            var isReplaced = db.Edge.Replace(edge.Id, newEdge);
+            var isReplaced = db.Edge.Replace(newEdge);
             
             Assert.AreEqual(true, isReplaced);
             
@@ -424,6 +425,54 @@ namespace Arango.Tests.ArangoEdgeTests
             Assert.AreEqual(edge1.GetField<string>("edgeFoo"), returnedEdge1.GetField<string>("edgeFoo"));
             Assert.AreEqual(edge1.HasField("edgeBar"), returnedEdge1.HasField("edgeBar"));
             Assert.AreEqual(edge1.GetField<string>("edgeBar"), returnedEdge1.GetField<string>("edgeBar"));
+        }
+        
+        [Test()]
+        public void Should_create_edge_from_generic_object_and_get_it_back()
+        {
+            Database.CreateTestCollection(Database.TestDocumentCollectionName);
+            Database.CreateTestCollection(Database.TestEdgeCollectionName);
+            var db = Database.GetTestDatabase();
+            
+            var person1 = new Person();
+            person1.FirstName = "Johny";
+            person1.LastName = "Bravo";
+            
+            var person2 = new Person();
+            person2.FirstName = "Larry";
+            person2.LastName = "Page";
+            
+            db.Document.Create(Database.TestDocumentCollectionName, person1);
+            db.Document.Create(Database.TestDocumentCollectionName, person2);
+            
+            var edge = new Person();
+            edge.ThisIsFrom = person1.ThisIsId;
+            edge.ThisIsTo = person2.ThisIsId;
+            edge.Aliased = "edge alias string";
+            
+            db.Edge.Create(Database.TestEdgeCollectionName, edge);
+            
+            // retrieve the very same document from database
+            var returnedEdge = db.Edge.Get<Person>(edge.ThisIsId);
+            
+            // check if the data from created and returned document are equal
+            Assert.AreEqual(false, string.IsNullOrEmpty(edge.ThisIsId));
+            Assert.AreEqual(false, string.IsNullOrEmpty(edge.ThisIsKey));
+            Assert.AreEqual(false, string.IsNullOrEmpty(edge.ThisIsRevision));
+            Assert.AreEqual(false, string.IsNullOrEmpty(edge.ThisIsFrom));
+            Assert.AreEqual(false, string.IsNullOrEmpty(edge.ThisIsTo));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedEdge.ThisIsId));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedEdge.ThisIsKey));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedEdge.ThisIsRevision));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedEdge.ThisIsFrom));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedEdge.ThisIsTo));
+            Assert.AreEqual(edge.ThisIsId, returnedEdge.ThisIsId);
+            Assert.AreEqual(edge.ThisIsKey, returnedEdge.ThisIsKey);
+            Assert.AreEqual(edge.ThisIsRevision, returnedEdge.ThisIsRevision);
+            Assert.AreEqual(edge.ThisIsFrom, returnedEdge.ThisIsFrom);
+            Assert.AreEqual(edge.ThisIsTo, returnedEdge.ThisIsTo);
+            
+            Assert.AreEqual(edge.Aliased, returnedEdge.Aliased);
         }
         
         public void Dispose()

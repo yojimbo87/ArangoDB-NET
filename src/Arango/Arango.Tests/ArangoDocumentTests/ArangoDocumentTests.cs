@@ -74,10 +74,11 @@ namespace Arango.Tests.ArangoDocumentTests
             db.Document.Create(Database.TestDocumentCollectionName, arangoDocument);
             
             // change data in that document and replaced it in database
-            ArangoDocument newArangoDocument = new ArangoDocument()
-                .SetField("baz.foo", "bar string value");
+            ArangoDocument newArangoDocument = new ArangoDocument();
+            newArangoDocument.Id = arangoDocument.Id;
+            newArangoDocument.SetField("baz.foo", "bar string value");
             
-            var isReplaced = db.Document.Replace(arangoDocument.Id, newArangoDocument);
+            var isReplaced = db.Document.Replace(newArangoDocument);
             
             Assert.AreEqual(true, isReplaced);
             
@@ -114,7 +115,7 @@ namespace Arango.Tests.ArangoDocumentTests
             // update data in that document and update it in database
             arangoDocument.SetField("baz.foo", "bar string value");
             
-            var isUpdated = db.Document.Update(arangoDocument.Id, arangoDocument);
+            var isUpdated = db.Document.Update(arangoDocument);
             
             Assert.AreEqual(true, isUpdated);
             
@@ -165,11 +166,6 @@ namespace Arango.Tests.ArangoDocumentTests
         {
             Database.CreateTestCollection(Database.TestDocumentCollectionName);
             var db = Database.GetTestDatabase();
-            
-            // create some test document
-            var arangoDocument = new ArangoDocument()
-                .SetField("foo", "foo string value")
-                .SetField("bar", 12345);
             
             var person = new Person();
             person.FirstName = "Johny";
@@ -262,12 +258,13 @@ namespace Arango.Tests.ArangoDocumentTests
             Assert.AreEqual(true, exists);
             
             var replacedPerson = new Person();
+            replacedPerson.ThisIsId = person.ThisIsId;
             replacedPerson.FirstName = "Robert";
             replacedPerson.LastName = "Pizza";
             replacedPerson.Age = 14;
             
             // replace original document with new one
-            var isReplaced = db.Document.Replace(person.ThisIsId, replacedPerson);
+            var isReplaced = db.Document.Replace(replacedPerson);
             
             Assert.AreEqual(true, isReplaced);
             
@@ -309,7 +306,7 @@ namespace Arango.Tests.ArangoDocumentTests
             person.FirstName = "Robert";
             person.Aliased = "aliased string";
             
-            var isUpdated = db.Document.Update(person.ThisIsId, person);
+            var isUpdated = db.Document.Update(person);
             
             Assert.AreEqual(true, isUpdated);
             
