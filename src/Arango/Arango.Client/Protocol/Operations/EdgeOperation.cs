@@ -196,10 +196,10 @@ namespace Arango.Client.Protocol
         
         #region PUT
         
-        internal bool Put(string id, ArangoEdge arangoEdge, bool waitForSync, string revision)
+        internal bool Put(ArangoEdge arangoEdge, bool waitForSync, string revision)
         {
             var request = new Request(RequestType.Edge, HttpMethod.Put);
-            request.RelativeUri = string.Join("/", _apiUri, id);
+            request.RelativeUri = string.Join("/", _apiUri, arangoEdge.Id);
             request.Body = arangoEdge.Serialize();
             
             // (optional)
@@ -246,10 +246,10 @@ namespace Arango.Client.Protocol
         
         #region PATCH
         
-        internal bool Patch(string id, ArangoEdge arangoEdge, bool waitForSync, string revision)
+        internal bool Patch(ArangoEdge arangoEdge, bool waitForSync, string revision)
         {
             var request = new Request(RequestType.Edge, HttpMethod.Patch);
-            request.RelativeUri = string.Join("/", _apiUri, id);
+            request.RelativeUri = string.Join("/", _apiUri, arangoEdge.Id);
             request.Body = arangoEdge.Serialize();
             
             // (optional)
