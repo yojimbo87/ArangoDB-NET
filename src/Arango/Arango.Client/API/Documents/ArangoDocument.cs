@@ -1,3 +1,4 @@
+using System.Reflection;
 
 namespace Arango.Client
 {
@@ -44,6 +45,33 @@ namespace Arango.Client
         public bool HasField(string fieldPath)
         {
             return Document.HasField(fieldPath);
+        }
+        
+        public void MapAttributes<T>(T genericObject)
+        {
+            // get arango specific fields to generic object if it has properties flagged with attributes
+            foreach (PropertyInfo propertyInfo in genericObject.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
+            {
+                var arangoProperty = propertyInfo.GetCustomAttribute<ArangoProperty>();
+                
+                if (arangoProperty != null)
+                {
+                    if (arangoProperty.Identity)
+                    {
+                        propertyInfo.SetValue(genericObject, Id, null);
+                    }
+                    
+                    if (arangoProperty.Key)
+                    {
+                        propertyInfo.SetValue(genericObject, Key, null);
+                    }
+                    
+                    if (arangoProperty.Revision)
+                    {
+                        propertyInfo.SetValue(genericObject, Revision, null);
+                    }
+                }
+            }
         }
     }
 }
