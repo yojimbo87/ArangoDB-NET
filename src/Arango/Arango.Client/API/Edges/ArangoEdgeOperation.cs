@@ -60,15 +60,47 @@ namespace Arango.Client
             return _edgeOperation.Delete(id);
         }
         
+        #region Replace
+        
         public bool Replace(ArangoEdge arangoEdge, bool waitForSync = false, string revision = null)
         {
             return _edgeOperation.Put(arangoEdge, waitForSync, revision);
         }
         
+        public bool Replace<T>(T genericObject, bool waitForSync = false, string revision = null)
+        {
+            var arangoEdge = new ArangoEdge();
+            arangoEdge.MapAttributesFrom(genericObject);
+            arangoEdge.Document.From(genericObject);
+            
+            var isReplaced = Replace(arangoEdge, waitForSync, revision);
+            arangoEdge.MapAttributesTo(genericObject);
+            
+            return isReplaced;
+        }
+        
+        #endregion
+        
+        #region Update
+        
         public bool Update(string id, ArangoEdge arangoEdge, bool waitForSync = false, string revision = null)
         {
             return _edgeOperation.Patch(arangoEdge, waitForSync, revision);
         }
+        
+        public bool Update<T>(T genericObject, bool waitForSync = false, string revision = null)
+        {
+            var arangoEdge = new ArangoEdge();
+            arangoEdge.MapAttributesFrom(genericObject);
+            arangoEdge.Document.From(genericObject);
+            
+            var isUpdated = Update(arangoEdge, waitForSync, revision);
+            arangoEdge.MapAttributesTo(genericObject);
+            
+            return isUpdated;
+        }
+        
+        #endregion
         
         public bool Exists(string id)
         {

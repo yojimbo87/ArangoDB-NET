@@ -475,6 +475,66 @@ namespace Arango.Tests.ArangoEdgeTests
             Assert.AreEqual(edge.Aliased, returnedEdge.Aliased);
         }
         
+        [Test()]
+        public void Should_create_edge_from_generic_object_and_replace_it_and_get_it_back()
+        {
+            Database.CreateTestCollection(Database.TestDocumentCollectionName);
+            Database.CreateTestCollection(Database.TestEdgeCollectionName);
+            var db = Database.GetTestDatabase();
+            
+            var person1 = new Person();
+            person1.FirstName = "Johny";
+            person1.LastName = "Bravo";
+            
+            var person2 = new Person();
+            person2.FirstName = "Larry";
+            person2.LastName = "Page";
+            
+            db.Document.Create(Database.TestDocumentCollectionName, person1);
+            db.Document.Create(Database.TestDocumentCollectionName, person2);
+            
+            var edge = new Person();
+            edge.ThisIsFrom = person1.ThisIsId;
+            edge.ThisIsTo = person2.ThisIsId;
+            edge.Aliased = "edge alias string";
+            
+            db.Edge.Create(Database.TestEdgeCollectionName, edge);
+            
+            var replacedEdge = new Person();
+            replacedEdge.ThisIsId = edge.ThisIsId;
+            replacedEdge.FirstName = "Robert";
+            
+            // replace original document with new one
+            var isReplaced = db.Edge.Replace(replacedEdge);
+            
+            Assert.AreEqual(true, isReplaced);
+            
+            // retrieve the very same document from database
+            var returnedEdge = db.Edge.Get<Person>(replacedEdge.ThisIsId);
+            
+            // check if the data from created and returned document are equal
+            Assert.AreEqual(false, string.IsNullOrEmpty(replacedEdge.ThisIsId));
+            Assert.AreEqual(false, string.IsNullOrEmpty(replacedEdge.ThisIsKey));
+            Assert.AreEqual(false, string.IsNullOrEmpty(replacedEdge.ThisIsRevision));
+            //Assert.AreEqual(false, string.IsNullOrEmpty(replacedEdge.ThisIsFrom));
+            //Assert.AreEqual(false, string.IsNullOrEmpty(replacedEdge.ThisIsTo));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedEdge.ThisIsId));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedEdge.ThisIsKey));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedEdge.ThisIsRevision));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedEdge.ThisIsFrom));
+            Assert.AreEqual(false, string.IsNullOrEmpty(returnedEdge.ThisIsTo));
+            Assert.AreEqual(replacedEdge.ThisIsId, returnedEdge.ThisIsId);
+            Assert.AreEqual(replacedEdge.ThisIsKey, returnedEdge.ThisIsKey);
+            Assert.AreEqual(replacedEdge.ThisIsRevision, returnedEdge.ThisIsRevision);
+            //Assert.AreEqual(replacedEdge.ThisIsFrom, returnedEdge.ThisIsFrom);
+            //Assert.AreEqual(replacedEdge.ThisIsTo, returnedEdge.ThisIsTo);
+            
+            Assert.AreEqual(replacedEdge.FirstName, returnedEdge.FirstName);
+            Assert.AreEqual(true, string.IsNullOrEmpty(returnedEdge.Aliased));
+        }
+        
+        // TODO: test for update edge
+        
         public void Dispose()
         {
             Database.DeleteTestCollection(Database.TestDocumentCollectionName);
