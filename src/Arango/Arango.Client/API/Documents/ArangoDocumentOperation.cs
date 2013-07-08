@@ -11,15 +11,43 @@ namespace Arango.Client
             _documentOperation = documentOperation;
         }
 
+        #region Get
+        
         public ArangoDocument Get(string id)
         {
             return _documentOperation.Get(id);
         }
         
+        public T Get<T>(string id) where T : class, new()
+        {
+            ArangoDocument arangoDocument = Get(id);
+            
+            // TODO: convert also ArangoDocument specific properties
+            
+            return (T)arangoDocument.Document.To<T>();
+        }
+        
+        #endregion
+        
+        #region Create
+        
         public void Create(string collection, ArangoDocument arangoDocument, bool waitForSync = false, bool createCollection = false)
         {
             _documentOperation.Post(collection, arangoDocument, waitForSync, createCollection);
         }
+        
+        public string Create<T>(string collection, T genericObject, bool waitForSync = false, bool createCollection = false)
+        {
+            ArangoDocument arangoDocument = new ArangoDocument();
+            arangoDocument.Document.From(genericObject);
+            
+            _documentOperation.Post(collection, arangoDocument, waitForSync, createCollection);
+            
+            // TODO: convert ArangoDocument specific properties which were added after create process
+            return arangoDocument.Id;
+        }
+        
+        #endregion
         
         public bool Delete(string id)
         {

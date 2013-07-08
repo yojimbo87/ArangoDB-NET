@@ -8,6 +8,7 @@ namespace Arango.Tests
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int Age { get; set; }
+        public Person Father { get; set; }
         
         [ArangoProperty(Serializable = false)]
         public string ShouldNotBeSerialized { get; set; }

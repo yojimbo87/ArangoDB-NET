@@ -193,7 +193,7 @@ namespace Arango.Client.Protocol
         
         internal bool Patch(ArangoDocument arangoDocument, bool waitForSync, string revision)
         {
-            var request = new Request(RequestType.Document, HttpMethod.Put);
+            var request = new Request(RequestType.Document, HttpMethod.Patch);
             request.RelativeUri = string.Join("/", _apiUri, arangoDocument.Id);
             request.Body = arangoDocument.Serialize();
             

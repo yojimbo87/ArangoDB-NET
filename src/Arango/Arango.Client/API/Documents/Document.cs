@@ -51,7 +51,7 @@ namespace Arango.Client
 
                             while (enumerator.MoveNext())
                             {
-                                // if current element is ODocument type which is dictionary<string, object>
+                                // if current element is Document type which is dictionary<string, object>
                                 // map its dictionary data to element instance
                                 if (enumerator.Current is Document)
                                 {
@@ -75,7 +75,7 @@ namespace Arango.Client
 
                             while (enumerator.MoveNext())
                             {
-                                // if current element is ODocument type which is Dictionary<string, object>
+                                // if current element is Document type which is Dictionary<string, object>
                                 // map its dictionary data to element instance
                                 if (enumerator.Current is Document)
                                 {
@@ -102,7 +102,7 @@ namespace Arango.Client
                             } 
                             else
                             {
-                                return (T)Convert.ChangeType(embeddedDocument[field], typeof(T));
+                                value = (T)Convert.ChangeType(embeddedDocument[field], typeof(T));
                             }
                         }
                         break;
@@ -131,7 +131,7 @@ namespace Arango.Client
 
                         while (enumerator.MoveNext())
                         {
-                            // if current element is ODocument type which is Dictionary<string, object>
+                            // if current element is Document type which is Dictionary<string, object>
                             // map its dictionary data to element instance
                             if (enumerator.Current is Document)
                             {
@@ -155,7 +155,7 @@ namespace Arango.Client
 
                         while (enumerator.MoveNext())
                         {
-                            // if current element is ODocument type which is Dictionary<string, object>
+                            // if current element is Document type which is Dictionary<string, object>
                             // map its dictionary data to element instance
                             if (enumerator.Current is Document)
                             {
@@ -182,7 +182,7 @@ namespace Arango.Client
                         } 
                         else
                         {
-                            return (T)Convert.ChangeType(this[fieldPath], typeof(T));
+                            value = (T)Convert.ChangeType(this[fieldPath], typeof(T));
                         }
                     }
                 }
@@ -477,7 +477,8 @@ namespace Arango.Client
                 {
                     var propertyName = propertyInfo.Name;
                     var arangoProperty = propertyInfo.GetCustomAttribute<ArangoProperty>();
-                    object fieldValue;
+                    object fieldValue = null;
+                    Type fieldType = null;
                     
                     if (arangoProperty != null)
                     {
@@ -495,67 +496,28 @@ namespace Arango.Client
                     if (document.HasField(propertyName))
                     {
                         fieldValue = document.GetField<object>(propertyName);
+                        
+                        if (fieldValue != null)
+                        {
+                            fieldType = fieldValue.GetType();
+                        }
                     }
                     else
                     {
                         continue;
                     }
                     
-                    if ((propertyInfo.PropertyType.IsArray || propertyInfo.PropertyType.IsGenericType))
+                    // property is a collection
+                    if ((propertyInfo.PropertyType.IsArray || 
+                         propertyInfo.PropertyType.IsGenericType))
                     {
-                        var collection = (IList)fieldValue;
-
-                        if (collection.Count > 0)
-                        {
-                            // create instance of property type
-                            var collectionInstance = Activator.CreateInstance(propertyInfo.PropertyType, collection.Count);
-
-                            for (int i = 0; i < collection.Count; i++)
-                            {
-                                // collection is simple array
-                                if (propertyInfo.PropertyType.IsArray)
-                                {
-                                    ((object[])collectionInstance)[i] = collection[i];
-                                }
-                                // collection is generic
-                                else if (propertyInfo.PropertyType.IsGenericType && (fieldValue is IEnumerable))
-                                {
-                                    var elementType = collection[i].GetType();
-
-                                    // generic collection consists of basic types or ORIDs
-                                    if (elementType.IsPrimitive ||
-                                        (elementType == typeof(string)) ||
-                                        (elementType == typeof(DateTime)) ||
-                                        (elementType == typeof(decimal)))
-                                    {
-                                        ((IList)collectionInstance).Add(collection[i]);
-                                    }
-                                    // generic collection consists of generic type which should be parsed
-                                    else
-                                    {
-                                        // create instance object based on first element of generic collection
-                                        var instance = Activator.CreateInstance(propertyInfo.PropertyType.GetGenericArguments().First(), null);
-                                        
-                                        if (instance.GetType() == typeof(Document))
-                                        {
-                                            ((IList)collectionInstance).Add(ToObject(instance, (Document)fieldValue));
-                                        }
-                                        else
-                                        {
-                                            ((IList)collectionInstance).Add(collection[i]);
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    var v = Activator.CreateInstance(collection[i].GetType(), collection[i]);
-
-                                    ((IList)collectionInstance).Add(v);
-                                }
-                            }
-
-                            propertyInfo.SetValue(genericObject, collectionInstance, null);
-                        }
+                        var instance = Activator.CreateInstance(propertyInfo.PropertyType);
+                            
+                        propertyInfo.SetValue(
+                            genericObject,
+                            ConvertToCollection(instance, (IList)fieldValue, propertyInfo.PropertyType),
+                            null
+                        );
                     }
                     // property is class except the string type since string values are parsed differently
                     else if (propertyInfo.PropertyType.IsClass &&
@@ -564,7 +526,7 @@ namespace Arango.Client
                         // create object instance of embedded class
                         var instance = Activator.CreateInstance(propertyInfo.PropertyType);
 
-                        if (propertyInfo.PropertyType == typeof(Document))
+                        if (fieldType == typeof(Document))
                         {
                             propertyInfo.SetValue(genericObject, ToObject(instance, (Document)fieldValue), null);
                         }
@@ -576,12 +538,88 @@ namespace Arango.Client
                     // property is basic type
                     else
                     {
-                        propertyInfo.SetValue(genericObject, fieldValue, null);
+                        if ((fieldValue == null) || (propertyInfo.PropertyType == fieldType))
+                        {
+                            propertyInfo.SetValue(genericObject, fieldValue, null);
+                        } 
+                        else
+                        {
+                            propertyInfo.SetValue(genericObject, Convert.ChangeType(fieldValue, propertyInfo.PropertyType), null);
+                        }
                     }
                 }
             }
 
             return genericObject;
+        }
+        
+        private object ConvertToCollection(object collectionObject, IList collection, Type collectionType)
+        {
+            if (collection == null)
+            {
+                return null;
+            }
+            
+            //List<object> convertedCollection = new List<object>();
+            
+            if (collection.Count > 0)
+            {
+                // create instance of property type
+                var collectionInstance = Activator.CreateInstance(collectionType, collection.Count);
+
+                for (int i = 0; i < collection.Count; i++)
+                {
+                    var elementType = collection[i].GetType();
+                    
+                    // collection is simple array
+                    if (collectionType.IsArray)
+                    {
+                        ((IList)collectionObject).Add(collection[i]);
+                    }
+                    // collection is generic
+                    else if (collectionType.IsGenericType && (collection is IEnumerable))
+                    {
+                        // generic collection consists of basic types
+                        if (elementType.IsPrimitive ||
+                            (elementType == typeof(string)) ||
+                            (elementType == typeof(DateTime)) ||
+                            (elementType == typeof(decimal)))
+                        {
+                            ((IList)collectionObject).Add(collection[i]);
+                        }
+                        // generic collection consists of generic type which should be parsed
+                        else
+                        {
+                            // create instance object based on first element of generic collection
+                            var instance = Activator.CreateInstance(collectionType.GetGenericArguments().First(), null);
+                            
+                            if (elementType == typeof(Document))
+                            {
+                                ((IList)collectionObject).Add(ToObject(instance, (Document)collection[i]));
+                            }
+                            else
+                            {
+                                if (elementType == instance.GetType())
+                                {
+                                    ((IList)collectionObject).Add(collection[i]);
+                                } 
+                                else
+                                {
+                                    ((IList)collectionObject).Add(Convert.ChangeType(collection[i], collectionType));
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var obj = Activator.CreateInstance(elementType, collection[i]);
+
+                        ((IList)collectionObject).Add(obj);
+                    }
+                }
+            }
+            
+            return collectionObject;
         }
         
         #endregion
@@ -621,90 +659,103 @@ namespace Arango.Client
                 
                 var propertyValue = propertyInfo.GetValue(genericObject);
                 
-                if ((propertyInfo.PropertyType.IsArray || propertyInfo.PropertyType.IsGenericType))
+                if (propertyInfo.PropertyType.IsArray || propertyInfo.PropertyType.IsGenericType)
                 {
-                    var collection = (IList)propertyValue;
-
-                    if (collection.Count > 0)
-                    {
-                        // create instance of property type
-                        var collectionInstance = Activator.CreateInstance(propertyInfo.PropertyType, collection.Count);
-
-                        for (int i = 0; i < collection.Count; i++)
-                        {
-                            // collection is simple array
-                            if (propertyInfo.PropertyType.IsArray)
-                            {
-                                ((object[])collectionInstance)[i] = collection[i];
-                            }
-                            // collection is generic
-                            else if (propertyInfo.PropertyType.IsGenericType && (propertyValue is IEnumerable))
-                            {
-                                var elementType = collection[i].GetType();
-
-                                // generic collection consists of basic types or ORIDs
-                                if (elementType.IsPrimitive ||
-                                    (elementType == typeof(string)) ||
-                                    (elementType == typeof(DateTime)) ||
-                                    (elementType == typeof(decimal)))
-                                {
-                                    ((IList)collectionInstance).Add(collection[i]);
-                                }
-                                // generic collection consists of generic type which should be parsed
-                                else
-                                {
-                                    // create instance object based on first element of generic collection
-                                    var instance = Activator.CreateInstance(propertyInfo.PropertyType.GetGenericArguments().First(), null);
-                                    
-                                    if (instance.GetType() == typeof(Document))
-                                    {
-                                        ((IList)collectionInstance).Add(FromObject(instance));
-                                    }
-                                    else
-                                    {
-                                        ((IList)collectionInstance).Add(collection[i]);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                var v = Activator.CreateInstance(collection[i].GetType(), collection[i]);
-
-                                ((IList)collectionInstance).Add(v);
-                            }
-                        }
-
-                        //propertyInfo.SetValue(genericObject, collectionInstance, null);
-                        document.SetField(propertyName, collectionInstance);
-                    }
+                    document.SetField(
+                        propertyName, 
+                        ConvertFromCollection((IList)propertyValue, propertyInfo.PropertyType)
+                    );
                 }
                 // property is class except the string type since string values are parsed differently
                 else if (propertyInfo.PropertyType.IsClass &&
                     (propertyInfo.PropertyType.Name != "String"))
                 {
-                    // create object instance of embedded class
-                    //var instance = Activator.CreateInstance(propertyInfo.PropertyType);
-
-                    if (propertyInfo.PropertyType == typeof(Document))
-                    {
-                        //propertyInfo.SetValue(genericObject, ToObject(instance, (Document)fieldValue), null);
-                        document.SetField(propertyName, FromObject(propertyValue));
-                    }
-                    else
-                    {
-                        //propertyInfo.SetValue(genericObject, fieldValue, null);
-                        document.SetField(propertyName, propertyValue);
-                    }
+                    document.SetField(
+                        propertyName, 
+                        ConvertFromObject(propertyValue, propertyInfo.PropertyType)
+                    );
                 }
                 // property is basic type
                 else
                 {
-                    //propertyInfo.SetValue(genericObject, fieldValue, null);
                     document.SetField(propertyName, propertyValue);
                 }
             }
             
             return document;
+        }
+        
+        private List<object> ConvertFromCollection(IList collection, Type collectionType)
+        {
+            var convertedCollection = new List<object>();
+            
+            if (collection.Count > 0)
+            {
+                // create instance of property type
+                var collectionInstance = Activator.CreateInstance(collectionType, collection.Count);
+
+                for (int i = 0; i < collection.Count; i++)
+                {
+                    var elementType = collection[i].GetType();
+                    
+                    // collection is simple array
+                    if (collectionType.IsArray)
+                    {
+                        convertedCollection.Add(collection[i]);
+                    }
+                    // collection is generic
+                    else if (collectionType.IsGenericType && (collection is IEnumerable))
+                    {
+                        // generic collection consists of basic types
+                        if (elementType.IsPrimitive ||
+                            (elementType == typeof(string)) ||
+                            (elementType == typeof(DateTime)) ||
+                            (elementType == typeof(decimal)))
+                        {
+                            convertedCollection.Add(collection[i]);
+                        }
+                        // generic collection consists of generic type which should be parsed
+                        else
+                        {
+                            // create instance object based on first element of generic collection
+                            var instance = Activator.CreateInstance(collectionType.GetGenericArguments().First(), null);
+                            
+                            if (elementType == typeof(Document))
+                            {
+                                convertedCollection.Add((Document)collection[i]);
+                            }
+                            else
+                            {
+                                convertedCollection.Add(FromObject(collection[i]));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var obj = Activator.CreateInstance(elementType, collection[i]);
+
+                        convertedCollection.Add(obj);
+                    }
+                }
+            }
+            
+            return convertedCollection;
+        }
+        
+        private Document ConvertFromObject(object obj, Type objectType)
+        {
+            if (obj == null)
+            {
+                return null;
+            }
+            if (objectType == typeof(Document))
+            {
+                return (Document)obj;
+            }
+            else
+            {
+                return FromObject(obj);
+            }
         }
         
         #endregion

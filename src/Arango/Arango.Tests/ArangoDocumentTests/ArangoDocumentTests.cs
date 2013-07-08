@@ -160,6 +160,71 @@ namespace Arango.Tests.ArangoDocumentTests
             Assert.AreEqual(false, exists);
         }
         
+        [Test()]
+        public void Should_create_document_from_generic_object_and_get_it_back()
+        {
+            Database.CreateTestCollection(Database.TestDocumentCollectionName);
+            var db = Database.GetTestDatabase();
+            
+            // create some test document
+            var arangoDocument = new ArangoDocument()
+                .SetField("foo", "foo string value")
+                .SetField("bar", 12345);
+            
+            var person = new Person();
+            person.FirstName = "Johny";
+            person.LastName = "Bravo";
+            person.Age = 25;
+            person.ShouldNotBeSerialized = "shouldn't be seen";
+            person.Aliased = "aliased string";
+            person.Interests = new List<string> {"programming", "hacking", "coding"};
+            person.Father = new Person { FirstName = "Larry", LastName = "Bravo", Age = 45, Interests = new List<string> { "couching", "tennis" } };
+            
+            var follower1 = new Person { FirstName = "Mike", LastName = "Tall", Interests = new List<string> { "biking", "skiing"} };
+            var follower2 = new Person { FirstName = "Lucy", LastName = "Fox", Interests = new List<string> { "cooking", "gardening"} };
+            
+            person.Followers = new List<Person> { follower1, follower2 };
+            
+            string id = db.Document.Create(Database.TestDocumentCollectionName, person);
+            
+            // check if the created document exists in database        
+            var exists = db.Document.Exists(id);
+            
+            Assert.AreEqual(true, exists);
+            
+            var returnedPerson = db.Document.Get<Person>(id);
+            
+            Assert.AreEqual(person.FirstName, returnedPerson.FirstName);
+            Assert.AreEqual(person.LastName, returnedPerson.LastName);
+            Assert.AreEqual(person.Age, returnedPerson.Age);
+            Assert.AreEqual(null, returnedPerson.ShouldNotBeSerialized);
+            Assert.AreEqual(person.Aliased, returnedPerson.Aliased);
+            
+            Assert.AreEqual(person.Interests.Count, returnedPerson.Interests.Count);
+            Assert.AreEqual(person.Interests[0], returnedPerson.Interests[0]);
+            Assert.AreEqual(person.Interests[1], returnedPerson.Interests[1]);
+            Assert.AreEqual(person.Interests[2], returnedPerson.Interests[2]);
+            
+            Assert.AreEqual(person.Father.FirstName, returnedPerson.Father.FirstName);
+            Assert.AreEqual(person.Father.LastName, returnedPerson.Father.LastName);
+            Assert.AreEqual(person.Father.Age, returnedPerson.Father.Age);
+            Assert.AreEqual(person.Father.Interests.Count, returnedPerson.Father.Interests.Count);
+            Assert.AreEqual(person.Father.Interests[0], returnedPerson.Father.Interests[0]);
+            Assert.AreEqual(person.Father.Interests[1], returnedPerson.Father.Interests[1]);
+            
+            Assert.AreEqual(person.Followers.Count, returnedPerson.Followers.Count);
+            Assert.AreEqual(person.Followers[0].FirstName, returnedPerson.Followers[0].FirstName);
+            Assert.AreEqual(person.Followers[0].LastName, returnedPerson.Followers[0].LastName);
+            Assert.AreEqual(person.Followers[0].Interests.Count, returnedPerson.Followers[0].Interests.Count);
+            Assert.AreEqual(person.Followers[0].Interests[0], returnedPerson.Followers[0].Interests[0]);
+            Assert.AreEqual(person.Followers[0].Interests[1], returnedPerson.Followers[0].Interests[1]);
+            Assert.AreEqual(person.Followers[1].FirstName, returnedPerson.Followers[1].FirstName);
+            Assert.AreEqual(person.Followers[1].LastName, returnedPerson.Followers[1].LastName);
+            Assert.AreEqual(person.Followers[1].Interests.Count, returnedPerson.Followers[1].Interests.Count);
+            Assert.AreEqual(person.Followers[1].Interests[0], returnedPerson.Followers[1].Interests[0]);
+            Assert.AreEqual(person.Followers[1].Interests[1], returnedPerson.Followers[1].Interests[1]);
+        }
+        
         public void Dispose()
         {
             Database.DeleteTestCollection(Database.TestDocumentCollectionName);

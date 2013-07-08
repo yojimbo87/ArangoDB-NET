@@ -43,10 +43,28 @@ namespace Arango.Tests.DocumentTests
                 .SetField("aliasedField", "aliased string")
                 .SetField("Interests", new List<string> {"programming", "hacking", "coding"});
             
-            var follower1 = new Person { FirstName = "Mike", LastName = "Tall", Interests = new List<string> { "biking", "skiing"} };
-            var follower2 = new Person { FirstName = "Lucy", LastName = "Fox", Interests = new List<string> { "cooking", "gardening"} };
+            //var follower1 = new Person { FirstName = "Mike", LastName = "Tall", Interests = new List<string> { "biking", "skiing"} };
+            //var follower2 = new Person { FirstName = "Lucy", LastName = "Fox", Interests = new List<string> { "cooking", "gardening"} };
             
-            document.SetField("Followers", new List<Person> { follower1, follower2 });
+            var father = new Document()
+                .SetField("FirstName", "Larry")
+                .SetField("LastName", "Bravo")
+                .SetField("Age", 45)
+                .SetField("Interests", new List<string> { "couching", "tennis" });
+            
+            document.SetField("Father", father);
+            
+            var follower1 = new Document()
+                .SetField("FirstName", "Mike")
+                .SetField("LastName", "Tall")
+                .SetField("Interests", new List<string> { "biking", "skiing" });
+            
+            var follower2 = new Document()
+                .SetField("FirstName", "Lucy")
+                .SetField("LastName", "Fox")
+                .SetField("Interests", new List<string> { "cooking", "gardening" });
+            
+            document.SetField("Followers", new List<Document> { follower1, follower2 });
             
             var person = document.To<Person>();
             
@@ -61,6 +79,13 @@ namespace Arango.Tests.DocumentTests
             Assert.AreEqual(document.GetField<List<string>>("Interests")[0], person.Interests[0]);
             Assert.AreEqual(document.GetField<List<string>>("Interests")[1], person.Interests[1]);
             Assert.AreEqual(document.GetField<List<string>>("Interests")[2], person.Interests[2]);
+            
+            Assert.AreEqual(document.GetField<string>("Father.FirstName"), person.Father.FirstName);
+            Assert.AreEqual(document.GetField<string>("Father.LastName"), person.Father.LastName);
+            Assert.AreEqual(document.GetField<int>("Father.Age"), person.Father.Age);
+            Assert.AreEqual(document.GetField<List<string>>("Father.Interests").Count, person.Father.Interests.Count);
+            Assert.AreEqual(document.GetField<List<string>>("Father.Interests")[0], person.Father.Interests[0]);
+            Assert.AreEqual(document.GetField<List<string>>("Father.Interests")[1], person.Father.Interests[1]);
             
             Assert.AreEqual(document.GetField<List<Person>>("Followers").Count, person.Followers.Count);
             Assert.AreEqual(document.GetField<List<Person>>("Followers")[0].FirstName, person.Followers[0].FirstName);
@@ -85,6 +110,7 @@ namespace Arango.Tests.DocumentTests
             person.ShouldNotBeSerialized = "shouldn't be seen";
             person.Aliased = "aliased string";
             person.Interests = new List<string> {"programming", "hacking", "coding"};
+            person.Father = new Person { FirstName = "Larry", LastName = "Bravo", Age = 45, Interests = new List<string> { "couching", "tennis" } };
             
             var follower1 = new Person { FirstName = "Mike", LastName = "Tall", Interests = new List<string> { "biking", "skiing"} };
             var follower2 = new Person { FirstName = "Lucy", LastName = "Fox", Interests = new List<string> { "cooking", "gardening"} };
@@ -106,16 +132,23 @@ namespace Arango.Tests.DocumentTests
             Assert.AreEqual(person.Interests[1], document.GetField<List<string>>("Interests")[1]);
             Assert.AreEqual(person.Interests[2], document.GetField<List<string>>("Interests")[2]);
             
-            Assert.AreEqual(person.Followers.Count, document.GetField<List<Person>>("Followers").Count);
-            Assert.AreEqual(person.Followers[0].FirstName, document.GetField<List<Person>>("Followers")[0].FirstName);
-            Assert.AreEqual(person.Followers[0].LastName, document.GetField<List<Person>>("Followers")[0].LastName);
-            Assert.AreEqual(person.Followers[0].Interests.Count, document.GetField<List<Person>>("Followers")[0].Interests.Count);
-            Assert.AreEqual(person.Followers[0].Interests[0], document.GetField<List<Person>>("Followers")[0].Interests[0]);
-            Assert.AreEqual(person.Followers[0].Interests[1], document.GetField<List<Person>>("Followers")[0].Interests[1]);
-            Assert.AreEqual(person.Followers[1].FirstName, document.GetField<List<Person>>("Followers")[1].FirstName);
-            Assert.AreEqual(person.Followers[1].LastName, document.GetField<List<Person>>("Followers")[1].LastName);
-            Assert.AreEqual(person.Followers[1].Interests[0], document.GetField<List<Person>>("Followers")[1].Interests[0]);
-            Assert.AreEqual(person.Followers[1].Interests[1], document.GetField<List<Person>>("Followers")[1].Interests[1]);
+            Assert.AreEqual(person.Father.FirstName, document.GetField<string>("Father.FirstName"));
+            Assert.AreEqual(person.Father.LastName, document.GetField<string>("Father.LastName"));
+            Assert.AreEqual(person.Father.Age, document.GetField<int>("Father.Age"));
+            Assert.AreEqual(person.Father.Interests.Count, document.GetField<List<string>>("Father.Interests").Count);
+            Assert.AreEqual(person.Father.Interests[0], document.GetField<List<string>>("Father.Interests")[0]);
+            Assert.AreEqual(person.Father.Interests[1], document.GetField<List<string>>("Father.Interests")[1]);
+            
+            Assert.AreEqual(person.Followers.Count, document.GetField<List<Document>>("Followers").Count);
+            Assert.AreEqual(person.Followers[0].FirstName, document.GetField<List<Document>>("Followers")[0].GetField<string>("FirstName"));
+            Assert.AreEqual(person.Followers[0].LastName, document.GetField<List<Document>>("Followers")[0].GetField<string>("LastName"));
+            Assert.AreEqual(person.Followers[0].Interests.Count, document.GetField<List<Document>>("Followers")[0].GetField<List<string>>("Interests").Count);
+            Assert.AreEqual(person.Followers[0].Interests[0], document.GetField<List<Document>>("Followers")[0].GetField<List<string>>("Interests")[0]);
+            Assert.AreEqual(person.Followers[0].Interests[1], document.GetField<List<Document>>("Followers")[0].GetField<List<string>>("Interests")[1]);
+            Assert.AreEqual(person.Followers[1].FirstName, document.GetField<List<Document>>("Followers")[1].GetField<string>("FirstName"));
+            Assert.AreEqual(person.Followers[1].LastName, document.GetField<List<Document>>("Followers")[1].GetField<string>("LastName"));
+            Assert.AreEqual(person.Followers[1].Interests[0], document.GetField<List<Document>>("Followers")[1].GetField<List<string>>("Interests")[0]);
+            Assert.AreEqual(person.Followers[1].Interests[1], document.GetField<List<Document>>("Followers")[1].GetField<List<string>>("Interests")[1]);
         }
     }
 }
