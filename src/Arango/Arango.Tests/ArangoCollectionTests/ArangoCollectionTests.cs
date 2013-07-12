@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Arango.Client;
 
 namespace Arango.Tests.ArangoCollectionTests
 {
     [TestFixture()]
-    public class ArangoCollectionTests
+    public class ArangoCollectionTests : IDisposable
     {
         [Test()]
         public void Should_create_and_delete_collection()
@@ -92,6 +93,46 @@ namespace Arango.Tests.ArangoCollectionTests
             
             // check if the collection was deleted from database
             Assert.AreEqual(true, isDeleted);
+        }
+        
+        [Test()]
+        public void Should_create_autoincrement_collection()
+        {
+            Database.DeleteTestCollection(Database.TestDocumentCollectionName);
+            
+            var db = Database.GetTestDatabase();
+            
+            // set collection data
+            var collection = new ArangoCollection();
+            collection.Name = Database.TestDocumentCollectionName;
+            collection.KeyOptions = new ArangoCollectionKeyOptions();
+            collection.KeyOptions.GeneratorType = ArangoKeyGeneratorType.Autoincrement;
+            
+            // create collection in database
+            db.Collection.Create(collection);
+            
+            // create document
+            var document1 = new ArangoDocument()
+                .SetField("foo", "foo string value");
+            
+            db.Document.Create(Database.TestDocumentCollectionName, document1);
+            
+            // check if the created document key starts with number 1
+            Assert.AreEqual("1", document1.Key);
+            
+            // create another document
+            var document2 = new ArangoDocument()
+                .SetField("foo", "foo string value");
+            
+            db.Document.Create(Database.TestDocumentCollectionName, document2);
+            
+            // check if the created document key is autoincremented to 2
+            Assert.AreEqual("2", document2.Key);
+        }
+        
+        public void Dispose()
+        {
+            Database.DeleteTestCollection(Database.TestDocumentCollectionName);
         }
     }
 }

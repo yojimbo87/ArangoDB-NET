@@ -100,7 +100,7 @@ namespace Arango.Client.Protocol
             {
                 if (collection.KeyOptions.GeneratorType != 0)
                 {
-                    document.SetField("keyOptions.type", collection.KeyOptions.GeneratorType);
+                    document.SetField("keyOptions.type", collection.KeyOptions.GeneratorType.ToString().ToLower());
                     
                     if (collection.KeyOptions.GeneratorType == ArangoKeyGeneratorType.Autoincrement)
                     {
