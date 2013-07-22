@@ -53,6 +53,17 @@ namespace Arango.Client
             arangoEdge.MapAttributesTo(genericObject);
         }
         
+        public ArangoEdge Create(string collection, string from, string to, bool waitForSync = false, bool createCollection = false)
+        {
+            var arangoEdge = new ArangoEdge();
+            arangoEdge.From = from;
+            arangoEdge.To = to;
+            
+            Create(collection, arangoEdge, waitForSync, createCollection);
+            
+            return arangoEdge;
+        }
+        
         #endregion
         
         public bool Delete(string id)

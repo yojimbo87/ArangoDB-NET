@@ -96,6 +96,39 @@ namespace Arango.Tests.ArangoEdgeTests
         }
         
         [Test()]
+        public void Should_create_edge_without_fields_and_get_it_back()
+        {
+            Database.CreateTestCollection(Database.TestDocumentCollectionName);
+            Database.CreateTestCollection(Database.TestEdgeCollectionName, ArangoCollectionType.Edge);
+            var db = Database.GetTestDatabase();
+            
+            // create test documents
+            var doc1 = new ArangoDocument()
+                .SetField("foo", "foo string value 1")
+                .SetField("bar", 12345);
+            
+            var doc2 = new ArangoDocument()
+                .SetField("foo", "foo string value 2")
+                .SetField("bar", 54321);
+            
+            db.Document.Create(Database.TestDocumentCollectionName, doc1);
+            db.Document.Create(Database.TestDocumentCollectionName, doc2);
+            
+            // create test edge
+            var edge = db.Edge.Create(Database.TestEdgeCollectionName, doc1.Id, doc2.Id);
+            
+            // get the very same edge from database
+            var returnedEdge = db.Edge.Get(edge.Id);
+            
+            // check if created and returned edge data are equal
+            Assert.AreEqual(edge.Id, returnedEdge.Id);
+            Assert.AreEqual(edge.Key, returnedEdge.Key);
+            Assert.AreEqual(edge.Revision, returnedEdge.Revision);
+            Assert.AreEqual(edge.From, returnedEdge.From);
+            Assert.AreEqual(edge.To, returnedEdge.To);
+        }
+        
+        [Test()]
         public void Should_create_and_replace_and_get_edge()
         {
             Database.CreateTestCollection(Database.TestDocumentCollectionName);
