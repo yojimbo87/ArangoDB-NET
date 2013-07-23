@@ -6,6 +6,7 @@ namespace Arango.Client
     public class ArangoProperty : Attribute
     {
         public bool Serializable { get; set; }
+        public bool Deserializable { get; set; }
         public bool Identity { get; set; }
         public bool Key { get; set; }
         public bool Revision { get; set; }
@@ -16,6 +17,7 @@ namespace Arango.Client
         public ArangoProperty()
         {
             Serializable = true;
+            Deserializable = true;
             Identity = false;
             Key = false;
             Revision = false;

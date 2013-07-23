@@ -171,7 +171,7 @@ namespace Arango.Tests.ArangoDocumentTests
             person.FirstName = "Johny";
             person.LastName = "Bravo";
             person.Age = 25;
-            person.ShouldNotBeSerialized = "shouldn't be seen";
+            person.ShouldNotBeSerializedOrDeserialized = "shouldn't be seen";
             person.Aliased = "aliased string";
             person.Interests = new List<string> {"programming", "hacking", "coding"};
             person.Father = new Person { FirstName = "Larry", LastName = "Bravo", Age = 45, Interests = new List<string> { "couching", "tennis" } };
@@ -205,7 +205,7 @@ namespace Arango.Tests.ArangoDocumentTests
             Assert.AreEqual(person.FirstName, returnedPerson.FirstName);
             Assert.AreEqual(person.LastName, returnedPerson.LastName);
             Assert.AreEqual(person.Age, returnedPerson.Age);
-            Assert.AreEqual(null, returnedPerson.ShouldNotBeSerialized);
+            Assert.AreEqual(null, returnedPerson.ShouldNotBeSerializedOrDeserialized);
             Assert.AreEqual(person.Aliased, returnedPerson.Aliased);
             
             Assert.AreEqual(person.Interests.Count, returnedPerson.Interests.Count);

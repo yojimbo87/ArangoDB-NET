@@ -482,7 +482,7 @@ namespace Arango.Client
                     
                     if (arangoProperty != null)
                     {
-                        if (!arangoProperty.Serializable)
+                        if (!arangoProperty.Deserializable)
                         {
                             continue;
                         }

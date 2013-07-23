@@ -39,7 +39,7 @@ namespace Arango.Tests.DocumentTests
                 .SetField("FirstName", "Johny")
                 .SetField("LastName", "Bravo")
                 .SetField("Age", 25)
-                .SetField("ShouldNotBeSerialized", "shouldn't be seen")
+                .SetField("ShouldNotBeSerializedOrDeserialized", "shouldn't be seen")
                 .SetField("aliasedField", "aliased string")
                 .SetField("Interests", new List<string> {"programming", "hacking", "coding"});
             
@@ -72,7 +72,7 @@ namespace Arango.Tests.DocumentTests
             Assert.AreEqual(document.GetField<string>("FirstName"), person.FirstName);
             Assert.AreEqual(document.GetField<string>("LastName"), person.LastName);
             Assert.AreEqual(document.GetField<int>("Age"), person.Age);
-            Assert.AreEqual(true, string.IsNullOrEmpty(person.ShouldNotBeSerialized));
+            Assert.AreEqual(true, string.IsNullOrEmpty(person.ShouldNotBeSerializedOrDeserialized));
             Assert.AreEqual(document.GetField<string>("aliasedField"), person.Aliased);
             
             Assert.AreEqual(document.GetField<List<string>>("Interests").Count, person.Interests.Count);
@@ -107,7 +107,7 @@ namespace Arango.Tests.DocumentTests
             person.FirstName = "Johny";
             person.LastName = "Bravo";
             person.Age = 25;
-            person.ShouldNotBeSerialized = "shouldn't be seen";
+            person.ShouldNotBeSerializedOrDeserialized = "shouldn't be seen";
             person.Aliased = "aliased string";
             person.Interests = new List<string> {"programming", "hacking", "coding"};
             person.Father = new Person { FirstName = "Larry", LastName = "Bravo", Age = 45, Interests = new List<string> { "couching", "tennis" } };
@@ -124,7 +124,7 @@ namespace Arango.Tests.DocumentTests
             Assert.AreEqual(person.FirstName, document.GetField<string>("FirstName"));
             Assert.AreEqual(person.LastName, document.GetField<string>("LastName"));
             Assert.AreEqual(person.Age, document.GetField<int>("Age"));
-            Assert.AreEqual(false, document.HasField("ShouldNotBeSerialized"));
+            Assert.AreEqual(false, document.HasField("ShouldNotBeSerializedOrDeserialized"));
             Assert.AreEqual(person.Aliased, document.GetField<string>("aliasedField"));
             
             Assert.AreEqual(person.Interests.Count, document.GetField<List<string>>("Interests").Count);
@@ -149,6 +149,23 @@ namespace Arango.Tests.DocumentTests
             Assert.AreEqual(person.Followers[1].LastName, document.GetField<List<Document>>("Followers")[1].GetField<string>("LastName"));
             Assert.AreEqual(person.Followers[1].Interests[0], document.GetField<List<Document>>("Followers")[1].GetField<List<string>>("Interests")[0]);
             Assert.AreEqual(person.Followers[1].Interests[1], document.GetField<List<Document>>("Followers")[1].GetField<List<string>>("Interests")[1]);
+        }
+        
+        [Test()]
+        public void Should_convert_to_generic_object_with_deserialized_only_field()
+        {
+            var document = new Document();
+            document.SetField("FirstName", "Johny");
+            document.SetField("LastName", "Bravo");
+            document.SetField("ShouldBeOnlyDeserialized", "Dummy text");
+            document.SetField("ShouldNotBeSerializedOrDeserialized", "Dummy text");
+            
+            var person = document.To<Person>();
+            
+            Assert.AreEqual(document.GetField<string>("FirstName"), person.FirstName);
+            Assert.AreEqual(document.GetField<string>("LastName"), person.LastName);
+            Assert.AreEqual(document.GetField<string>("ShouldBeOnlyDeserialized"), person.ShouldBeOnlyDeserialized);
+            Assert.AreEqual(null, person.ShouldNotBeSerializedOrDeserialized);
         }
     }
 }

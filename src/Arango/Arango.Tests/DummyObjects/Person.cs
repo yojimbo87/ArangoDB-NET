@@ -26,7 +26,10 @@ namespace Arango.Tests
         public Person Father { get; set; }
         
         [ArangoProperty(Serializable = false)]
-        public string ShouldNotBeSerialized { get; set; }
+        public string ShouldBeOnlyDeserialized { get; set; }
+        
+        [ArangoProperty(Serializable = false, Deserializable = false)]
+        public string ShouldNotBeSerializedOrDeserialized { get; set; }
         
         [ArangoProperty(Alias = "aliasedField")]
         public string Aliased { get; set; }
