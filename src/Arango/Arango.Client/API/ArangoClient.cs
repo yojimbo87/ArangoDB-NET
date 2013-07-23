@@ -15,7 +15,7 @@ namespace Arango.Client
 
         public static string DriverVersion
         {
-            get { return "0.2.1"; }
+            get { return "0.3.0"; }
         }
 
         public static void AddDatabase(string hostname, int port, bool isSecured, string userName, string password, string alias)
