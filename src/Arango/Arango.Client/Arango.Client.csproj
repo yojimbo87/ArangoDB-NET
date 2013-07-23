@@ -38,6 +38,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\ArangoClient.cs" />
     <Compile Include="API\Collections\ArangoCollection.cs" />
     <Compile Include="API\Collections\ArangoCollectionKeyOptions.cs" />
     <Compile Include="API\Collections\ArangoCollectionOperation.cs" />
@@ -52,7 +53,6 @@
     <Compile Include="API\Edges\ArangoEdgeDirection.cs" />
     <Compile Include="API\Edges\ArangoEdgeOperation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ArangoClient.cs" />
     <Compile Include="Protocol\Connection.cs" />
     <Compile Include="Protocol\Operations\CollectionOperation.cs" />
     <Compile Include="Protocol\Operations\CursorOperation.cs" />
