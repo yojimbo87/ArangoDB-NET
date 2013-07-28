@@ -92,7 +92,7 @@ namespace Arango.Client.Protocol
 
                 if (!string.IsNullOrEmpty(response.JsonString))
                 {
-                    response.Document.Deserialize(response.JsonString);
+                    response.Document = Document.Deserialize(response.JsonString);
                 }
             }
             catch (WebException webException)
@@ -108,7 +108,7 @@ namespace Arango.Client.Protocol
                 
                 if (!string.IsNullOrEmpty(response.JsonString))
                 {
-                    response.Document.Deserialize(response.JsonString);
+                    response.Document = Document.Deserialize(response.JsonString);
                     
                     errorMessage = string.Format(
                             "ArangoDB responded with error code {0}:\n{1} [error number {2}]",

@@ -14,7 +14,10 @@ namespace Arango.Client
         
         public Document(string json) 
         {
-            Deserialize(json);
+            foreach(KeyValuePair<string, object> field in Deserialize(json))
+            {
+                this.Add(field.Key, field.Value);
+            }
         }
         
         #region Field operations
@@ -373,8 +376,9 @@ namespace Arango.Client
         
         #region Deserialization
 
-        public void Deserialize(string json)
+        public static Document Deserialize(string json)
         {
+            Document document = new Document();
             Dictionary<string, JToken> fields = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(json);
 
             foreach (KeyValuePair<string, JToken> field in fields)
@@ -382,19 +386,21 @@ namespace Arango.Client
                 switch (field.Value.Type)
                 {
                     case JTokenType.Array:
-                        this.Add(field.Key, DeserializeArray((JArray)field.Value));
+                        document.Add(field.Key, DeserializeArray((JArray)field.Value));
                         break;
                     case JTokenType.Object:
-                        this.Add(field.Key, DeserializeEmbeddedObject((JObject)field.Value));
+                        document.Add(field.Key, DeserializeEmbeddedObject((JObject)field.Value));
                         break;
                     default:
-                        this.Add(field.Key, DeserializeValue(field.Value));
+                        document.Add(field.Key, DeserializeValue(field.Value));
                         break;
                 }
             }
+            
+            return document;
         }
 
-        private object DeserializeEmbeddedObject(JObject jObject)
+        private static object DeserializeEmbeddedObject(JObject jObject)
         {
             Document embedded = new Document();
 
@@ -417,7 +423,7 @@ namespace Arango.Client
             return embedded;
         }
 
-        private List<object> DeserializeArray(JArray jArray)
+        private static List<object> DeserializeArray(JArray jArray)
         {
             List<object> array = new List<object>();
             
@@ -440,7 +446,7 @@ namespace Arango.Client
             return array;
         }
         
-        private object DeserializeValue(JToken token)
+        private static object DeserializeValue(JToken token)
         {
             return token.ToObject<object>();
         }
