@@ -365,6 +365,80 @@ namespace Arango.Client
             return document;
         }
         
+        // evaluate equality of document fields and values
+        #region Compare
+        
+        public bool Compare(Document document)
+        {
+            return CompareDocuments(document, this);
+        }
+        
+        private bool CompareDocuments(Document document1, Document document2)
+        {
+            var areEqual = false;
+            
+            foreach (KeyValuePair<string, object> field in document1)
+            {
+                if (document2.HasField(field.Key))
+                {
+                    var obj = document2.GetField<object>(field.Key);
+                    
+                    if ((field.Value is Document) && (obj is Document))
+                    {
+                        areEqual = CompareDocuments((Document)field.Value, (Document)obj);
+                    }
+                    else if ((field.Value is IList) && (obj is IList))
+                    {
+                        areEqual = CompareCollections((IList)field.Value, (IList)obj);
+                    }
+                    else
+                    {
+                        areEqual = CompareValues(field.Value, obj);
+                    }
+                    
+                    if (!areEqual)
+                    {
+                        break;
+                    }
+                }
+            }
+            
+            return areEqual;
+        }
+        
+        private bool CompareCollections(IList collection1, IList collection2)
+        {
+            var areEqual = false;
+
+            for (var i = 0; i < collection1.Count; i++)
+            {
+                var item = collection1[i];
+                
+                if ((item is Document) && (collection2[i] is Document))
+                {
+                    areEqual = CompareDocuments((Document)item, (Document)collection2[i]);
+                }
+                else
+                {
+                    areEqual = CompareValues(item, collection2[i]);
+                }
+                
+                if (!areEqual)
+                {
+                    break;
+                }
+            }
+            
+            return areEqual;
+        }
+        
+        private bool CompareValues(object value1, object value2)
+        {
+            return value1.Equals(value2);
+        }
+        
+        #endregion
+        
         #region Serialization
 
         public static string Serialize<T>(T obj)

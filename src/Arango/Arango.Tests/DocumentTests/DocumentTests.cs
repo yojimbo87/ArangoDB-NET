@@ -167,5 +167,101 @@ namespace Arango.Tests.DocumentTests
             Assert.AreEqual(document.GetField<string>("ShouldBeOnlyDeserialized"), person.ShouldBeOnlyDeserialized);
             Assert.AreEqual(null, person.ShouldNotBeSerializedOrDeserialized);
         }
+        
+        [Test()]
+        public void Should_evaluate_simple_documents_as_equal()
+        {
+            var document1 = new Document()
+                .SetField("foo", "string value 1")
+                .SetField("bar", 123);
+            
+            var document2 = new Document()
+                .SetField("foo", "string value 1")
+                .SetField("bar", 123);
+            
+            var areEqual = document1.Compare(document2);
+            
+            Assert.AreEqual(true, areEqual);
+        }
+        
+        [Test()]
+        public void Should_evaluate_simple_documents_as_not_equal()
+        {
+            var document1 = new Document()
+                .SetField("foo", "string value 1")
+                .SetField("bar", 111);
+            
+            var document2 = new Document()
+                .SetField("foo", "string value 1")
+                .SetField("bar", 123);
+            
+            var areEqual = document1.Compare(document2);
+            
+            Assert.AreEqual(false, areEqual);
+        }
+        
+        [Test()]
+        public void Should_evaluate_nested_documents_as_equal()
+        {
+            var document1 = new Document()
+                .SetField("baz.foo", "string value 1")
+                .SetField("baz.bar", 123);
+            
+            var document2 = new Document()
+                .SetField("baz.foo", "string value 1")
+                .SetField("baz.bar", 123);
+            
+            var areEqual = document1.Compare(document2);
+            
+            Assert.AreEqual(true, areEqual);
+        }
+        
+        [Test()]
+        public void Should_evaluate_nested_documents_as_not_equal()
+        {
+            var document1 = new Document()
+                .SetField("baz.foo", "string value 1")
+                .SetField("baz.bar", 123);
+            
+            var document2 = new Document()
+                .SetField("baz.foo", "string value 1")
+                .SetField("baz.bar", 111);
+            
+            var areEqual = document1.Compare(document2);
+            
+            Assert.AreEqual(false, areEqual);
+        }
+        
+        [Test()]
+        public void Should_evaluate_documents_with_nested_collection_as_equal()
+        {
+            var document1 = new Document()
+                .SetField("baz.foo", new List<string> { "one", "two", "three" })
+                .SetField("baz.bar", 123);
+            
+            var document2 = new Document()
+                .SetField("baz.foo", new List<string> { "one", "two", "three" })
+                .SetField("baz.bar", 123);
+            
+            var areEqual = document1.Compare(document2);
+            
+            Assert.AreEqual(true, areEqual);
+        }
+        
+        [Test()]
+        public void Should_evaluate_documents_with_nested_collection_as_not_equal()
+        {
+            var document1 = new Document()
+                .SetField("baz.foo", new List<string> { "one", "two", "three" })
+                .SetField("baz.bar", 123);
+            
+            var document2 = new Document()
+                .SetField("baz.foo", new List<string> { "one", "two", "four" })
+                .SetField("baz.bar", 123);
+            
+            var areEqual = document1.Compare(document2);
+            
+            Assert.AreEqual(false, areEqual);
+        }
     }
 }
