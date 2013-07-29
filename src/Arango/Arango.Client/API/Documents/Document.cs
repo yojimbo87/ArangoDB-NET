@@ -461,11 +461,23 @@ namespace Arango.Client
         
         #region Deserialization
 
-        public static Document Deserialize(string json)
+        public static Document Deserialize(string json, bool dateTimeAsString = false)
         {
-            Document document = new Document();
-            Dictionary<string, JToken> fields = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(json);
-
+            var document = new Document();
+            Dictionary<string, JToken> fields;
+                
+            if (dateTimeAsString)
+            {
+                var settings = new JsonSerializerSettings();
+                settings.DateParseHandling = DateParseHandling.None;
+                
+                fields = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(json, settings);
+            }
+            else
+            {
+                fields = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(json);
+            }
+            
             foreach (KeyValuePair<string, JToken> field in fields)
             {
                 switch (field.Value.Type)

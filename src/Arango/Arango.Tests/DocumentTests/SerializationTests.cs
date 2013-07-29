@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using NUnit.Framework;
@@ -117,6 +118,29 @@ namespace Arango.Tests.DocumentTests
             
             // compare json representation of document
             var expected = "{\"string\":\"foo bar\",\"embedded\":{\"string\":\"foo bar\",\"array\":[\"foo\",\"bar\"]},\"array\":[\"foo\",\"bar\"]}";
+            var actual = Document.Serialize(document);
+
+            Assert.AreEqual(expected, actual);
+        }
+        
+        [Test()]
+        public void Should_serialize_datetime()
+        {
+            var dateTime = new DateTime(2008, 12, 20, 2, 12, 2);
+            
+            // fill document with data
+            var document = new Document()
+                .SetField("datetime1", "2008-12-20T02:12:02Z")
+                .SetField("datetime2", dateTime)
+                .SetField("datetime3", TimeZoneInfo.ConvertTimeToUtc(DateTime.Parse("2008-12-20T02:12:02Z")));
+
+            // check if document data types are equal on retrieval
+            Assert.AreEqual("2008-12-20T02:12:02Z", document.GetField<string>("datetime1"));
+            Assert.AreEqual(dateTime, document.GetField<DateTime>("datetime2"));
+            Assert.AreEqual(TimeZoneInfo.ConvertTimeToUtc(DateTime.Parse("2008-12-20T02:12:02Z")), document.GetField<DateTime>("datetime3"));
+            
+            // compare json representation of document
+            var expected = "{\"datetime1\":\"2008-12-20T02:12:02Z\",\"datetime2\":\"2008-12-20T02:12:02\",\"datetime3\":\"2008-12-20T02:12:02Z\"}";
             var actual = Document.Serialize(document);
 
             Assert.AreEqual(expected, actual);

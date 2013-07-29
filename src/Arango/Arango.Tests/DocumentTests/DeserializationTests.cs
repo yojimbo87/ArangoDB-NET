@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Arango.Client;
@@ -119,6 +120,40 @@ namespace Arango.Tests.DocumentTests
             
             // check generated json value
             Assert.AreEqual(json, Document.Serialize(document));
+        }
+        
+        [Test()]
+        public void Should_deserialize_datetime_as_objects()
+        {
+            var dateTime = DateTime.Parse("2008-12-20T02:12:02");
+            
+            var json = "{\"datetime1\":\"2008-12-20T02:12:02Z\",\"datetime2\":\"" + dateTime.ToString("yyyy-MM-dd'T'HH:mm:ss") + "\"}";
+            var document = Document.Deserialize(json);
+            
+            // check if the fields existence
+            Assert.AreEqual(true, document.HasField("datetime1"));
+            Assert.AreEqual(true, document.HasField("datetime2"));
+            
+            // check for fields values
+            Assert.AreEqual(TimeZoneInfo.ConvertTimeToUtc(DateTime.Parse("2008-12-20T02:12:02Z")), document.GetField<DateTime>("datetime1"));
+            Assert.AreEqual(dateTime, document.GetField<DateTime>("datetime2"));
+        }
+        
+        [Test()]
+        public void Should_deserialize_datetime_as_strings()
+        {
+            var dateTime = DateTime.Parse("2008-12-20T02:12:02");
+            
+            var json = "{\"datetime1\":\"2008-12-20T02:12:02Z\",\"datetime2\":\"" + dateTime.ToString("yyyy-MM-dd'T'HH:mm:ss") + "\"}";
+            var document = Document.Deserialize(json, true);
+            
+            // check if the fields existence
+            Assert.AreEqual(true, document.HasField("datetime1"));
+            Assert.AreEqual(true, document.HasField("datetime2"));
+            
+            // check for fields values
+            Assert.AreEqual("2008-12-20T02:12:02Z", document.GetField<string>("datetime1"));
+            Assert.AreEqual(dateTime.ToString("yyyy-MM-dd'T'HH:mm:ss"), document.GetField<string>("datetime2"));
         }
     }
 }
