@@ -434,7 +434,18 @@ namespace Arango.Client
         
         private bool CompareValues(object value1, object value2)
         {
-            return value1.Equals(value2);
+            var areEqual = false;
+            
+            if ((value1 != null) && (value2 != null))
+            {
+                areEqual = value1.Equals(value2);
+            }
+            else if ((value1 == null) && (value2 == null))
+            {
+                areEqual = true;
+            }
+            
+            return areEqual;
         }
         
         #endregion

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Arango.Client;
 
@@ -237,11 +238,13 @@ namespace Arango.Tests.DocumentTests
         {
             var document1 = new Document()
                 .SetField("baz.foo", new List<string> { "one", "two", "three" })
-                .SetField("baz.bar", 123);
+                .SetField("baz.bar", 123)
+                .SetField<object>("baz.null", null);
             
             var document2 = new Document()
                 .SetField("baz.foo", new List<string> { "one", "two", "three" })
-                .SetField("baz.bar", 123);
+                .SetField("baz.bar", 123)
+                .SetField<object>("baz.null", null);
             
             var areEqual = document1.Compare(document2);
             
@@ -253,11 +256,31 @@ namespace Arango.Tests.DocumentTests
         {
             var document1 = new Document()
                 .SetField("baz.foo", new List<string> { "one", "two", "three" })
-                .SetField("baz.bar", 123);
+                .SetField("baz.bar", 123)
+                .SetField<object>("baz.null", null);
             
             var document2 = new Document()
                 .SetField("baz.foo", new List<string> { "one", "two", "four" })
-                .SetField("baz.bar", 123);
+                .SetField("baz.bar", 123)
+                .SetField<object>("baz.null", null);
+            
+            var areEqual = document1.Compare(document2);
+            
+            Assert.AreEqual(false, areEqual);
+        }
+        
+        [Test()]
+        public void Should_evaluate_documents_with_null_value_as_not_equal()
+        {
+            var document1 = new Document()
+                .SetField("baz.foo", new List<string> { "one", "two", "three" })
+                .SetField("baz.bar", 123)
+                .SetField<object>("baz.null", null);
+            
+            var document2 = new Document()
+                .SetField("baz.foo", new List<string> { "one", "two", "three" })
+                .SetField("baz.bar", 123)
+                .SetField<object>("baz.null", "whoa");
             
             var areEqual = document1.Compare(document2);
             
