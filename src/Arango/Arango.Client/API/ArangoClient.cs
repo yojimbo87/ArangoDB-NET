@@ -15,7 +15,7 @@ namespace Arango.Client
 
         public static string DriverVersion
         {
-            get { return "0.5.0"; }
+            get { return "0.6.0"; }
         }
         
         public static ArangoSettings Settings { get; set; }
