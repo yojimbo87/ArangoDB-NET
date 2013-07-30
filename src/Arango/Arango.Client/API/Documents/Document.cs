@@ -461,6 +461,11 @@ namespace Arango.Client
         
         #region Deserialization
 
+        public static Document Deserialize(string json)
+        {
+            return Deserialize(json, ArangoClient.Settings.DeserializeDateTimeAsString);
+        }
+        
         public static Document Deserialize(string json, bool dateTimeAsString = false)
         {
             var document = new Document();
@@ -468,10 +473,8 @@ namespace Arango.Client
                 
             if (dateTimeAsString)
             {
-                var settings = new JsonSerializerSettings();
-                settings.DateParseHandling = DateParseHandling.None;
-                
-                fields = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(json, settings);
+                ArangoClient.Settings.SerializerSettings.DateParseHandling = DateParseHandling.None;
+                fields = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(json, ArangoClient.Settings.SerializerSettings);
             }
             else
             {

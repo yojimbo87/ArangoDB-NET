@@ -39,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="API\ArangoClient.cs" />
+    <Compile Include="API\ArangoSettings.cs" />
     <Compile Include="API\Collections\ArangoCollection.cs" />
     <Compile Include="API\Collections\ArangoCollectionKeyOptions.cs" />
     <Compile Include="API\Collections\ArangoCollectionOperation.cs" />

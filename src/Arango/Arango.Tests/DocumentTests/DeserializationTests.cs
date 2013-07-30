@@ -125,10 +125,11 @@ namespace Arango.Tests.DocumentTests
         [Test()]
         public void Should_deserialize_datetime_as_objects()
         {
+            ArangoClient.Settings.DeserializeDateTimeAsString = true;
             var dateTime = DateTime.Parse("2008-12-20T02:12:02");
             
             var json = "{\"datetime1\":\"2008-12-20T02:12:02Z\",\"datetime2\":\"" + dateTime.ToString("yyyy-MM-dd'T'HH:mm:ss") + "\"}";
-            var document = Document.Deserialize(json);
+            var document = Document.Deserialize(json, false);
             
             // check if the fields existence
             Assert.AreEqual(true, document.HasField("datetime1"));
@@ -142,10 +143,11 @@ namespace Arango.Tests.DocumentTests
         [Test()]
         public void Should_deserialize_datetime_as_strings()
         {
+            ArangoClient.Settings.DeserializeDateTimeAsString = true;
             var dateTime = DateTime.Parse("2008-12-20T02:12:02");
             
             var json = "{\"datetime1\":\"2008-12-20T02:12:02Z\",\"datetime2\":\"" + dateTime.ToString("yyyy-MM-dd'T'HH:mm:ss") + "\"}";
-            var document = Document.Deserialize(json, true);
+            var document = Document.Deserialize(json);
             
             // check if the fields existence
             Assert.AreEqual(true, document.HasField("datetime1"));

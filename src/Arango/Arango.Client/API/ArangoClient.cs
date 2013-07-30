@@ -17,6 +17,13 @@ namespace Arango.Client
         {
             get { return "0.5.0"; }
         }
+        
+        public static ArangoSettings Settings { get; set; }
+        
+        static ArangoClient()
+        {
+            Settings = new ArangoSettings();
+        }
 
         public static void AddDatabase(string hostname, int port, bool isSecured, string userName, string password, string alias)
         {
