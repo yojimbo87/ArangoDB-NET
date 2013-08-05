@@ -17,9 +17,7 @@ namespace Arango.Client.Protocol
         
         #region POST
         
-        // TODO: bindVars optional parameter
-        // http://www.arangodb.org/manuals/current/HttpCursor.html#HttpCursorPost
-        internal List<Document> Post(string query, bool returnCount, out int count, int batchSize)
+        internal List<Document> Post(string query, bool returnCount, out int count, int batchSize, Dictionary<string, object> bindVars)
         {
             var request = new Request(RequestType.Cursor, HttpMethod.Post);
             request.RelativeUri = _apiUri;
@@ -39,6 +37,19 @@ namespace Arango.Client.Protocol
             if (batchSize > 0)
             {
                 bodyDocument.SetField("batchSize", batchSize);
+            }
+            
+            // (optional) set list of bind parameters
+            if ((bindVars != null) && (bindVars.Count > 0))
+            {
+                Document bindVarsDocument = new Document();
+                
+                foreach (KeyValuePair<string, object> item in bindVars)
+                {
+                    bindVarsDocument.SetField(item.Key, item.Value);
+                }
+                
+                bodyDocument.SetField("bindVars", bindVarsDocument);
             }
             
             request.Body = Document.Serialize(bodyDocument);
@@ -61,7 +72,7 @@ namespace Arango.Client.Protocol
                     // get more results if present
                     if (response.Document.GetField<bool>("hasMore"))
                     {
-                        int cursorId = response.Document.GetField<int>("id");
+                        long cursorId = response.Document.GetField<long>("id");
                         
                         documents.AddRange(Put(cursorId));
                     }
@@ -88,7 +99,7 @@ namespace Arango.Client.Protocol
         
         #region PUT
         
-        internal List<Document> Put(int id)
+        internal List<Document> Put(long id)
         {
             var request = new Request(RequestType.Cursor, HttpMethod.Put);
             request.RelativeUri = string.Join("/", _apiUri, id);
@@ -104,7 +115,7 @@ namespace Arango.Client.Protocol
                     // get more results if present
                     if (response.Document.GetField<bool>("hasMore"))
                     {
-                        int cursorId = response.Document.GetField<int>("id");
+                        long cursorId = response.Document.GetField<long>("id");
                         
                         documents.AddRange(Put(cursorId));
                     }

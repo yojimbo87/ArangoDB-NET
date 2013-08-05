@@ -30,32 +30,40 @@ namespace Arango.Client
                 return new ArangoEdgeOperation(new EdgeOperation(_connection));
             }
         }
+        
+        public ArangoQueryOperation Query
+        {
+            get
+            {
+                return new ArangoQueryOperation(new CursorOperation(_connection));
+            }
+        }
 
         public ArangoDatabase(string alias)
         {
             _connection = ArangoClient.GetConnection(alias);
         }
         
-        #region Query
+        /*#region Query
         
-        public List<Document> Query(string aql, out int count, int batchSize = 0)
+        public List<Document> Query(string aql, out int count, Dictionary<string, object> bindVars = null, int batchSize = 0)
         {
             CursorOperation cursorOperation = new CursorOperation(_connection);
             
-            return cursorOperation.Post(aql, true, out count, batchSize);
+            return cursorOperation.Post(aql, true, out count, batchSize, bindVars);
         }
         
-        public List<Document> Query(string aql, int batchSize = 0)
+        public List<Document> Query(string aql, Dictionary<string, object> bindVars = null, int batchSize = 0)
         {
             CursorOperation cursorOperation = new CursorOperation(_connection);
             int count = 0;
             
-            return cursorOperation.Post(aql, false, out count, batchSize);
+            return cursorOperation.Post(aql, false, out count, batchSize, bindVars);
         }
         
-        public List<T> Query<T>(string aql, int batchSize = 0) where T : class, new()
+        public List<T> Query<T>(string aql, Dictionary<string, object> bindVars = null, int batchSize = 0) where T : class, new()
         {
-            List<Document> documents = Query(aql, batchSize);
+            List<Document> documents = Query(aql, bindVars, batchSize);
             List<T> genericCollection = new List<T>();
             
             foreach (Document document in documents)
@@ -69,7 +77,7 @@ namespace Arango.Client
             return genericCollection;
         }
         
-        #endregion
+        #endregion*/
     }
 }
 
