@@ -19,7 +19,9 @@ namespace Arango.Tests.QueryTests
                 "FOR x IN " + Database.TestDocumentCollectionName + " " +
                 "RETURN x";
             
-            List<Document> documents = db.Query(aql);
+            List<Document> documents = db.Query
+                .AQL(aql)
+                .Execute();
             
             Assert.AreEqual(5, documents.Count);
             
@@ -47,7 +49,10 @@ namespace Arango.Tests.QueryTests
                 "FOR x IN " + Database.TestDocumentCollectionName + " " +
                 "RETURN x";
             
-            List<Document> documents = db.Query(aql, 2);
+            List<Document> documents = db.Query
+                .AQL(aql)
+                .BatchSize(2)
+                .Execute();
             
             Assert.AreEqual(5, documents.Count);
             
@@ -77,7 +82,9 @@ namespace Arango.Tests.QueryTests
             
             int count = 0;
             
-            List<Document> documents = db.Query(aql, out count);
+            List<Document> documents = db.Query
+                .AQL(aql)
+                .Execute(out count);
             
             Assert.AreEqual(5, documents.Count);
             Assert.AreEqual(5, count);
@@ -108,8 +115,10 @@ namespace Arango.Tests.QueryTests
                 "RETURN x";
             
             int count = 0;
-            
-            List<Document> documents = db.Query(aql, out count);
+
+            List<Document> documents = db.Query
+                .AQL(aql)
+                .Execute(out count);
             
             Assert.AreEqual(2, documents.Count);
             Assert.AreEqual(2, count);
@@ -138,7 +147,9 @@ namespace Arango.Tests.QueryTests
                 "FOR x IN " + Database.TestDocumentCollectionName + " " +
                 "RETURN x";
             
-            List<Person> returnedPeople = db.Query<Person>(aql);
+            List<Person> returnedPeople = db.Query
+                .AQL(aql)
+                .Execute<Person>();
             
             Assert.AreEqual(5, returnedPeople.Count);
             
@@ -151,6 +162,38 @@ namespace Arango.Tests.QueryTests
                 Assert.AreEqual(per.ThisIsRevision, person.ThisIsRevision);
                 Assert.AreEqual(per.FirstName, person.FirstName);
                 Assert.AreEqual(per.LastName, person.LastName);
+            }
+        }
+        
+        [Test()]
+        public void Should_return_list_through_AQL_with_bindVars()
+        {
+            List<ArangoDocument> docs = CreateDummyDocuments().Where(q => q.GetField<int>("bar") == 54321).ToList();
+            var db = Database.GetTestDatabase();
+            
+            var aql = 
+                "FOR x IN " + Database.TestDocumentCollectionName + " " +
+                "FILTER x.bar == @bar " +
+                "RETURN x";
+            
+            List<Document> documents = db.Query
+                .AQL(aql)
+                .AddVar("bar", 54321)
+                .Execute();
+            
+            Assert.AreEqual(4, documents.Count);
+            
+            foreach (Document document in documents)
+            {
+                ArangoDocument doc = docs.Where(x => x.Id == document.GetField<string>("_id")).First();
+                
+                Assert.AreEqual(doc.Id, document.GetField<string>("_id"));
+                Assert.AreEqual(doc.Key, document.GetField<string>("_key"));
+                Assert.AreEqual(doc.Revision, document.GetField<string>("_rev"));
+                Assert.AreEqual(doc.HasField("foo"), document.HasField("foo"));
+                Assert.AreEqual(doc.GetField<string>("foo"), document.GetField<string>("foo"));
+                Assert.AreEqual(doc.HasField("bar"), document.HasField("bar"));
+                Assert.AreEqual(doc.GetField<string>("bar"), document.GetField<string>("bar"));
             }
         }
         
