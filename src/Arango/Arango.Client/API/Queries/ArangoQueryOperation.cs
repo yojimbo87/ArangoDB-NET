@@ -82,5 +82,10 @@ namespace Arango.Client
             
             return genericCollection;
         }
+        
+        public string ToString()
+        {
+            return _aql;
+        }
     }
 }
