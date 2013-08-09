@@ -7,19 +7,22 @@ namespace Arango.Client
     {
         private CursorOperation _cursorOperation;
         
-        private string _aql { get; set; }
-        private int _batchSize { get; set; }
-        private Dictionary<string, object> _bindVars { get; set; }
+        private string _aql  = "";
+        private int _batchSize = 0;
+        private Dictionary<string, object> _bindVars = new Dictionary<string, object>();
         
         internal ArangoQueryOperation(CursorOperation cursorOperation)
         {
             _cursorOperation = cursorOperation;
-            _bindVars = new Dictionary<string, object>();
         }
         
-        public ArangoQueryOperation AQL(string aql)
+        public ArangoQueryOperation()
         {
-            _aql = aql;
+        }
+        
+        public ArangoQueryOperation Aql(string aql)
+        {
+            _aql += aql;
             
             return this;
         }
@@ -31,12 +34,68 @@ namespace Arango.Client
             return this;
         }
         
-        public ArangoQueryOperation AddVar(string key, object value)
+        public ArangoQueryOperation AddParameter(string key, object value)
         {
             _bindVars.Add(key, value);
             
             return this;
         }
+        
+        #region AQL generator
+        
+        // TODO: nester for should be enclosed in brackets
+        public ArangoQueryOperation For(string variable, string expression)
+        {
+            if (_aql.Length == 0)
+            {
+                _aql = AQL.For;
+                
+                Join(variable, AQL.In, expression);
+            }
+            else
+            {
+                Join(AQL.For, variable, AQL.In, expression);
+            }
+            
+            return this;
+        }
+        
+        public ArangoQueryOperation Filter(string variable)
+        {
+            Join(AQL.Filter, variable);
+            
+            return this;
+        }
+        
+        public ArangoQueryOperation Equals<T>(T conditionValue)
+        {
+            Join(AQL.Equals, ToString(conditionValue));
+            
+            return this;
+        }
+        
+        public ArangoQueryOperation And(string variable)
+        {
+            Join(AQL.And, variable);
+            
+            return this;
+        }
+        
+        public ArangoQueryOperation Return(string variable)
+        {
+            Join(AQL.Return, variable);
+            
+            return this;
+        }
+        
+        public ArangoQueryOperation From(string expression)
+        {
+            Join(AQL.From, expression);
+            
+            return this;
+        }
+        
+        #endregion
         
         #region ToList
         
@@ -87,9 +146,26 @@ namespace Arango.Client
         
         #endregion
         
-        public string ToString()
+        public override string ToString()
         {
             return _aql;
+        }
+        
+        private string ToString(object value)
+        {
+            if (value is string)
+            {
+                return "'" + value + "'";
+            }
+            else
+            {
+                return value.ToString();
+            }
+        }
+        
+        private void Join(params string[] parts)
+        {
+            _aql += " " + string.Join(" ", parts);
         }
     }
 }

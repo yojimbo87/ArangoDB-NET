@@ -10,7 +10,7 @@ namespace Arango.Tests.QueryTests
     public class CursorTests : IDisposable
     {
         [Test()]
-        public void Should_return_list_through_AQL()
+        public void Should_return_list_through_Aql()
         {
             List<ArangoDocument> docs = CreateDummyDocuments();
             var db = Database.GetTestDatabase();
@@ -20,8 +20,8 @@ namespace Arango.Tests.QueryTests
                 "RETURN x";
             
             List<Document> documents = db.Query
-                .AQL(aql)
-                .Run();
+                .Aql(aql)
+                .ToList();
             
             Assert.AreEqual(5, documents.Count);
             
@@ -40,7 +40,7 @@ namespace Arango.Tests.QueryTests
         }
         
         [Test()]
-        public void Should_return_list_through_AQL_with_small_batch_size()
+        public void Should_return_list_through_Aql_with_small_batch_size()
         {
             List<ArangoDocument> docs = CreateDummyDocuments();
             var db = Database.GetTestDatabase();
@@ -50,9 +50,9 @@ namespace Arango.Tests.QueryTests
                 "RETURN x";
             
             List<Document> documents = db.Query
-                .AQL(aql)
+                .Aql(aql)
                 .BatchSize(2)
-                .Run();
+                .ToList();
             
             Assert.AreEqual(5, documents.Count);
             
@@ -71,7 +71,7 @@ namespace Arango.Tests.QueryTests
         }
         
         [Test()]
-        public void Should_return_list_through_AQL_and_return_count()
+        public void Should_return_list_through_Aql_and_return_count()
         {
             List<ArangoDocument> docs = CreateDummyDocuments();
             var db = Database.GetTestDatabase();
@@ -83,8 +83,8 @@ namespace Arango.Tests.QueryTests
             int count = 0;
             
             List<Document> documents = db.Query
-                .AQL(aql)
-                .Run(out count);
+                .Aql(aql)
+                .ToList(out count);
             
             Assert.AreEqual(5, documents.Count);
             Assert.AreEqual(5, count);
@@ -104,7 +104,7 @@ namespace Arango.Tests.QueryTests
         }
         
         [Test()]
-        public void Should_return_list_through_AQL_with_limit_and_return_count()
+        public void Should_return_list_through_Aql_with_limit_and_return_count()
         {
             List<ArangoDocument> docs = CreateDummyDocuments();
             var db = Database.GetTestDatabase();
@@ -117,8 +117,8 @@ namespace Arango.Tests.QueryTests
             int count = 0;
 
             List<Document> documents = db.Query
-                .AQL(aql)
-                .Run(out count);
+                .Aql(aql)
+                .ToList(out count);
             
             Assert.AreEqual(2, documents.Count);
             Assert.AreEqual(2, count);
@@ -138,7 +138,7 @@ namespace Arango.Tests.QueryTests
         }
         
         [Test()]
-        public void Should_return_generic_list_through_AQL()
+        public void Should_return_generic_list_through_Aql()
         {
             List<Person> people = CreateDummyPeople();
             var db = Database.GetTestDatabase();
@@ -148,8 +148,8 @@ namespace Arango.Tests.QueryTests
                 "RETURN x";
             
             List<Person> returnedPeople = db.Query
-                .AQL(aql)
-                .Run<Person>();
+                .Aql(aql)
+                .ToList<Person>();
             
             Assert.AreEqual(5, returnedPeople.Count);
             
@@ -166,7 +166,7 @@ namespace Arango.Tests.QueryTests
         }
         
         [Test()]
-        public void Should_return_list_through_AQL_with_bindVars()
+        public void Should_return_list_through_Aql_with_bindVars()
         {
             List<ArangoDocument> docs = CreateDummyDocuments().Where(q => q.GetField<int>("bar") == 54321).ToList();
             var db = Database.GetTestDatabase();
@@ -177,9 +177,9 @@ namespace Arango.Tests.QueryTests
                 "RETURN x";
             
             List<Document> documents = db.Query
-                .AQL(aql)
-                .AddVar("bar", 54321)
-                .Run();
+                .Aql(aql)
+                .AddParameter("bar", 54321)
+                .ToList();
             
             Assert.AreEqual(4, documents.Count);
             

@@ -66,6 +66,7 @@
     <Compile Include="DocumentTests\SerializationTests.cs" />
     <Compile Include="DocumentTests\DeserializationTests.cs" />
     <Compile Include="DummyObjects\Person.cs" />
+    <Compile Include="QueryTests\AqlTests.cs" />
     <Compile Include="QueryTests\CursorTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
