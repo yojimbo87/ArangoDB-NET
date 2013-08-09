@@ -38,19 +38,21 @@ namespace Arango.Client
             return this;
         }
         
-        public List<Document> Run(out int count)
+        #region ToList
+        
+        public List<Document> ToList(out int count)
         {
             return _cursorOperation.Post(_aql, true, out count, _batchSize, _bindVars);
         }
         
-        public List<Document> Run()
+        public List<Document> ToList()
         {
             int count = 0;
             
             return _cursorOperation.Post(_aql, false, out count, _batchSize, _bindVars);
         }
         
-        public List<T> Run<T>(out int count) where T : class, new()
+        public List<T> ToList<T>(out int count) where T : class, new()
         {
             List<Document> documents = _cursorOperation.Post(_aql, true, out count, _batchSize, _bindVars);
             List<T> genericCollection = new List<T>();
@@ -66,7 +68,7 @@ namespace Arango.Client
             return genericCollection;
         }
         
-        public List<T> Run<T>() where T : class, new()
+        public List<T> ToList<T>() where T : class, new()
         {
             int count = 0;
             List<Document> documents = _cursorOperation.Post(_aql, false, out count, _batchSize, _bindVars);
@@ -82,6 +84,8 @@ namespace Arango.Client
             
             return genericCollection;
         }
+        
+        #endregion
         
         public string ToString()
         {
