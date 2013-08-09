@@ -21,7 +21,7 @@ namespace Arango.Tests.QueryTests
             
             List<Document> documents = db.Query
                 .AQL(aql)
-                .Execute();
+                .Run();
             
             Assert.AreEqual(5, documents.Count);
             
@@ -52,7 +52,7 @@ namespace Arango.Tests.QueryTests
             List<Document> documents = db.Query
                 .AQL(aql)
                 .BatchSize(2)
-                .Execute();
+                .Run();
             
             Assert.AreEqual(5, documents.Count);
             
@@ -84,7 +84,7 @@ namespace Arango.Tests.QueryTests
             
             List<Document> documents = db.Query
                 .AQL(aql)
-                .Execute(out count);
+                .Run(out count);
             
             Assert.AreEqual(5, documents.Count);
             Assert.AreEqual(5, count);
@@ -118,7 +118,7 @@ namespace Arango.Tests.QueryTests
 
             List<Document> documents = db.Query
                 .AQL(aql)
-                .Execute(out count);
+                .Run(out count);
             
             Assert.AreEqual(2, documents.Count);
             Assert.AreEqual(2, count);
@@ -149,7 +149,7 @@ namespace Arango.Tests.QueryTests
             
             List<Person> returnedPeople = db.Query
                 .AQL(aql)
-                .Execute<Person>();
+                .Run<Person>();
             
             Assert.AreEqual(5, returnedPeople.Count);
             
@@ -179,7 +179,7 @@ namespace Arango.Tests.QueryTests
             List<Document> documents = db.Query
                 .AQL(aql)
                 .AddVar("bar", 54321)
-                .Execute();
+                .Run();
             
             Assert.AreEqual(4, documents.Count);
             
