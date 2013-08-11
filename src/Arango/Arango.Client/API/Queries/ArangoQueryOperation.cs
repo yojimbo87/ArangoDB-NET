@@ -7,9 +7,11 @@ namespace Arango.Client
     {
         private CursorOperation _cursorOperation;
         
-        private string _aql  = "";
         private int _batchSize = 0;
         private Dictionary<string, object> _bindVars = new Dictionary<string, object>();
+        private string _aql = "";
+        private string _lastOperation = AQL.None;
+        private int _level = 0;
         
         internal ArangoQueryOperation(CursorOperation cursorOperation)
         {
@@ -41,35 +43,87 @@ namespace Arango.Client
             return this;
         }
         
-        #region AQL generator
-        
-        // TODO: nester for should be enclosed in brackets
-        public ArangoQueryOperation For(string variable, string expression)
-        {
-            if (_aql.Length == 0)
-            {
-                _aql = AQL.For;
-                
-                Join(variable, AQL.In, expression);
-            }
-            else
-            {
-                Join(AQL.For, variable, AQL.In, expression);
-            }
-            
-            return this;
-        }
+        #region AQL standard operations
         
         public ArangoQueryOperation Filter(string variable)
         {
             Join(AQL.Filter, variable);
             
+            _lastOperation = AQL.Filter;
+            
             return this;
         }
         
-        public ArangoQueryOperation Equals<T>(T conditionValue)
+        public ArangoQueryOperation For(string variable, string expression)
         {
-            Join(AQL.Equals, ToString(conditionValue));
+            if (_level > 0)
+            {
+                _aql += "(";
+            }
+            
+            switch (_lastOperation)
+            {
+                case AQL.None:
+                    _aql = AQL.For;
+                
+                    Join(variable, AQL.In, expression);
+                    break;
+                case AQL.Let:
+                    _aql += " (" + AQL.For;
+                    
+                    Join(variable, AQL.In, expression);
+                    break;
+                case AQL.Return:
+                    _aql += ")";
+                    
+                    Join(AQL.For, variable, AQL.In, expression);
+                    break;
+                default:
+                    Join(AQL.For, variable, AQL.In, expression);
+                    break;
+            }
+            
+            _lastOperation = AQL.For;
+            _level++;
+            
+            return this;
+        }
+        
+        public ArangoQueryOperation Let(string variable)
+        {
+            if (_lastOperation == AQL.None)
+            {
+                _aql = AQL.Let;
+                
+                Join(variable, AQL.Equals);
+            }
+            else
+            {
+                Join(AQL.Let, variable, AQL.Equals);
+            }
+            
+            _lastOperation = AQL.Let;
+            
+            return this;
+        }
+        
+        public ArangoQueryOperation Return(string variable)
+        {
+            Join(AQL.Return, variable);
+            
+            _lastOperation = AQL.Return;
+            _level--;
+            
+            return this;
+        }
+        
+        #endregion
+        
+        #region AQL expression operators
+        
+        public ArangoQueryOperation Equals<T>(T conditionValue, bool isVariable = false)
+        {
+            Join(AQL.DoubleEquals, (isVariable ? conditionValue.ToString() : ToString(conditionValue)));
             
             return this;
         }
@@ -81,12 +135,9 @@ namespace Arango.Client
             return this;
         }
         
-        public ArangoQueryOperation Return(string variable)
-        {
-            Join(AQL.Return, variable);
-            
-            return this;
-        }
+        #endregion
+        
+        #region AQL support methods
         
         public ArangoQueryOperation From(string expression)
         {
@@ -101,19 +152,19 @@ namespace Arango.Client
         
         public List<Document> ToList(out int count)
         {
-            return _cursorOperation.Post(_aql, true, out count, _batchSize, _bindVars);
+            return _cursorOperation.Post(_aql.ToString(), true, out count, _batchSize, _bindVars);
         }
         
         public List<Document> ToList()
         {
             int count = 0;
             
-            return _cursorOperation.Post(_aql, false, out count, _batchSize, _bindVars);
+            return _cursorOperation.Post(_aql.ToString(), false, out count, _batchSize, _bindVars);
         }
         
         public List<T> ToList<T>(out int count) where T : class, new()
         {
-            List<Document> documents = _cursorOperation.Post(_aql, true, out count, _batchSize, _bindVars);
+            List<Document> documents = _cursorOperation.Post(_aql.ToString(), true, out count, _batchSize, _bindVars);
             List<T> genericCollection = new List<T>();
             
             foreach (Document document in documents)
@@ -130,7 +181,7 @@ namespace Arango.Client
         public List<T> ToList<T>() where T : class, new()
         {
             int count = 0;
-            List<Document> documents = _cursorOperation.Post(_aql, false, out count, _batchSize, _bindVars);
+            List<Document> documents = _cursorOperation.Post(_aql.ToString(), false, out count, _batchSize, _bindVars);
             List<T> genericCollection = new List<T>();
             
             foreach (Document document in documents)
@@ -146,8 +197,16 @@ namespace Arango.Client
         
         #endregion
         
+        #region ToString
+        
         public override string ToString()
         {
+            for (int i = 0; i < _level; i++)
+            {
+                _aql += ")";
+                _level--;
+            }
+            
             return _aql;
         }
         
@@ -162,6 +221,8 @@ namespace Arango.Client
                 return value.ToString();
             }
         }
+        
+        #endregion
         
         private void Join(params string[] parts)
         {
