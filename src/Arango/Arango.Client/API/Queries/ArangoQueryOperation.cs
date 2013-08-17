@@ -10,6 +10,9 @@ namespace Arango.Client
         private int _batchSize = 0;
         private Dictionary<string, object> _bindVars = new Dictionary<string, object>();
         private string _aql = "";
+        
+        // list of variables created with let keyword
+        private List<string> _variables = new List<string>();
         // name of the last performed operation in query chain
         private string _lastOperation = AQL.None;
         // depth of nested operations
@@ -58,7 +61,6 @@ namespace Arango.Client
         
         public ArangoQueryOperation For(string variable, string expression)
         {
-            // TODO: rename Also to With
             // TODO: refactor query generation
             // - use something like dictionary<string, ?> to produce execution tree
             // - FOR and RETURN operations are crucial for the execution
@@ -101,6 +103,13 @@ namespace Arango.Client
         
         public ArangoQueryOperation Let(string variable)
         {
+            if (_variables.Contains(variable))
+            {
+                throw new ArangoException("Variable name is already used within the AQL query.");
+            }
+            
+            _variables.Add(variable);
+            
             if (_lastOperation == AQL.None)
             {
                 _aql = AQL.Let;
@@ -131,9 +140,16 @@ namespace Arango.Client
         
         #region AQL expression operators
         
-        public ArangoQueryOperation Equals<T>(T conditionValue, bool isVariable = false)
+        public ArangoQueryOperation Equals<T>(T conditionValue)
         {
-            Join(AQL.DoubleEquals, (isVariable ? conditionValue.ToString() : ToString(conditionValue)));
+            if ((conditionValue is string) && _variables.Contains(conditionValue.ToString()))
+            {
+                Join(AQL.DoubleEquals, conditionValue.ToString());
+            }
+            else
+            {
+                Join(AQL.DoubleEquals, ToString(conditionValue));
+            }
             
             return this;
         }

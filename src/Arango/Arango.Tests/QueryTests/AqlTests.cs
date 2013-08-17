@@ -19,8 +19,8 @@ namespace Arango.Tests.QueryTests
             
             var generatedQuery = new ArangoQueryOperation()
                 .For("f", "Foo")
-                .Filter("f.bar").Equals("xyz")
-                .Return("f")
+                    .Filter("f.bar").Equals("xyz")
+                    .Return("f")
                 .ToString();
             
             Assert.AreEqual(query, generatedQuery);
@@ -45,7 +45,7 @@ namespace Arango.Tests.QueryTests
                         .Filter("f.bar").Equals("xyz")
                         .Return("f.bar")
                 .For("f", "Foo")
-                    .Filter("f.bar").Equals("foo", true)
+                    .Filter("f.bar").Equals("foo")
                     .Return("f")
                 .ToString();
             
