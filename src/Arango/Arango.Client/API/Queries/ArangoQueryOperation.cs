@@ -10,7 +10,9 @@ namespace Arango.Client
         private int _batchSize = 0;
         private Dictionary<string, object> _bindVars = new Dictionary<string, object>();
         private string _aql = "";
+        // name of the last performed operation in query chain
         private string _lastOperation = AQL.None;
+        // depth of nested operations
         private int _level = 0;
         
         internal ArangoQueryOperation(CursorOperation cursorOperation)
@@ -56,24 +58,32 @@ namespace Arango.Client
         
         public ArangoQueryOperation For(string variable, string expression)
         {
-            if (_level > 0)
+            // TODO: rename Also to With
+            // TODO: refactor query generation
+            // - use something like dictionary<string, ?> to produce execution tree
+            // - FOR and RETURN operations are crucial for the execution
+            
+            /*if (_level > 0)
             {
                 _aql += "(";
-            }
+            }*/
             
             switch (_lastOperation)
             {
                 case AQL.None:
+                    // FOR operation starts without initial space
                     _aql = AQL.For;
                 
                     Join(variable, AQL.In, expression);
                     break;
                 case AQL.Let:
+                    // FOR within LET operation starts with brackets
                     _aql += " (" + AQL.For;
                     
                     Join(variable, AQL.In, expression);
                     break;
                 case AQL.Return:
+                    // 
                     _aql += ")";
                     
                     Join(AQL.For, variable, AQL.In, expression);
