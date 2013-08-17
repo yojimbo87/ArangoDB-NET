@@ -19,6 +19,11 @@ namespace Arango.Client
         {
         }
 
+        public ArangoException(string message) 
+            : base(message)
+        {
+        }
+        
         public ArangoException(HttpStatusCode httpStatusCode, string message, string webExceptionMessage) 
             : base(message)
         {
