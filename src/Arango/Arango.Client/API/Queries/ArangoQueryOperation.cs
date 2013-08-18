@@ -14,9 +14,9 @@ namespace Arango.Client
         // list of variables created with let keyword
         private List<string> _variables = new List<string>();
         // name of the last performed operation in query chain
-        private string _lastOperation = AQL.None;
+        //private string _lastOperation = AQL.None;
         // depth of nested operations
-        private int _level = 0;
+        //private int _level = 0;
         
         internal ArangoQueryOperation(CursorOperation cursorOperation)
         {
