@@ -6,17 +6,11 @@ namespace Arango.Client
 {
     public static class ArangoClient
     {
-        private static List<Connection> _connections = new List<Connection>();
+        private static Dictionary<string, Connection> _connections = new Dictionary<string, Connection>();
 
-        public static string DriverName
-        {
-            get { return "ArangoDB-NET"; }
-        }
+        public const string DriverName = "ArangoDB-NET";
 
-        public static string DriverVersion
-        {
-            get { return "0.7.0"; }
-        }
+        public const string DriverVersion = "0.7.0";
         
         public static ArangoSettings Settings { get; set; }
         
@@ -27,14 +21,15 @@ namespace Arango.Client
 
         public static void AddDatabase(string hostname, int port, bool isSecured, string userName, string password, string alias)
         {
-            var connection = new Connection(hostname, port, isSecured, userName, password, alias);
-
-            _connections.Add(connection);
+            _connections.Add(
+                alias,
+                new Connection(hostname, port, isSecured, userName, password, alias)
+            );
         }
 
         internal static Connection GetConnection(string alias)
         {
-            return _connections.Where(connection => connection.Alias == alias).FirstOrDefault();
+            return _connections[alias];
         }
     }
 }
