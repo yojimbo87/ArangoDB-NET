@@ -48,7 +48,9 @@ namespace Arango.Client
             return this;
         }
         
-        #region AQL standard operations
+        // TODO: AQL query generator
+        // - problem is in parantheses before and after FOR cycles which depend on RETURN clause
+        /*#region AQL standard operations
         
         public ArangoQueryOperation Filter(string variable)
         {
@@ -60,15 +62,11 @@ namespace Arango.Client
         }
         
         public ArangoQueryOperation For(string variable, string expression)
-        {
-            // TODO: refactor query generation
-            // - use something like dictionary<string, ?> to produce execution tree
-            // - FOR and RETURN operations are crucial for the execution
-            
-            /*if (_level > 0)
-            {
-                _aql += "(";
-            }*/
+        {   
+            //if (_level > 0)
+            //{
+            //    _aql += "(";
+            //}
             
             switch (_lastOperation)
             {
@@ -172,7 +170,7 @@ namespace Arango.Client
             return this;
         }
         
-        #endregion
+        #endregion*/
         
         #region ToList
         
@@ -227,11 +225,11 @@ namespace Arango.Client
         
         public override string ToString()
         {
-            for (int i = 0; i < _level; i++)
-            {
-                _aql += ")";
-                _level--;
-            }
+            //for (int i = 0; i < _level; i++)
+            //{
+            //    _aql += ")";
+            //    _level--;
+            //}
             
             return _aql;
         }
@@ -250,9 +248,9 @@ namespace Arango.Client
         
         #endregion
         
-        private void Join(params string[] parts)
+        /*private void Join(params string[] parts)
         {
             _aql += " " + string.Join(" ", parts);
-        }
+        }*/
     }
 }
