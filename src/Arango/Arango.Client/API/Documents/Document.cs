@@ -11,12 +11,12 @@ namespace Arango.Client
     public class Document : Dictionary<string, object>
     {
         /// <summary>
-        /// Create document.
+        /// Creates document.
         /// </summary>
         public Document() {}
         
         /// <summary>
-        /// Create document from specified JSON string.
+        /// Creates document from specified JSON string.
         /// </summary>
         public Document(string json) 
         {
@@ -29,7 +29,7 @@ namespace Arango.Client
         #region Field operations
         
         /// <summary>
-        /// Retrieve specified field from this document. Can be complex path, e.g. foo.bar.baz
+        /// Retrieves specified field from this document. Can be complex path, e.g. foo.bar.baz
         /// </summary>
         public T GetField<T>(string fieldPath)
         {
@@ -204,7 +204,7 @@ namespace Arango.Client
         }
 
         /// <summary>
-        /// Set specified value to specified field in this document.
+        /// Sets specified value to specified field in document.
         /// </summary>
         public Document SetField<T>(string fieldPath, T value)
         {
@@ -260,7 +260,7 @@ namespace Arango.Client
         }
         
         /// <summary>
-        /// Remove specified field from this document.
+        /// Removes specified field from document.
         /// </summary>
         public Document RemoveField(string fieldPath)
         {
@@ -304,7 +304,7 @@ namespace Arango.Client
         }
 
         /// <summary>
-        /// Check if the specified field is present in this document.
+        /// Checks if the specified field is present in document.
         /// </summary>
         public bool HasField(string fieldPath)
         {
@@ -369,7 +369,7 @@ namespace Arango.Client
         }
         
         /// <summary>
-        /// Return this document except specified fields.
+        /// Returns document except specified fields.
         /// </summary>
         public Document Except(params string[] fields)
         {
@@ -389,6 +389,9 @@ namespace Arango.Client
         // evaluate equality of document fields and values
         #region Compare
         
+        /// <summary>
+        /// Compares document with another one.
+        /// </summary>
         public bool Compare(Document document)
         {
             return CompareDocuments(document, this);
@@ -474,7 +477,7 @@ namespace Arango.Client
         #region Serialization
         
         /// <summary>
-        /// Serialize specified object to JSON string.
+        /// Serializes specified object to JSON string.
         /// </summary>
         public static string Serialize<T>(T obj)
         {
@@ -486,7 +489,7 @@ namespace Arango.Client
         #region Deserialization
 
         /// <summary>
-        /// Deserialize specified JSON string to document object. Default datetime deserialization settings will be used.
+        /// Deserializes specified JSON string to document object. Default datetime deserialization settings will be used.
         /// </summary>
         public static Document Deserialize(string json)
         {
@@ -494,7 +497,7 @@ namespace Arango.Client
         }
         
         /// <summary>
-        /// Deserialize specified json string to document object. Specified datetime deserialization settings will be used.
+        /// Deserializes specified json string to document object. Specified datetime deserialization settings will be used.
         /// </summary>
         public static Document Deserialize(string json, bool dateTimeAsString = false)
         {
@@ -586,7 +589,7 @@ namespace Arango.Client
         #region Convert to generic object
         
         /// <summary>
-        /// Convert and copy this document fields to specified generic object.
+        /// Converts and copies document fields to specified generic object.
         /// </summary>
         public T To<T>() where T : class, new()
         {
@@ -766,7 +769,7 @@ namespace Arango.Client
         #region Convert from generic object
         
         /// <summary>
-        /// Convert and copy specified generic object properties to this document fields.
+        /// Converts and copies specified generic object properties to document fields.
         /// </summary>
         public void From<T>(T genericObject)
         {
@@ -910,7 +913,7 @@ namespace Arango.Client
         #endregion
     
         /// <summary>
-        /// Maps ArangoDB document specific attributes (_id, _key, _rev, _from, _to) from specified to this object.
+        /// Maps ArangoDB document specific attributes (_id, _key, _rev, _from, _to) from document to specified object.
         /// </summary>
         public void MapAttributesTo<T>(T genericObject)
         {
