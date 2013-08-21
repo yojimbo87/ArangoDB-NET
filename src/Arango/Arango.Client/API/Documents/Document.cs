@@ -10,8 +10,14 @@ namespace Arango.Client
 {
     public class Document : Dictionary<string, object>
     {
+        /// <summary>
+        /// Create document.
+        /// </summary>
         public Document() {}
         
+        /// <summary>
+        /// Create document from specified JSON string.
+        /// </summary>
         public Document(string json) 
         {
             foreach(KeyValuePair<string, object> field in Deserialize(json))
@@ -22,6 +28,9 @@ namespace Arango.Client
         
         #region Field operations
         
+        /// <summary>
+        /// Retrieve specified field from this document. Can be complex path, e.g. foo.bar.baz
+        /// </summary>
         public T GetField<T>(string fieldPath)
         {
             Type type = typeof(T);
@@ -194,6 +203,9 @@ namespace Arango.Client
             return value;
         }
 
+        /// <summary>
+        /// Set specified value to specified field in this document.
+        /// </summary>
         public Document SetField<T>(string fieldPath, T value)
         {
             if (fieldPath.Contains("."))
@@ -247,6 +259,9 @@ namespace Arango.Client
             return this;
         }
         
+        /// <summary>
+        /// Remove specified field from this document.
+        /// </summary>
         public Document RemoveField(string fieldPath)
         {
             if (fieldPath.Contains("."))
@@ -288,6 +303,9 @@ namespace Arango.Client
             return this;
         }
 
+        /// <summary>
+        /// Check if the specified field is present in this document.
+        /// </summary>
         public bool HasField(string fieldPath)
         {
             bool contains = false;
@@ -350,6 +368,9 @@ namespace Arango.Client
             }
         }
         
+        /// <summary>
+        /// Return this document except specified fields.
+        /// </summary>
         public Document Except(params string[] fields)
         {
             Document document = new Document();
@@ -451,7 +472,10 @@ namespace Arango.Client
         #endregion
         
         #region Serialization
-
+        
+        /// <summary>
+        /// Serialize specified object to JSON string.
+        /// </summary>
         public static string Serialize<T>(T obj)
         {
             return JsonConvert.SerializeObject(obj);
@@ -461,11 +485,17 @@ namespace Arango.Client
         
         #region Deserialization
 
+        /// <summary>
+        /// Deserialize specified JSON string to document object. Default datetime deserialization settings will be used.
+        /// </summary>
         public static Document Deserialize(string json)
         {
             return Deserialize(json, ArangoClient.Settings.DeserializeDateTimeAsString);
         }
         
+        /// <summary>
+        /// Deserialize specified json string to document object. Specified datetime deserialization settings will be used.
+        /// </summary>
         public static Document Deserialize(string json, bool dateTimeAsString = false)
         {
             var document = new Document();
@@ -555,6 +585,9 @@ namespace Arango.Client
         
         #region Convert to generic object
         
+        /// <summary>
+        /// Convert and copy this document fields to specified generic object.
+        /// </summary>
         public T To<T>() where T : class, new()
         {
             T genericObject = new T();
@@ -732,6 +765,9 @@ namespace Arango.Client
         
         #region Convert from generic object
         
+        /// <summary>
+        /// Convert and copy specified generic object properties to this document fields.
+        /// </summary>
         public void From<T>(T genericObject)
         {
             foreach (KeyValuePair<string, object> field in FromObject(genericObject))
@@ -873,6 +909,9 @@ namespace Arango.Client
         
         #endregion
     
+        /// <summary>
+        /// Maps ArangoDB document specific attributes (_id, _key, _rev, _from, _to) from specified to this object.
+        /// </summary>
         public void MapAttributesTo<T>(T genericObject)
         {
             // get arango specific fields to generic object if it has properties flagged with attributes
