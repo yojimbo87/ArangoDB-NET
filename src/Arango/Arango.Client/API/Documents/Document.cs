@@ -327,7 +327,15 @@ namespace Arango.Client
                     if (embeddedDocument.ContainsKey(field))
                     {
                         embeddedDocument = (Document)embeddedDocument[field];
-                        iteration++;
+                        
+                        if (embeddedDocument == null)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            iteration++;
+                        }
                     }
                     else
                     {
