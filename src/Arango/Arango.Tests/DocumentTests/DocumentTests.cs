@@ -9,6 +9,26 @@ namespace Arango.Tests.DocumentTests
     public class DocumentTests
     {
         [Test()]
+        public void Should_check_presence_of_non_existing_field()
+        {
+            // setup document with some fields
+            var document = new Document()
+                .SetField("foo", "string value 1")
+                .SetField("bar", "string value 2")
+                .SetField("baz.foo", "string value 3")
+                .SetField<object>("baz.null", null);
+
+            // check if the fields were removed
+            Assert.AreEqual(true, document.HasField("foo"));
+            Assert.AreEqual(true, document.HasField("bar"));
+            Assert.AreEqual(true, document.HasField("baz.foo"));
+            Assert.AreEqual(true, document.HasField("baz.null"));
+            Assert.AreEqual(false, document.HasField("baz.bar"));
+            Assert.AreEqual(false, document.HasField("baz.bar.foo"));
+            Assert.AreEqual(false, document.HasField("baz.null.foo"));
+        }
+        
+        [Test()]
         public void Should_remove_fields()
         {
             // setup document with some fields
