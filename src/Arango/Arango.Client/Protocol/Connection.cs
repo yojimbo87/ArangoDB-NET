@@ -83,13 +83,19 @@ namespace Arango.Client.Protocol
 
             try
             {
-                var httpResponse = (HttpWebResponse)httpRequest.GetResponse();
-                var reader = new StreamReader(httpResponse.GetResponseStream());
-
-                response.StatusCode = httpResponse.StatusCode;
-                response.Headers = httpResponse.Headers;
-                response.JsonString = reader.ReadToEnd();
-
+                using (var httpResponse = (HttpWebResponse)httpRequest.GetResponse())
+                {
+                    var responseStream = httpResponse.GetResponseStream();
+                    var reader = new StreamReader(responseStream);
+    
+                    response.StatusCode = httpResponse.StatusCode;
+                    response.Headers = httpResponse.Headers;
+                    response.JsonString = reader.ReadToEnd();
+                    
+                    reader.Close();
+                    responseStream.Close();
+                }
+                
                 if (!string.IsNullOrEmpty(response.JsonString))
                 {
                     response.Document = Document.Deserialize(response.JsonString);
@@ -98,13 +104,19 @@ namespace Arango.Client.Protocol
             catch (WebException webException)
             {
                 var httpResponse = (HttpWebResponse)webException.Response;
-                var reader = new StreamReader(httpResponse.GetResponseStream());
+                var responseStream = httpResponse.GetResponseStream();
+                var reader = new StreamReader(responseStream);
                 var errorMessage = "";
 
                 response.IsException = true;
                 response.StatusCode = httpResponse.StatusCode;
                 response.Headers = httpResponse.Headers;
                 response.JsonString = reader.ReadToEnd();
+                
+                reader.Close();
+                responseStream.Close();
+                httpResponse.Close();
+                httpResponse.Dispose();
                 
                 if (!string.IsNullOrEmpty(response.JsonString))
                 {
