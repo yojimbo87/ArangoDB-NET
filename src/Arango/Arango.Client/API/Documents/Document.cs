@@ -1498,7 +1498,7 @@ namespace Arango.Client
         public static Document DeserializeDocument(string json)
         {
             var document = new Document();
-            var fields = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(json);
+            var fields = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(json, DocumentSettings.SerializerSettings);
             
             foreach (KeyValuePair<string, JToken> field in fields)
             {
