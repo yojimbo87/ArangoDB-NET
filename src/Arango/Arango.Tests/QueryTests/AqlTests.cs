@@ -6,10 +6,10 @@ using Arango.Client;
 
 namespace Arango.Tests.QueryTests
 {
-    [TestFixture()]
+    /*[TestFixture()]
     public class AqlTests
     {
-        /*[Test()]
+        [Test()]
         public void Should_generate_for_filter_return_query()
         {
             var query = 
@@ -50,6 +50,6 @@ namespace Arango.Tests.QueryTests
                 .ToString();
             
             Assert.AreEqual(query, generatedQuery);
-        }*/
-    }
+        }
+    }*/
 }

@@ -19,13 +19,13 @@ namespace Arango.Console
                 "test"
             );
 
-            ArangoDatabase db = new ArangoDatabase("test");
+            var db = new ArangoDatabase("test");
 
-            ArangoDocument document = db.Document.Get("Usersasfd/21857976");
+            var document = db.Document.Get("Usersasfd/21857976");
 
-            System.Console.WriteLine(document.Id);
-            System.Console.WriteLine(document.Key);
-            System.Console.WriteLine(document.Revision);
+            System.Console.WriteLine(document.String("_id"));
+            System.Console.WriteLine(document.String("_key"));
+            System.Console.WriteLine(document.String("_rev"));
             
             /*ArangoCollection collection = db.Collection.Get("Users");
 

@@ -5,6 +5,7 @@ using Arango.Client;
 
 namespace Arango.Tests.ArangoDocumentTests
 {
+    // TODO: go through tests and include isnull tests and similar more robust testing stuff
     [TestFixture()]
     public class ArangoDocumentTests : IDisposable
     {
@@ -15,22 +16,25 @@ namespace Arango.Tests.ArangoDocumentTests
             var db = Database.GetTestDatabase();
             
             // create document object
-            var arangoDocument = new ArangoDocument()
-                .SetField("foo", "foo string value")
-                .SetField("bar", 12345);
+            var document = new Document()
+                .String("foo", "foo string value")
+                .Int("bar", 12345);
             
             // save it to database collection 
-            db.Document.Create(Database.TestDocumentCollectionName, arangoDocument);
+            db.Document.Create(Database.TestDocumentCollectionName, document);
             
             // check if it contains data after creation
-            Assert.AreEqual(false, string.IsNullOrEmpty(arangoDocument.Id));
-            Assert.AreEqual(false, string.IsNullOrEmpty(arangoDocument.Key));
-            Assert.AreEqual(false, string.IsNullOrEmpty(arangoDocument.Revision));
-            Assert.AreEqual(true, arangoDocument.HasField("foo"));
-            Assert.AreEqual(true, arangoDocument.HasField("bar"));
+            Assert.AreEqual(false, document.IsNull("_id"));
+            Assert.AreEqual(false, document.IsNull("_key"));
+            Assert.AreEqual(false, document.IsNull("_rev"));
+            Assert.AreEqual(false, document.IsNull("foo"));
+            Assert.AreEqual(false, document.IsNull("bar"));
+            
+            Assert.AreEqual(true, document.Has("foo"));
+            Assert.AreEqual(true, document.Has("bar"));
             
             // delete created document
-            var isDeleted = db.Document.Delete(arangoDocument.Id);
+            var isDeleted = db.Document.Delete(document.String("_id"));
             
             Assert.AreEqual(true, isDeleted);
         }
@@ -41,25 +45,48 @@ namespace Arango.Tests.ArangoDocumentTests
             Database.CreateTestCollection(Database.TestDocumentCollectionName);
             var db = Database.GetTestDatabase();
             
+            var dateUtcNow = DateTime.UtcNow;
+            var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            TimeSpan span = (dateUtcNow.ToUniversalTime() - unixEpoch);
+            
             // create document object
-            var arangoDocument = new ArangoDocument()
-                .SetField("foo", "foo string value")
-                .SetField("bar", 12345);
+            var document = new Document()
+                .String("foo", "foo string value")
+                .Int("bar", 12345)
+                .DateTime("dateTime", dateUtcNow);
             
             // save it to database collection 
-            db.Document.Create(Database.TestDocumentCollectionName, arangoDocument);
+            db.Document.Create(Database.TestDocumentCollectionName, document);
             
             // get the very same document from database
-            var returnedArangoDocument = db.Document.Get(arangoDocument.Id);
+            var returnedDocument = db.Document.Get(document.String("_id"));
             
             // check if created and returned document data are equal
-            Assert.AreEqual(arangoDocument.Id, returnedArangoDocument.Id);
-            Assert.AreEqual(arangoDocument.Key, returnedArangoDocument.Key);
-            Assert.AreEqual(arangoDocument.Revision, returnedArangoDocument.Revision);
-            Assert.AreEqual(arangoDocument.HasField("foo"), returnedArangoDocument.HasField("foo"));
-            Assert.AreEqual(arangoDocument.GetField<string>("foo"), returnedArangoDocument.GetField<string>("foo"));
-            Assert.AreEqual(arangoDocument.HasField("bar"), returnedArangoDocument.HasField("bar"));
-            Assert.AreEqual(arangoDocument.GetField<int>("bar"), returnedArangoDocument.GetField<int>("bar"));
+            
+            Assert.AreEqual(false, document.IsNull("_id"));
+            Assert.AreEqual(false, document.IsNull("_key"));
+            Assert.AreEqual(false, document.IsNull("_rev"));
+            Assert.AreEqual(false, document.IsNull("foo"));
+            Assert.AreEqual(false, document.IsNull("bar"));
+            Assert.AreEqual(false, document.IsNull("dateTime"));
+            Assert.AreEqual(false, returnedDocument.IsNull("_id"));
+            Assert.AreEqual(false, returnedDocument.IsNull("_key"));
+            Assert.AreEqual(false, returnedDocument.IsNull("_rev"));
+            Assert.AreEqual(false, returnedDocument.IsNull("foo"));
+            Assert.AreEqual(false, returnedDocument.IsNull("bar"));
+            Assert.AreEqual(false, returnedDocument.IsNull("dateTime"));
+            
+            Assert.AreEqual(document.String("_id"), returnedDocument.String("_id"));
+            Assert.AreEqual(document.String("_key"), returnedDocument.String("_key"));
+            Assert.AreEqual(document.String("_rev"), returnedDocument.String("_rev"));
+            Assert.AreEqual(document.Has("foo"), returnedDocument.Has("foo"));
+            Assert.AreEqual(document.String("foo"), returnedDocument.String("foo"));
+            Assert.AreEqual(document.Has("bar"), returnedDocument.Has("bar"));
+            Assert.AreEqual(document.Int("bar"), returnedDocument.Int("bar"));
+            Assert.AreEqual(typeof(long), returnedDocument.Type("dateTime"));
+            Assert.AreEqual(typeof(DateTime), returnedDocument.DateTime("dateTime").GetType());
+            Assert.AreEqual((long)span.TotalSeconds, document.Long("dateTime"));
+            Assert.AreEqual(dateUtcNow.ToString("yyyy-MM-dd HH:mm:ss"), document.DateTime("dateTime").ToString("yyyy-MM-dd HH:mm:ss"));
         }
         
         [Test()]
@@ -69,38 +96,52 @@ namespace Arango.Tests.ArangoDocumentTests
             var db = Database.GetTestDatabase();
             
             // create document object
-            var arangoDocument = new ArangoDocument()
-                .SetField("foo", "foo string value")
-                .SetField("bar", 12345);
+            var document = new Document()
+                .String("foo", "foo string value")
+                .Int("bar", 12345);
             
             // save it to database collection 
-            db.Document.Create(Database.TestDocumentCollectionName, arangoDocument);
+            db.Document.Create(Database.TestDocumentCollectionName, document);
             
             // create new document object
-            var newArangoDocument = new ArangoDocument();
-            newArangoDocument.Id = arangoDocument.Id;
-            newArangoDocument.SetField("baz.foo", "bar string value");
+            var newDocument = new Document()
+                .String("_id", document.String("_id"))
+                .String("baz.foo", "bar string value");
             
             // replace previously created document with new one
-            var isReplaced = db.Document.Replace(newArangoDocument);
+            var isReplaced = db.Document.Replace(newDocument);
             
             Assert.AreEqual(true, isReplaced);
             
             // get the very same document from database
-            var returnedArangoDocument = db.Document.Get(arangoDocument.Id);
+            var returnedDocument = db.Document.Get(document.String("_id"));
             
             // check if the data of replaced and returned document are equal
-            Assert.AreEqual(newArangoDocument.Id, returnedArangoDocument.Id);
-            Assert.AreEqual(newArangoDocument.Key, returnedArangoDocument.Key);
-            Assert.AreEqual(newArangoDocument.Revision, returnedArangoDocument.Revision);
-            Assert.AreEqual(newArangoDocument.HasField("baz.foo"), returnedArangoDocument.HasField("baz.foo"));
-            Assert.AreEqual(newArangoDocument.GetField<string>("baz.foo"), returnedArangoDocument.GetField<string>("baz.foo"));
+            Assert.AreEqual(false, document.IsNull("_id"));
+            Assert.AreEqual(false, document.IsNull("_key"));
+            Assert.AreEqual(false, document.IsNull("_rev"));
+            Assert.AreEqual(false, document.IsNull("foo"));
+            Assert.AreEqual(false, document.IsNull("bar"));
+            Assert.AreEqual(false, newDocument.IsNull("_id"));
+            Assert.AreEqual(false, newDocument.IsNull("_key"));
+            Assert.AreEqual(false, newDocument.IsNull("_rev"));
+            Assert.AreEqual(false, newDocument.IsNull("baz.foo"));
+            Assert.AreEqual(false, returnedDocument.IsNull("_id"));
+            Assert.AreEqual(false, returnedDocument.IsNull("_key"));
+            Assert.AreEqual(false, returnedDocument.IsNull("_rev"));
+            Assert.AreEqual(false, returnedDocument.IsNull("baz.foo"));
+            
+            Assert.AreEqual(newDocument.String("_id"), returnedDocument.String("_id"));
+            Assert.AreEqual(newDocument.String("_key"), returnedDocument.String("_key"));
+            Assert.AreEqual(newDocument.String("_rev"), returnedDocument.String("_rev"));
+            Assert.AreEqual(newDocument.Has("baz.foo"), returnedDocument.Has("baz.foo"));
+            Assert.AreEqual(newDocument.String("baz.foo"), returnedDocument.String("baz.foo"));
             
             // check if the original data doesn't exist anymore
-            Assert.AreEqual(false, newArangoDocument.HasField("foo"));
-            Assert.AreEqual(false, newArangoDocument.HasField("bar"));
-            Assert.AreEqual(false, returnedArangoDocument.HasField("foo"));
-            Assert.AreEqual(false, returnedArangoDocument.HasField("bar"));
+            Assert.AreEqual(false, newDocument.Has("foo"));
+            Assert.AreEqual(false, newDocument.Has("bar"));
+            Assert.AreEqual(false, returnedDocument.Has("foo"));
+            Assert.AreEqual(false, returnedDocument.Has("bar"));
         }
         
         [Test()]
@@ -110,34 +151,47 @@ namespace Arango.Tests.ArangoDocumentTests
             var db = Database.GetTestDatabase();
             
             // create document object
-            var arangoDocument = new ArangoDocument()
-                .SetField("foo", "foo string value")
-                .SetField("bar", 12345);
+            var document = new Document()
+                .String("foo", "foo string value")
+                .Int("bar", 12345);
             
             // save it to database collection
-            db.Document.Create(Database.TestDocumentCollectionName, arangoDocument);
+            db.Document.Create(Database.TestDocumentCollectionName, document);
             
             // update data in that document
-            arangoDocument.SetField("baz.foo", "bar string value");
+            document.String("baz.foo", "bar string value");
             
             // update document in database
-            var isUpdated = db.Document.Update(arangoDocument);
+            var isUpdated = db.Document.Update(document);
             
             Assert.AreEqual(true, isUpdated);
             
             // get the very same document from database
-            var returnedArangoDocument = db.Document.Get(arangoDocument.Id);
+            var returnedDocument = db.Document.Get(document.String("_id"));
             
             // check if the data of updated and returned document are equal
-            Assert.AreEqual(arangoDocument.Id, returnedArangoDocument.Id);
-            Assert.AreEqual(arangoDocument.Key, returnedArangoDocument.Key);
-            Assert.AreEqual(arangoDocument.Revision, returnedArangoDocument.Revision);
-            Assert.AreEqual(arangoDocument.HasField("foo"), returnedArangoDocument.HasField("foo"));
-            Assert.AreEqual(arangoDocument.GetField<string>("foo"), returnedArangoDocument.GetField<string>("foo"));
-            Assert.AreEqual(arangoDocument.HasField("bar"), returnedArangoDocument.HasField("bar"));
-            Assert.AreEqual(arangoDocument.GetField<int>("bar"), returnedArangoDocument.GetField<int>("bar"));
-            Assert.AreEqual(arangoDocument.HasField("baz.foo"), returnedArangoDocument.HasField("baz.foo"));
-            Assert.AreEqual(arangoDocument.GetField<string>("baz.foo"), returnedArangoDocument.GetField<string>("baz.foo"));
+            Assert.AreEqual(false, document.IsNull("_id"));
+            Assert.AreEqual(false, document.IsNull("_key"));
+            Assert.AreEqual(false, document.IsNull("_rev"));
+            Assert.AreEqual(false, document.IsNull("foo"));
+            Assert.AreEqual(false, document.IsNull("bar"));
+            Assert.AreEqual(false, document.IsNull("baz.foo"));
+            Assert.AreEqual(false, returnedDocument.IsNull("_id"));
+            Assert.AreEqual(false, returnedDocument.IsNull("_key"));
+            Assert.AreEqual(false, returnedDocument.IsNull("_rev"));
+            Assert.AreEqual(false, returnedDocument.IsNull("foo"));
+            Assert.AreEqual(false, returnedDocument.IsNull("bar"));
+            Assert.AreEqual(false, returnedDocument.IsNull("baz.foo"));
+            
+            Assert.AreEqual(document.String("_id"), returnedDocument.String("_id"));
+            Assert.AreEqual(document.String("_key"), returnedDocument.String("_key"));
+            Assert.AreEqual(document.String("_rev"), returnedDocument.String("_rev"));
+            Assert.AreEqual(document.Has("foo"), returnedDocument.Has("foo"));
+            Assert.AreEqual(document.String("foo"), returnedDocument.String("foo"));
+            Assert.AreEqual(document.Has("bar"), returnedDocument.Has("bar"));
+            Assert.AreEqual(document.Int("bar"), returnedDocument.Int("bar"));
+            Assert.AreEqual(document.Has("baz.foo"), returnedDocument.Has("baz.foo"));
+            Assert.AreEqual(document.String("baz.foo"), returnedDocument.String("baz.foo"));
         }
         
         [Test()]
@@ -147,23 +201,23 @@ namespace Arango.Tests.ArangoDocumentTests
             var db = Database.GetTestDatabase();
             
             // create document object
-            var arangoDocument = new ArangoDocument()
-                .SetField("foo", "foo string value")
-                .SetField("bar", 12345);
+            var document = new Document()
+                .String("foo", "foo string value")
+                .Int("bar", 12345);
             
             // save it to database collection
-            db.Document.Create(Database.TestDocumentCollectionName, arangoDocument);
+            db.Document.Create(Database.TestDocumentCollectionName, document);
             
             // check if the created document exists in database        
-            var exists = db.Document.Exists(arangoDocument.Id);
+            var exists = db.Document.Exists(document.String("_id"));
             
             Assert.AreEqual(true, exists);
             
             // delete document
-            db.Document.Delete(arangoDocument.Id);
+            db.Document.Delete(document.String("_id"));
             
             // check if the document was deleted
-            exists = db.Document.Exists(arangoDocument.Id);
+            exists = db.Document.Exists(document.String("_id"));
             
             Assert.AreEqual(false, exists);
         }
@@ -247,9 +301,9 @@ namespace Arango.Tests.ArangoDocumentTests
             var db = Database.GetTestDatabase();
             
             // create some test document
-            var arangoDocument = new ArangoDocument()
-                .SetField("foo", "foo string value")
-                .SetField("bar", 12345);
+            var document = new Document()
+                .String("foo", "foo string value")
+                .Int("bar", 12345);
             
             var person = new Person();
             person.FirstName = "Johny";

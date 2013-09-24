@@ -22,15 +22,15 @@ namespace Arango.Client.Protocol
             request.RelativeUri = string.Join("/", _apiUri, name);
             
             var response = _connection.Process(request);
-            ArangoCollection collection = new ArangoCollection();
+            var collection = new ArangoCollection();
 
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    collection.Id = response.Document.GetField<string>("id");
-                    collection.Name = response.Document.GetField<string>("name");
-                    collection.Status = response.Document.GetField<ArangoCollectionStatus>("status");
-                    collection.Type = response.Document.GetField<ArangoCollectionType>("type");
+                    collection.Id = response.Document.String("id");
+                    collection.Name = response.Document.String("name");
+                    collection.Status = response.Document.Enum<ArangoCollectionStatus>("status");
+                    collection.Type = response.Document.Enum<ArangoCollectionType>("type");
                     break;
                 case HttpStatusCode.NotFound:
                     collection = null;
@@ -40,9 +40,9 @@ namespace Arango.Client.Protocol
                     {
                         throw new ArangoException(
                             response.StatusCode,
-                            response.Document.GetField<string>("driverErrorMessage"),
-                            response.Document.GetField<string>("driverExceptionMessage"),
-                            response.Document.GetField<Exception>("driverInnerException")
+                            response.Document.String("driverErrorMessage"),
+                            response.Document.String("driverExceptionMessage"),
+                            response.Document.Object<Exception>("driverInnerException")
                         );
                     }
                     break;
@@ -63,36 +63,36 @@ namespace Arango.Client.Protocol
             var document = new Document();
             
             // set collection name
-            document.SetField("name", collection.Name);
+            document.String("name", collection.Name);
             
             // (optional, default: 2) set type
             if (collection.Type != 0)
             {
-                document.SetField("type", collection.Type);
+                document.Enum("type", collection.Type);
             }
             
             // (optional, default: false) set waitForSync
             if (collection.WaitForSync)
             {
-                document.SetField("waitForSync", collection.WaitForSync);
+                document.Bool("waitForSync", collection.WaitForSync);
             }
             
             // (optional, default: arangodb config) set journalSize
             if (collection.JournalSize > 0)
             {
-                document.SetField("journalSize", collection.JournalSize);
+                document.Int("journalSize", collection.JournalSize);
             }
             
             // (optional, default: false) set isSystem
             if (collection.IsSystem)
             {
-                document.SetField("isSystem", collection.IsSystem);
+                document.Bool("isSystem", collection.IsSystem);
             }
             
             // (optional, default: false) set isVolatile
             if (collection.IsVolatile)
             {
-                document.SetField("isVolatile", collection.IsVolatile);
+                document.Bool("isVolatile", collection.IsVolatile);
             }
             
             // (optional) set keyOptions
@@ -100,25 +100,25 @@ namespace Arango.Client.Protocol
             {
                 if (collection.KeyOptions.GeneratorType != 0)
                 {
-                    document.SetField("keyOptions.type", collection.KeyOptions.GeneratorType.ToString().ToLower());
+                    document.String("keyOptions.type", collection.KeyOptions.GeneratorType.ToString().ToLower());
                     
                     if (collection.KeyOptions.GeneratorType == ArangoKeyGeneratorType.Autoincrement)
                     {
                         if (collection.KeyOptions.Increment > 0)
                         {
-                            document.SetField("keyOptions.increment", collection.KeyOptions.Increment);
+                            document.Int("keyOptions.increment", collection.KeyOptions.Increment);
                         }
                         
                         if (collection.KeyOptions.Offset > 0)
                         {
-                            document.SetField("keyOptions.offset", collection.KeyOptions.Offset);
+                            document.Int("keyOptions.offset", collection.KeyOptions.Offset);
                         }
                     }
                 }
                 
                 if (collection.KeyOptions.AllowUserKeys)
                 {
-                    document.SetField("keyOptions.allowUserKeys", collection.KeyOptions.AllowUserKeys);
+                    document.Bool("keyOptions.allowUserKeys", collection.KeyOptions.AllowUserKeys);
                 }
             }
             
@@ -129,22 +129,22 @@ namespace Arango.Client.Protocol
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    collection.Id = response.Document.GetField<string>("id");
-                    collection.Name = response.Document.GetField<string>("name");
-                    collection.Status = response.Document.GetField<ArangoCollectionStatus>("status");
-                    collection.Type = response.Document.GetField<ArangoCollectionType>("type");
-                    collection.WaitForSync = response.Document.GetField<bool>("waitForSync");
-                    collection.IsVolatile = response.Document.GetField<bool>("isVolatile");
-                    collection.IsSystem = response.Document.GetField<bool>("isSystem");
+                    collection.Id = response.Document.String("id");
+                    collection.Name = response.Document.String("name");
+                    collection.Status = response.Document.Enum<ArangoCollectionStatus>("status");
+                    collection.Type = response.Document.Enum<ArangoCollectionType>("type");
+                    collection.WaitForSync = response.Document.Bool("waitForSync");
+                    collection.IsVolatile = response.Document.Bool("isVolatile");
+                    collection.IsSystem = response.Document.Bool("isSystem");
                     break;
                 default:
                     if (response.IsException)
                     {
                         throw new ArangoException(
                             response.StatusCode,
-                            response.Document.GetField<string>("driverErrorMessage"),
-                            response.Document.GetField<string>("driverExceptionMessage"),
-                            response.Document.GetField<Exception>("driverInnerException")
+                            response.Document.String("driverErrorMessage"),
+                            response.Document.String("driverExceptionMessage"),
+                            response.Document.Object<Exception>("driverInnerException")
                         );
                     }
                     break;
@@ -174,9 +174,9 @@ namespace Arango.Client.Protocol
                     {
                         throw new ArangoException(
                             response.StatusCode,
-                            response.Document.GetField<string>("driverErrorMessage"),
-                            response.Document.GetField<string>("driverExceptionMessage"),
-                            response.Document.GetField<Exception>("driverInnerException")
+                            response.Document.String("driverErrorMessage"),
+                            response.Document.String("driverExceptionMessage"),
+                            response.Document.Object<Exception>("driverInnerException")
                         );
                     }
                     break;
@@ -207,9 +207,9 @@ namespace Arango.Client.Protocol
                     {
                         throw new ArangoException(
                             response.StatusCode,
-                            response.Document.GetField<string>("driverErrorMessage"),
-                            response.Document.GetField<string>("driverExceptionMessage"),
-                            response.Document.GetField<Exception>("driverInnerException")
+                            response.Document.String("driverErrorMessage"),
+                            response.Document.String("driverExceptionMessage"),
+                            response.Document.Object<Exception>("driverInnerException")
                         );
                     }
                     break;

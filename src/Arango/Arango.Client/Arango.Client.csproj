@@ -46,11 +46,12 @@
     <Compile Include="API\Collections\ArangoCollectionStatus.cs" />
     <Compile Include="API\Collections\ArangoCollectionType.cs" />
     <Compile Include="API\Collections\ArangoKeyGeneratorType.cs" />
-    <Compile Include="API\Documents\ArangoDocument.cs" />
     <Compile Include="API\Documents\ArangoDocumentOperation.cs" />
     <Compile Include="API\Documents\ArangoProperty.cs" />
+    <Compile Include="API\Documents\DateTimeFormat.cs" />
     <Compile Include="API\Documents\Document.cs" />
-    <Compile Include="API\Edges\ArangoEdge.cs" />
+    <Compile Include="API\Documents\DocumentSettings.cs" />
+    <Compile Include="API\Documents\MergeOptions.cs" />
     <Compile Include="API\Edges\ArangoEdgeDirection.cs" />
     <Compile Include="API\Edges\ArangoEdgeOperation.cs" />
     <Compile Include="API\Queries\ArangoQueryOperation.cs" />

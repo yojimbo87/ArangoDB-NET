@@ -16,24 +16,21 @@ namespace Arango.Client.Protocol
 
         #region GET
 
-        internal ArangoDocument Get(string id)
+        internal Document Get(string id)
         {
             var request = new Request(RequestType.Document, HttpMethod.Get);
             request.RelativeUri = string.Join("/", _apiUri, id);
             
             var response = _connection.Process(request);
-            ArangoDocument document = new ArangoDocument();
+            var document = new Document();
 
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    document.Id = response.Document.GetField<string>("_id");
-                    document.Key = response.Document.GetField<string>("_key");
-                    document.Revision = response.Document.GetField<string>("_rev");
-                    document.Document = response.Document.Except("_id", "_key", "_rev");
+                    document = response.Document;
                     break;
                 case HttpStatusCode.NotModified:
-                    document.Revision = response.Headers.Get("etag").Replace("\"", "");
+                    document.String("_rev", response.Headers.Get("etag").Replace("\"", ""));
                     break;
                 case HttpStatusCode.NotFound:
                     document = null;
@@ -43,9 +40,9 @@ namespace Arango.Client.Protocol
                     {
                         throw new ArangoException(
                             response.StatusCode,
-                            response.Document.GetField<string>("driverErrorMessage"),
-                            response.Document.GetField<string>("driverExceptionMessage"),
-                            response.Document.GetField<Exception>("driverInnerException")
+                            response.Document.String("driverErrorMessage"),
+                            response.Document.String("driverExceptionMessage"),
+                            response.Document.Object<Exception>("driverInnerException")
                         );
                     }
                     break;
@@ -58,11 +55,11 @@ namespace Arango.Client.Protocol
         
         #region POST
         
-        internal void Post(string collection, ArangoDocument arangoDocument, bool waitForSync, bool createCollection)
+        internal void Post(string collection, Document document, bool waitForSync, bool createCollection)
         {
             var request = new Request(RequestType.Document, HttpMethod.Post);
             request.RelativeUri = _apiUri;
-            request.Body = arangoDocument.Serialize();
+            request.Body = document.Except("_id", "_key", "_rev").Serialize();
             
             // set collection name where the document will be created
             request.QueryString.Add("collection", collection);
@@ -85,18 +82,18 @@ namespace Arango.Client.Protocol
             {
                 case HttpStatusCode.Created:
                 case HttpStatusCode.Accepted:
-                    arangoDocument.Id = response.Document.GetField<string>("_id");
-                    arangoDocument.Key = response.Document.GetField<string>("_key");
-                    arangoDocument.Revision = response.Document.GetField<string>("_rev");
+                    document.String("_id", response.Document.String("_id"));
+                    document.String("_key", response.Document.String("_key"));
+                    document.String("_rev", response.Document.String("_rev"));
                     break;
                 default:
                     if (response.IsException)
                     {
                         throw new ArangoException(
                             response.StatusCode,
-                            response.Document.GetField<string>("driverErrorMessage"),
-                            response.Document.GetField<string>("driverExceptionMessage"),
-                            response.Document.GetField<Exception>("driverInnerException")
+                            response.Document.String("driverErrorMessage"),
+                            response.Document.String("driverExceptionMessage"),
+                            response.Document.Object<Exception>("driverInnerException")
                         );
                     }
                     break;
@@ -126,9 +123,9 @@ namespace Arango.Client.Protocol
                     {
                         throw new ArangoException(
                             response.StatusCode,
-                            response.Document.GetField<string>("driverErrorMessage"),
-                            response.Document.GetField<string>("driverExceptionMessage"),
-                            response.Document.GetField<Exception>("driverInnerException")
+                            response.Document.String("driverErrorMessage"),
+                            response.Document.String("driverExceptionMessage"),
+                            response.Document.Object<Exception>("driverInnerException")
                         );
                     }
                     break;
@@ -141,11 +138,11 @@ namespace Arango.Client.Protocol
         
         #region PUT
         
-        internal bool Put(ArangoDocument arangoDocument, bool waitForSync, string revision)
+        internal bool Put(Document document, bool waitForSync, string revision)
         {
             var request = new Request(RequestType.Document, HttpMethod.Put);
-            request.RelativeUri = string.Join("/", _apiUri, arangoDocument.Id);
-            request.Body = arangoDocument.Serialize();
+            request.RelativeUri = string.Join("/", _apiUri, document.String("_id"));
+            request.Body =  document.Except("_id", "_key", "_rev").Serialize();
             
             // (optional)
             if (waitForSync)
@@ -167,18 +164,18 @@ namespace Arango.Client.Protocol
                 case HttpStatusCode.Created:
                 case HttpStatusCode.Accepted:
                     isReplaced = true;
-                    arangoDocument.Id = response.Document.GetField<string>("_id");
-                    arangoDocument.Key = response.Document.GetField<string>("_key");
-                    arangoDocument.Revision = response.Document.GetField<string>("_rev");
+                    document.String("_id", response.Document.String("_id"));
+                    document.String("_key", response.Document.String("_key"));
+                    document.String("_rev", response.Document.String("_rev"));
                     break;
                 default:
                     if (response.IsException)
                     {
                         throw new ArangoException(
                             response.StatusCode,
-                            response.Document.GetField<string>("driverErrorMessage"),
-                            response.Document.GetField<string>("driverExceptionMessage"),
-                            response.Document.GetField<Exception>("driverInnerException")
+                            response.Document.String("driverErrorMessage"),
+                            response.Document.String("driverExceptionMessage"),
+                            response.Document.Object<Exception>("driverInnerException")
                         );
                     }
                     break;
@@ -191,11 +188,11 @@ namespace Arango.Client.Protocol
         
         #region PATCH
         
-        internal bool Patch(ArangoDocument arangoDocument, bool waitForSync, string revision)
+        internal bool Patch(Document document, bool waitForSync, string revision)
         {
             var request = new Request(RequestType.Document, HttpMethod.Patch);
-            request.RelativeUri = string.Join("/", _apiUri, arangoDocument.Id);
-            request.Body = arangoDocument.Serialize();
+            request.RelativeUri = string.Join("/", _apiUri, document.String("_id"));
+            request.Body = document.Except("_id", "_key", "_rev").Serialize();
             
             // (optional)
             if (waitForSync)
@@ -217,18 +214,18 @@ namespace Arango.Client.Protocol
                 case HttpStatusCode.Created:
                 case HttpStatusCode.Accepted:
                     isUpdated = true;
-                    arangoDocument.Id = response.Document.GetField<string>("_id");
-                    arangoDocument.Key = response.Document.GetField<string>("_key");
-                    arangoDocument.Revision = response.Document.GetField<string>("_rev");
+                    document.String("_id", response.Document.String("_id"));
+                    document.String("_key", response.Document.String("_key"));
+                    document.String("_rev", response.Document.String("_rev"));
                     break;
                 default:
                     if (response.IsException)
                     {
                         throw new ArangoException(
                             response.StatusCode,
-                            response.Document.GetField<string>("driverErrorMessage"),
-                            response.Document.GetField<string>("driverExceptionMessage"),
-                            response.Document.GetField<Exception>("driverInnerException")
+                            response.Document.String("driverErrorMessage"),
+                            response.Document.String("driverExceptionMessage"),
+                            response.Document.Object<Exception>("driverInnerException")
                         );
                     }
                     break;
@@ -261,9 +258,9 @@ namespace Arango.Client.Protocol
                     {
                         throw new ArangoException(
                             response.StatusCode,
-                            response.Document.GetField<string>("driverErrorMessage"),
-                            response.Document.GetField<string>("driverExceptionMessage"),
-                            response.Document.GetField<Exception>("driverInnerException")
+                            response.Document.String("driverErrorMessage"),
+                            response.Document.String("driverExceptionMessage"),
+                            response.Document.Object<Exception>("driverInnerException")
                         );
                     }
                     break;

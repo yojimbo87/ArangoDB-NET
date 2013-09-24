@@ -14,21 +14,22 @@ namespace Arango.Client
 
         #region Get
         
-        public ArangoEdge Get(string id)
+        public Document Get(string id)
         {
             return _edgeOperation.Get(id);
         }
         
         public T Get<T>(string id) where T : class, new()
         {
-            var arangoEdge = Get(id);
-            var obj = (T)arangoEdge.Document.To<T>();
-            arangoEdge.MapAttributesTo(obj);
+            var edge = Get(id);
+            var obj = (T)edge.ToObject<T>();
+            
+            edge.MapAttributesTo(obj);
             
             return obj;
         }
         
-        public List<ArangoEdge> Get(string collection, string vertexId, ArangoEdgeDirection direction = ArangoEdgeDirection.Any)
+        public List<Document> Get(string collection, string vertexId, ArangoEdgeDirection direction = ArangoEdgeDirection.Any)
         {
             return _edgeOperation.Get(collection, vertexId, direction);
         }
@@ -37,31 +38,31 @@ namespace Arango.Client
         
         #region Create
         
-        public void Create(string collection, ArangoEdge arangoEdge, bool waitForSync = false, bool createCollection = false)
+        public void Create(string collection, Document edge, bool waitForSync = false, bool createCollection = false)
         {
-            _edgeOperation.Post(collection, arangoEdge, waitForSync, createCollection);
+            _edgeOperation.Post(collection, edge, waitForSync, createCollection);
         }
         
         public void Create<T>(string collection, T genericObject, bool waitForSync = false, bool createCollection = false)
         {
-            var arangoEdge = new ArangoEdge();
-            arangoEdge.MapAttributesFrom(genericObject);
-            arangoEdge.Document.From(genericObject);
+            var edge = Document.ToDocument(genericObject);
             
-            Create(collection, arangoEdge, waitForSync, createCollection);
+            edge.MapAttributesFrom(genericObject);
             
-            arangoEdge.MapAttributesTo(genericObject);
+            Create(collection, edge, waitForSync, createCollection);
+            
+            edge.MapAttributesTo(genericObject);
         }
         
-        public ArangoEdge Create(string collection, string from, string to, bool waitForSync = false, bool createCollection = false)
+        public Document Create(string collection, string from, string to, bool waitForSync = false, bool createCollection = false)
         {
-            var arangoEdge = new ArangoEdge();
-            arangoEdge.From = from;
-            arangoEdge.To = to;
+            var edge = new Document();
+            edge.String("_from", from);
+            edge.String("_to", to);
             
-            Create(collection, arangoEdge, waitForSync, createCollection);
+            Create(collection, edge, waitForSync, createCollection);
             
-            return arangoEdge;
+            return edge;
         }
         
         #endregion
@@ -73,19 +74,20 @@ namespace Arango.Client
         
         #region Replace
         
-        public bool Replace(ArangoEdge arangoEdge, bool waitForSync = false, string revision = null)
+        public bool Replace(Document edge, bool waitForSync = false, string revision = null)
         {
-            return _edgeOperation.Put(arangoEdge, waitForSync, revision);
+            return _edgeOperation.Put(edge, waitForSync, revision);
         }
         
         public bool Replace<T>(T genericObject, bool waitForSync = false, string revision = null)
         {
-            var arangoEdge = new ArangoEdge();
-            arangoEdge.MapAttributesFrom(genericObject);
-            arangoEdge.Document.From(genericObject);
+            var edge = Document.ToDocument(genericObject);
             
-            var isReplaced = Replace(arangoEdge, waitForSync, revision);
-            arangoEdge.MapAttributesTo(genericObject);
+            edge.MapAttributesFrom(genericObject);
+            
+            var isReplaced = Replace(edge, waitForSync, revision);
+            
+            edge.MapAttributesTo(genericObject);
             
             return isReplaced;
         }
@@ -94,19 +96,20 @@ namespace Arango.Client
         
         #region Update
         
-        public bool Update(ArangoEdge arangoEdge, bool waitForSync = false, string revision = null)
+        public bool Update(Document edge, bool waitForSync = false, string revision = null)
         {
-            return _edgeOperation.Patch(arangoEdge, waitForSync, revision);
+            return _edgeOperation.Patch(edge, waitForSync, revision);
         }
         
         public bool Update<T>(T genericObject, bool waitForSync = false, string revision = null)
         {
-            var arangoEdge = new ArangoEdge();
-            arangoEdge.MapAttributesFrom(genericObject);
-            arangoEdge.Document.From(genericObject);
+            var edge = Document.ToDocument(genericObject);
             
-            var isUpdated = Update(arangoEdge, waitForSync, revision);
-            arangoEdge.MapAttributesTo(genericObject);
+            edge.MapAttributesFrom(genericObject);
+            
+            var isUpdated = Update(edge, waitForSync, revision);
+            
+            edge.MapAttributesTo(genericObject);
             
             return isUpdated;
         }

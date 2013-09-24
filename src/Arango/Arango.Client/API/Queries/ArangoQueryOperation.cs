@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Arango.Client.Protocol;
 
 namespace Arango.Client
@@ -176,44 +179,89 @@ namespace Arango.Client
         
         public List<Document> ToList(out int count)
         {
-            return _cursorOperation.Post(_aql.ToString(), true, out count, _batchSize, _bindVars);
+            var items = _cursorOperation.Post(_aql.ToString(), true, out count, _batchSize, _bindVars);
+            
+            return items.Cast<Document>().ToList();
         }
         
         public List<Document> ToList()
         {
-            int count = 0;
+            var count = 0;
+            var items = _cursorOperation.Post(_aql.ToString(), false, out count, _batchSize, _bindVars);
             
-            return _cursorOperation.Post(_aql.ToString(), false, out count, _batchSize, _bindVars);
+            return items.Cast<Document>().ToList();
         }
         
-        public List<T> ToList<T>(out int count) where T : class, new()
+        public List<T> ToList<T>(out int count) where T: class, new()
         {
-            List<Document> documents = _cursorOperation.Post(_aql.ToString(), true, out count, _batchSize, _bindVars);
-            List<T> genericCollection = new List<T>();
-            
-            foreach (Document document in documents)
+            var type = typeof(T);
+            var items = _cursorOperation.Post(_aql.ToString(), true, out count, _batchSize, _bindVars);
+            var genericCollection = new List<T>();
+
+            if (type.IsPrimitive ||
+                (type == typeof(string)) ||
+                (type == typeof(DateTime)) ||
+                (type == typeof(decimal)))
             {
-                T genericObject = document.To<T>();
-                document.MapAttributesTo(genericObject);
-                
-                genericCollection.Add(genericObject);
+                foreach (object item in items)
+                {
+                    genericCollection.Add((T)Convert.ChangeType(item, type));
+                }
+            }
+            else if (type == typeof(Document))
+            {
+                genericCollection = items.Cast<T>().ToList();
+            }
+            else
+            {
+                foreach (object item in items)
+                {
+                    var document = (Document)item;
+                    var genericObject = Activator.CreateInstance(type);
+                    
+                    document.ToObject(genericObject);
+                    document.MapAttributesTo(genericObject);
+                    
+                    genericCollection.Add((T)genericObject);
+                }
             }
             
             return genericCollection;
         }
         
-        public List<T> ToList<T>() where T : class, new()
+        public List<T> ToList<T>()
         {
-            int count = 0;
-            List<Document> documents = _cursorOperation.Post(_aql.ToString(), false, out count, _batchSize, _bindVars);
-            List<T> genericCollection = new List<T>();
+            var type = typeof(T);
+            var count = 0;
+            var items = _cursorOperation.Post(_aql.ToString(), false, out count, _batchSize, _bindVars);
+            var genericCollection = new List<T>();
             
-            foreach (Document document in documents)
+            if (type.IsPrimitive ||
+                (type == typeof(string)) ||
+                (type == typeof(DateTime)) ||
+                (type == typeof(decimal)))
             {
-                T genericObject = document.To<T>();
-                document.MapAttributesTo(genericObject);
-                
-                genericCollection.Add(genericObject);
+                foreach (object item in items)
+                {
+                    genericCollection.Add((T)Convert.ChangeType(item, type));
+                }
+            }
+            else if (type == typeof(Document))
+            {
+                genericCollection = items.Cast<T>().ToList();
+            }
+            else
+            {
+                foreach (object item in items)
+                {
+                    var document = (Document)item;
+                    var genericObject = Activator.CreateInstance(type);
+                    
+                    document.ToObject(genericObject);
+                    document.MapAttributesTo(genericObject);
+                    
+                    genericCollection.Add((T)genericObject);
+                }
             }
             
             return genericCollection;

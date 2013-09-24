@@ -43,7 +43,7 @@ namespace Arango.Tests
         
         public static void CreateTestCollection(string collectionName, ArangoCollectionType collectionType = ArangoCollectionType.Document)
         {
-            ArangoDatabase db = GetTestDatabase();
+            var db = GetTestDatabase();
             
             if (db.Collection.Get(collectionName) != null)
             {
@@ -52,7 +52,7 @@ namespace Arango.Tests
             }
             
             // create new test collection
-            ArangoCollection collection = new ArangoCollection();
+            var collection = new ArangoCollection();
             collection.Name = collectionName;
             collection.Type = collectionType;
             

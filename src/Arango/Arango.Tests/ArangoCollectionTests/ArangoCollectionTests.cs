@@ -112,22 +112,22 @@ namespace Arango.Tests.ArangoCollectionTests
             db.Collection.Create(collection);
             
             // create document
-            var document1 = new ArangoDocument()
-                .SetField("foo", "foo string value");
-            
+            var document1 = new Document()
+                .String("foo", "foo string value");
+
             db.Document.Create(Database.TestDocumentCollectionName, document1);
             
             // check if the created document key starts with number 1
-            Assert.AreEqual("1", document1.Key);
+            Assert.AreEqual("1", document1.String("_key"));
             
             // create another document
-            var document2 = new ArangoDocument()
-                .SetField("foo", "foo string value");
+            var document2 = new Document()
+                .String("foo", "foo string value");
             
             db.Document.Create(Database.TestDocumentCollectionName, document2);
             
             // check if the created document key is autoincremented to 2
-            Assert.AreEqual("2", document2.Key);
+            Assert.AreEqual("2", document2.String("_key"));
         }
         
         public void Dispose()

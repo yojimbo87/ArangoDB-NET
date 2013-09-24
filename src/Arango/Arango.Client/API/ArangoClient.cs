@@ -17,6 +17,7 @@ namespace Arango.Client
         static ArangoClient()
         {
             Settings = new ArangoSettings();
+            Document.Settings.DateTimeFormat = DateTimeFormat.UnixTimeStamp;
         }
 
         public static void AddDatabase(string hostname, int port, bool isSecured, string userName, string password, string alias)

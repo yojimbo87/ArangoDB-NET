@@ -5,14 +5,17 @@ namespace Arango.Client
 {
     public class ArangoSettings
     {
-        internal JsonSerializerSettings SerializerSettings { get; set; }
-
-        public bool DeserializeDateTimeAsString { get; set; }
-        
-        public ArangoSettings()
-        {
-            SerializerSettings = new JsonSerializerSettings();
-            DeserializeDateTimeAsString = false;
+        public DateTimeFormat DateTimeFormat 
+        { 
+            get
+            {
+                return Document.Settings.DateTimeFormat; 
+            }
+            
+            set
+            {
+                Document.Settings.DateTimeFormat = value;
+            }
         }
     }
 }

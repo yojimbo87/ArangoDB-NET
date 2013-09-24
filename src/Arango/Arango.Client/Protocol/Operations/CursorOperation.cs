@@ -17,125 +17,125 @@ namespace Arango.Client.Protocol
         
         #region POST
         
-        internal List<Document> Post(string query, bool returnCount, out int count, int batchSize, Dictionary<string, object> bindVars)
+        internal List<object> Post(string query, bool returnCount, out int count, int batchSize, Dictionary<string, object> bindVars)
         {
             var request = new Request(RequestType.Cursor, HttpMethod.Post);
             request.RelativeUri = _apiUri;
             
-            Document bodyDocument = new Document();
+            var bodyDocument = new Document();
             
             // set AQL string
-            bodyDocument.SetField("query", query);
+            bodyDocument.String("query", query);
                 
             // (optional) set number of found documents
             if (returnCount)
             {
-                bodyDocument.SetField("count", returnCount);
+                bodyDocument.Bool("count", returnCount);
             }
             
             // (optional) set how much documents should be returned
             if (batchSize > 0)
             {
-                bodyDocument.SetField("batchSize", batchSize);
+                bodyDocument.Int("batchSize", batchSize);
             }
             
             // (optional) set list of bind parameters
             if ((bindVars != null) && (bindVars.Count > 0))
             {
-                Document bindVarsDocument = new Document();
+                var bindVarsDocument = new Document();
                 
                 foreach (KeyValuePair<string, object> item in bindVars)
                 {
-                    bindVarsDocument.SetField(item.Key, item.Value);
+                    bindVarsDocument.Object(item.Key, item.Value);
                 }
                 
-                bodyDocument.SetField("bindVars", bindVarsDocument);
+                bodyDocument.Docunet("bindVars", bindVarsDocument);
             }
             
             request.Body = Document.Serialize(bodyDocument);
             
             var response = _connection.Process(request);
-            List<Document> documents = new List<Document>();
+            var items = new List<object>();
             count = 0;
             
             switch (response.StatusCode)
             {
                 case HttpStatusCode.Created:
-                    documents.AddRange(response.Document.GetField<List<Document>>("result"));
+                    items.AddRange(response.Document.List<object>("result"));
                     
                     // get count of returned document if present
                     if (returnCount)
                     {
-                        count = response.Document.GetField<int>("count");
+                        count = response.Document.Int("count");
                     }
                    
                     // get more results if present
-                    if (response.Document.GetField<bool>("hasMore"))
+                    if (response.Document.Bool("hasMore"))
                     {
-                        long cursorId = response.Document.GetField<long>("id");
+                        long cursorId = response.Document.Long("id");
                         
-                        documents.AddRange(Put(cursorId));
+                        items.AddRange(Put(cursorId));
                     }
                     break;
                 default:
-                    documents = null;
+                    items = null;
                     
                     if (response.IsException)
                     {
                         throw new ArangoException(
                             response.StatusCode,
-                            response.Document.GetField<string>("driverErrorMessage"),
-                            response.Document.GetField<string>("driverExceptionMessage"),
-                            response.Document.GetField<Exception>("driverInnerException")
+                            response.Document.String("driverErrorMessage"),
+                            response.Document.String("driverExceptionMessage"),
+                            response.Document.Object<Exception>("driverInnerException")
                         );
                     }
                     break;
             }
             
-            return documents;
+            return items;
         }
         
         #endregion
         
         #region PUT
         
-        internal List<Document> Put(long id)
+        internal List<object> Put(long id)
         {
             var request = new Request(RequestType.Cursor, HttpMethod.Put);
             request.RelativeUri = string.Join("/", _apiUri, id);
             
             var response = _connection.Process(request);
-            List<Document> documents = new List<Document>();
+            var items = new List<object>();
             
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    documents.AddRange(response.Document.GetField<List<Document>>("result"));
+                    items.AddRange(response.Document.List<object>("result"));
                     
                     // get more results if present
-                    if (response.Document.GetField<bool>("hasMore"))
+                    if (response.Document.Bool("hasMore"))
                     {
-                        long cursorId = response.Document.GetField<long>("id");
+                        long cursorId = response.Document.Long("id");
                         
-                        documents.AddRange(Put(cursorId));
+                        items.AddRange(Put(cursorId));
                     }
                     break;
                 default:
-                    documents = null;
+                    items = null;
                     
                     if (response.IsException)
                     {
                         throw new ArangoException(
                             response.StatusCode,
-                            response.Document.GetField<string>("driverErrorMessage"),
-                            response.Document.GetField<string>("driverExceptionMessage"),
-                            response.Document.GetField<Exception>("driverInnerException")
+                            response.Document.String("driverErrorMessage"),
+                            response.Document.String("driverExceptionMessage"),
+                            response.Document.Object<Exception>("driverInnerException")
                         );
                     }
                     break;
             }
             
-            return documents;
+            return items;
         }
         
         #endregion

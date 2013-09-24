@@ -4,7 +4,6 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-//using ServiceStack.Text;
 using Newtonsoft.Json;
 
 namespace Arango.Client.Protocol
@@ -98,7 +97,7 @@ namespace Arango.Client.Protocol
                 
                 if (!string.IsNullOrEmpty(response.JsonString))
                 {
-                    response.Document = Document.Deserialize(response.JsonString);
+                    response.Document.Parse(response.JsonString);
                 }
             }
             catch (WebException webException)
@@ -120,19 +119,19 @@ namespace Arango.Client.Protocol
                 
                 if (!string.IsNullOrEmpty(response.JsonString))
                 {
-                    response.Document = Document.Deserialize(response.JsonString);
+                    response.Document.Parse(response.JsonString);
                     
                     errorMessage = string.Format(
                             "ArangoDB responded with error code {0}:\n{1} [error number {2}]",
-                            response.Document.GetField<string>("code"),
-                            response.Document.GetField<string>("errorMessage"),
-                            response.Document.GetField<string>("errorNum")
+                            response.Document.Enum<HttpStatusCode>("code"),
+                            response.Document.String("errorMessage"),
+                            response.Document.Int("errorNum")
                         );
                 }
                 
-                response.Document.SetField("driverErrorMessage", errorMessage);
-                response.Document.SetField("driverExceptionMessage", webException.Message);
-                response.Document.SetField("driverInnerException", webException.InnerException);
+                response.Document.String("driverErrorMessage", errorMessage);
+                response.Document.String("driverExceptionMessage", webException.Message);
+                response.Document.Object("driverInnerException", webException.InnerException);
             }
 
             return response;

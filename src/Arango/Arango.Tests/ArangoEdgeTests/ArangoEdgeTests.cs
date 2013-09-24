@@ -17,36 +17,37 @@ namespace Arango.Tests.ArangoEdgeTests
             var db = Database.GetTestDatabase();
             
             // create test documents
-            var doc1 = new ArangoDocument()
-                .SetField("foo", "foo string value 1")
-                .SetField("bar", 12345);
+            var doc1 = new Document()
+                .String("foo", "foo string value 1")
+                .Int("bar", 12345);
             
-            var doc2 = new ArangoDocument()
-                .SetField("foo", "foo string value 2")
-                .SetField("bar", 54321);
+            var doc2 = new Document()
+                .String("foo", "foo string value 2")
+                .Int("bar", 54321);
             
             db.Document.Create(Database.TestDocumentCollectionName, doc1);
             db.Document.Create(Database.TestDocumentCollectionName, doc2);
             
             // create test edge
-            var edge = new ArangoEdge()
-                .SetField("edgeFoo", "foo string value")
-                .SetField("edgeBar", 12345);
+            var edge = new Document()
+                .String("edgeFoo", "foo string value")
+                .Int("edgeBar", 12345);
             
-            edge.From = doc1.Id;
-            edge.To = doc2.Id;
+            edge.String("_from", doc1.String("_id"));
+            edge.String("_to", doc2.String("_id"));
             
             db.Edge.Create(Database.TestEdgeCollectionName, edge);
             
             // check if it contains data after creation
-            Assert.AreEqual(false, string.IsNullOrEmpty(edge.Id));
-            Assert.AreEqual(false, string.IsNullOrEmpty(edge.Key));
-            Assert.AreEqual(false, string.IsNullOrEmpty(edge.Revision));
-            Assert.AreEqual(true, edge.HasField("edgeFoo"));
-            Assert.AreEqual(true, edge.HasField("edgeBar"));
+            Assert.AreEqual(false, edge.IsNull("_id"));
+            Assert.AreEqual(false, edge.IsNull("_key"));
+            Assert.AreEqual(false, edge.IsNull("_rev"));
+            
+            Assert.AreEqual(true, edge.Has("edgeFoo"));
+            Assert.AreEqual(true, edge.Has("edgeBar"));
             
             // delete that document
-            var isDeleted = db.Edge.Delete(edge.Id);
+            var isDeleted = db.Edge.Delete(edge.String("_id"));
             
             Assert.AreEqual(true, isDeleted);
         }
@@ -59,40 +60,55 @@ namespace Arango.Tests.ArangoEdgeTests
             var db = Database.GetTestDatabase();
             
             // create test documents
-            var doc1 = new ArangoDocument()
-                .SetField("foo", "foo string value 1")
-                .SetField("bar", 12345);
+            var doc1 = new Document()
+                .String("foo", "foo string value 1")
+                .Int("bar", 12345);
             
-            var doc2 = new ArangoDocument()
-                .SetField("foo", "foo string value 2")
-                .SetField("bar", 54321);
+            var doc2 = new Document()
+                .String("foo", "foo string value 2")
+                .Int("bar", 54321);
             
             db.Document.Create(Database.TestDocumentCollectionName, doc1);
             db.Document.Create(Database.TestDocumentCollectionName, doc2);
             
             // create test edge
-            var edge = new ArangoEdge()
-                .SetField("edgeFoo", "foo string value")
-                .SetField("edgeBar", 12345);
+            var edge = new Document()
+                .String("edgeFoo", "foo string value")
+                .Int("edgeBar", 12345);
             
-            edge.From = doc1.Id;
-            edge.To = doc2.Id;
+            edge.String("_from", doc1.String("_id"));
+            edge.String("_to", doc2.String("_id"));
             
             db.Edge.Create(Database.TestEdgeCollectionName, edge);
             
             // get the very same edge from database
-            var returnedEdge = db.Edge.Get(edge.Id);
+            var returnedEdge = db.Edge.Get(edge.String("_id"));
             
             // check if created and returned edge data are equal
-            Assert.AreEqual(edge.Id, returnedEdge.Id);
-            Assert.AreEqual(edge.Key, returnedEdge.Key);
-            Assert.AreEqual(edge.Revision, returnedEdge.Revision);
-            Assert.AreEqual(edge.From, returnedEdge.From);
-            Assert.AreEqual(edge.To, returnedEdge.To);
-            Assert.AreEqual(edge.HasField("edgeFoo"), returnedEdge.HasField("edgeFoo"));
-            Assert.AreEqual(edge.GetField<string>("edgeFoo"), returnedEdge.GetField<string>("edgeFoo"));
-            Assert.AreEqual(edge.HasField("edgeBar"), returnedEdge.HasField("edgeBar"));
-            Assert.AreEqual(edge.GetField<int>("edgeBar"), returnedEdge.GetField<int>("edgeBar"));
+            Assert.AreEqual(false, edge.IsNull("_id"));
+            Assert.AreEqual(false, edge.IsNull("_key"));
+            Assert.AreEqual(false, edge.IsNull("_rev"));
+            Assert.AreEqual(false, edge.IsNull("_from"));
+            Assert.AreEqual(false, edge.IsNull("_to"));
+            Assert.AreEqual(false, edge.IsNull("edgeFoo"));
+            Assert.AreEqual(false, edge.IsNull("edgeBar"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_id"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_key"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_rev"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_from"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_to"));
+            Assert.AreEqual(false, returnedEdge.IsNull("edgeFoo"));
+            Assert.AreEqual(false, returnedEdge.IsNull("edgeBar"));
+            
+            Assert.AreEqual(edge.String("_id"), returnedEdge.String("_id"));
+            Assert.AreEqual(edge.String("_key"), returnedEdge.String("_key"));
+            Assert.AreEqual(edge.String("_rev"), returnedEdge.String("_rev"));
+            Assert.AreEqual(edge.String("_from"), returnedEdge.String("_from"));
+            Assert.AreEqual(edge.String("_to"), returnedEdge.String("_to"));
+            Assert.AreEqual(edge.Has("edgeFoo"), returnedEdge.Has("edgeFoo"));
+            Assert.AreEqual(edge.String("edgeFoo"), returnedEdge.String("edgeFoo"));
+            Assert.AreEqual(edge.Has("edgeBar"), returnedEdge.Has("edgeBar"));
+            Assert.AreEqual(edge.Int("edgeBar"), returnedEdge.Int("edgeBar"));
         }
         
         [Test()]
@@ -103,29 +119,40 @@ namespace Arango.Tests.ArangoEdgeTests
             var db = Database.GetTestDatabase();
             
             // create test documents
-            var doc1 = new ArangoDocument()
-                .SetField("foo", "foo string value 1")
-                .SetField("bar", 12345);
+            var doc1 = new Document()
+                .String("foo", "foo string value 1")
+                .Int("bar", 12345);
             
-            var doc2 = new ArangoDocument()
-                .SetField("foo", "foo string value 2")
-                .SetField("bar", 54321);
+            var doc2 = new Document()
+                .String("foo", "foo string value 2")
+                .Int("bar", 54321);
             
             db.Document.Create(Database.TestDocumentCollectionName, doc1);
             db.Document.Create(Database.TestDocumentCollectionName, doc2);
             
             // create test edge
-            var edge = db.Edge.Create(Database.TestEdgeCollectionName, doc1.Id, doc2.Id);
+            var edge = db.Edge.Create(Database.TestEdgeCollectionName, doc1.String("_id"), doc2.String("_id"));
             
             // get the very same edge from database
-            var returnedEdge = db.Edge.Get(edge.Id);
+            var returnedEdge = db.Edge.Get(edge.String("_id"));
             
             // check if created and returned edge data are equal
-            Assert.AreEqual(edge.Id, returnedEdge.Id);
-            Assert.AreEqual(edge.Key, returnedEdge.Key);
-            Assert.AreEqual(edge.Revision, returnedEdge.Revision);
-            Assert.AreEqual(edge.From, returnedEdge.From);
-            Assert.AreEqual(edge.To, returnedEdge.To);
+            Assert.AreEqual(false, edge.IsNull("_id"));
+            Assert.AreEqual(false, edge.IsNull("_key"));
+            Assert.AreEqual(false, edge.IsNull("_rev"));
+            Assert.AreEqual(false, edge.IsNull("_from"));
+            Assert.AreEqual(false, edge.IsNull("_to"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_id"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_key"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_rev"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_from"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_to"));
+            
+            Assert.AreEqual(edge.String("_id"), returnedEdge.String("_id"));
+            Assert.AreEqual(edge.String("_key"), returnedEdge.String("_key"));
+            Assert.AreEqual(edge.String("_rev"), returnedEdge.String("_rev"));
+            Assert.AreEqual(edge.String("_from"), returnedEdge.String("_from"));
+            Assert.AreEqual(edge.String("_to"), returnedEdge.String("_to"));
         }
         
         [Test()]
@@ -136,51 +163,64 @@ namespace Arango.Tests.ArangoEdgeTests
             var db = Database.GetTestDatabase();
             
             // create test documents
-            var doc1 = new ArangoDocument()
-                .SetField("foo", "foo string value 1")
-                .SetField("bar", 12345);
+            var doc1 = new Document()
+                .String("foo", "foo string value 1")
+                .Int("bar", 12345);
             
-            var doc2 = new ArangoDocument()
-                .SetField("foo", "foo string value 2")
-                .SetField("bar", 54321);
+            var doc2 = new Document()
+                .String("foo", "foo string value 2")
+                .Int("bar", 54321);
             
             db.Document.Create(Database.TestDocumentCollectionName, doc1);
             db.Document.Create(Database.TestDocumentCollectionName, doc2);
             
             // create test edge
-            var edge = new ArangoEdge()
-                .SetField("edgeFoo", "foo string value")
-                .SetField("edgeBar", 12345);
+            var edge = new Document()
+                .String("edgeFoo", "foo string value")
+                .Int("edgeBar", 12345);
             
-            edge.From = doc1.Id;
-            edge.To = doc2.Id;
+            edge.String("_from", doc1.String("_id"));
+            edge.String("_to", doc2.String("_id"));
             
             db.Edge.Create(Database.TestEdgeCollectionName, edge);
             
             // change data in that edge and replaced it in database
-            var newEdge = new ArangoEdge();
-            newEdge.Id = edge.Id;
-            newEdge.SetField("baz.foo", "bar string value");
+            var newEdge = new Document();
+            newEdge.String("_id", edge.String("_id"));
+            newEdge.String("baz.foo", "bar string value");
             
             var isReplaced = db.Edge.Replace(newEdge);
             
             Assert.AreEqual(true, isReplaced);
             
             // get the very same edge from database
-            var returnedEdge = db.Edge.Get(edge.Id);
+            var returnedEdge = db.Edge.Get(edge.String("_id"));
             
             // check if the data of replaced and returned edge are equal
-            Assert.AreEqual(newEdge.Id, returnedEdge.Id);
-            Assert.AreEqual(newEdge.Key, returnedEdge.Key);
-            Assert.AreEqual(newEdge.Revision, returnedEdge.Revision);
-            Assert.AreEqual(newEdge.HasField("baz.foo"), returnedEdge.HasField("baz.foo"));
-            Assert.AreEqual(newEdge.GetField<string>("baz.foo"), returnedEdge.GetField<string>("baz.foo"));
+            Assert.AreEqual(false, newEdge.IsNull("_id"));
+            Assert.AreEqual(false, newEdge.IsNull("_key"));
+            Assert.AreEqual(false, newEdge.IsNull("_rev"));
+            Assert.AreEqual(false, newEdge.IsNull("_from"));
+            Assert.AreEqual(false, newEdge.IsNull("_to"));
+            Assert.AreEqual(false, newEdge.IsNull("baz.foo"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_id"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_key"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_rev"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_from"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_to"));
+            Assert.AreEqual(false, returnedEdge.IsNull("baz.foo"));
+            
+            Assert.AreEqual(newEdge.String("_id"), returnedEdge.String("_id"));
+            Assert.AreEqual(newEdge.String("_key"), returnedEdge.String("_key"));
+            Assert.AreEqual(newEdge.String("_rev"), returnedEdge.String("_rev"));
+            Assert.AreEqual(newEdge.Has("baz.foo"), returnedEdge.Has("baz.foo"));
+            Assert.AreEqual(newEdge.String("baz.foo"), returnedEdge.String("baz.foo"));
             
             // check if the original data doesn't exist anymore
-            Assert.AreEqual(false, newEdge.HasField("foo"));
-            Assert.AreEqual(false, newEdge.HasField("bar"));
-            Assert.AreEqual(false, returnedEdge.HasField("foo"));
-            Assert.AreEqual(false, returnedEdge.HasField("bar"));
+            Assert.AreEqual(false, newEdge.Has("foo"));
+            Assert.AreEqual(false, newEdge.Has("bar"));
+            Assert.AreEqual(false, returnedEdge.Has("foo"));
+            Assert.AreEqual(false, returnedEdge.Has("bar"));
         }
         
         [Test()]
@@ -191,47 +231,64 @@ namespace Arango.Tests.ArangoEdgeTests
             var db = Database.GetTestDatabase();
             
              // create test documents
-            var doc1 = new ArangoDocument()
-                .SetField("foo", "foo string value 1")
-                .SetField("bar", 12345);
+            var doc1 = new Document()
+                .String("foo", "foo string value 1")
+                .Int("bar", 12345);
             
-            var doc2 = new ArangoDocument()
-                .SetField("foo", "foo string value 2")
-                .SetField("bar", 54321);
+            var doc2 = new Document()
+                .String("foo", "foo string value 2")
+                .Int("bar", 54321);
             
             db.Document.Create(Database.TestDocumentCollectionName, doc1);
             db.Document.Create(Database.TestDocumentCollectionName, doc2);
             
             // create test edge
-            var edge = new ArangoEdge()
-                .SetField("edgeFoo", "foo string value")
-                .SetField("edgeBar", 12345);
+            var edge = new Document()
+                .String("edgeFoo", "foo string value")
+                .Int("edgeBar", 12345);
             
-            edge.From = doc1.Id;
-            edge.To = doc2.Id;
+            edge.String("_from", doc1.String("_id"));
+            edge.String("_to", doc2.String("_id"));
             
             db.Edge.Create(Database.TestEdgeCollectionName, edge);
             
             // update data in that document and update it in database
-            edge.SetField("baz.foo", "bar string value");
+            edge.String("baz.foo", "bar string value");
             
             var isUpdated = db.Edge.Update(edge);
             
             Assert.AreEqual(true, isUpdated);
             
             // get the very same document from database
-            var returnedEdge = db.Edge.Get(edge.Id);
+            var returnedEdge = db.Edge.Get(edge.String("_id"));
             
             // check if the data of updated and returned document are equal
-            Assert.AreEqual(edge.Id, returnedEdge.Id);
-            Assert.AreEqual(edge.Key, returnedEdge.Key);
-            Assert.AreEqual(edge.Revision, returnedEdge.Revision);
-            Assert.AreEqual(edge.HasField("foo"), returnedEdge.HasField("foo"));
-            Assert.AreEqual(edge.GetField<string>("foo"), returnedEdge.GetField<string>("foo"));
-            Assert.AreEqual(edge.HasField("bar"), returnedEdge.HasField("bar"));
-            Assert.AreEqual(edge.GetField<int>("bar"), returnedEdge.GetField<int>("bar"));
-            Assert.AreEqual(edge.HasField("baz.foo"), returnedEdge.HasField("baz.foo"));
-            Assert.AreEqual(edge.GetField<string>("baz.foo"), returnedEdge.GetField<string>("baz.foo"));
+            Assert.AreEqual(false, edge.IsNull("_id"));
+            Assert.AreEqual(false, edge.IsNull("_key"));
+            Assert.AreEqual(false, edge.IsNull("_rev"));
+            Assert.AreEqual(false, edge.IsNull("_from"));
+            Assert.AreEqual(false, edge.IsNull("_to"));
+            Assert.AreEqual(false, edge.IsNull("edgeFoo"));
+            Assert.AreEqual(false, edge.IsNull("edgeBar"));
+            Assert.AreEqual(false, edge.IsNull("baz.foo"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_id"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_key"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_rev"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_from"));
+            Assert.AreEqual(false, returnedEdge.IsNull("_to"));
+            Assert.AreEqual(false, returnedEdge.IsNull("edgeFoo"));
+            Assert.AreEqual(false, returnedEdge.IsNull("edgeBar"));
+            Assert.AreEqual(false, returnedEdge.IsNull("baz.foo"));
+            
+            Assert.AreEqual(edge.String("_id"), returnedEdge.String("_id"));
+            Assert.AreEqual(edge.String("_key"), returnedEdge.String("_key"));
+            Assert.AreEqual(edge.String("_rev"), returnedEdge.String("_rev"));
+            Assert.AreEqual(edge.Has("edgeFoo"), returnedEdge.Has("edgeFoo"));
+            Assert.AreEqual(edge.String("edgeFoo"), returnedEdge.String("edgeFoo"));
+            Assert.AreEqual(edge.Has("edgeBar"), returnedEdge.Has("edgeBar"));
+            Assert.AreEqual(edge.Int("edgeBar"), returnedEdge.Int("edgeBar"));
+            Assert.AreEqual(edge.Has("baz.foo"), returnedEdge.Has("baz.foo"));
+            Assert.AreEqual(edge.String("baz.foo"), returnedEdge.String("baz.foo"));
         }
         
         [Test()]
@@ -242,37 +299,37 @@ namespace Arango.Tests.ArangoEdgeTests
             var db = Database.GetTestDatabase();
             
             // create test documents
-            var doc1 = new ArangoDocument()
-                .SetField("foo", "foo string value 1")
-                .SetField("bar", 12345);
+            var doc1 = new Document()
+                .String("foo", "foo string value 1")
+                .Int("bar", 12345);
             
-            var doc2 = new ArangoDocument()
-                .SetField("foo", "foo string value 2")
-                .SetField("bar", 54321);
+            var doc2 = new Document()
+                .String("foo", "foo string value 2")
+                .Int("bar", 54321);
             
             db.Document.Create(Database.TestDocumentCollectionName, doc1);
             db.Document.Create(Database.TestDocumentCollectionName, doc2);
             
             // create test edge
-            var edge = new ArangoEdge()
-                .SetField("edgeFoo", "foo string value")
-                .SetField("edgeBar", 12345);
+            var edge = new Document()
+                .String("edgeFoo", "foo string value")
+                .Int("edgeBar", 12345);
             
-            edge.From = doc1.Id;
-            edge.To = doc2.Id;
+            edge.String("_from", doc1.String("_id"));
+            edge.String("_to", doc2.String("_id"));
             
             db.Edge.Create(Database.TestEdgeCollectionName, edge);
             
             // check if the created edge exists in database        
-            var exists = db.Edge.Exists(edge.Id);
+            var exists = db.Edge.Exists(edge.String("_id"));
             
             Assert.AreEqual(true, exists);
             
             // delete edge
-            db.Edge.Delete(edge.Id);
+            db.Edge.Delete(edge.String("_id"));
             
             // check if the edge was deleted
-            exists = db.Edge.Exists(edge.Id);
+            exists = db.Edge.Exists(edge.String("_id"));
             
             Assert.AreEqual(false, exists);
         }
@@ -285,65 +342,95 @@ namespace Arango.Tests.ArangoEdgeTests
             var db = Database.GetTestDatabase();
             
             // create test documents
-            var doc1 = new ArangoDocument()
-                .SetField("foo", "foo string value 1")
-                .SetField("bar", 12345);
+            var doc1 = new Document()
+                .String("foo", "foo string value 1")
+                .Int("bar", 12345);
             
-            var doc2 = new ArangoDocument()
-                .SetField("foo", "foo string value 2")
-                .SetField("bar", 54321);
+            var doc2 = new Document()
+                .String("foo", "foo string value 2")
+                .Int("bar", 54321);
             
             db.Document.Create(Database.TestDocumentCollectionName, doc1);
             db.Document.Create(Database.TestDocumentCollectionName, doc2);
             
             // create test edge
-            var edge1 = new ArangoEdge()
-                .SetField("edgeFoo", "foo string value 1")
-                .SetField("edgeBar", 12345);
+            var edge1 = new Document()
+                .String("edgeFoo", "foo string value 1")
+                .Int("edgeBar", 12345);
             
-            edge1.From = doc1.Id;
-            edge1.To = doc2.Id;
+            edge1.String("_from", doc1.String("_id"));
+            edge1.String("_to", doc2.String("_id"));
             
             db.Edge.Create(Database.TestEdgeCollectionName, edge1);
             
             // create another test edge
-            var edge2 = new ArangoEdge()
-                .SetField("edgeFoo", "foo string value 2")
-                .SetField("edgeBar", 54321);
+            var edge2 = new Document()
+                .String("edgeFoo", "foo string value 2")
+                .Int("edgeBar", 54321);
             
-            edge2.From = doc2.Id;
-            edge2.To = doc1.Id;
+            edge2.String("_from", doc2.String("_id"));
+            edge2.String("_to", doc1.String("_id"));
             
             db.Edge.Create(Database.TestEdgeCollectionName, edge2);
             
             // get both edges
-            List<ArangoEdge> anyEdges = db.Edge.Get(Database.TestEdgeCollectionName, doc1.Id);
+            var anyEdges = db.Edge.Get(Database.TestEdgeCollectionName, doc1.String("_id"));
             
             Assert.AreEqual(2, anyEdges.Count);
             
-            ArangoEdge returnedEdge1 = anyEdges.Where(x => x.Id == edge1.Id).First();
+            var returnedEdge1 = anyEdges.Where(x => x.String("_id") == edge1.String("_id")).First();
             
-            Assert.AreEqual(edge1.Id, returnedEdge1.Id);
-            Assert.AreEqual(edge1.Key, returnedEdge1.Key);
-            Assert.AreEqual(edge1.Revision, returnedEdge1.Revision);
-            Assert.AreEqual(edge1.From, returnedEdge1.From);
-            Assert.AreEqual(edge1.To, returnedEdge1.To);
-            Assert.AreEqual(edge1.HasField("edgeFoo"), returnedEdge1.HasField("edgeFoo"));
-            Assert.AreEqual(edge1.GetField<string>("edgeFoo"), returnedEdge1.GetField<string>("edgeFoo"));
-            Assert.AreEqual(edge1.HasField("edgeBar"), returnedEdge1.HasField("edgeBar"));
-            Assert.AreEqual(edge1.GetField<string>("edgeBar"), returnedEdge1.GetField<string>("edgeBar"));
+            Assert.AreEqual(false, edge1.IsNull("_id"));
+            Assert.AreEqual(false, edge1.IsNull("_key"));
+            Assert.AreEqual(false, edge1.IsNull("_rev"));
+            Assert.AreEqual(false, edge1.IsNull("_from"));
+            Assert.AreEqual(false, edge1.IsNull("_to"));
+            Assert.AreEqual(false, edge1.IsNull("edgeFoo"));
+            Assert.AreEqual(false, edge1.IsNull("edgeBar"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("_id"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("_key"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("_rev"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("_from"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("_to"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("edgeFoo"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("edgeBar"));
             
-            ArangoEdge returnedEdge2 = anyEdges.Where(x => x.Id == edge2.Id).First();
+            Assert.AreEqual(edge1.String("_id"), returnedEdge1.String("_id"));
+            Assert.AreEqual(edge1.String("_key"), returnedEdge1.String("_key"));
+            Assert.AreEqual(edge1.String("_rev"), returnedEdge1.String("_rev"));
+            Assert.AreEqual(edge1.String("_from"), returnedEdge1.String("_from"));
+            Assert.AreEqual(edge1.String("_to"), returnedEdge1.String("_to"));
+            Assert.AreEqual(edge1.Has("edgeFoo"), returnedEdge1.Has("edgeFoo"));
+            Assert.AreEqual(edge1.String("edgeFoo"), returnedEdge1.String("edgeFoo"));
+            Assert.AreEqual(edge1.Has("edgeBar"), returnedEdge1.Has("edgeBar"));
+            Assert.AreEqual(edge1.Int("edgeBar"), returnedEdge1.Int("edgeBar"));
             
-            Assert.AreEqual(edge2.Id, returnedEdge2.Id);
-            Assert.AreEqual(edge2.Key, returnedEdge2.Key);
-            Assert.AreEqual(edge2.Revision, returnedEdge2.Revision);
-            Assert.AreEqual(edge2.From, returnedEdge2.From);
-            Assert.AreEqual(edge2.To, returnedEdge2.To);
-            Assert.AreEqual(edge2.HasField("edgeFoo"), returnedEdge2.HasField("edgeFoo"));
-            Assert.AreEqual(edge2.GetField<string>("edgeFoo"), returnedEdge2.GetField<string>("edgeFoo"));
-            Assert.AreEqual(edge2.HasField("edgeBar"), returnedEdge2.HasField("edgeBar"));
-            Assert.AreEqual(edge2.GetField<string>("edgeBar"), returnedEdge2.GetField<string>("edgeBar"));
+            var returnedEdge2 = anyEdges.Where(x => x.String("_id") == edge2.String("_id")).First();
+            
+            Assert.AreEqual(false, edge2.IsNull("_id"));
+            Assert.AreEqual(false, edge2.IsNull("_key"));
+            Assert.AreEqual(false, edge2.IsNull("_rev"));
+            Assert.AreEqual(false, edge2.IsNull("_from"));
+            Assert.AreEqual(false, edge2.IsNull("_to"));
+            Assert.AreEqual(false, edge2.IsNull("edgeFoo"));
+            Assert.AreEqual(false, edge2.IsNull("edgeBar"));
+            Assert.AreEqual(false, returnedEdge2.IsNull("_id"));
+            Assert.AreEqual(false, returnedEdge2.IsNull("_key"));
+            Assert.AreEqual(false, returnedEdge2.IsNull("_rev"));
+            Assert.AreEqual(false, returnedEdge2.IsNull("_from"));
+            Assert.AreEqual(false, returnedEdge2.IsNull("_to"));
+            Assert.AreEqual(false, returnedEdge2.IsNull("edgeFoo"));
+            Assert.AreEqual(false, returnedEdge2.IsNull("edgeBar"));
+            
+            Assert.AreEqual(edge2.String("_id"), returnedEdge2.String("_id"));
+            Assert.AreEqual(edge2.String("_key"), returnedEdge2.String("_key"));
+            Assert.AreEqual(edge2.String("_rev"), returnedEdge2.String("_rev"));
+            Assert.AreEqual(edge2.String("_from"), returnedEdge2.String("_from"));
+            Assert.AreEqual(edge2.String("_to"), returnedEdge2.String("_to"));
+            Assert.AreEqual(edge2.Has("edgeFoo"), returnedEdge2.Has("edgeFoo"));
+            Assert.AreEqual(edge2.String("edgeFoo"), returnedEdge2.String("edgeFoo"));
+            Assert.AreEqual(edge2.Has("edgeBar"), returnedEdge2.Has("edgeBar"));
+            Assert.AreEqual(edge2.Int("edgeBar"), returnedEdge2.Int("edgeBar"));
         }
         
         [Test()]
@@ -354,53 +441,68 @@ namespace Arango.Tests.ArangoEdgeTests
             var db = Database.GetTestDatabase();
             
             // create test documents
-            var doc1 = new ArangoDocument()
-                .SetField("foo", "foo string value 1")
-                .SetField("bar", 12345);
+            var doc1 = new Document()
+                .String("foo", "foo string value 1")
+                .Int("bar", 12345);
             
-            var doc2 = new ArangoDocument()
-                .SetField("foo", "foo string value 2")
-                .SetField("bar", 54321);
+            var doc2 = new Document()
+                .String("foo", "foo string value 2")
+                .Int("bar", 54321);
             
             db.Document.Create(Database.TestDocumentCollectionName, doc1);
             db.Document.Create(Database.TestDocumentCollectionName, doc2);
             
             // create test edge
-            var edge1 = new ArangoEdge()
-                .SetField("edgeFoo", "foo string value 1")
-                .SetField("edgeBar", 12345);
+            var edge1 = new Document()
+                .String("edgeFoo", "foo string value 1")
+                .Int("edgeBar", 12345);
             
-            edge1.From = doc1.Id;
-            edge1.To = doc2.Id;
+            edge1.String("_from", doc1.String("_id"));
+            edge1.String("_to", doc2.String("_id"));
             
             db.Edge.Create(Database.TestEdgeCollectionName, edge1);
             
             // create another test edge
-            var edge2 = new ArangoEdge()
-                .SetField("edgeFoo", "foo string value 2")
-                .SetField("edgeBar", 54321);
+            var edge2 = new Document()
+                .String("edgeFoo", "foo string value 2")
+                .Int("edgeBar", 54321);
             
-            edge2.From = doc2.Id;
-            edge2.To = doc1.Id;
+            edge2.String("_from", doc2.String("_id"));
+            edge2.String("_to", doc1.String("_id"));
             
             db.Edge.Create(Database.TestEdgeCollectionName, edge2);
             
             // get both edges
-            List<ArangoEdge> anyEdges = db.Edge.Get(Database.TestEdgeCollectionName, doc2.Id, ArangoEdgeDirection.In);
+            var anyEdges = db.Edge.Get(Database.TestEdgeCollectionName, doc2.String("_id"), ArangoEdgeDirection.In);
             
             Assert.AreEqual(1, anyEdges.Count);
             
-            ArangoEdge returnedEdge1 = anyEdges.Where(x => x.Id == edge1.Id).First();
+            var returnedEdge1 = anyEdges.Where(x => x.String("_id") == edge1.String("_id")).First();
             
-            Assert.AreEqual(edge1.Id, returnedEdge1.Id);
-            Assert.AreEqual(edge1.Key, returnedEdge1.Key);
-            Assert.AreEqual(edge1.Revision, returnedEdge1.Revision);
-            Assert.AreEqual(edge1.From, returnedEdge1.From);
-            Assert.AreEqual(edge1.To, returnedEdge1.To);
-            Assert.AreEqual(edge1.HasField("edgeFoo"), returnedEdge1.HasField("edgeFoo"));
-            Assert.AreEqual(edge1.GetField<string>("edgeFoo"), returnedEdge1.GetField<string>("edgeFoo"));
-            Assert.AreEqual(edge1.HasField("edgeBar"), returnedEdge1.HasField("edgeBar"));
-            Assert.AreEqual(edge1.GetField<string>("edgeBar"), returnedEdge1.GetField<string>("edgeBar"));
+            Assert.AreEqual(false, edge1.IsNull("_id"));
+            Assert.AreEqual(false, edge1.IsNull("_key"));
+            Assert.AreEqual(false, edge1.IsNull("_rev"));
+            Assert.AreEqual(false, edge1.IsNull("_from"));
+            Assert.AreEqual(false, edge1.IsNull("_to"));
+            Assert.AreEqual(false, edge1.IsNull("edgeFoo"));
+            Assert.AreEqual(false, edge1.IsNull("edgeBar"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("_id"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("_key"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("_rev"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("_from"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("_to"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("edgeFoo"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("edgeBar"));
+            
+            Assert.AreEqual(edge1.String("_id"), returnedEdge1.String("_id"));
+            Assert.AreEqual(edge1.String("_key"), returnedEdge1.String("_key"));
+            Assert.AreEqual(edge1.String("_rev"), returnedEdge1.String("_rev"));
+            Assert.AreEqual(edge1.String("_from"), returnedEdge1.String("_from"));
+            Assert.AreEqual(edge1.String("_to"), returnedEdge1.String("_to"));
+            Assert.AreEqual(edge1.Has("edgeFoo"), returnedEdge1.Has("edgeFoo"));
+            Assert.AreEqual(edge1.String("edgeFoo"), returnedEdge1.String("edgeFoo"));
+            Assert.AreEqual(edge1.Has("edgeBar"), returnedEdge1.Has("edgeBar"));
+            Assert.AreEqual(edge1.Int("edgeBar"), returnedEdge1.Int("edgeBar"));
         }
         
         [Test()]
@@ -411,53 +513,68 @@ namespace Arango.Tests.ArangoEdgeTests
             var db = Database.GetTestDatabase();
             
             // create test documents
-            var doc1 = new ArangoDocument()
-                .SetField("foo", "foo string value 1")
-                .SetField("bar", 12345);
+            var doc1 = new Document()
+                .String("foo", "foo string value 1")
+                .Int("bar", 12345);
             
-            var doc2 = new ArangoDocument()
-                .SetField("foo", "foo string value 2")
-                .SetField("bar", 54321);
+            var doc2 = new Document()
+                .String("foo", "foo string value 2")
+                .Int("bar", 54321);
             
             db.Document.Create(Database.TestDocumentCollectionName, doc1);
             db.Document.Create(Database.TestDocumentCollectionName, doc2);
             
             // create test edge
-            var edge1 = new ArangoEdge()
-                .SetField("edgeFoo", "foo string value 1")
-                .SetField("edgeBar", 12345);
+            var edge1 = new Document()
+                .String("edgeFoo", "foo string value 1")
+                .Int("edgeBar", 12345);
             
-            edge1.From = doc1.Id;
-            edge1.To = doc2.Id;
+            edge1.String("_from", doc1.String("_id"));
+            edge1.String("_to", doc2.String("_id"));
             
             db.Edge.Create(Database.TestEdgeCollectionName, edge1);
             
             // create another test edge
-            var edge2 = new ArangoEdge()
-                .SetField("edgeFoo", "foo string value 2")
-                .SetField("edgeBar", 54321);
+            var edge2 = new Document()
+                .String("edgeFoo", "foo string value 2")
+                .Int("edgeBar", 54321);
             
-            edge2.From = doc2.Id;
-            edge2.To = doc1.Id;
+            edge2.String("_from", doc2.String("_id"));
+            edge2.String("_to", doc1.String("_id"));
             
             db.Edge.Create(Database.TestEdgeCollectionName, edge2);
             
             // get both edges
-            List<ArangoEdge> anyEdges = db.Edge.Get(Database.TestEdgeCollectionName, doc1.Id, ArangoEdgeDirection.Out);
+            var anyEdges = db.Edge.Get(Database.TestEdgeCollectionName, doc1.String("_id"), ArangoEdgeDirection.Out);
             
             Assert.AreEqual(1, anyEdges.Count);
             
-            ArangoEdge returnedEdge1 = anyEdges.Where(x => x.Id == edge1.Id).First();
+            var returnedEdge1 = anyEdges.Where(x => x.String("_id") == edge1.String("_id")).First();
             
-            Assert.AreEqual(edge1.Id, returnedEdge1.Id);
-            Assert.AreEqual(edge1.Key, returnedEdge1.Key);
-            Assert.AreEqual(edge1.Revision, returnedEdge1.Revision);
-            Assert.AreEqual(edge1.From, returnedEdge1.From);
-            Assert.AreEqual(edge1.To, returnedEdge1.To);
-            Assert.AreEqual(edge1.HasField("edgeFoo"), returnedEdge1.HasField("edgeFoo"));
-            Assert.AreEqual(edge1.GetField<string>("edgeFoo"), returnedEdge1.GetField<string>("edgeFoo"));
-            Assert.AreEqual(edge1.HasField("edgeBar"), returnedEdge1.HasField("edgeBar"));
-            Assert.AreEqual(edge1.GetField<string>("edgeBar"), returnedEdge1.GetField<string>("edgeBar"));
+            Assert.AreEqual(false, edge1.IsNull("_id"));
+            Assert.AreEqual(false, edge1.IsNull("_key"));
+            Assert.AreEqual(false, edge1.IsNull("_rev"));
+            Assert.AreEqual(false, edge1.IsNull("_from"));
+            Assert.AreEqual(false, edge1.IsNull("_to"));
+            Assert.AreEqual(false, edge1.IsNull("edgeFoo"));
+            Assert.AreEqual(false, edge1.IsNull("edgeBar"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("_id"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("_key"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("_rev"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("_from"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("_to"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("edgeFoo"));
+            Assert.AreEqual(false, returnedEdge1.IsNull("edgeBar"));
+            
+            Assert.AreEqual(edge1.String("_id"), returnedEdge1.String("_id"));
+            Assert.AreEqual(edge1.String("_key"), returnedEdge1.String("_key"));
+            Assert.AreEqual(edge1.String("_rev"), returnedEdge1.String("_rev"));
+            Assert.AreEqual(edge1.String("_from"), returnedEdge1.String("_from"));
+            Assert.AreEqual(edge1.String("_to"), returnedEdge1.String("_to"));
+            Assert.AreEqual(edge1.Has("edgeFoo"), returnedEdge1.Has("edgeFoo"));
+            Assert.AreEqual(edge1.String("edgeFoo"), returnedEdge1.String("edgeFoo"));
+            Assert.AreEqual(edge1.Has("edgeBar"), returnedEdge1.Has("edgeBar"));
+            Assert.AreEqual(edge1.Int("edgeBar"), returnedEdge1.Int("edgeBar"));
         }
         
         [Test()]
