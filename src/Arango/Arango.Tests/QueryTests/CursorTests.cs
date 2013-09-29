@@ -19,6 +19,12 @@ namespace Arango.Tests.QueryTests
                 "FOR x IN " + Database.TestDocumentCollectionName + " " +
                 "RETURN x.foo";
             
+            var singleItem1 = db.Query
+                .Aql(aql1)
+                .First<string>();
+            
+            Assert.AreEqual(false, string.IsNullOrEmpty(singleItem1));
+            
             var items1 = db.Query
                 .Aql(aql1)
                 .ToList<string>();
@@ -35,6 +41,12 @@ namespace Arango.Tests.QueryTests
             var aql2 = 
                 "FOR x IN " + Database.TestDocumentCollectionName + " " +
                 "RETURN x.bar";
+            
+            var singleItem2 = db.Query
+                .Aql(aql2)
+                .First<int>();
+            
+            Assert.AreEqual(true, singleItem2 > 0);
             
             var items2 = db.Query
                 .Aql(aql2)
@@ -59,6 +71,20 @@ namespace Arango.Tests.QueryTests
             var aql = 
                 "FOR x IN " + Database.TestDocumentCollectionName + " " +
                 "RETURN x";
+            
+            var singleDocument = db.Query
+                .Aql(aql)
+                .First();
+            
+            var doc1 = docs.Where(x => x.String("_id") == singleDocument.String("_id")).First();
+                
+            Assert.AreEqual(doc1.String("_id"), singleDocument.String("_id"));
+            Assert.AreEqual(doc1.String("_key"), singleDocument.String("_key"));
+            Assert.AreEqual(doc1.String("_rev"), singleDocument.String("_rev"));
+            Assert.AreEqual(doc1.Has("foo"), singleDocument.Has("foo"));
+            Assert.AreEqual(doc1.String("foo"), singleDocument.String("foo"));
+            Assert.AreEqual(doc1.Has("bar"), singleDocument.Has("bar"));
+            Assert.AreEqual(doc1.Int("bar"), singleDocument.Int("bar"));
             
             var documents = db.Query
                 .Aql(aql)
@@ -187,6 +213,18 @@ namespace Arango.Tests.QueryTests
             var aql = 
                 "FOR x IN " + Database.TestDocumentCollectionName + " " +
                 "RETURN x";
+            
+            var singlePerson = db.Query
+                .Aql(aql)
+                .First<Person>();
+            
+            var per1 = people.Where(x => x.ThisIsId == singlePerson.ThisIsId).First();
+                
+            Assert.AreEqual(per1.ThisIsId, singlePerson.ThisIsId);
+            Assert.AreEqual(per1.ThisIsKey, singlePerson.ThisIsKey);
+            Assert.AreEqual(per1.ThisIsRevision, singlePerson.ThisIsRevision);
+            Assert.AreEqual(per1.FirstName, singlePerson.FirstName);
+            Assert.AreEqual(per1.LastName, singlePerson.LastName);
             
             var returnedPeople = db.Query
                 .Aql(aql)

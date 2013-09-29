@@ -269,6 +269,20 @@ namespace Arango.Client
         
         #endregion
         
+        #region First
+        
+        public Document First()
+        {
+            return ToList().FirstOrDefault();
+        }
+        
+        public T First<T>()
+        {
+            return ToList<T>().FirstOrDefault();
+        }
+        
+        #endregion
+        
         #region ToString
         
         public override string ToString()
