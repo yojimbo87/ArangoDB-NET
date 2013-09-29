@@ -873,6 +873,14 @@ namespace Arango.Client
                 TimeSpan span = (((DateTime)value).ToUniversalTime() - DocumentSettings.UnixEpoch);
                 value = (long)span.TotalSeconds;
             }
+            else if ((valueType.Name == "String") && (type.Name == "DateTime"))
+            {
+                value = System.DateTime.Parse((string)value, DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AdjustToUniversal);
+            }
+            else if ((valueType.Name == "Int64") && (type.Name == "DateTime"))
+            {
+                value = DocumentSettings.UnixEpoch.AddSeconds((long)value);
+            }
             else
             {
                 value = System.Convert.ChangeType(value, type);
