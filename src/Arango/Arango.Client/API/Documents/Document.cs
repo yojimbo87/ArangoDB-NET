@@ -860,7 +860,7 @@ namespace Arango.Client
             return this;
         }
         
-        private object ConvertField(object value, Type type, DateTimeFormat dateTimeFormat = DateTimeFormat.DateTimeObject)
+        private object ConvertField(object value, Type type)
         {
             var valueType = value.GetType();
             
