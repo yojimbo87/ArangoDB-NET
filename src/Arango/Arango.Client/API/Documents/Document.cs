@@ -35,7 +35,7 @@ namespace Arango.Client
             }
             else
             {
-                return Convert.ToBoolean(fieldValue);
+                return System.Convert.ToBoolean(fieldValue);
             }
         }
         
@@ -49,7 +49,7 @@ namespace Arango.Client
             }
             else
             {
-                return Convert.ToByte(fieldValue);
+                return System.Convert.ToByte(fieldValue);
             }
         }
         
@@ -63,7 +63,7 @@ namespace Arango.Client
             }
             else
             {
-                return Convert.ToInt16(fieldValue);
+                return System.Convert.ToInt16(fieldValue);
             }
         }
         
@@ -77,7 +77,7 @@ namespace Arango.Client
             }
             else
             {
-                return Convert.ToInt32(fieldValue);
+                return System.Convert.ToInt32(fieldValue);
             }
         }
         
@@ -91,7 +91,7 @@ namespace Arango.Client
             }
             else
             {
-                return Convert.ToInt64(fieldValue);
+                return System.Convert.ToInt64(fieldValue);
             }
         }
         
@@ -105,7 +105,7 @@ namespace Arango.Client
             }
             else
             {
-                return Convert.ToSingle(fieldValue);
+                return System.Convert.ToSingle(fieldValue);
             }
         }
         
@@ -119,7 +119,7 @@ namespace Arango.Client
             }
             else
             {
-                return Convert.ToDouble(fieldValue);
+                return System.Convert.ToDouble(fieldValue);
             }
         }
         
@@ -133,7 +133,7 @@ namespace Arango.Client
             }
             else
             {
-                return Convert.ToDecimal(fieldValue);
+                return System.Convert.ToDecimal(fieldValue);
             }
         }
         
@@ -197,34 +197,34 @@ namespace Arango.Client
                 switch (type.Name)
                 {
                     case "Boolean":
-                        collection = ((List<object>)data).Select(Convert.ToBoolean).ToList() as List<T>;
+                        collection = ((List<object>)data).Select(System.Convert.ToBoolean).ToList() as List<T>;
                         break;
                     case "Byte":
-                        collection = ((List<object>)data).Select(Convert.ToByte).ToList() as List<T>;
+                        collection = ((List<object>)data).Select(System.Convert.ToByte).ToList() as List<T>;
                         break;
                     case "Int16":
-                        collection = ((List<object>)data).Select(Convert.ToInt16).ToList() as List<T>;
+                        collection = ((List<object>)data).Select(System.Convert.ToInt16).ToList() as List<T>;
                         break;
                     case "Int32":
-                        collection = ((List<object>)data).Select(Convert.ToInt32).ToList() as List<T>;
+                        collection = ((List<object>)data).Select(System.Convert.ToInt32).ToList() as List<T>;
                         break;
                     case "Int64":
-                        collection = ((List<object>)data).Select(Convert.ToInt64).ToList() as List<T>;
+                        collection = ((List<object>)data).Select(System.Convert.ToInt64).ToList() as List<T>;
                         break;
                     case "Single":
-                        collection = ((List<object>)data).Select(Convert.ToSingle).ToList() as List<T>;
+                        collection = ((List<object>)data).Select(System.Convert.ToSingle).ToList() as List<T>;
                         break;
                     case "Double":
-                        collection = ((List<object>)data).Select(Convert.ToDouble).ToList() as List<T>;
+                        collection = ((List<object>)data).Select(System.Convert.ToDouble).ToList() as List<T>;
                         break;
                     case "Decimal":
-                        collection = ((List<object>)data).Select(Convert.ToDecimal).ToList() as List<T>;
+                        collection = ((List<object>)data).Select(System.Convert.ToDecimal).ToList() as List<T>;
                         break;
                     case "DateTime":
-                        collection = ((List<object>)data).Select(Convert.ToDateTime).ToList() as List<T>;
+                        collection = ((List<object>)data).Select(System.Convert.ToDateTime).ToList() as List<T>;
                         break;
                     case "String":
-                        collection = ((List<object>)data).Select(Convert.ToString).ToList() as List<T>;
+                        collection = ((List<object>)data).Select(System.Convert.ToString).ToList() as List<T>;
                         break;
                     default:
                         collection = ((IEnumerable)data).Cast<T>().ToList();
@@ -788,6 +788,101 @@ namespace Arango.Client
         
         #endregion
         
+        #region Field type conversion
+        
+        public Document Convert(string fieldPath, Type type)
+        {
+            var currentField = "";
+            var arrayContent = "";
+            
+            if (fieldPath.Contains("."))
+            {
+                var fields = fieldPath.Split('.');
+                var iteration = 1;
+                var embeddedDocument = this;
+                
+                foreach (var field in fields)
+                {
+                    currentField = field;
+                    arrayContent = "";
+                    
+                    if (field.Contains("["))
+                    {
+                        var firstIndex = field.IndexOf('[');
+                        var lastIndex = field.IndexOf(']');
+                        
+                        arrayContent = field.Substring(firstIndex + 1, lastIndex - firstIndex - 1);
+                        currentField = field.Substring(0, firstIndex);
+                    }
+                    
+                    if (iteration == fields.Length)
+                    {
+                        if (embeddedDocument.ContainsKey(currentField))
+                        {
+                            embeddedDocument[currentField] = ConvertField(embeddedDocument[currentField], type);
+                        }
+                        
+                        break;
+                    }
+
+                    if (embeddedDocument.ContainsKey(currentField))
+                    {
+                        embeddedDocument = (Document)GetFieldValue(currentField, arrayContent, embeddedDocument);
+                    }
+                    else
+                    {
+                        // if current field in path isn't present
+                        break;
+                    }
+
+                    iteration++;
+                }
+            }
+            else
+            {
+                currentField = fieldPath;
+                
+                if (fieldPath.Contains("["))
+                {
+                    var firstIndex = fieldPath.IndexOf('[');
+                    var lastIndex = fieldPath.IndexOf(']');
+                    
+                    arrayContent = fieldPath.Substring(firstIndex + 1, lastIndex - firstIndex - 1);
+                    currentField = fieldPath.Substring(0, firstIndex);
+                }
+                
+                if (this.ContainsKey(currentField))
+                {
+                    this[currentField] = ConvertField(this[currentField], type);
+                }
+            }
+            
+            return this;
+        }
+        
+        private object ConvertField(object value, Type type, DateTimeFormat dateTimeFormat = DateTimeFormat.DateTimeObject)
+        {
+            var valueType = value.GetType();
+            
+            if ((valueType.Name == "DateTime") && (type.Name == "String"))
+            {
+                value = ((DateTime)value).ToUniversalTime().ToString("yyyy-MM-dd'T'HH:mm:ss.fffK", DateTimeFormatInfo.InvariantInfo);
+            }
+            else if ((valueType.Name == "DateTime") && (type.Name == "Int64"))
+            {
+                TimeSpan span = (((DateTime)value).ToUniversalTime() - DocumentSettings.UnixEpoch);
+                value = (long)span.TotalSeconds;
+            }
+            else
+            {
+                value = System.Convert.ChangeType(value, type);
+            }
+            
+            return value;
+        }
+        
+        #endregion
+        
         public Document Drop(string fieldPath)
         {
             var currentField = "";
@@ -1202,7 +1297,7 @@ namespace Arango.Client
                         } 
                         else
                         {
-                            propertyInfo.SetValue(genericObject, Convert.ChangeType(fieldValue, propertyInfo.PropertyType), null);
+                            propertyInfo.SetValue(genericObject, System.Convert.ChangeType(fieldValue, propertyInfo.PropertyType), null);
                         }
                     }
                 }
@@ -1263,7 +1358,7 @@ namespace Arango.Client
                                 } 
                                 else
                                 {
-                                    ((IList)collectionObject).Add(Convert.ChangeType(collection[i], collectionType));
+                                    ((IList)collectionObject).Add(System.Convert.ChangeType(collection[i], collectionType));
                                 }
                             }
                         }
@@ -1454,34 +1549,34 @@ namespace Arango.Client
                 switch (type.Name)
                 {
                     case "Boolean":
-                        collection = data.Select(Convert.ToBoolean).ToList() as List<T>;
+                        collection = data.Select(System.Convert.ToBoolean).ToList() as List<T>;
                         break;
                     case "Byte":
-                        collection = data.Select(Convert.ToByte).ToList() as List<T>;
+                        collection = data.Select(System.Convert.ToByte).ToList() as List<T>;
                         break;
                     case "Int16":
-                        collection = data.Select(Convert.ToInt16).ToList() as List<T>;
+                        collection = data.Select(System.Convert.ToInt16).ToList() as List<T>;
                         break;
                     case "Int32":
-                        collection = data.Select(Convert.ToInt32).ToList() as List<T>;
+                        collection = data.Select(System.Convert.ToInt32).ToList() as List<T>;
                         break;
                     case "Int64":
-                        collection = data.Select(Convert.ToInt64).ToList() as List<T>;
+                        collection = data.Select(System.Convert.ToInt64).ToList() as List<T>;
                         break;
                     case "Single":
-                        collection = data.Select(Convert.ToSingle).ToList() as List<T>;
+                        collection = data.Select(System.Convert.ToSingle).ToList() as List<T>;
                         break;
                     case "Double":
-                        collection = data.Select(Convert.ToDouble).ToList() as List<T>;
+                        collection = data.Select(System.Convert.ToDouble).ToList() as List<T>;
                         break;
                     case "Decimal":
-                        collection = data.Select(Convert.ToDecimal).ToList() as List<T>;
+                        collection = data.Select(System.Convert.ToDecimal).ToList() as List<T>;
                         break;
                     case "DateTime":
-                        collection = data.Select(Convert.ToDateTime).ToList() as List<T>;
+                        collection = data.Select(System.Convert.ToDateTime).ToList() as List<T>;
                         break;
                     case "String":
-                        collection = data.Select(Convert.ToString).ToList() as List<T>;
+                        collection = data.Select(System.Convert.ToString).ToList() as List<T>;
                         break;
                     default:
                         collection = ((IEnumerable)data).Cast<T>().ToList();
