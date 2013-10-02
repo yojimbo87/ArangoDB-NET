@@ -568,7 +568,7 @@ namespace Arango.Client
         /// <param name="value">Value to be saved in specified field.</param>
         public Document Docunet<T>(string fieldPath, T value)
         {
-            if (inputObject is Document)
+            if (value is Document)
             {
                 SetField(fieldPath, value);
             }
