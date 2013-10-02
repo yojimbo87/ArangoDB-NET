@@ -5,7 +5,6 @@ using Arango.Client;
 
 namespace Arango.Tests.ArangoDocumentTests
 {
-    // TODO: go through tests and include isnull tests and similar more robust testing stuff
     [TestFixture()]
     public class ArangoDocumentTests : IDisposable
     {

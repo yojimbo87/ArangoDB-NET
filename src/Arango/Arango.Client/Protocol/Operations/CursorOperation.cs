@@ -52,7 +52,7 @@ namespace Arango.Client.Protocol
                 bodyDocument.Docunet("bindVars", bindVarsDocument);
             }
             
-            request.Body = Document.Serialize(bodyDocument);
+            request.Body = bodyDocument.Serialize();
             
             var response = _connection.Process(request);
             var items = new List<object>();

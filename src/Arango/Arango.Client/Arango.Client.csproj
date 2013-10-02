@@ -60,6 +60,7 @@
     <Compile Include="Protocol\Connection.cs" />
     <Compile Include="Protocol\Operations\CollectionOperation.cs" />
     <Compile Include="Protocol\Operations\CursorOperation.cs" />
+    <Compile Include="Protocol\Operations\DatabaseOperation.cs" />
     <Compile Include="Protocol\Operations\EdgeOperation.cs" />
     <Compile Include="Protocol\Request.cs" />
     <Compile Include="Protocol\RequestType.cs" />

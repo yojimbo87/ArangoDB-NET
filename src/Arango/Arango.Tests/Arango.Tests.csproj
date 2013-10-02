@@ -62,6 +62,7 @@
     <Compile Include="ArangoDocumentTests\ArangoDocumentTests.cs" />
     <Compile Include="ArangoEdgeTests\ArangoEdgeTests.cs" />
     <Compile Include="Database.cs" />
+    <Compile Include="DatabaseTests\DatabaseTests.cs" />
     <Compile Include="DummyObjects\Person.cs" />
     <Compile Include="QueryTests\AqlTests.cs" />
     <Compile Include="QueryTests\CursorTests.cs" />
@@ -72,6 +73,7 @@
     <Folder Include="ArangoDocumentTests" />
     <Folder Include="ArangoEdgeTests" />
     <Folder Include="DummyObjects" />
+    <Folder Include="DatabaseTests" />
     <Folder Include="QueryTests" />
   </ItemGroup>
   <ItemGroup>

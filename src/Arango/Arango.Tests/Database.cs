@@ -7,9 +7,13 @@ namespace Arango.Tests
         public static string Hostname { get; set; }
         public static int Port { get; set; }
         public static bool IsSecured { get; set; }
+        public static string DatabaseName { get; set; }
+        public static string Alias { get; set; }
         public static string UserName { get; set; }
         public static string Password { get; set; }
-        public static string Alias { get; set; }
+        
+        public static string TestDatabaseOneTime { get; set; }
+        public static string TestDatabaseGeneral { get; set; }
         
         public static string TestDocumentCollectionName { get; set; }
         public static string TestEdgeCollectionName { get; set; }
@@ -19,20 +23,25 @@ namespace Arango.Tests
             Hostname = "localhost";
             Port = 8529;
             IsSecured = false;
+            DatabaseName = "test";
+            Alias = "test";
             UserName = "";
             Password = "";
-            Alias = "test";
+            
+            TestDatabaseOneTime = "testOneTimeDatabase001xyzLatif";
+            TestDatabaseGeneral = "testDatabaseGeneral001xyzLatif";
             
             TestDocumentCollectionName = "testDocumentCollection001xyzLatif";
             TestEdgeCollectionName = "testEdgeCollection001xyzLatif";
             
-            ArangoClient.AddDatabase(
+            ArangoClient.AddConnection(
                 Hostname,
                 Port,
                 IsSecured,
+                DatabaseName,
+                Alias,
                 UserName,
-                Password,
-                Alias
+                Password
             );
         }
         
@@ -61,7 +70,7 @@ namespace Arango.Tests
         
         public static void DeleteTestCollection(string collectionName)
         {
-            ArangoDatabase db = GetTestDatabase();
+            var db = GetTestDatabase();
             
             if (db.Collection.Get(collectionName) != null)
             {

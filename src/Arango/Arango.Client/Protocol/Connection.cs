@@ -17,12 +17,14 @@ namespace Arango.Client.Protocol
         public int Port { get; set; }
 
         public bool IsSecured { get; set; }
+        
+        public string DatabaseName { get; set; }
 
+        public string Alias { get; set; }
+        
         public string Username { get; set; }
 
         public string Password { get; set; }
-
-        public string Alias { get; set; }
 
         internal Uri BaseUri { get; set; }
 
@@ -30,16 +32,34 @@ namespace Arango.Client.Protocol
 
         #endregion
 
-        internal Connection(string hostname, int port, bool isSecured, string userName, string password, string alias)
+        internal Connection(string hostname, int port, bool isSecured, string userName = "", string password = "")
         {
             Hostname = hostname;
             Port = port;
             IsSecured = isSecured;
             Username = userName;
             Password = password;
-            Alias = alias;
 
             BaseUri = new Uri((isSecured ? "https" : "http") + "://" + hostname + ":" + port + "/");
+
+            if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
+            {
+                Credentials = new CredentialCache();
+                Credentials.Add(BaseUri, "Basic", new NetworkCredential(userName, password));
+            }
+        }
+        
+        internal Connection(string hostname, int port, bool isSecured, string databaseName, string alias, string userName = "", string password = "")
+        {
+            Hostname = hostname;
+            Port = port;
+            IsSecured = isSecured;
+            DatabaseName = databaseName;
+            Alias = alias;
+            Username = userName;
+            Password = password;
+
+            BaseUri = new Uri((isSecured ? "https" : "http") + "://" + hostname + ":" + port + "/_db/" + databaseName + "/");
 
             if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
             {

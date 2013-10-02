@@ -10,12 +10,11 @@ namespace Arango.Console
     {
         public static void Main(string[] args)
         {
-            ArangoClient.AddDatabase(
+            ArangoClient.AddConnection(
                 "localhost",
                 8529,
                 false,
-                "",
-                "",
+                "test",
                 "test"
             );
 
