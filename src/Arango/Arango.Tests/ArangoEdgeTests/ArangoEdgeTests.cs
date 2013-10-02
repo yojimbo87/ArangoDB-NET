@@ -9,6 +9,11 @@ namespace Arango.Tests.ArangoEdgeTests
     [TestFixture()]
     public class ArangoEdgeTests : IDisposable
     {
+        public ArangoEdgeTests()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+        }
+        
         [Test()]
         public void Should_create_and_delete_edge()
         {
@@ -581,7 +586,7 @@ namespace Arango.Tests.ArangoEdgeTests
         public void Should_create_edge_from_generic_object_and_get_it_back()
         {
             Database.CreateTestCollection(Database.TestDocumentCollectionName);
-            Database.CreateTestCollection(Database.TestEdgeCollectionName);
+            Database.CreateTestCollection(Database.TestEdgeCollectionName, ArangoCollectionType.Edge);
             var db = Database.GetTestDatabase();
             
             var person1 = new Person();
@@ -629,7 +634,7 @@ namespace Arango.Tests.ArangoEdgeTests
         public void Should_create_edge_from_generic_object_and_replace_it_and_get_it_back()
         {
             Database.CreateTestCollection(Database.TestDocumentCollectionName);
-            Database.CreateTestCollection(Database.TestEdgeCollectionName);
+            Database.CreateTestCollection(Database.TestEdgeCollectionName, ArangoCollectionType.Edge);
             var db = Database.GetTestDatabase();
             
             var person1 = new Person();
@@ -687,7 +692,7 @@ namespace Arango.Tests.ArangoEdgeTests
         public void Should_create_edge_from_generic_object_and_update_it_and_get_it_back()
         {
             Database.CreateTestCollection(Database.TestDocumentCollectionName);
-            Database.CreateTestCollection(Database.TestEdgeCollectionName);
+            Database.CreateTestCollection(Database.TestEdgeCollectionName, ArangoCollectionType.Edge);
             var db = Database.GetTestDatabase();
             
             var person1 = new Person();
@@ -746,6 +751,7 @@ namespace Arango.Tests.ArangoEdgeTests
         {
             Database.DeleteTestCollection(Database.TestDocumentCollectionName);
             Database.DeleteTestCollection(Database.TestEdgeCollectionName);
+            Database.DeleteTestDatabase(Database.TestDatabaseGeneral);
         }
     }
 }

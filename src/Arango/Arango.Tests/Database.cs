@@ -4,6 +4,12 @@ namespace Arango.Tests
 {
     public static class Database
     {
+        public static string TestDatabaseOneTime { get; set; }
+        public static string TestDatabaseGeneral { get; set; }
+        
+        public static string TestDocumentCollectionName { get; set; }
+        public static string TestEdgeCollectionName { get; set; }
+        
         public static string Hostname { get; set; }
         public static int Port { get; set; }
         public static bool IsSecured { get; set; }
@@ -12,27 +18,21 @@ namespace Arango.Tests
         public static string UserName { get; set; }
         public static string Password { get; set; }
         
-        public static string TestDatabaseOneTime { get; set; }
-        public static string TestDatabaseGeneral { get; set; }
-        
-        public static string TestDocumentCollectionName { get; set; }
-        public static string TestEdgeCollectionName { get; set; }
-        
         static Database()
         {
-            Hostname = "localhost";
-            Port = 8529;
-            IsSecured = false;
-            DatabaseName = "test";
-            Alias = "test";
-            UserName = "";
-            Password = "";
-            
             TestDatabaseOneTime = "testOneTimeDatabase001xyzLatif";
             TestDatabaseGeneral = "testDatabaseGeneral001xyzLatif";
             
             TestDocumentCollectionName = "testDocumentCollection001xyzLatif";
             TestEdgeCollectionName = "testEdgeCollection001xyzLatif";
+            
+            Hostname = "localhost";
+            Port = 8529;
+            IsSecured = false;
+            DatabaseName = TestDatabaseGeneral;
+            Alias = "test";
+            UserName = "";
+            Password = "";
             
             ArangoClient.AddConnection(
                 Hostname,
@@ -48,6 +48,43 @@ namespace Arango.Tests
         public static ArangoDatabase GetTestDatabase()
         {
             return new ArangoDatabase(Alias);
+        }
+        
+        public static void CreateTestDatabase(string databaseName)
+        {
+            DeleteTestDatabase(Database.TestDatabaseGeneral);
+            
+            ArangoClient.CreateDatabase(
+                Database.Hostname,
+                Database.Port,
+                Database.IsSecured,
+                Database.TestDatabaseGeneral,
+                Database.UserName,
+                Database.Password
+            );
+        }
+        
+        public static void DeleteTestDatabase(string databaseName)
+        {
+            var databases = ArangoClient.ListDatabases(
+                Database.Hostname,
+                Database.Port,
+                Database.IsSecured,
+                Database.UserName,
+                Database.Password
+            );
+            
+            if (databases.Contains(Database.TestDatabaseGeneral))
+            {
+                ArangoClient.DeleteDatabase(
+                    Database.Hostname,
+                    Database.Port,
+                    Database.IsSecured,
+                    Database.TestDatabaseGeneral,
+                    Database.UserName,
+                    Database.Password
+                );
+            }
         }
         
         public static void CreateTestCollection(string collectionName, ArangoCollectionType collectionType = ArangoCollectionType.Document)

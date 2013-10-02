@@ -9,6 +9,11 @@ namespace Arango.Tests.QueryTests
     [TestFixture()]
     public class CursorTests : IDisposable
     {
+        public CursorTests()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+        }
+        
         [Test()]
         public void Should_return_simple_values_list_through_Aql()
         {
@@ -365,6 +370,7 @@ namespace Arango.Tests.QueryTests
         public void Dispose()
         {
             Database.DeleteTestCollection(Database.TestDocumentCollectionName);
+            Database.DeleteTestDatabase(Database.TestDatabaseGeneral);
         }
     }
 }

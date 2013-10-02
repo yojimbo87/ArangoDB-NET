@@ -8,6 +8,11 @@ namespace Arango.Tests.ArangoCollectionTests
     [TestFixture()]
     public class ArangoCollectionTests : IDisposable
     {
+        public ArangoCollectionTests()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+        }
+        
         [Test()]
         public void Should_create_and_delete_collection()
         {
@@ -133,6 +138,7 @@ namespace Arango.Tests.ArangoCollectionTests
         public void Dispose()
         {
             Database.DeleteTestCollection(Database.TestDocumentCollectionName);
+            Database.DeleteTestDatabase(Database.TestDatabaseGeneral);
         }
     }
 }
