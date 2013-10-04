@@ -205,8 +205,8 @@ namespace Arango.Tests.ArangoEdgeTests
             Assert.AreEqual(false, newEdge.IsNull("_id"));
             Assert.AreEqual(false, newEdge.IsNull("_key"));
             Assert.AreEqual(false, newEdge.IsNull("_rev"));
-            Assert.AreEqual(false, newEdge.IsNull("_from"));
-            Assert.AreEqual(false, newEdge.IsNull("_to"));
+            Assert.AreEqual(true, newEdge.IsNull("_from"));
+            Assert.AreEqual(true, newEdge.IsNull("_to"));
             Assert.AreEqual(false, newEdge.IsNull("baz.foo"));
             Assert.AreEqual(false, returnedEdge.IsNull("_id"));
             Assert.AreEqual(false, returnedEdge.IsNull("_key"));
