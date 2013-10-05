@@ -715,6 +715,11 @@ namespace Arango.Client
                     if (embeddedDocument.ContainsKey(currentField))
                     {
                         embeddedDocument = (Document)GetFieldValue(currentField, arrayContent, embeddedDocument);
+                        
+                        if (embeddedDocument == null)
+                        {
+                            return false;
+                        }
                     }
                     else
                     {
@@ -831,6 +836,11 @@ namespace Arango.Client
                     if (embeddedDocument.ContainsKey(currentField))
                     {
                         embeddedDocument = (Document)GetFieldValue(currentField, arrayContent, embeddedDocument);
+                        
+                        if (embeddedDocument == null)
+                        {
+                            return true;
+                        }
                     }
                     else
                     {
