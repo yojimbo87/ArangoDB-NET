@@ -112,7 +112,9 @@ namespace Arango.Client.Protocol
                     response.JsonString = reader.ReadToEnd();
                     
                     reader.Close();
+                    reader.Dispose();
                     responseStream.Close();
+                    responseStream.Dispose();
                 }
                 
                 if (!string.IsNullOrEmpty(response.JsonString))
@@ -122,36 +124,60 @@ namespace Arango.Client.Protocol
             }
             catch (WebException webException)
             {
-                var httpResponse = (HttpWebResponse)webException.Response;
-                var responseStream = httpResponse.GetResponseStream();
-                var reader = new StreamReader(responseStream);
-                var errorMessage = "";
-
-                response.IsException = true;
-                response.StatusCode = httpResponse.StatusCode;
-                response.Headers = httpResponse.Headers;
-                response.JsonString = reader.ReadToEnd();
-                
-                reader.Close();
-                responseStream.Close();
-                httpResponse.Close();
-                httpResponse.Dispose();
-                
-                if (!string.IsNullOrEmpty(response.JsonString))
+                if ((webException.Status == WebExceptionStatus.ProtocolError) && 
+                    (webException.Response != null))
                 {
-                    response.Document.Parse(response.JsonString);
+                    var errorMessage = "";
+                    var exceptionHttpResponse = (HttpWebResponse)webException.Response;
                     
-                    errorMessage = string.Format(
-                            "ArangoDB responded with error code {0}:\n{1} [error number {2}]",
-                            response.Document.Enum<HttpStatusCode>("code"),
-                            response.Document.String("errorMessage"),
-                            response.Document.Int("errorNum")
-                        );
+                    response.IsException = true;
+                    response.StatusCode = exceptionHttpResponse.StatusCode;
+                    
+                    if (exceptionHttpResponse.Headers.Count > 0)
+                    {
+                        response.Headers = exceptionHttpResponse.Headers;
+                    }
+                    
+                    if (exceptionHttpResponse.ContentLength > 0)
+                    {
+                        var exceptionResponseStream = exceptionHttpResponse.GetResponseStream();
+                        var exceptionReader = new StreamReader(exceptionResponseStream);
+        
+                        response.JsonString = exceptionReader.ReadToEnd();
+                        
+                        exceptionReader.Close();
+                        exceptionReader.Dispose();
+                        exceptionResponseStream.Close();
+                        exceptionResponseStream.Dispose();
+                    }
+                    
+                    exceptionHttpResponse.Close();
+                    exceptionHttpResponse.Dispose();
+                    
+                    if (!string.IsNullOrEmpty(response.JsonString))
+                    {
+                        response.Document.Parse(response.JsonString);
+                        
+                        errorMessage = string.Format(
+                                "ArangoDB responded with error code {0}:\n{1} [error number {2}]",
+                                response.Document.Enum<HttpStatusCode>("code"),
+                                response.Document.String("errorMessage"),
+                                response.Document.Int("errorNum")
+                            );
+                    }
+                    else
+                    {
+                        errorMessage = "ArangoDB response was empty.";
+                    }
+                    
+                    response.Document.String("driverErrorMessage", errorMessage);
+                    response.Document.String("driverExceptionMessage", webException.Message);
+                    response.Document.Object("driverInnerException", webException.InnerException);
                 }
-                
-                response.Document.String("driverErrorMessage", errorMessage);
-                response.Document.String("driverExceptionMessage", webException.Message);
-                response.Document.Object("driverInnerException", webException.InnerException);
+                else
+                {
+                    throw;
+                }
             }
 
             return response;
