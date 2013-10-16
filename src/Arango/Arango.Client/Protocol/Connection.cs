@@ -28,8 +28,6 @@ namespace Arango.Client.Protocol
 
         internal Uri BaseUri { get; set; }
 
-        internal CredentialCache Credentials { get; set; }
-
         #endregion
 
         internal Connection(string hostname, int port, bool isSecured, string userName = "", string password = "")
@@ -41,12 +39,6 @@ namespace Arango.Client.Protocol
             Password = password;
 
             BaseUri = new Uri((isSecured ? "https" : "http") + "://" + hostname + ":" + port + "/");
-
-            if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
-            {
-                Credentials = new CredentialCache();
-                Credentials.Add(BaseUri, "Basic", new NetworkCredential(userName, password));
-            }
         }
         
         internal Connection(string hostname, int port, bool isSecured, string databaseName, string alias, string userName = "", string password = "")
@@ -60,38 +52,42 @@ namespace Arango.Client.Protocol
             Password = password;
 
             BaseUri = new Uri((isSecured ? "https" : "http") + "://" + hostname + ":" + port + "/_db/" + databaseName + "/");
-
-            if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
-            {
-                Credentials = new CredentialCache();
-                Credentials.Add(BaseUri, "Basic", new NetworkCredential(userName, password));
-            }
         }
 
         internal Response Process(Request request)
         {
             var httpRequest = (HttpWebRequest)HttpWebRequest.Create(BaseUri + request.RelativeUri);
-            httpRequest.KeepAlive = true;
-            httpRequest.Method = request.Method;
-            httpRequest.UserAgent = ArangoClient.DriverName + "/" + ArangoClient.DriverVersion;
-
-            if (Credentials != null)
-            {
-                httpRequest.Credentials = Credentials;
-            }
-
+            
             if ((request.Headers.Count > 0))
             {
                 httpRequest.Headers = request.Headers;
             }
+            
+            httpRequest.KeepAlive = true;
+            httpRequest.SendChunked = false;
+            httpRequest.Method = request.Method;
+            httpRequest.UserAgent = ArangoClient.DriverName + "/" + ArangoClient.DriverVersion;
+            
+            if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
+            {
+                httpRequest.Headers.Add(
+                    "Authorization", 
+                    "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(Username + ":" + Password))
+                );
+            }
 
             if (!string.IsNullOrEmpty(request.Body))
             {
-                byte[] data = Encoding.UTF8.GetBytes(request.Body);
-
+                httpRequest.ContentType = "application/json; charset=utf-8";
+                
+                var data = Encoding.UTF8.GetBytes(request.Body);
                 var stream = httpRequest.GetRequestStream();
+                
                 stream.Write(data, 0, data.Length);
+                stream.Flush();
+                
                 stream.Close();
+                stream.Dispose();
             }
             else
             {
