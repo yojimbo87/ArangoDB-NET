@@ -48,7 +48,7 @@ namespace Arango.Client
             
             if (fieldValue == null)
             {
-                throw new Exception("Value is null.");
+                throw new NullFieldException("Field '" + fieldPath + "' has null value.");
             }
             else
             {
@@ -66,7 +66,7 @@ namespace Arango.Client
             
             if (fieldValue == null)
             {
-                throw new Exception("Value is null.");
+                throw new NullFieldException("Field '" + fieldPath + "' has null value.");
             }
             else
             {
@@ -84,13 +84,14 @@ namespace Arango.Client
             
             if (fieldValue == null)
             {
-                throw new Exception("Value is null.");
+                throw new NullFieldException("Field '" + fieldPath + "' has null value.");
             }
             else
             {
                 return System.Convert.ToInt16(fieldValue);
             }
         }
+        
         /// <summary> 
         /// Gets integer (Int32) type value of specific field.
         /// </summary>
@@ -101,7 +102,7 @@ namespace Arango.Client
             
             if (fieldValue == null)
             {
-                throw new Exception("Value is null.");
+                throw new NullFieldException("Field '" + fieldPath + "' has null value.");
             }
             else
             {
@@ -119,7 +120,7 @@ namespace Arango.Client
             
             if (fieldValue == null)
             {
-                throw new Exception("Value is null.");
+                throw new NullFieldException("Field '" + fieldPath + "' has null value.");
             }
             else
             {
@@ -137,7 +138,7 @@ namespace Arango.Client
             
             if (fieldValue == null)
             {
-                throw new Exception("Value is null.");
+                throw new NullFieldException("Field '" + fieldPath + "' has null value.");
             }
             else
             {
@@ -155,7 +156,7 @@ namespace Arango.Client
             
             if (fieldValue == null)
             {
-                throw new Exception("Value is null.");
+                throw new NullFieldException("Field '" + fieldPath + "' has null value.");
             }
             else
             {
@@ -173,7 +174,7 @@ namespace Arango.Client
             
             if (fieldValue == null)
             {
-                throw new Exception("Value is null.");
+                throw new NullFieldException("Field '" + fieldPath + "' has null value.");
             }
             else
             {
@@ -186,7 +187,7 @@ namespace Arango.Client
         /// </summary>
         /// <param name="fieldPath">Path to the field in document.</param>
         public string String(string fieldPath)
-        {
+        {            
             return (string)GetField(fieldPath);
         }
         
@@ -345,10 +346,16 @@ namespace Arango.Client
                     if (embeddedDocument.ContainsKey(currentField))
                     {
                         embeddedDocument = (Document)GetFieldValue(currentField, arrayContent, embeddedDocument);
+                        
+                        // if current field document is null - break cycle and throw exception
+                        if (embeddedDocument == null)
+                        {
+                            break;
+                        }
                     }
+                    // current field in path isn't present
                     else
                     {
-                        // if current field in path isn't present
                         break;
                     }
 
@@ -373,8 +380,8 @@ namespace Arango.Client
                     return GetFieldValue(currentField, arrayContent, this);
                 }
             }
-            
-            return null;
+             
+            throw new NonExistingFieldException("Field '" + fieldPath + "' does not exist.");
         }
         
         private object GetFieldValue(string fieldName, string arrayContent, Document fieldObject)
@@ -383,10 +390,20 @@ namespace Arango.Client
             {
                 return fieldObject[fieldName];
             }
-            else
+            else if (arrayContent != "*")
             {
-                return ((IList)fieldObject[fieldName])[int.Parse(arrayContent)];
+                var collection = ((IList)fieldObject[fieldName]);
+                var index = int.Parse(arrayContent);
+                
+                if ((index >= 0) && (collection.Count > index))
+                {
+                    return collection[index];
+                }
+                
+                throw new IndexOutOfRangeException("Index in field '" + fieldName + "' is out of range.");
             }
+            
+            throw new Exception("Invalid array index value.");
         }
         
         #endregion
@@ -536,7 +553,7 @@ namespace Arango.Client
 
             return this;
         }
-        
+
         /// <summary> 
         /// Sets object type value to specific field.
         /// </summary>
@@ -591,7 +608,7 @@ namespace Arango.Client
             
             return this;
         }
-        
+
         /// <summary> 
         /// Sets generic list object value to specific field.
         /// </summary>
@@ -604,8 +621,11 @@ namespace Arango.Client
             return this;
         }
         
-        private void SetField(string fieldPath, object inputObject)
+        private void SetField(string fieldPath, object value)
         {
+            var currentField = "";
+            var arrayContent = "";
+            
             if (fieldPath.Contains("."))
             {
                 var fields = fieldPath.Split('.');
@@ -614,29 +634,42 @@ namespace Arango.Client
 
                 foreach (var field in fields)
                 {
+                    currentField = field;
+                    arrayContent = "";
+                    
+                    if (field.Contains("["))
+                    {
+                        var firstIndex = field.IndexOf('[');
+                        var lastIndex = field.IndexOf(']');
+                        
+                        arrayContent = field.Substring(firstIndex + 1, lastIndex - firstIndex - 1);
+                        currentField = field.Substring(0, firstIndex);
+                    }
+                    
                     if (iteration == fields.Length)
                     {
-                        if (embeddedDocument.ContainsKey(field))
-                        {
-                            embeddedDocument[field] = inputObject;
-                        }
-                        else
-                        {
-                            embeddedDocument.Add(field, inputObject);
-                        }
+                        SetFieldValue(currentField, arrayContent, embeddedDocument, value);
                         
                         break;
                     }
 
-                    if (embeddedDocument.ContainsKey(field))
+                    if (embeddedDocument.ContainsKey(currentField))
                     {
-                        embeddedDocument = (Document)embeddedDocument[field];
+                        embeddedDocument = (Document)GetFieldValue(currentField, arrayContent, embeddedDocument);
+                        
+                        // embedded document is null - it needs to be created
+                        if (embeddedDocument == null)
+                        {
+                            var tempDocument = new Document();
+                            embeddedDocument.Add(currentField, tempDocument);
+                            embeddedDocument = tempDocument;
+                        }
                     }
+                    // document which contains the field doesn't exist create it first
                     else
                     {
-                        // if document which contains the field doesn't exist create it first
                         var tempDocument = new Document();
-                        embeddedDocument.Add(field, tempDocument);
+                        embeddedDocument.Add(currentField, tempDocument);
                         embeddedDocument = tempDocument;
                     }
 
@@ -645,13 +678,58 @@ namespace Arango.Client
             }
             else
             {
-                if (this.ContainsKey(fieldPath))
+                currentField = fieldPath;
+                
+                if (fieldPath.Contains("["))
                 {
-                    this[fieldPath] = inputObject;
+                    var firstIndex = fieldPath.IndexOf('[');
+                    var lastIndex = fieldPath.IndexOf(']');
+                    
+                    arrayContent = fieldPath.Substring(firstIndex + 1, lastIndex - firstIndex - 1);
+                    currentField = fieldPath.Substring(0, firstIndex);
+                }
+
+                SetFieldValue(currentField, arrayContent, this, value);
+            }
+        }
+        
+        private void SetFieldValue(string fieldName, string arrayContent, Document fieldObject, object value)
+        {
+            // add new field or replace existing one
+            if (arrayContent == "")
+            {
+                if (fieldObject.ContainsKey(fieldName))
+                {
+                    fieldObject[fieldName] = value;
                 }
                 else
                 {
-                    this.Add(fieldPath, inputObject);
+                    fieldObject.Add(fieldName, value);
+                }
+            }
+            // add new collection item or replace existing one
+            else
+            {
+                var collection = ((IList)fieldObject[fieldName]);
+
+                // add new item to collection
+                if (arrayContent == "*")
+                {
+                    collection.Add(value);
+                }
+                // replace existing item in collection
+                else
+                {
+                    var index = int.Parse(arrayContent);
+                    
+                    if ((index >= 0) && (collection.Count > index))
+                    {
+                        collection[index] = value;
+                        
+                        return;
+                    }
+                    
+                    throw new IndexOutOfRangeException("Index in field '" + fieldName + "' is out of range.");
                 }
             }
         }
@@ -666,103 +744,57 @@ namespace Arango.Client
         /// <param name="fieldPath">Path to the field in document.</param>
         public bool Has(string fieldPath)
         {
-            var currentField = "";
-            var arrayContent = "";
-            
-            if (fieldPath.Contains("."))
+            try
             {
-                var fields = fieldPath.Split('.');
-                var iteration = 1;
-                var embeddedDocument = this;
+                var field = GetField(fieldPath);
                 
-                foreach (var field in fields)
-                {
-                    currentField = field;
-                    arrayContent = "";
-                    
-                    if (field.Contains("["))
-                    {
-                        var firstIndex = field.IndexOf('[');
-                        var lastIndex = field.IndexOf(']');
-                        
-                        arrayContent = field.Substring(firstIndex + 1, lastIndex - firstIndex - 1);
-                        currentField = field.Substring(0, firstIndex);
-                    }
-                    
-                    if (iteration == fields.Length)
-                    {
-                        if (embeddedDocument.ContainsKey(currentField))
-                        {
-                            // it's array - should check if there is value at specific index
-                            if (arrayContent != "")
-                            {
-                                // passed array index is less than total number of elements in the array
-                                if (((IList)embeddedDocument[currentField]).Count > int.Parse(arrayContent))
-                                {
-                                    return true;
-                                }
-                            }
-                            // it's single value
-                            else
-                            {
-                                return true;
-                            }
-                        }
-                        
-                        break;
-                    }
-
-                    if (embeddedDocument.ContainsKey(currentField))
-                    {
-                        embeddedDocument = (Document)GetFieldValue(currentField, arrayContent, embeddedDocument);
-                        
-                        if (embeddedDocument == null)
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        // if current field in path isn't present
-                        break;
-                    }
-
-                    iteration++;
-                }
+                return true;
             }
-            else
+            catch (NonExistingFieldException exception)
             {
-                currentField = fieldPath;
+                return false;
+            }
+            catch (IndexOutOfRangeException exception)
+            {
+                return false;
+            }
+        }
+        
+        /// <summary> 
+        /// Checks for existence of specific field of specific type in document.
+        /// </summary>
+        /// <param name="fieldPath">Path to the field in document.</param>
+        /// <param name="type">Type which should field have.</param>
+        public bool Has(string fieldPath, Type type)
+        {
+            try
+            {
+                var fieldValue = GetField(fieldPath);
                 
-                if (fieldPath.Contains("["))
+                if (fieldValue != null)
                 {
-                    var firstIndex = fieldPath.IndexOf('[');
-                    var lastIndex = fieldPath.IndexOf(']');
+                    var fieldType = fieldValue.GetType();
                     
-                    arrayContent = fieldPath.Substring(firstIndex + 1, lastIndex - firstIndex - 1);
-                    currentField = fieldPath.Substring(0, firstIndex);
-                }
-                
-                if (this.ContainsKey(currentField))
-                {
-                    // it's array - should check if there is value at specific index
-                    if (arrayContent != "")
-                    {
-                        // passed array index is less than total number of elements in the array
-                        if (((IList)this[currentField]).Count > int.Parse(arrayContent))
-                        {
-                            return true;
-                        }
-                    }
-                    // it's single value
-                    else
+                    if (fieldType == type)
                     {
                         return true;
                     }
                 }
+                else if ((fieldValue == null) && (type == typeof(Nullable)))
+                {
+                    return true;
+                }
+                
+                return false;
             }
-            
-            return false;
+            catch (NonExistingFieldException exception)
+            {
+                return false;
+            }
+            catch (IndexOutOfRangeException exception)
+            {
+                return false;
+            }
         }
         
         /// <summary> 
@@ -771,135 +803,27 @@ namespace Arango.Client
         /// <param name="fieldPath">Path to the field in document.</param>
         public bool IsNull(string fieldPath)
         {
-            var currentField = "";
-            var arrayContent = "";
-            
-            if (fieldPath.Contains("."))
+            try
             {
-                var fields = fieldPath.Split('.');
-                var iteration = 1;
-                var embeddedDocument = this;
+                var fieldValue = GetField(fieldPath);
                 
-                foreach (var field in fields)
-                {
-                    currentField = field;
-                    arrayContent = "";
-                    
-                    if (field.Contains("["))
-                    {
-                        var firstIndex = field.IndexOf('[');
-                        var lastIndex = field.IndexOf(']');
-                        
-                        arrayContent = field.Substring(firstIndex + 1, lastIndex - firstIndex - 1);
-                        currentField = field.Substring(0, firstIndex);
-                    }
-                    
-                    if (iteration == fields.Length)
-                    {
-                        if (embeddedDocument.ContainsKey(currentField))
-                        {
-                            // it's array - should check if there is value at specific index
-                            if (arrayContent != "")
-                            {
-                                var collection = (IList)embeddedDocument[currentField];
-                                var index = int.Parse(arrayContent);                        
-                                // passed array index is less than total number of elements in the array
-                                if (collection.Count > index)
-                                {
-                                    if (collection[index] == null)
-                                    {
-                                        return true;
-                                    }
-                                }
-                                else
-                                {
-                                    return true;
-                                }
-                            }
-                            // it's single value
-                            else
-                            {
-                                if (embeddedDocument[currentField] == null)
-                                {
-                                    return true;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            return true;
-                        }
-                        
-                        break;
-                    }
-
-                    if (embeddedDocument.ContainsKey(currentField))
-                    {
-                        embeddedDocument = (Document)GetFieldValue(currentField, arrayContent, embeddedDocument);
-                        
-                        if (embeddedDocument == null)
-                        {
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        // if current field in path isn't present
-                        return true;
-                    }
-
-                    iteration++;
-                }
-            }
-            else
-            {
-                currentField = fieldPath;
-                
-                if (fieldPath.Contains("["))
-                {
-                    var firstIndex = fieldPath.IndexOf('[');
-                    var lastIndex = fieldPath.IndexOf(']');
-                    
-                    arrayContent = fieldPath.Substring(firstIndex + 1, lastIndex - firstIndex - 1);
-                    currentField = fieldPath.Substring(0, firstIndex);
-                }
-                
-                if (this.ContainsKey(currentField))
-                {
-                    // it's array - should check if there is value at specific index
-                    if (arrayContent != "")
-                    {
-                        var collection = (IList)this[currentField];
-                        var index = int.Parse(arrayContent);                        
-                        // passed array index is less than total number of elements in the array
-                        if (collection.Count > index)
-                        {
-                            if (collection[index] == null)
-                            {
-                                return true;
-                            }
-                        }
-                        else
-                        {
-                            return true;
-                        }
-                    }
-                    // it's single value
-                    else
-                    {
-                        if (this[currentField] == null)
-                        {
-                            return true;
-                        }
-                    }
-                }
-                else
+                if (fieldValue == null)
                 {
                     return true;
                 }
+                else
+                {
+                    return false;
+                }
             }
-            
-            return false;
+            catch (NonExistingFieldException exception)
+            {
+                return true;
+            }
+            catch (IndexOutOfRangeException exception)
+            {
+                return true;
+            }
         }
         
         /// <summary> 
@@ -908,72 +832,16 @@ namespace Arango.Client
         /// <param name="fieldPath">Path to the field in document.</param>
         public Type Type(string fieldPath)
         {
-            var currentField = "";
-            var arrayContent = "";
+            var fieldValue = GetField(fieldPath);
             
-            if (fieldPath.Contains("."))
+            if (fieldValue == null)
             {
-                var fields = fieldPath.Split('.');
-                var iteration = 1;
-                var embeddedDocument = this;
-                
-                foreach (var field in fields)
-                {
-                    currentField = field;
-                    arrayContent = "";
-                    
-                    if (field.Contains("["))
-                    {
-                        var firstIndex = field.IndexOf('[');
-                        var lastIndex = field.IndexOf(']');
-                        
-                        arrayContent = field.Substring(firstIndex + 1, lastIndex - firstIndex - 1);
-                        currentField = field.Substring(0, firstIndex);
-                    }
-                    
-                    if (iteration == fields.Length)
-                    {
-                        if (embeddedDocument.ContainsKey(currentField))
-                        {
-                            return embeddedDocument[currentField].GetType();
-                        }
-                        
-                        break;
-                    }
-
-                    if (embeddedDocument.ContainsKey(currentField))
-                    {
-                        embeddedDocument = (Document)GetFieldValue(currentField, arrayContent, embeddedDocument);
-                    }
-                    else
-                    {
-                        // if current field in path isn't present
-                        break;
-                    }
-
-                    iteration++;
-                }
+                return typeof(Nullable);
             }
             else
             {
-                currentField = fieldPath;
-                
-                if (fieldPath.Contains("["))
-                {
-                    var firstIndex = fieldPath.IndexOf('[');
-                    var lastIndex = fieldPath.IndexOf(']');
-                    
-                    arrayContent = fieldPath.Substring(firstIndex + 1, lastIndex - firstIndex - 1);
-                    currentField = fieldPath.Substring(0, firstIndex);
-                }
-                
-                if (this.ContainsKey(currentField))
-                {
-                    return this[currentField].GetType();
-                }
+                return fieldValue.GetType();
             }
-            
-            return null;
         }
         
         #endregion
@@ -1023,11 +891,16 @@ namespace Arango.Client
                     if (embeddedDocument.ContainsKey(currentField))
                     {
                         embeddedDocument = (Document)GetFieldValue(currentField, arrayContent, embeddedDocument);
+                        
+                        if (embeddedDocument == null)
+                        {
+                            throw new NonExistingFieldException("Field '" + fieldPath + "' does not exist.");
+                        }
                     }
+                    // current field in path isn't present
                     else
                     {
-                        // if current field in path isn't present
-                        break;
+                        throw new NonExistingFieldException("Field '" + fieldPath + "' does not exist.");
                     }
 
                     iteration++;
@@ -1049,6 +922,10 @@ namespace Arango.Client
                 if (this.ContainsKey(currentField))
                 {
                     this[currentField] = ConvertField(this[currentField], type);
+                }
+                else
+                {
+                    throw new NonExistingFieldException("Field '" + fieldPath + "' does not exist.");
                 }
             }
             
@@ -1128,11 +1005,16 @@ namespace Arango.Client
                     if (embeddedDocument.ContainsKey(currentField))
                     {
                         embeddedDocument = (Document)GetFieldValue(currentField, arrayContent, embeddedDocument);
+                        
+                        if (embeddedDocument == null)
+                        {
+                            throw new NonExistingFieldException("Field '" + fieldPath + "' does not exist.");
+                        }
                     }
+                    // current field in path isn't present
                     else
                     {
-                        // if current field in path isn't present
-                        break;
+                        throw new NonExistingFieldException("Field '" + fieldPath + "' does not exist.");
                     }
 
                     iteration++;
@@ -1154,6 +1036,10 @@ namespace Arango.Client
                 if (this.ContainsKey(currentField))
                 {
                     this.Remove(currentField);
+                }
+                else
+                {
+                    throw new NonExistingFieldException("Field '" + fieldPath + "' does not exist.");
                 }
             }
             
@@ -1305,7 +1191,14 @@ namespace Arango.Client
             
             foreach (string field in fields)
             {
-                document.Drop(field);
+                try
+                {
+                    document.Drop(field);
+                }
+                catch(Exception e)
+                {
+                    // fail silently if the field doesn't exist
+                }
             }
             
             return document;
@@ -1471,6 +1364,7 @@ namespace Arango.Client
                 foreach (PropertyInfo propertyInfo in genericObjectType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
                 {
                     var propertyName = propertyInfo.Name;
+                    // TODO: arango hack
                     var arangoProperty = propertyInfo.GetCustomAttribute<ArangoProperty>();
                     object fieldValue = null;
                     Type fieldType = null;
@@ -1647,6 +1541,7 @@ namespace Arango.Client
                 foreach (var propertyInfo in inputObjectType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
                 {
                     var propertyName = propertyInfo.Name;
+                    // TODO: arango hack
                     var arangoProperty = propertyInfo.GetCustomAttribute<ArangoProperty>();
     
                     if (arangoProperty != null)
@@ -1770,9 +1665,9 @@ namespace Arango.Client
         /// Serializes specified generic object to it's JSON string representation.
         /// </summary>
         /// <param name="value">Generic object to be serialized into JSON string.</param>
-        public static string Serialize<T>(T obj)
+        public static string Serialize<T>(T value)
         {
-            return JsonConvert.SerializeObject(obj);
+            return JsonConvert.SerializeObject(value);
         }
         
         #endregion
@@ -1942,27 +1837,27 @@ namespace Arango.Client
                 
                 if (arangoProperty != null)
                 {
-                    if (arangoProperty.Identity)
+                    if (arangoProperty.Identity && Has("_id"))
                     {
                         propertyInfo.SetValue(genericObject, String("_id"), null);
                     }
                     
-                    if (arangoProperty.Key)
+                    if (arangoProperty.Key && Has("_key"))
                     {
                         propertyInfo.SetValue(genericObject, String("_key"), null);
                     }
                     
-                    if (arangoProperty.Revision)
+                    if (arangoProperty.Revision && Has("_rev"))
                     {
                         propertyInfo.SetValue(genericObject, String("_rev"), null);
                     }
                     
-                    if (arangoProperty.From)
+                    if (arangoProperty.From && Has("_from"))
                     {
                         propertyInfo.SetValue(genericObject, String("_from"), null);
                     }
                     
-                    if (arangoProperty.To)
+                    if (arangoProperty.To && Has("_to"))
                     {
                         propertyInfo.SetValue(genericObject, String("_to"), null);
                     }

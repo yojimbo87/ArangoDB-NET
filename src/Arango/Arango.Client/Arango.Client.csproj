@@ -51,6 +51,8 @@
     <Compile Include="API\Documents\DateTimeFormat.cs" />
     <Compile Include="API\Documents\Document.cs" />
     <Compile Include="API\Documents\DocumentSettings.cs" />
+    <Compile Include="API\Documents\Exceptions\NonExistingFieldException.cs" />
+    <Compile Include="API\Documents\Exceptions\NullFieldException.cs" />
     <Compile Include="API\Documents\MergeOptions.cs" />
     <Compile Include="API\Edges\ArangoEdgeDirection.cs" />
     <Compile Include="API\Edges\ArangoEdgeOperation.cs" />
@@ -74,6 +76,7 @@
   <ItemGroup>
     <Folder Include="API\Collections" />
     <Folder Include="API\Documents" />
+    <Folder Include="API\Documents\Exceptions" />
     <Folder Include="API\Edges" />
     <Folder Include="API\Queries" />
     <Folder Include="Protocol\" />
