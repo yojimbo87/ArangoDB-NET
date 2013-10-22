@@ -1195,7 +1195,7 @@ namespace Arango.Client
                 {
                     document.Drop(field);
                 }
-                catch(Exception e)
+                catch(Exception exception)
                 {
                     // fail silently if the field doesn't exist
                 }
@@ -1214,7 +1214,14 @@ namespace Arango.Client
             
             foreach (string field in fields)
             {
-                document.SetField(field, GetField(field));
+                try
+                {
+                    document.SetField(field, GetField(field));
+                }
+                catch(Exception exception)
+                {
+                    // fail silently if the field doesn't exist
+                }
             }
             
             return document;
