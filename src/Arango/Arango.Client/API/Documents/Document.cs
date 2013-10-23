@@ -963,6 +963,8 @@ namespace Arango.Client
         
         #endregion
         
+        #region Field drop
+        
         /// <summary> 
         /// Removes specified field from document.
         /// </summary>
@@ -996,7 +998,11 @@ namespace Arango.Client
                     {
                         if (embeddedDocument.ContainsKey(currentField))
                         {
-                            embeddedDocument.Remove(currentField);
+                            DropFieldValue(currentField, arrayContent, embeddedDocument);
+                        }
+                        else
+                        {
+                            throw new NonExistingFieldException("Field '" + currentField + "' does not exist.");
                         }
                         
                         break;
@@ -1035,7 +1041,7 @@ namespace Arango.Client
                 
                 if (this.ContainsKey(currentField))
                 {
-                    this.Remove(currentField);
+                    DropFieldValue(currentField, arrayContent, this);
                 }
                 else
                 {
@@ -1045,6 +1051,32 @@ namespace Arango.Client
             
             return this;
         }
+        
+        private void DropFieldValue(string fieldName, string arrayContent, Document fieldObject)
+        {
+            // remove entire field
+            if (arrayContent == "")
+            {
+                fieldObject.Remove(fieldName);
+            }
+            // remove field array item
+            else
+            {
+                var collection = ((IList)fieldObject[fieldName]);
+                var index = int.Parse(arrayContent);
+                
+                if ((index >= 0) && (collection.Count > index))
+                {
+                    collection.RemoveAt(index);
+                    
+                    return;
+                }
+                
+                throw new IndexOutOfRangeException("Index in field '" + fieldName + "' is out of range.");
+            }
+        }
+        
+        #endregion
         
         #region Clone
         
