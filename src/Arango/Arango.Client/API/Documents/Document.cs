@@ -7,12 +7,15 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+// TODO:
+// - try to use partial classes or extension methods to inject arango specific code to document class
+
 namespace Arango.Client
 {
     /// <summary> 
     /// Document JSON-like structure represented as dictionary of strings and objects.
     /// </summary>
-    public class Document : Dictionary<string, object>
+    public partial class Document : Dictionary<string, object>
     {
         /// <summary> 
         /// Global settings object for documents.
@@ -214,12 +217,12 @@ namespace Arango.Client
         }
         
         /// <summary> 
-        /// Gets object type value of specific field.
+        /// Gets document value of specific field.
         /// </summary>
         /// <param name="fieldPath">Path to the field in document.</param>
-        public object Object(string fieldPath)
+        public Document Object(string fieldPath)
         {
-            return (object)GetField(fieldPath);
+            return (Document)GetField(fieldPath);
         }
         
         /// <summary> 
@@ -235,10 +238,10 @@ namespace Arango.Client
         /// Gets document object value of specific field.
         /// </summary>
         /// <param name="fieldPath">Path to the field in document.</param>
-        public Document Docunet(string fieldPath)
+        /*public Document Docunet(string fieldPath)
         {
             return (Document)GetField(fieldPath);
-        }
+        }*/
         
         /// <summary> 
         /// Gets enum value of specific field.
@@ -567,32 +570,13 @@ namespace Arango.Client
         }
         
         /// <summary> 
-        /// Sets generic object value to specific field.
+        /// Sets document or generic object value to specific field.
         /// </summary>
         /// <param name="fieldPath">Path to the field in document.</param>
         /// <param name="value">Value to be saved in specified field.</param>
         public Document Object<T>(string fieldPath, T value)
         {
             SetField(fieldPath, value);
-            
-            return this;
-        }
-        
-        /// <summary> 
-        /// Sets document object value to specific field.
-        /// </summary>
-        /// <param name="fieldPath">Path to the field in document.</param>
-        /// <param name="value">Value to be saved in specified field.</param>
-        public Document Docunet<T>(string fieldPath, T value)
-        {
-            if (value is Document)
-            {
-                SetField(fieldPath, value);
-            }
-            else
-            {
-                SetField(fieldPath, ToDocument<T>(value));
-            }
             
             return this;
         }
@@ -700,11 +684,11 @@ namespace Arango.Client
             {
                 if (fieldObject.ContainsKey(fieldName))
                 {
-                    fieldObject[fieldName] = value;
+                    fieldObject[fieldName] = ParseObject(value);
                 }
                 else
                 {
-                    fieldObject.Add(fieldName, value);
+                    fieldObject.Add(fieldName, ParseObject(value));
                 }
             }
             // add new collection item or replace existing one
@@ -715,7 +699,7 @@ namespace Arango.Client
                 // add new item to collection
                 if (arrayContent == "*")
                 {
-                    collection.Add(value);
+                    collection.Add(ParseObject(value));
                 }
                 // replace existing item in collection
                 else
@@ -724,13 +708,25 @@ namespace Arango.Client
                     
                     if ((index >= 0) && (collection.Count > index))
                     {
-                        collection[index] = value;
+                        collection[index] = ParseObject(value);
                         
                         return;
                     }
                     
                     throw new IndexOutOfRangeException("Index in field '" + fieldName + "' is out of range.");
                 }
+            }
+        }
+        
+        private object ParseObject(object value)
+        {
+            if (value is Dictionary<string, object>)
+            {
+                return ToDocument(value);
+            }
+            else
+            {
+                return value;
             }
         }
         
@@ -1386,100 +1382,6 @@ namespace Arango.Client
             genericObject = (T)ToObject<T>(genericObject, this);
         }
         
-        private T ToObject<T>(T genericObject, Document document) where T : class, new()
-        {
-            var genericObjectType = genericObject.GetType();
-
-            if (genericObject is Document)
-            {
-                // if generic object is arango specific class - use set field to copy data
-                foreach (KeyValuePair<string, object> item in document)
-                {
-                    (genericObject as Document).SetField(item.Key, item.Value);
-                }
-            }
-            else
-            {
-                foreach (PropertyInfo propertyInfo in genericObjectType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
-                {
-                    var propertyName = propertyInfo.Name;
-                    // TODO: arango hack
-                    var arangoProperty = propertyInfo.GetCustomAttribute<ArangoProperty>();
-                    object fieldValue = null;
-                    Type fieldType = null;
-                    
-                    if (arangoProperty != null)
-                    {
-                        if (!arangoProperty.Deserializable)
-                        {
-                            continue;
-                        }
-                        
-                        if (!string.IsNullOrEmpty(arangoProperty.Alias))
-                        {
-                            propertyName = arangoProperty.Alias;
-                        }
-                    }
-                    
-                    if (document.Has(propertyName))
-                    {
-                        fieldValue = document.GetField(propertyName);
-                        
-                        if (fieldValue != null)
-                        {
-                            fieldType = fieldValue.GetType();
-                        }
-                    }
-                    else
-                    {
-                        continue;
-                    }
-                    
-                    // property is a collection
-                    if ((propertyInfo.PropertyType.IsArray || 
-                         propertyInfo.PropertyType.IsGenericType))
-                    {
-                        var instance = Activator.CreateInstance(propertyInfo.PropertyType);
-                            
-                        propertyInfo.SetValue(
-                            genericObject,
-                            ConvertToCollection(instance, (IList)fieldValue, propertyInfo.PropertyType),
-                            null
-                        );
-                    }
-                    // property is class except the string type since string values are parsed differently
-                    else if (propertyInfo.PropertyType.IsClass && (propertyInfo.PropertyType.Name != "String"))
-                    {
-                        // create object instance of embedded class
-                        var instance = Activator.CreateInstance(propertyInfo.PropertyType);
-
-                        if (fieldType == typeof(Document))
-                        {
-                            propertyInfo.SetValue(genericObject, ToObject(instance, (Document)fieldValue), null);
-                        }
-                        else
-                        {
-                            propertyInfo.SetValue(genericObject, fieldValue, null);
-                        }
-                    }
-                    // property is basic type
-                    else
-                    {
-                        if ((fieldValue == null) || (propertyInfo.PropertyType == fieldType))
-                        {
-                            propertyInfo.SetValue(genericObject, fieldValue, null);
-                        } 
-                        else
-                        {
-                            propertyInfo.SetValue(genericObject, System.Convert.ChangeType(fieldValue, propertyInfo.PropertyType), null);
-                        }
-                    }
-                }
-            }
-
-            return genericObject;
-        }
-        
         private object ConvertToCollection(object collectionObject, IList collection, Type collectionType)
         {
             if (collection == null)
@@ -1550,86 +1452,7 @@ namespace Arango.Client
         }
         
         #endregion
-        
-        /// <summary> 
-        /// Converts generic object to it's document representation.
-        /// </summary>
-        /// <param name="inputObject">Generic object to be converted into document.</param>
-        public static Document ToDocument<T>(T inputObject)
-        {
-            if (inputObject is Document)
-            {
-                return inputObject as Document;
-            }
-            else if (inputObject is Dictionary<string, object>)
-            {
-                var document = new Document();
-                
-                foreach (KeyValuePair<string, object> field in inputObject as Dictionary<string, object>)
-                {
-                    document.Object(field.Key, field.Value);
-                }
-                
-                return document;
-            }
-            else
-            {
-                var inputObjectType = inputObject.GetType();
-                var document = new Document();
-                
-                foreach (var propertyInfo in inputObjectType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
-                {
-                    var propertyName = propertyInfo.Name;
-                    // TODO: arango hack
-                    var arangoProperty = propertyInfo.GetCustomAttribute<ArangoProperty>();
-    
-                    if (arangoProperty != null)
-                    {
-                        // do not convert properties which are not flagged for serialization or
-                        // represent arango specific fields
-                        if (!arangoProperty.Serializable ||
-                            arangoProperty.Identity ||
-                            arangoProperty.Key ||
-                            arangoProperty.Revision ||
-                            arangoProperty.From ||
-                            arangoProperty.To)
-                        {
-                            continue;
-                        }
-                        
-                        if (!string.IsNullOrEmpty(arangoProperty.Alias))
-                        {
-                            propertyName = arangoProperty.Alias;
-                        }
-                    }
-                    
-                    var propertyValue = propertyInfo.GetValue(inputObject);
-                    
-                    if (propertyValue == null)
-                    {
-                        document.SetField(propertyName, null);
-                    }
-                    // property is array or collection
-                    else if (propertyInfo.PropertyType.IsArray || propertyInfo.PropertyType.IsGenericType)
-                    {
-                        document.SetField(propertyName, ToList(propertyValue));
-                    }
-                    // property is class except the string type since string values are parsed differently
-                    else if (propertyInfo.PropertyType.IsClass && (propertyInfo.PropertyType.Name != "String"))
-                    {
-                        document.SetField(propertyName, ToDocument(propertyValue));
-                    }
-                    // property is basic type
-                    else
-                    {
-                        document.SetField(propertyName, propertyValue);
-                    }
-                }
-                
-                return document;
-            }
-        }
-        
+
         /// <summary> 
         /// Converts generic collection to list of objects which are suitable for storing in document field.
         /// </summary>
@@ -1862,6 +1685,184 @@ namespace Arango.Client
         }
         
         #endregion
+    }
+    
+    // arango specific reimplementation of several methods and addition of methods
+    // which deals with mapping of arango attributes
+    public partial class Document : Dictionary<string, object>
+    {
+        private T ToObject<T>(T genericObject, Document document) where T : class, new()
+        {
+            var genericObjectType = genericObject.GetType();
+
+            if (genericObject is Document)
+            {
+                // if generic object is arango specific class - use set field to copy data
+                foreach (KeyValuePair<string, object> item in document)
+                {
+                    (genericObject as Document).SetField(item.Key, item.Value);
+                }
+            }
+            else
+            {
+                foreach (PropertyInfo propertyInfo in genericObjectType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    var propertyName = propertyInfo.Name;
+                    // TODO: arango hack
+                    var arangoProperty = propertyInfo.GetCustomAttribute<ArangoProperty>();
+                    object fieldValue = null;
+                    Type fieldType = null;
+                    
+                    if (arangoProperty != null)
+                    {
+                        if (!arangoProperty.Deserializable)
+                        {
+                            continue;
+                        }
+                        
+                        if (!string.IsNullOrEmpty(arangoProperty.Alias))
+                        {
+                            propertyName = arangoProperty.Alias;
+                        }
+                    }
+                    
+                    if (document.Has(propertyName))
+                    {
+                        fieldValue = document.GetField(propertyName);
+                        
+                        if (fieldValue != null)
+                        {
+                            fieldType = fieldValue.GetType();
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                    
+                    // property is a collection
+                    if ((propertyInfo.PropertyType.IsArray || 
+                         propertyInfo.PropertyType.IsGenericType))
+                    {
+                        var instance = Activator.CreateInstance(propertyInfo.PropertyType);
+                            
+                        propertyInfo.SetValue(
+                            genericObject,
+                            ConvertToCollection(instance, (IList)fieldValue, propertyInfo.PropertyType),
+                            null
+                        );
+                    }
+                    // property is class except the string type since string values are parsed differently
+                    else if (propertyInfo.PropertyType.IsClass && (propertyInfo.PropertyType.Name != "String"))
+                    {
+                        // create object instance of embedded class
+                        var instance = Activator.CreateInstance(propertyInfo.PropertyType);
+
+                        if (fieldType == typeof(Document))
+                        {
+                            propertyInfo.SetValue(genericObject, ToObject(instance, (Document)fieldValue), null);
+                        }
+                        else
+                        {
+                            propertyInfo.SetValue(genericObject, fieldValue, null);
+                        }
+                    }
+                    // property is basic type
+                    else
+                    {
+                        if ((fieldValue == null) || (propertyInfo.PropertyType == fieldType))
+                        {
+                            propertyInfo.SetValue(genericObject, fieldValue, null);
+                        } 
+                        else
+                        {
+                            propertyInfo.SetValue(genericObject, System.Convert.ChangeType(fieldValue, propertyInfo.PropertyType), null);
+                        }
+                    }
+                }
+            }
+
+            return genericObject;
+        }
+        
+        /// <summary> 
+        /// Converts generic object to it's document representation.
+        /// </summary>
+        /// <param name="inputObject">Generic object to be converted into document.</param>
+        public static Document ToDocument<T>(T inputObject)
+        {
+            if (inputObject is Document)
+            {
+                return inputObject as Document;
+            }
+            else if (inputObject is Dictionary<string, object>)
+            {
+                var document = new Document();
+                
+                foreach (KeyValuePair<string, object> field in inputObject as Dictionary<string, object>)
+                {
+                    document.Object(field.Key, field.Value);
+                }
+                
+                return document;
+            }
+            else
+            {
+                var inputObjectType = inputObject.GetType();
+                var document = new Document();
+                
+                foreach (var propertyInfo in inputObjectType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    var propertyName = propertyInfo.Name;
+                    // TODO: arango hack
+                    var arangoProperty = propertyInfo.GetCustomAttribute<ArangoProperty>();
+    
+                    if (arangoProperty != null)
+                    {
+                        // do not convert properties which are not flagged for serialization or
+                        // represent arango specific fields
+                        if (!arangoProperty.Serializable ||
+                            arangoProperty.Identity ||
+                            arangoProperty.Key ||
+                            arangoProperty.Revision ||
+                            arangoProperty.From ||
+                            arangoProperty.To)
+                        {
+                            continue;
+                        }
+                        
+                        if (!string.IsNullOrEmpty(arangoProperty.Alias))
+                        {
+                            propertyName = arangoProperty.Alias;
+                        }
+                    }
+                    
+                    var propertyValue = propertyInfo.GetValue(inputObject);
+                    
+                    if (propertyValue == null)
+                    {
+                        document.SetField(propertyName, null);
+                    }
+                    // property is array or collection
+                    else if (propertyInfo.PropertyType.IsArray || propertyInfo.PropertyType.IsGenericType)
+                    {
+                        document.SetField(propertyName, ToList(propertyValue));
+                    }
+                    // property is class except the string type since string values are parsed differently
+                    else if (propertyInfo.PropertyType.IsClass && (propertyInfo.PropertyType.Name != "String"))
+                    {
+                        document.SetField(propertyName, ToDocument(propertyValue));
+                    }
+                    // property is basic type
+                    else
+                    {
+                        document.SetField(propertyName, propertyValue);
+                    }
+                }
+                
+                return document;
+            }
+        }
         
         /// <summary>
         /// Maps ArangoDB document specific attributes (_id, _key, _rev, _from, _to) from current document to specified generic object.

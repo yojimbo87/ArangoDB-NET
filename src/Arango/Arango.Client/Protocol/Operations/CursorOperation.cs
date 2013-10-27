@@ -49,7 +49,7 @@ namespace Arango.Client.Protocol
                     bindVarsDocument.Object(item.Key, item.Value);
                 }
                 
-                bodyDocument.Docunet("bindVars", bindVarsDocument);
+                bodyDocument.Object("bindVars", bindVarsDocument);
             }
             
             request.Body = bodyDocument.Serialize();
