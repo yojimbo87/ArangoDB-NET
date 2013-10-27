@@ -269,14 +269,14 @@ namespace Arango.Client
         
         #endregion
         
-        #region First
+        #region ToObject
         
-        public Document First()
+        public Document ToObject()
         {
             return ToList().FirstOrDefault();
         }
         
-        public T First<T>()
+        public T ToObject<T>()
         {
             return ToList<T>().FirstOrDefault();
         }

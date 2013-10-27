@@ -26,7 +26,7 @@ namespace Arango.Tests.QueryTests
             
             var singleItem1 = db.Query
                 .Aql(aql1)
-                .First<string>();
+                .ToObject<string>();
             
             Assert.AreEqual(false, string.IsNullOrEmpty(singleItem1));
             
@@ -49,7 +49,7 @@ namespace Arango.Tests.QueryTests
             
             var singleItem2 = db.Query
                 .Aql(aql2)
-                .First<int>();
+                .ToObject<int>();
             
             Assert.AreEqual(true, singleItem2 > 0);
             
@@ -79,7 +79,7 @@ namespace Arango.Tests.QueryTests
             
             var singleDocument = db.Query
                 .Aql(aql)
-                .First();
+                .ToObject();
             
             var doc1 = docs.Where(x => x.String("_id") == singleDocument.String("_id")).First();
                 
@@ -221,7 +221,7 @@ namespace Arango.Tests.QueryTests
             
             var singlePerson = db.Query
                 .Aql(aql)
-                .First<Person>();
+                .ToObject<Person>();
             
             var per1 = people.Where(x => x.ThisIsId == singlePerson.ThisIsId).First();
                 
