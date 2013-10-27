@@ -7,9 +7,6 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-// TODO:
-// - try to use partial classes or extension methods to inject arango specific code to document class
-
 namespace Arango.Client
 {
     /// <summary> 
@@ -1708,7 +1705,7 @@ namespace Arango.Client
                 foreach (PropertyInfo propertyInfo in genericObjectType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
                 {
                     var propertyName = propertyInfo.Name;
-                    // TODO: arango hack
+                    // HACK: arango specific properties check
                     var arangoProperty = propertyInfo.GetCustomAttribute<ArangoProperty>();
                     object fieldValue = null;
                     Type fieldType = null;
@@ -1814,7 +1811,7 @@ namespace Arango.Client
                 foreach (var propertyInfo in inputObjectType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
                 {
                     var propertyName = propertyInfo.Name;
-                    // TODO: arango hack
+                    // HACK: arango specific properties check
                     var arangoProperty = propertyInfo.GetCustomAttribute<ArangoProperty>();
     
                     if (arangoProperty != null)
