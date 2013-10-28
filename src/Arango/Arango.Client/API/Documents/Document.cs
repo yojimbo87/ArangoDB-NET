@@ -1706,20 +1706,24 @@ namespace Arango.Client
                 {
                     var propertyName = propertyInfo.Name;
                     // HACK: arango specific properties check
-                    var arangoProperty = propertyInfo.GetCustomAttribute<ArangoProperty>();
+                    var arangoProperties = propertyInfo.GetCustomAttributes(typeof(ArangoProperty), true);
                     object fieldValue = null;
                     Type fieldType = null;
-                    
-                    if (arangoProperty != null)
+
+                    if (arangoProperties.Any())
                     {
-                        if (!arangoProperty.Deserializable)
+                        var arangoProperty = arangoProperties.First() as ArangoProperty;
+                        if (arangoProperty != null)
                         {
-                            continue;
-                        }
-                        
-                        if (!string.IsNullOrEmpty(arangoProperty.Alias))
-                        {
-                            propertyName = arangoProperty.Alias;
+                            if (!arangoProperty.Deserializable)
+                            {
+                                continue;
+                            }
+
+                            if (!string.IsNullOrEmpty(arangoProperty.Alias))
+                            {
+                                propertyName = arangoProperty.Alias;
+                            }
                         }
                     }
                     
@@ -1812,29 +1816,33 @@ namespace Arango.Client
                 {
                     var propertyName = propertyInfo.Name;
                     // HACK: arango specific properties check
-                    var arangoProperty = propertyInfo.GetCustomAttribute<ArangoProperty>();
-    
-                    if (arangoProperty != null)
+                    var arangoProperties = propertyInfo.GetCustomAttributes(typeof(ArangoProperty), true);
+
+                    if (arangoProperties.Any())
                     {
-                        // do not convert properties which are not flagged for serialization or
-                        // represent arango specific fields
-                        if (!arangoProperty.Serializable ||
-                            arangoProperty.Identity ||
-                            arangoProperty.Key ||
-                            arangoProperty.Revision ||
-                            arangoProperty.From ||
-                            arangoProperty.To)
+                        var arangoProperty = arangoProperties.First() as ArangoProperty;
+                        if (arangoProperty != null)
                         {
-                            continue;
-                        }
-                        
-                        if (!string.IsNullOrEmpty(arangoProperty.Alias))
-                        {
-                            propertyName = arangoProperty.Alias;
+                            // do not convert properties which are not flagged for serialization or
+                            // represent arango specific fields
+                            if (!arangoProperty.Serializable ||
+                                arangoProperty.Identity ||
+                                arangoProperty.Key ||
+                                arangoProperty.Revision ||
+                                arangoProperty.From ||
+                                arangoProperty.To)
+                            {
+                                continue;
+                            }
+
+                            if (!string.IsNullOrEmpty(arangoProperty.Alias))
+                            {
+                                propertyName = arangoProperty.Alias;
+                            }
                         }
                     }
                     
-                    var propertyValue = propertyInfo.GetValue(inputObject);
+                    var propertyValue = propertyInfo.GetValue(inputObject, null);
                     
                     if (propertyValue == null)
                     {
@@ -1870,33 +1878,37 @@ namespace Arango.Client
             // get arango specific fields to generic object if it has properties flagged with attributes
             foreach (PropertyInfo propertyInfo in genericObject.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
-                var arangoProperty = propertyInfo.GetCustomAttribute<ArangoProperty>();
-                
-                if (arangoProperty != null)
+                var arangoProperties = propertyInfo.GetCustomAttributes(typeof(ArangoProperty), true);
+
+                if (arangoProperties.Any())
                 {
-                    if (arangoProperty.Identity && Has("_id"))
+                    var arangoProperty = arangoProperties.First() as ArangoProperty;
+                    if (arangoProperty != null)
                     {
-                        propertyInfo.SetValue(genericObject, String("_id"), null);
-                    }
-                    
-                    if (arangoProperty.Key && Has("_key"))
-                    {
-                        propertyInfo.SetValue(genericObject, String("_key"), null);
-                    }
-                    
-                    if (arangoProperty.Revision && Has("_rev"))
-                    {
-                        propertyInfo.SetValue(genericObject, String("_rev"), null);
-                    }
-                    
-                    if (arangoProperty.From && Has("_from"))
-                    {
-                        propertyInfo.SetValue(genericObject, String("_from"), null);
-                    }
-                    
-                    if (arangoProperty.To && Has("_to"))
-                    {
-                        propertyInfo.SetValue(genericObject, String("_to"), null);
+                        if (arangoProperty.Identity && Has("_id"))
+                        {
+                            propertyInfo.SetValue(genericObject, String("_id"), null);
+                        }
+
+                        if (arangoProperty.Key && Has("_key"))
+                        {
+                            propertyInfo.SetValue(genericObject, String("_key"), null);
+                        }
+
+                        if (arangoProperty.Revision && Has("_rev"))
+                        {
+                            propertyInfo.SetValue(genericObject, String("_rev"), null);
+                        }
+
+                        if (arangoProperty.From && Has("_from"))
+                        {
+                            propertyInfo.SetValue(genericObject, String("_from"), null);
+                        }
+
+                        if (arangoProperty.To && Has("_to"))
+                        {
+                            propertyInfo.SetValue(genericObject, String("_to"), null);
+                        }
                     }
                 }
             }
@@ -1911,33 +1923,37 @@ namespace Arango.Client
             // get arango specific fields to generic object if it has properties flagged with attributes
             foreach (PropertyInfo propertyInfo in genericObject.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
-                var arangoProperty = propertyInfo.GetCustomAttribute<ArangoProperty>();
-                
-                if (arangoProperty != null)
+                var arangoProperties = propertyInfo.GetCustomAttributes(typeof(ArangoProperty), true);
+
+                if (arangoProperties.Any())
                 {
-                    if (arangoProperty.Identity)
+                    var arangoProperty = arangoProperties.First() as ArangoProperty;
+                    if (arangoProperty != null)
                     {
-                        String("_id", (string)propertyInfo.GetValue(genericObject));
-                    }
-                    
-                    if (arangoProperty.Key)
-                    {
-                        String("_key", (string)propertyInfo.GetValue(genericObject));
-                    }
-                    
-                    if (arangoProperty.Revision)
-                    {
-                        String("_rev", (string)propertyInfo.GetValue(genericObject));
-                    }
-                    
-                    if (arangoProperty.From)
-                    {
-                        String("_from", (string)propertyInfo.GetValue(genericObject));
-                    }
-                    
-                    if (arangoProperty.To)
-                    {
-                        String("_to", (string)propertyInfo.GetValue(genericObject));
+                        if (arangoProperty.Identity)
+                        {
+                            String("_id", (string)propertyInfo.GetValue(genericObject, null));
+                        }
+
+                        if (arangoProperty.Key)
+                        {
+                            String("_key", (string)propertyInfo.GetValue(genericObject, null));
+                        }
+
+                        if (arangoProperty.Revision)
+                        {
+                            String("_rev", (string)propertyInfo.GetValue(genericObject, null));
+                        }
+
+                        if (arangoProperty.From)
+                        {
+                            String("_from", (string)propertyInfo.GetValue(genericObject, null));
+                        }
+
+                        if (arangoProperty.To)
+                        {
+                            String("_to", (string)propertyInfo.GetValue(genericObject, null));
+                        }
                     }
                 }
             }
