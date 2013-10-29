@@ -124,31 +124,25 @@ namespace Arango.Client.Protocol
                     (webException.Response != null))
                 {
                     var errorMessage = "";
-                    var exceptionHttpResponse = (HttpWebResponse)webException.Response;
-                    
-                    response.IsException = true;
-                    response.StatusCode = exceptionHttpResponse.StatusCode;
-                    
-                    if (exceptionHttpResponse.Headers.Count > 0)
+                    using (var exceptionHttpResponse = (HttpWebResponse)webException.Response)
                     {
-                        response.Headers = exceptionHttpResponse.Headers;
+                        response.IsException = true;
+                        response.StatusCode = exceptionHttpResponse.StatusCode;
+
+                        if (exceptionHttpResponse.Headers.Count > 0)
+                        {
+                            response.Headers = exceptionHttpResponse.Headers;
+                        }
+
+                        if (exceptionHttpResponse.ContentLength > 0)
+                        {
+                            using (var exceptionResponseStream = exceptionHttpResponse.GetResponseStream())
+                            using (var exceptionReader = new StreamReader(exceptionResponseStream))
+                            {
+                                response.JsonString = exceptionReader.ReadToEnd();
+                            }
+                        }
                     }
-                    
-                    if (exceptionHttpResponse.ContentLength > 0)
-                    {
-                        var exceptionResponseStream = exceptionHttpResponse.GetResponseStream();
-                        var exceptionReader = new StreamReader(exceptionResponseStream);
-        
-                        response.JsonString = exceptionReader.ReadToEnd();
-                        
-                        exceptionReader.Close();
-                        exceptionReader.Dispose();
-                        exceptionResponseStream.Close();
-                        exceptionResponseStream.Dispose();
-                    }
-                    
-                    exceptionHttpResponse.Close();
-                    exceptionHttpResponse.Dispose();
                     
                     if (!string.IsNullOrEmpty(response.JsonString))
                     {

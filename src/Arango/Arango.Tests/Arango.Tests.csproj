@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Arango.Tests</RootNamespace>
     <AssemblyName>Arango.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <NoWin32Manifest>False</NoWin32Manifest>
     <SignAssembly>False</SignAssembly>
     <DelaySign>False</DelaySign>
