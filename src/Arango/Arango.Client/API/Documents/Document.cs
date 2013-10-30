@@ -1688,6 +1688,23 @@ namespace Arango.Client
     // which deals with mapping of arango attributes
     public partial class Document : Dictionary<string, object>
     {
+        public static bool IsId(string id)
+        {
+            if (id.Contains("/"))
+            {
+                var split = id.Split('/');
+                
+                if ((split.Length == 2) && (split[0].Length > 0) && (split[1].Length > 0))
+                {
+                    long key;
+                    
+                    return long.TryParse(split[1], out key);
+                }
+            }
+            
+            return false;
+        }
+        
         private T ToObject<T>(T genericObject, Document document) where T : class, new()
         {
             var genericObjectType = genericObject.GetType();
