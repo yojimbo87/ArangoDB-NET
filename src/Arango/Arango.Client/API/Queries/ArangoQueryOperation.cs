@@ -6,6 +6,9 @@ using Arango.Client.Protocol;
 
 namespace Arango.Client
 {
+    /// <summary> 
+    /// Expose AQL querying functionality.
+    /// </summary>
     public class ArangoQueryOperation
     {
         private CursorOperation _cursorOperation;
@@ -26,10 +29,10 @@ namespace Arango.Client
             _cursorOperation = cursorOperation;
         }
         
-        public ArangoQueryOperation()
-        {
-        }
-        
+        /// <summary> 
+        /// Appends AQL query.
+        /// </summary>
+        /// <param name="aql">AQL query to be appended.</param>
         public ArangoQueryOperation Aql(string aql)
         {
             _aql += aql;
@@ -37,6 +40,10 @@ namespace Arango.Client
             return this;
         }
         
+        /// <summary> 
+        /// Specifies maximum number of result documents to be transferred from the server to the client in one roundtrip.
+        /// </summary>
+        /// <param name="aql">Size of the batch being transferred in one roundtrip.</param>
         public ArangoQueryOperation BatchSize(int batchSize)
         {
             _batchSize = batchSize;
@@ -44,6 +51,11 @@ namespace Arango.Client
             return this;
         }
         
+        /// <summary> 
+        /// Specifies bind parameter and it's value.
+        /// </summary>
+        /// <param name="key">Key of the bind parameter. '@' sign will be added automatically.</param>
+        /// <param name="value">Value of the bind parameter.</param>
         public ArangoQueryOperation AddParameter(string key, object value)
         {
             _bindVars.Add(key, value);
@@ -177,6 +189,10 @@ namespace Arango.Client
         
         #region ToList
         
+        /// <summary> 
+        /// Executes AQL query and returns list of documents.
+        /// </summary>
+        /// <param name="count">Variable where will be stored total number of result documents available after execution.</param>
         public List<Document> ToList(out int count)
         {
             var items = _cursorOperation.Post(_aql.ToString(), true, out count, _batchSize, _bindVars);
@@ -184,6 +200,9 @@ namespace Arango.Client
             return items.Cast<Document>().ToList();
         }
         
+        /// <summary> 
+        /// Executes AQL query and returns list of documents.
+        /// </summary>
         public List<Document> ToList()
         {
             var count = 0;
@@ -192,6 +211,10 @@ namespace Arango.Client
             return items.Cast<Document>().ToList();
         }
         
+        /// <summary> 
+        /// Executes AQL query and returns list of objects.
+        /// </summary>
+        /// <param name="count">Variable where will be stored total number of result objects available after execution.</param>
         public List<T> ToList<T>(out int count) where T: class, new()
         {
             var type = typeof(T);
@@ -229,6 +252,9 @@ namespace Arango.Client
             return genericCollection;
         }
         
+        /// <summary> 
+        /// Executes AQL query and returns list of objects.
+        /// </summary>
         public List<T> ToList<T>()
         {
             var type = typeof(T);
@@ -271,11 +297,17 @@ namespace Arango.Client
         
         #region ToObject
         
+        /// <summary> 
+        /// Executes AQL query and returns first document available in the result list.
+        /// </summary>
         public Document ToObject()
         {
             return ToList().FirstOrDefault();
         }
         
+        /// <summary> 
+        /// Executes AQL query and returns first object available in the result list.
+        /// </summary>
         public T ToObject<T>()
         {
             return ToList<T>().FirstOrDefault();
@@ -285,6 +317,9 @@ namespace Arango.Client
         
         #region ToString
         
+        /// <summary> 
+        /// Returns current value of constructed AQL query.
+        /// </summary>
         public override string ToString()
         {
             //for (int i = 0; i < _level; i++)
