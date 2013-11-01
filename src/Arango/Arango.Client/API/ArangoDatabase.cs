@@ -38,6 +38,14 @@ namespace Arango.Client
                 return new ArangoQueryOperation(new CursorOperation(_connection));
             }
         }
+        
+        public ArangoFunctionOperation Function
+        {
+            get
+            {
+                return new ArangoFunctionOperation(new FunctionOperation(_connection));
+            }
+        }
 
         public ArangoDatabase(string alias)
         {

@@ -6,6 +6,7 @@ namespace Arango.Client.Protocol
         Collection,
         Document,
         Edge,
-        Cursor
+        Cursor,
+        Function
     }
 }

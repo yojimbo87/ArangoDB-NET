@@ -65,6 +65,7 @@
     <Compile Include="DatabaseTests\DatabaseTests.cs" />
     <Compile Include="DocumentTests\DocumentTests.cs" />
     <Compile Include="DummyObjects\Person.cs" />
+    <Compile Include="FunctionTests\ArangoFunctionTests.cs" />
     <Compile Include="QueryTests\AqlTests.cs" />
     <Compile Include="QueryTests\CursorTests.cs" />
   </ItemGroup>
@@ -76,6 +77,7 @@
     <Folder Include="DummyObjects" />
     <Folder Include="DatabaseTests" />
     <Folder Include="DocumentTests" />
+    <Folder Include="FunctionTests" />
     <Folder Include="QueryTests" />
   </ItemGroup>
   <ItemGroup>

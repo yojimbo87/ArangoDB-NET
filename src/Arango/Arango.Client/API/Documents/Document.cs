@@ -743,11 +743,11 @@ namespace Arango.Client
                 
                 return true;
             }
-            catch (NonExistingFieldException exception)
+            catch (NonExistingFieldException)
             {
                 return false;
             }
-            catch (IndexOutOfRangeException exception)
+            catch (IndexOutOfRangeException)
             {
                 return false;
             }
@@ -780,11 +780,11 @@ namespace Arango.Client
                 
                 return false;
             }
-            catch (NonExistingFieldException exception)
+            catch (NonExistingFieldException)
             {
                 return false;
             }
-            catch (IndexOutOfRangeException exception)
+            catch (IndexOutOfRangeException)
             {
                 return false;
             }
@@ -809,11 +809,11 @@ namespace Arango.Client
                     return false;
                 }
             }
-            catch (NonExistingFieldException exception)
+            catch (NonExistingFieldException)
             {
                 return true;
             }
-            catch (IndexOutOfRangeException exception)
+            catch (IndexOutOfRangeException)
             {
                 return true;
             }
@@ -1220,7 +1220,7 @@ namespace Arango.Client
                 {
                     document.Drop(field);
                 }
-                catch(Exception exception)
+                catch(Exception)
                 {
                     // fail silently if the field doesn't exist
                 }
@@ -1243,7 +1243,7 @@ namespace Arango.Client
                 {
                     document.SetField(field, GetField(field));
                 }
-                catch(Exception exception)
+                catch(Exception)
                 {
                     // fail silently if the field doesn't exist
                 }
