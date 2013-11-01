@@ -65,6 +65,23 @@ namespace Arango.Tests.FunctionTests
             Assert.AreEqual(fahrenheit, returnedFahrenheit);
         }
         
+        [Test()]
+        public void Should_create_and_delete_function()
+        {
+            var db = Database.GetTestDatabase();
+            
+            var created = db.Function.Create(
+                "myfunctions::temperature::celsiustofahrenheit", 
+                "function (celsius) { return celsius * 1.8 + 40; }"
+            );
+            
+            Assert.AreEqual(true, created);
+            
+            var deleted = db.Function.Delete("myfunctions::temperature::celsiustofahrenheit");
+            
+            Assert.AreEqual(true, deleted);
+        }
+        
         public void Dispose()
         {
             Database.DeleteTestCollection(Database.TestDocumentCollectionName);

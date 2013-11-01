@@ -29,5 +29,19 @@ namespace Arango.Client
         }
         
         #endregion
+        
+        #region Delete
+        
+        public bool Delete(string name)
+        {
+            return _functionOperation.Delete(name, null);
+        }
+        
+        public bool Delete(string name, bool group)
+        {
+            return _functionOperation.Delete(name, group ? "true" : "false");
+        }
+        
+        #endregion
     }
 }

@@ -57,6 +57,43 @@ namespace Arango.Client.Protocol
         
         #endregion
         
+        #region DELETE
         
+        internal bool Delete(string name, string group)
+        {
+            var request = new Request(RequestType.Function, HttpMethod.Delete);
+            request.RelativeUri = string.Join("/", _apiUri, name);
+            
+            // (optional)
+            if (!string.IsNullOrEmpty(group))
+            {
+                request.QueryString.Add("group", group);
+            }
+            
+            var response = _connection.Process(request);
+            var isRemoved = false;
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    isRemoved = true;
+                    break;
+                default:
+                    if (response.IsException)
+                    {
+                        throw new ArangoException(
+                            response.StatusCode,
+                            response.Document.String("driverErrorMessage"),
+                            response.Document.String("driverExceptionMessage"),
+                            response.Document.Object<Exception>("driverInnerException")
+                        );
+                    }
+                    break;
+            }
+            
+            return isRemoved;
+        }
+        
+        #endregion
     }
 }
