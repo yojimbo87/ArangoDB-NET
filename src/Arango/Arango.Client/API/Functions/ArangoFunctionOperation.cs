@@ -12,6 +12,20 @@ namespace Arango.Client
             _functionOperation = functionOperation;
         }
         
+        #region Get
+        
+        public List<Document> Get()
+        {
+            return Get(null);
+        }
+        
+        public List<Document> Get(string @namespace)
+        {
+            return _functionOperation.Get(@namespace);
+        }
+        
+        #endregion
+        
         #region Create
         
         public bool Create(string name, string code)

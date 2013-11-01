@@ -15,6 +15,47 @@ namespace Arango.Client.Protocol
             _connection = connection;
         }
         
+        #region GET
+        
+        internal List<Document> Get(string @namespace)
+        {
+            var request = new Request(RequestType.Function, HttpMethod.Get);
+            request.RelativeUri = _apiUri;
+            
+            // (optional)
+            if (!string.IsNullOrEmpty(@namespace))
+            {
+                request.QueryString.Add("namespace", @namespace);
+            }
+            
+            var response = _connection.Process(request);
+            List<Document> functions;
+            
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    functions = response.List;
+                    break;
+                default:
+                    functions = null;
+                    
+                    if (response.IsException)
+                    {
+                        throw new ArangoException(
+                            response.StatusCode,
+                            response.Document.String("driverErrorMessage"),
+                            response.Document.String("driverExceptionMessage"),
+                            response.Document.Object<Exception>("driverInnerException")
+                        );
+                    }
+                    break;
+            }
+            
+            return functions;
+        }
+        
+        #endregion
+        
         #region POST
         
         internal bool Post(string name, string code)

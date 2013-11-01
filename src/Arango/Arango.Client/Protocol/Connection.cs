@@ -115,7 +115,20 @@ namespace Arango.Client.Protocol
                 
                 if (!string.IsNullOrEmpty(response.JsonString))
                 {
-                    response.Document.Parse(response.JsonString);
+                    // response string is array
+                    if (response.JsonString[0] == '[')
+                    {
+                        response.List = Document.DeserializeArray<Document>(response.JsonString);
+                    }
+                    // response string is object
+                    else
+                    {
+                        response.Document = Document.DeserializeDocument(response.JsonString);
+                    }
+                }
+                else
+                {
+                    response.Document = new Document();
                 }
             }
             catch (WebException webException)
@@ -146,7 +159,16 @@ namespace Arango.Client.Protocol
                     
                     if (!string.IsNullOrEmpty(response.JsonString))
                     {
-                        response.Document.Parse(response.JsonString);
+                        // response string is array
+                        if (response.JsonString[0] == '[')
+                        {
+                            response.List = Document.DeserializeArray<Document>(response.JsonString);
+                        }
+                        // response string is object
+                        else
+                        {
+                            response.Document = Document.DeserializeDocument(response.JsonString);
+                        }
                         
                         errorMessage = string.Format(
                                 "ArangoDB responded with error code {0}:\n{1} [error number {2}]",
@@ -157,6 +179,7 @@ namespace Arango.Client.Protocol
                     }
                     else
                     {
+                        response.Document = new Document();
                         errorMessage = "ArangoDB response was empty.";
                     }
                     
