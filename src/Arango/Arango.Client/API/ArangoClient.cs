@@ -19,7 +19,7 @@ namespace Arango.Client
         public const string DriverVersion = "0.7.0";
         
         /// <summary>
-        /// Driver settings object.
+        /// Driver global settings object.
         /// </summary>
         public static ArangoSettings Settings { get; set; }
         
@@ -46,6 +46,15 @@ namespace Arango.Client
             return databaseOperation.Get();
         }
         
+        /// <summary>
+        /// Creates new database with specified parameters. 
+        /// </summary>
+        /// <param name="hostname">Hostname of database connection.</param>
+        /// <param name="port">Port number of database connection.</param>
+        /// <param name="isSecured">Flag indicating if the database connection is HTTP or HTTPS.</param>
+        /// <param name="databaseName">Name of the database to be created.</param>
+        /// <param name="userName">User name for authentication.</param>
+        /// <param name="password">Password for authentication.</param>
         public static bool CreateDatabase(string hostname, int port, bool isSecured, string databaseName, string userName = "", string password = "")
         {
             var databaseOperation = new DatabaseOperation(
@@ -55,6 +64,15 @@ namespace Arango.Client
             return databaseOperation.Post(databaseName);
         }
         
+        /// <summary>
+        /// Deletes specified database. 
+        /// </summary>
+        /// <param name="hostname">Hostname of database connection.</param>
+        /// <param name="port">Port number of database connection.</param>
+        /// <param name="isSecured">Flag indicating if the database connection is HTTP or HTTPS.</param>
+        /// <param name="databaseName">Name of the database to be deleted.</param>
+        /// <param name="userName">User name for authentication.</param>
+        /// <param name="password">Password for authentication.</param>
         public static bool DeleteDatabase(string hostname, int port, bool isSecured, string databaseName, string userName = "", string password = "")
         {
             var databaseOperation = new DatabaseOperation(
@@ -65,7 +83,7 @@ namespace Arango.Client
         }
 
         /// <summary>
-        /// Precreates connection to existing database stored under specified alias which can be retrieved later via ArangoDatabase object. 
+        /// Stores connection data to existing database under specified alias which will be used by ArangoDatabase objects. 
         /// </summary>
         /// <param name="hostname">Hostname of database connection.</param>
         /// <param name="port">Port number of database connection.</param>

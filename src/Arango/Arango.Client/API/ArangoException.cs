@@ -3,6 +3,9 @@ using System.Net;
 
 namespace Arango.Client
 {
+    /// <summary> 
+    /// Represents Arango specific exception.
+    /// </summary>
     public class ArangoException : Exception
     {
         /// <summary>
@@ -15,15 +18,28 @@ namespace Arango.Client
         /// </summary>
         public string WebExceptionMessage { get; set; }
 
+        /// <summary>
+        /// Creates Arango specific exception.
+        /// </summary>
         public ArangoException()
         {
         }
 
+        /// <summary>
+        /// Creates Arango specific exception with specified message.
+        /// </summary>
+        /// <param name="message">Message which describes the error.</param>
         public ArangoException(string message) 
             : base(message)
         {
         }
         
+        /// <summary>
+        /// Creates Arango specific exception with specified parameters.
+        /// </summary>
+        /// <param name="httpStatusCode">HTTP status code of new exception.</param>
+        /// <param name="message">Message which describes the error.</param>
+        /// <param name="webExceptionMessage">Message of exception copied from web exception where it originated.</param>
         public ArangoException(HttpStatusCode httpStatusCode, string message, string webExceptionMessage) 
             : base(message)
         {
@@ -31,8 +47,15 @@ namespace Arango.Client
             WebExceptionMessage = webExceptionMessage;
         }
 
-        public ArangoException(HttpStatusCode httpStatusCode, string message, string webExceptionMessage, Exception inner)
-            : base(message, inner)
+        /// <summary>
+        /// Creates Arango specific exception with specified parameters.
+        /// </summary>
+        /// <param name="httpStatusCode">HTTP status code of new exception.</param>
+        /// <param name="message">MMessage which describes the error.</param>
+        /// <param name="webExceptionMessage">Message of exception copied from web exception where it originated.</param>
+        /// <param name="innerException">Exception that is the cause of current exception.</param>
+        public ArangoException(HttpStatusCode httpStatusCode, string message, string webExceptionMessage, Exception innerException)
+            : base(message, innerException)
         {
             HttpStatusCode = httpStatusCode;
             WebExceptionMessage = webExceptionMessage;
