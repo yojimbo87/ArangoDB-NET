@@ -2,6 +2,9 @@ using Arango.Client.Protocol;
 
 namespace Arango.Client
 {
+    /// <summary> 
+    /// Expose document management functionality.
+    /// </summary>
     public class ArangoDocumentOperation
     {
         private DocumentOperation _documentOperation;
@@ -14,16 +17,18 @@ namespace Arango.Client
         #region Get
         
         /// <summary>
-        /// Retrieves document object from database identified by ID.
+        /// Retrieves document with specified identifier.
         /// </summary>
+        /// <param name="id">Document identifier.</param>
         public Document Get(string id)
         {
             return _documentOperation.Get(id);
         }
         
         /// <summary>
-        /// Retrieves document from database identified by ID and maps it to specified generic object.
+        /// Retrieves document with specified identifier mapped to object.
         /// </summary>
+        /// <param name="id">Document identifier.</param>
         public T Get<T>(string id) where T : class, new()
         {
             var document = Get(id);
@@ -38,17 +43,25 @@ namespace Arango.Client
         
         #region Create
         
-        /// <summary>
-        /// Creates document in database collection and assigns additional data to referenced object.
+        /// <summary> 
+        /// Creates document in specified collection. Passed document parameter will be updated with _id, _key and _rev fields.
         /// </summary>
+        /// <param name="collection">Collection in which will be document created.</param>
+        /// <param name="document">Document with data which will be saved to newly created document. Document have to contain _id field.</param>
+        /// <param name="waitForSync">Determines if the response should wait until document has been synced to disk.</param>
+        /// <param name="createCollection">Determines if previously specified collection should be created if it not exists.</param>
         public void Create(string collection, Document document, bool waitForSync = false, bool createCollection = false)
         {
             _documentOperation.Post(collection, document, waitForSync, createCollection);
         }
         
-        /// <summary>
-        /// Creates document in database collection and assigns additional data to referenced object.
+        /// <summary> 
+        /// Creates document in specified collection. Passed genericObject parameter will be updated with Identity, Key and Revision properties if they were mapped through ArangoProperty class.
         /// </summary>
+        /// <param name="collection">Collection in which will be document created.</param>
+        /// <param name="genericObject">Object with data which will be saved to newly created document. Object have to contain Identity property mapped through ArangoProperty class.</param>
+        /// <param name="waitForSync">Determines if the response should wait until document has been synced to disk.</param>
+        /// <param name="createCollection">Determines if previously specified collection should be created if it not exists.</param>
         public void Create<T>(string collection, T genericObject, bool waitForSync = false, bool createCollection = false)
         {
             var document = Document.ToDocument(genericObject);
@@ -60,9 +73,10 @@ namespace Arango.Client
         
         #endregion
         
-        /// <summary>
-        /// Deletes specified document from database collection and returnes boolean value which indicates if the operation was successful.
+        /// <summary> 
+        /// Deletes document with specified identifier.
         /// </summary>
+        /// <param name="id">Identifier of the document to be deleted.</param>
         public bool Delete(string id)
         {
             return _documentOperation.Delete(id);
@@ -70,17 +84,23 @@ namespace Arango.Client
         
         #region Replace
         
-        /// <summary>
-        /// Replace existing document in database collection with another document object and retrieves boolean value indicating if the operation was successful.
+        /// <summary> 
+        /// Replaces specified document. Passed document parameter will be updated with _id, _key and _rev fields.
         /// </summary>
+        /// <param name="document">Document with data that will replace existing document data. Document have to contain _id field.</param>
+        /// <param name="waitForSync">Determines if the response should wait until document has been synced to disk.</param>
+        /// <param name="revision">Replaces edge with specific revision.</param>
         public bool Replace(Document document, bool waitForSync = false, string revision = null)
         {
             return _documentOperation.Put(document, waitForSync, revision);
         }
         
-        /// <summary>
-        /// Replace existing document in database collection with another document object and retrieves boolean value indicating if the operation was successful.
+        /// <summary> 
+        /// Replaces specified document. Passed genericObject parameter will be updated with Identity, Key and Revision properties if they were mapped through ArangoProperty class.
         /// </summary>
+        /// <param name="genericObject">Object with data that will replace existing edge data. Object have to contain Identity property mapped through ArangoProperty class.</param>
+        /// <param name="waitForSync">Determines if the response should wait until document has been synced to disk.</param>
+        /// <param name="revision">Replaces edge with specific revision.</param>
         public bool Replace<T>(T genericObject, bool waitForSync = false, string revision = null)
         {
             var document = Document.ToDocument(genericObject);
@@ -98,17 +118,23 @@ namespace Arango.Client
         
         #region Update
         
-        /// <summary>
-        /// Updates existing document in database collection and retrieves boolean value indicating if the operation was successful.
+        /// <summary> 
+        /// Updates specified document. Passed document parameter will be updated with _id, _key and _rev fields.
         /// </summary>
+        /// <param name="edge">Document with data that will update existing document data. Document have to contain _id field.</param>
+        /// <param name="waitForSync">Determines if the response should wait until document has been synced to disk.</param>
+        /// <param name="revision">Updates edge with specific revision.</param>
         public bool Update(Document document, bool waitForSync = false, string revision = null)
         {
             return _documentOperation.Patch(document, waitForSync, revision);
         }
         
-        /// <summary>
-        /// Updates existing document in database collection and retrieves boolean value indicating if the operation was successful.
+        /// <summary> 
+        /// Updates specified document. Passed genericObject parameter will be updated with Identifier, Key and Revision properties if they were mapped through ArangoProperty class.
         /// </summary>
+        /// <param name="genericObject">Object with data that will update existing document data. Object have to contain Identity property mapped through ArangoProperty class.</param>
+        /// <param name="waitForSync">Determines if the response should wait until document has been synced to disk.</param>
+        /// <param name="revision">Updates edge with specific revision.</param>
         public bool Update<T>(T genericObject, bool waitForSync = false, string revision = null)
         {
             var document = Document.ToDocument(genericObject);
@@ -124,9 +150,10 @@ namespace Arango.Client
         
         #endregion
         
-        /// <summary>
-        /// Check for existence of specific document.
+        /// <summary> 
+        /// Determines if the document with specified identifier is present in database.
         /// </summary>
+        /// <param name="id">Identifier of the document to be checked for existence.</param>
         public bool Exists(string id)
         {
             return _documentOperation.Head(id);

@@ -68,7 +68,7 @@ namespace Arango.Client
         }
         
         /// <summary> 
-        /// Creates edge in specified collection. Passed genericObject parameter will be updated with Id, Key and Revision properties if they were mapped through ArangoProperty class.
+        /// Creates edge in specified collection. Passed genericObject parameter will be updated with Identity, Key and Revision properties if they were mapped through ArangoProperty class.
         /// </summary>
         /// <param name="collection">Collection in which will be edge created.</param>
         /// <param name="genericObject">Object with data which will be saved to newly created edge. Object have to contains From and To properties mapped through ArangoProperty class.</param>
@@ -129,9 +129,9 @@ namespace Arango.Client
         }
         
         /// <summary> 
-        /// Replaces specified edge. Passed genericObject parameter will be updated with Id, Key and Revision properties if they were mapped through ArangoProperty class.
+        /// Replaces specified edge. Passed genericObject parameter will be updated with Identity, Key and Revision properties if they were mapped through ArangoProperty class.
         /// </summary>
-        /// <param name="genericObject">Object with data that will replace existing edge data. Object have to contains From and To properties mapped through ArangoProperty class.</param>
+        /// <param name="genericObject">Object with data that will replace existing edge data. Object have to contain From and To properties mapped through ArangoProperty class.</param>
         /// <param name="waitForSync">Determines if the response should wait until document has been synced to disk.</param>
         /// <param name="revision">Replaces edge with specific revision.</param>
         public bool Replace<T>(T genericObject, bool waitForSync = false, string revision = null)
@@ -163,9 +163,9 @@ namespace Arango.Client
         }
         
         /// <summary> 
-        /// Updates specified edge. Passed genericObject parameter will be updated with Id, Key and Revision properties if they were mapped through ArangoProperty class.
+        /// Updates specified edge. Passed genericObject parameter will be updated with Identity, Key and Revision properties if they were mapped through ArangoProperty class.
         /// </summary>
-        /// <param name="genericObject">Object with data that will update existing edge data. Object have to contains From and To properties mapped through ArangoProperty class.</param>
+        /// <param name="genericObject">Object with data that will update existing edge data. Object have to contain From and To properties mapped through ArangoProperty class.</param>
         /// <param name="waitForSync">Determines if the response should wait until document has been synced to disk.</param>
         /// <param name="revision">Updates edge with specific revision.</param>
         public bool Update<T>(T genericObject, bool waitForSync = false, string revision = null)
