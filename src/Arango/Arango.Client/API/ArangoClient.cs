@@ -16,7 +16,7 @@ namespace Arango.Client
         /// <summary>
         /// Version of the driver.
         /// </summary>
-        public const string DriverVersion = "0.7.0";
+        public const string DriverVersion = "0.8.0";
         
         /// <summary>
         /// Driver global settings object.
