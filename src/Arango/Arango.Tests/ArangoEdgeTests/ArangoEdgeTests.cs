@@ -477,12 +477,12 @@ namespace Arango.Tests.ArangoEdgeTests
             
             db.Edge.Create(Database.TestEdgeCollectionName, edge2);
             
-            // get both edges
-            var anyEdges = db.Edge.Get(Database.TestEdgeCollectionName, doc2.String("_id"), ArangoEdgeDirection.In);
+            // get only ingoing edges (should be one)
+            var inEdges = db.Edge.Get(Database.TestEdgeCollectionName, doc2.String("_id"), ArangoEdgeDirection.In);
             
-            Assert.AreEqual(1, anyEdges.Count);
+            Assert.AreEqual(1, inEdges.Count);
             
-            var returnedEdge1 = anyEdges.Where(x => x.String("_id") == edge1.String("_id")).First();
+            var returnedEdge1 = inEdges.Where(x => x.String("_id") == edge1.String("_id")).First();
             
             Assert.AreEqual(false, edge1.IsNull("_id"));
             Assert.AreEqual(false, edge1.IsNull("_key"));
@@ -549,12 +549,12 @@ namespace Arango.Tests.ArangoEdgeTests
             
             db.Edge.Create(Database.TestEdgeCollectionName, edge2);
             
-            // get both edges
-            var anyEdges = db.Edge.Get(Database.TestEdgeCollectionName, doc1.String("_id"), ArangoEdgeDirection.Out);
+            // get only outgoing edges (should be one)
+            var outEdges = db.Edge.Get(Database.TestEdgeCollectionName, doc1.String("_id"), ArangoEdgeDirection.Out);
             
-            Assert.AreEqual(1, anyEdges.Count);
+            Assert.AreEqual(1, outEdges.Count);
             
-            var returnedEdge1 = anyEdges.Where(x => x.String("_id") == edge1.String("_id")).First();
+            var returnedEdge1 = outEdges.Where(x => x.String("_id") == edge1.String("_id")).First();
             
             Assert.AreEqual(false, edge1.IsNull("_id"));
             Assert.AreEqual(false, edge1.IsNull("_key"));
