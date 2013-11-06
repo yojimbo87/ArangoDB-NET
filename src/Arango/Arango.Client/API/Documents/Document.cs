@@ -294,7 +294,33 @@ namespace Arango.Client
                         collection = ((List<object>)data).Select(System.Convert.ToDecimal).ToList() as List<T>;
                         break;
                     case "DateTime":
-                        collection = ((List<object>)data).Select(System.Convert.ToDateTime).ToList() as List<T>;
+                        var list = ((IEnumerable)data).Cast<object>().ToList();
+                        
+                        if (list.Count > 0)
+                        {
+                            var itemType = list[0].GetType();
+                            
+                            // if list consist of long values convert them to DateTime objects using unix epoch
+                            if (itemType.Equals(typeof(long)))
+                            {
+                                foreach (long item in list)
+                                {
+                                    collection.Add((T)System.Convert.ChangeType(DocumentSettings.UnixEpoch.AddSeconds((long)item), typeof(T)));
+                                }
+                            }
+                            // if list consist of string values try convert them to DateTime objects
+                            else if (itemType.Equals(typeof(string)))
+                            {
+                                foreach (string item in list)
+                                {
+                                    collection.Add((T)System.Convert.ChangeType(System.DateTime.Parse((string)item, DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AdjustToUniversal), typeof(T)));
+                                }
+                            }
+                            else
+                            {
+                                collection = ((List<object>)data).Select(System.Convert.ToDateTime).ToList() as List<T>;
+                            }
+                        }
                         break;
                     case "String":
                         collection = ((List<object>)data).Select(System.Convert.ToString).ToList() as List<T>;
