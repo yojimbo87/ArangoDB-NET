@@ -3,11 +3,6 @@ namespace Arango.Client.Protocol
 {
     internal static class AQL
     {
-        // internal operations
-        internal const string String = "STRING";
-        internal const string Value = "VALUE";
-        internal const string Variable = "VARIABLE";
-        
         // standard high level operations
         internal const string COLLECT = "COLLECT";
         internal const string FILTER = "FILTER";
@@ -18,11 +13,21 @@ namespace Arango.Client.Protocol
         internal const string LIMIT = "LIMIT";
         internal const string RETURN = "RETURN";
         internal const string SORT = "SORT";
-        
+
+        // standard functions
+        internal const string DOCUMENT = "DOCUMENT";
+        internal const string EDGES = "EDGES";
+
         // symbols
         internal const string And = "&&";
         internal const string DoubleEquals = "==";
         internal new const string Equals = "=";
-        internal const string From = ":";
+
+        // internal operations
+        internal const string Collection = "COLLECTION";
+        internal const string List = "LIST";
+        internal const string String = "STRING";
+        internal const string Value = "VALUE";
+        internal const string Variable = "VARIABLE";
     }
 }

@@ -69,6 +69,10 @@ namespace Arango.Client
 
         #endregion
 
+        /*
+         *  standard high level operations
+         */
+
         #region FILTER
 
         public ArangoQueryOperation FILTER(string attribute)
@@ -102,17 +106,6 @@ namespace Arango.Client
         public ArangoQueryOperation IN(Func<ArangoQueryOperation, ArangoQueryOperation> context)
         {
             var etom = new Etom(AQL.IN);
-            etom.Children = context(new ArangoQueryOperation()).ExpressionTree;
-
-            ExpressionTree.Add(etom);
-
-            return this;
-        }
-
-        public ArangoQueryOperation IN(string expression, Func<ArangoQueryOperation, ArangoQueryOperation> context)
-        {
-            var etom = new Etom(AQL.IN);
-            etom.AddValues(expression);
             etom.Children = context(new ArangoQueryOperation()).ExpressionTree;
 
             ExpressionTree.Add(etom);
@@ -160,6 +153,131 @@ namespace Arango.Client
         }
 
         #endregion
+
+        /*
+         *  standard AQL functions
+         */
+
+        public ArangoQueryOperation DOCUMENT(params string[] documentIds)
+        {
+            var etom = new Etom(AQL.DOCUMENT);
+
+            // if parameter consists of more than one value it should be enclosed in square brackets
+            if (documentIds.Count() > 1)
+            {
+                var expression = new StringBuilder("[");
+
+                for (int i = 0; i < documentIds.Count(); i++)
+                {
+                    expression.Append(ToString(documentIds[i]));
+
+                    if (i < (documentIds.Count() - 1))
+                    {
+                        expression.Append(", ");
+                    }
+                }
+
+                expression.Append("]");
+
+                etom.AddValues(expression.ToString());
+            }
+            else if (documentIds.Count() == 1)
+            {
+                // if documentId is valid document ID/handle enclose it with single quotes
+                // otherwise it's most probably variable which shouldn't be enclosed
+                if (Document.IsId(documentIds.First()))
+                {
+                    etom.AddValues(ToString(documentIds.First()));
+                }
+                else
+                {
+                    etom.AddValues(documentIds.First());
+                }
+            }
+
+            ExpressionTree.Add(etom);
+
+            return this;
+        }
+
+        public ArangoQueryOperation EDGES(string collection, string vertexId, ArangoEdgeDirection edgeDirection)
+        {
+            var expression = collection + ", ";
+
+            // if vertex is valid document ID/handle enclose it with single quotes
+            // otherwise it's most probably variable which shouldn't be enclosed
+            if (Document.IsId(vertexId))
+            {
+                expression += "'" + vertexId + "'";
+            }
+            else
+            {
+                expression += vertexId;
+            }
+
+            expression += ", ";
+
+            switch (edgeDirection)
+            {
+                case ArangoEdgeDirection.In:
+                    expression += "inbound";
+                    break;
+                case ArangoEdgeDirection.Out:
+                    expression += "outbound";
+                    break;
+                case ArangoEdgeDirection.Any:
+                    expression += "any";
+                    break;
+                default:
+                    break;
+            }
+
+            var etom = new Etom(AQL.EDGES);
+            etom.AddValues(expression);
+
+            ExpressionTree.Add(etom);
+
+            return this;
+        }
+
+        /*
+         *  internal functions
+         */
+
+        public ArangoQueryOperation Collection(string name)
+        {
+            var etom = new Etom(AQL.Collection);
+            etom.AddValues(name);
+
+            ExpressionTree.Add(etom);
+
+            return this;
+        }
+
+        public ArangoQueryOperation List(params object[] values)
+        {
+            var etom = new Etom(AQL.List);
+
+            var expression = new StringBuilder("[");
+
+            for (int i = 0; i < values.Count(); i++)
+            {
+                expression.Append(ToString(values[i]));
+
+                if (i < (values.Count() - 1))
+                {
+                    expression.Append(", ");
+                }
+            }
+
+            expression.Append("]");
+
+            etom.AddValues(expression.ToString());
+
+            ExpressionTree.Add(etom);
+
+            return this;
+        }
 
         public ArangoQueryOperation Value(object value)
         {
@@ -327,6 +445,7 @@ namespace Arango.Client
             {
                 switch (etom.Type)
                 {
+                    // standard high level operations
                     case AQL.FILTER:
                         if (spaceCount != 0)
                         {
@@ -341,10 +460,10 @@ namespace Arango.Client
                             expression.Append("\n" + Tabulate(spaceCount));
                         }
 
-                        expression.Append(AQL.FOR + Stringify(etom.Values));
+                        expression.Append(AQL.FOR + " " + etom.Value);
                         break;
                     case AQL.IN:
-                        expression.Append(" " + AQL.IN + Stringify(etom.Values));
+                        expression.Append(" " + AQL.IN);
 
                         if (etom.Children.Count > 0)
                         {
@@ -357,7 +476,7 @@ namespace Arango.Client
                             expression.Append("\n" + Tabulate(spaceCount));
                         }
 
-                        expression.Append(AQL.LET + Stringify(etom.Values) + " =");
+                        expression.Append(AQL.LET + " " + etom.Value + " =");
 
                         if (etom.Children.Count > 0)
                         {
@@ -374,6 +493,40 @@ namespace Arango.Client
 
                         expression.Append(AQL.RETURN + Stringify(etom.Values));
                         break;
+                    // standard AQL functions
+                    case AQL.DOCUMENT:
+                        if (spaceCount != 0)
+                        {
+                            expression.Append(" ");
+                        }
+
+                        expression.Append(AQL.DOCUMENT + "(" + etom.Value + ")");
+                        break;
+                    case AQL.EDGES:
+                        if (spaceCount != 0)
+                        {
+                            expression.Append(" ");
+                        }
+
+                        expression.Append(AQL.EDGES + "(" + etom.Value + ")");
+                        break;
+                    // internal operations
+                    case AQL.Collection:
+                        if (spaceCount != 0)
+                        {
+                            expression.Append(" ");
+                        }
+
+                        expression.Append(etom.Value);
+                        break;
+                    case AQL.List:
+                        if (spaceCount != 0)
+                        {
+                            expression.Append(" ");
+                        }
+
+                        expression.Append(etom.Value);
+                        break;
                     case AQL.String:
                         if (spaceCount != 0)
                         {
@@ -386,7 +539,7 @@ namespace Arango.Client
                         expression.Append(Stringify(etom.Values));
                         break;
                     case AQL.Variable:
-                        expression.Append(" " + etom.Values.First());
+                        expression.Append(" " + etom.Value);
                         break;
                     default:
                         break;
