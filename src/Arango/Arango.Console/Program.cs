@@ -10,7 +10,7 @@ namespace Arango.Console
     {
         public static void Main(string[] args)
         {
-            ArangoClient.AddConnection(
+            /*ArangoClient.AddConnection(
                 "localhost",
                 8529,
                 false,
@@ -20,67 +20,25 @@ namespace Arango.Console
 
             var db = new ArangoDatabase("test");
 
-            var document = db.Document.Get("Usersasfd/21857976");
+            var aql = db.Query.ToString();
 
-            System.Console.WriteLine(document.String("_id"));
-            System.Console.WriteLine(document.String("_key"));
-            System.Console.WriteLine(document.String("_rev"));
-            
-            /*ArangoCollection collection = db.Collection.Get("Users");
+            System.Console.WriteLine(aql);*/
 
-            System.Console.WriteLine(collection.Id);
-            System.Console.WriteLine(collection.Name);
-            System.Console.WriteLine(collection.Status);
-            System.Console.WriteLine(collection.Type);*/
-            
-            /*ArangoCollection col1 = new ArangoCollection();
-            col1.Name = "latif";
-            col1.Type = ArangoCollectionType.Edge;
-            col1.WaitForSync = true;
-            col1.JournalSize = 64000;
-            
-            db.Collection.Create(col1);
-            
-            System.Console.WriteLine(col1.Id);
-            System.Console.WriteLine(col1.Name);
-            System.Console.WriteLine(col1.Status);
-            System.Console.WriteLine(col1.Type);
-            
-            System.Console.WriteLine(db.Collection.Delete(col1.Name));*/
-            
-            /*string json = @"{
-                ""integer"": 12345,
-                ""_foo"": ""bar"",
-                ""embedded"": {
-                    ""bar"": ""baz""
-                },
-                ""array"": [1, 2, 3, 4, 5],
-                ""complex"": [{""x"":111,""y"":222},{""y"":333}]
-            }";*/
+            ArangoExpressionOperation expression = new ArangoExpressionOperation()
+                .FOR("foo").IN("col", ctx => ctx
+                    .FILTER("foo.bar")
+                    .LET("ddd", "aaa")
+                    .FOR("bar").IN("col2", ctx2 => ctx2
+                        .FILTER("bar.foo")
+                        .LET("xxx", "aaa")
+                        .LET("xxx", ctx3 => ctx3
+                            .FOR("foo").IN("col3", ctx4 => ctx4
+                                .RETURN("bbb"))
+                        )
+                        .RETURN("foo"))
+                );
 
-            /*var json = "{\"null\":null,\"embedded\":{\"null\":null}}";
-
-            var doc = new ArangoDocument(json);
-
-            System.Console.WriteLine(JsonConvert.SerializeObject(doc, Formatting.Indented));
-
-            /*Dictionary<string, object> foo = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-
-            foreach (KeyValuePair<string, object> item in foo)
-            {
-                System.Console.WriteLine("{0} {1} {2}", item.Key, item.Value, item.Value.GetType());
-            }
-
-            System.Console.WriteLine("{0} {1}", ((JObject)foo["embedded"])["bar"], ((JObject)foo["embedded"]).Type);*/
-
-            /*Dictionary<string, object> bar = new Dictionary<string, object>();
-
-            bar.Add("foo", "bar");
-            bar.Add("int", 123);
-            bar.Add("emb", foo);
-            bar.Add("arr", new string[] {"a", "b", "c"});
-
-            System.Console.WriteLine(JsonConvert.SerializeObject(bar, Formatting.Indented));*/
+            System.Console.WriteLine(expression.ToString());
 
             System.Console.ReadLine();
         }

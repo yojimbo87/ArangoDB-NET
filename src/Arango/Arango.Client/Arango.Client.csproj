@@ -73,19 +73,14 @@
     <Compile Include="API\ArangoException.cs" />
     <Compile Include="API\ArangoDatabase.cs" />
     <Compile Include="Protocol\Operations\DocumentOperation.cs" />
+    <Compile Include="Protocol\AQL\Etom.cs" />
+    <Compile Include="API\Queries\ArangoExpressionOperation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Folder Include="API\Collections" />
-    <Folder Include="API\Documents" />
-    <Folder Include="API\Documents\Exceptions" />
-    <Folder Include="API\Edges" />
-    <Folder Include="API\Functions" />
-    <Folder Include="API\Queries" />
     <Folder Include="Protocol\" />
-    <Folder Include="API" />
-    <Folder Include="Protocol\AQL" />
-    <Folder Include="Protocol\Operations" />
+    <Folder Include="API\" />
+    <Folder Include="API\Documents\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

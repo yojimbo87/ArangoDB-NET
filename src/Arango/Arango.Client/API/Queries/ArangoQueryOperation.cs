@@ -17,13 +17,6 @@ namespace Arango.Client
         private Dictionary<string, object> _bindVars = new Dictionary<string, object>();
         private string _aql = "";
         
-        // list of variables created with let keyword
-        private List<string> _variables = new List<string>();
-        // name of the last performed operation in query chain
-        //private string _lastOperation = AQL.None;
-        // depth of nested operations
-        //private int _level = 0;
-        
         internal ArangoQueryOperation(CursorOperation cursorOperation)
         {
             _cursorOperation = cursorOperation;
@@ -62,130 +55,6 @@ namespace Arango.Client
             
             return this;
         }
-        
-        // TODO: AQL query generator
-        // - problem is in parantheses before and after FOR cycles which depend on RETURN clause
-        /*#region AQL standard operations
-        
-        public ArangoQueryOperation Filter(string variable)
-        {
-            Join(AQL.Filter, variable);
-            
-            _lastOperation = AQL.Filter;
-            
-            return this;
-        }
-        
-        public ArangoQueryOperation For(string variable, string expression)
-        {   
-            //if (_level > 0)
-            //{
-            //    _aql += "(";
-            //}
-            
-            switch (_lastOperation)
-            {
-                case AQL.None:
-                    // FOR operation starts without initial space
-                    _aql = AQL.For;
-                
-                    Join(variable, AQL.In, expression);
-                    break;
-                case AQL.Let:
-                    // FOR within LET operation starts with brackets
-                    _aql += " (" + AQL.For;
-                    
-                    Join(variable, AQL.In, expression);
-                    break;
-                case AQL.Return:
-                    // 
-                    _aql += ")";
-                    
-                    Join(AQL.For, variable, AQL.In, expression);
-                    break;
-                default:
-                    Join(AQL.For, variable, AQL.In, expression);
-                    break;
-            }
-            
-            _lastOperation = AQL.For;
-            _level++;
-            
-            return this;
-        }
-        
-        public ArangoQueryOperation Let(string variable)
-        {
-            if (_variables.Contains(variable))
-            {
-                throw new ArangoException("Variable name is already used within the AQL query.");
-            }
-            
-            _variables.Add(variable);
-            
-            if (_lastOperation == AQL.None)
-            {
-                _aql = AQL.Let;
-                
-                Join(variable, AQL.Equals);
-            }
-            else
-            {
-                Join(AQL.Let, variable, AQL.Equals);
-            }
-            
-            _lastOperation = AQL.Let;
-            
-            return this;
-        }
-        
-        public ArangoQueryOperation Return(string variable)
-        {
-            Join(AQL.Return, variable);
-            
-            _lastOperation = AQL.Return;
-            _level--;
-            
-            return this;
-        }
-        
-        #endregion
-        
-        #region AQL expression operators
-        
-        public ArangoQueryOperation Equals<T>(T conditionValue)
-        {
-            if ((conditionValue is string) && _variables.Contains(conditionValue.ToString()))
-            {
-                Join(AQL.DoubleEquals, conditionValue.ToString());
-            }
-            else
-            {
-                Join(AQL.DoubleEquals, ToString(conditionValue));
-            }
-            
-            return this;
-        }
-        
-        public ArangoQueryOperation And(string variable)
-        {
-            Join(AQL.And, variable);
-            
-            return this;
-        }
-        
-        #endregion
-        
-        #region AQL support methods
-        
-        public ArangoQueryOperation From(string expression)
-        {
-            Join(AQL.From, expression);
-            
-            return this;
-        }
-        
-        #endregion*/
         
         #region ToList
         
@@ -318,16 +187,10 @@ namespace Arango.Client
         #region ToString
         
         /// <summary> 
-        /// Returns current value of constructed AQL query.
+        /// Returns AQL query string.
         /// </summary>
         public override string ToString()
         {
-            //for (int i = 0; i < _level; i++)
-            //{
-            //    _aql += ")";
-            //    _level--;
-            //}
-            
             return _aql;
         }
         
@@ -344,10 +207,5 @@ namespace Arango.Client
         }
         
         #endregion
-        
-        /*private void Join(params string[] parts)
-        {
-            _aql += " " + string.Join(" ", parts);
-        }*/
     }
 }
