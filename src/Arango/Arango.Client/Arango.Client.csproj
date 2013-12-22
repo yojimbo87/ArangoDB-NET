@@ -74,7 +74,6 @@
     <Compile Include="API\ArangoDatabase.cs" />
     <Compile Include="Protocol\Operations\DocumentOperation.cs" />
     <Compile Include="Protocol\AQL\Etom.cs" />
-    <Compile Include="API\Queries\ArangoExpressionOperation.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

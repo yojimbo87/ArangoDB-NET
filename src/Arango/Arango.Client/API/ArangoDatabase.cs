@@ -53,15 +53,6 @@ namespace Arango.Client
                 return new ArangoQueryOperation(new CursorOperation(_connection));
             }
         }
-
-        // TODO: docs
-        public ArangoExpressionOperation Expression
-        {
-            get
-            {
-                return new ArangoExpressionOperation(new CursorOperation(_connection));
-            }
-        }
         
         /// <summary> 
         /// Expose AQL function management functionality.

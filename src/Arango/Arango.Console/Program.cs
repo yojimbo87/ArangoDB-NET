@@ -24,15 +24,15 @@ namespace Arango.Console
 
             System.Console.WriteLine(aql);*/
 
-            ArangoExpressionOperation expression = new ArangoExpressionOperation()
+            ArangoQueryOperation expression = new ArangoQueryOperation()
                 .FOR("foo").IN("col", ctx => ctx
                     .FILTER("foo.bar")
-                    .LET("ddd", "aaa")
+                    .LET("ddd").Value("aaa")
                     .FOR("bar").IN("col2", ctx2 => ctx2
                         .FILTER("bar.foo")
-                        .LET("xxx", "aaa")
+                        .LET("xxx").Variable("aaa")
                         .LET("xxx", ctx3 => ctx3
-                            .FOR("foo").IN("col3", ctx4 => ctx4
+                            .FOR("foo").IN(ctx4 => ctx4
                                 .RETURN("bbb"))
                         )
                         .RETURN("foo"))

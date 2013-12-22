@@ -3,12 +3,12 @@ namespace Arango.Client.Protocol
 {
     internal static class AQL
     {
-        internal const string None = "NONE";
-
-        // used to indicate nested AQL expression, e.g. brackets expression in LET x = (FOR ... RETURN ...)
-        internal const string Nesting = "NESTING";
+        // internal operations
+        internal const string String = "STRING";
+        internal const string Value = "VALUE";
+        internal const string Variable = "VARIABLE";
         
-        // high level operations
+        // standard high level operations
         internal const string COLLECT = "COLLECT";
         internal const string FILTER = "FILTER";
         internal const string FOR = "FOR";

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Arango.Client.Protocol;
 
 namespace Arango.Client
@@ -11,25 +12,35 @@ namespace Arango.Client
     /// </summary>
     public class ArangoQueryOperation
     {
-        private CursorOperation _cursorOperation;
-        
+        private const int _spaceCount = 4;
         private int _batchSize = 0;
+        private CursorOperation _cursorOperation;
         private Dictionary<string, object> _bindVars = new Dictionary<string, object>();
-        private string _aql = "";
-        
+
+        internal List<Etom> ExpressionTree = new List<Etom>();
+
+        public ArangoQueryOperation()
+        {
+        }
+
         internal ArangoQueryOperation(CursorOperation cursorOperation)
         {
             _cursorOperation = cursorOperation;
         }
+
+        #region Query settings
         
         /// <summary> 
         /// Appends AQL query.
         /// </summary>
-        /// <param name="aql">AQL query to be appended.</param>
-        public ArangoQueryOperation Aql(string aql)
+        /// <param name="queryString">AQL query string to be appended.</param>
+        public ArangoQueryOperation Aql(string queryStirng)
         {
-            _aql += aql;
-            
+            var etom = new Etom(AQL.String);
+            etom.AddValues(queryStirng);
+
+            ExpressionTree.Add(etom);
+
             return this;
         }
         
@@ -55,7 +66,121 @@ namespace Arango.Client
             
             return this;
         }
-        
+
+        #endregion
+
+        #region FILTER
+
+        public ArangoQueryOperation FILTER(string attribute)
+        {
+            var etom = new Etom(AQL.FILTER);
+            etom.AddValues(attribute);
+
+            ExpressionTree.Add(etom);
+
+            return this;
+        }
+
+        #endregion
+
+        #region FOR
+
+        public ArangoQueryOperation FOR(string variableName)
+        {
+            var etom = new Etom(AQL.FOR);
+            etom.AddValues(variableName);
+
+            ExpressionTree.Add(etom);
+
+            return this;
+        }
+
+        #endregion
+
+        #region IN
+
+        public ArangoQueryOperation IN(Func<ArangoQueryOperation, ArangoQueryOperation> context)
+        {
+            var etom = new Etom(AQL.IN);
+            etom.Children = context(new ArangoQueryOperation()).ExpressionTree;
+
+            ExpressionTree.Add(etom);
+
+            return this;
+        }
+
+        public ArangoQueryOperation IN(string expression, Func<ArangoQueryOperation, ArangoQueryOperation> context)
+        {
+            var etom = new Etom(AQL.IN);
+            etom.AddValues(expression);
+            etom.Children = context(new ArangoQueryOperation()).ExpressionTree;
+
+            ExpressionTree.Add(etom);
+
+            return this;
+        }
+
+        #endregion
+
+        #region LET
+
+        public ArangoQueryOperation LET(string variableName)
+        {
+            var etom = new Etom(AQL.LET);
+            etom.AddValues(variableName);
+
+            ExpressionTree.Add(etom);
+
+            return this;
+        }
+
+        public ArangoQueryOperation LET(string variableName, Func<ArangoQueryOperation, ArangoQueryOperation> context)
+        {
+            var etom = new Etom(AQL.LET);
+            etom.AddValues(variableName);
+            etom.Children = context(new ArangoQueryOperation()).ExpressionTree;
+
+            ExpressionTree.Add(etom);
+
+            return this;
+        }
+
+        #endregion
+
+        #region RETURN
+
+        public ArangoQueryOperation RETURN(string variableName)
+        {
+            var etom = new Etom(AQL.RETURN);
+            etom.AddValues(variableName);
+
+            ExpressionTree.Add(etom);
+
+            return this;
+        }
+
+        #endregion
+
+        public ArangoQueryOperation Value(object value)
+        {
+            var etom = new Etom(AQL.Value);
+            etom.AddValues(value);
+
+            ExpressionTree.Add(etom);
+
+            return this;
+        }
+
+        public ArangoQueryOperation Variable(string name)
+        {
+            var etom = new Etom(AQL.Variable);
+            etom.AddValues(name);
+
+            ExpressionTree.Add(etom);
+
+            return this;
+        }
+
         #region ToList
         
         /// <summary> 
@@ -64,7 +189,7 @@ namespace Arango.Client
         /// <param name="count">Variable where will be stored total number of result documents available after execution.</param>
         public List<Document> ToList(out int count)
         {
-            var items = _cursorOperation.Post(_aql.ToString(), true, out count, _batchSize, _bindVars);
+            var items = _cursorOperation.Post(ToString(), true, out count, _batchSize, _bindVars);
             
             return items.Cast<Document>().ToList();
         }
@@ -75,7 +200,7 @@ namespace Arango.Client
         public List<Document> ToList()
         {
             var count = 0;
-            var items = _cursorOperation.Post(_aql.ToString(), false, out count, _batchSize, _bindVars);
+            var items = _cursorOperation.Post(ToString(), false, out count, _batchSize, _bindVars);
             
             return items.Cast<Document>().ToList();
         }
@@ -87,7 +212,7 @@ namespace Arango.Client
         public List<T> ToList<T>(out int count) where T: class, new()
         {
             var type = typeof(T);
-            var items = _cursorOperation.Post(_aql.ToString(), true, out count, _batchSize, _bindVars);
+            var items = _cursorOperation.Post(ToString(), true, out count, _batchSize, _bindVars);
             var genericCollection = new List<T>();
 
             if (type.IsPrimitive ||
@@ -128,7 +253,7 @@ namespace Arango.Client
         {
             var type = typeof(T);
             var count = 0;
-            var items = _cursorOperation.Post(_aql.ToString(), false, out count, _batchSize, _bindVars);
+            var items = _cursorOperation.Post(ToString(), false, out count, _batchSize, _bindVars);
             var genericCollection = new List<T>();
             
             if (type.IsPrimitive ||
@@ -191,7 +316,84 @@ namespace Arango.Client
         /// </summary>
         public override string ToString()
         {
-            return _aql;
+            return ToString(ExpressionTree, 0);
+        }
+
+        private string ToString(List<Etom> expressionTree, int spaceCount)
+        {
+            var expression = new StringBuilder();
+
+            foreach (Etom etom in expressionTree)
+            {
+                switch (etom.Type)
+                {
+                    case AQL.FILTER:
+                        if (spaceCount != 0)
+                        {
+                            expression.Append("\n" + Tabulate(spaceCount));
+                        }
+
+                        expression.Append(AQL.FILTER + Stringify(etom.Values));
+                        break;
+                    case AQL.FOR:
+                        if (spaceCount != 0)
+                        {
+                            expression.Append("\n" + Tabulate(spaceCount));
+                        }
+
+                        expression.Append(AQL.FOR + Stringify(etom.Values));
+                        break;
+                    case AQL.IN:
+                        expression.Append(" " + AQL.IN + Stringify(etom.Values));
+
+                        if (etom.Children.Count > 0)
+                        {
+                            expression.Append(ToString(etom.Children, spaceCount + _spaceCount));
+                        }
+                        break;
+                    case AQL.LET:
+                        if (spaceCount != 0)
+                        {
+                            expression.Append("\n" + Tabulate(spaceCount));
+                        }
+
+                        expression.Append(AQL.LET + Stringify(etom.Values) + " =");
+
+                        if (etom.Children.Count > 0)
+                        {
+                            expression.Append(" (");
+                            expression.Append(ToString(etom.Children, spaceCount + _spaceCount));
+                            expression.Append("\n" + Tabulate(spaceCount) + ")");
+                        }
+                        break;
+                    case AQL.RETURN:
+                        if (spaceCount != 0)
+                        {
+                            expression.Append("\n" + Tabulate(spaceCount));
+                        }
+
+                        expression.Append(AQL.RETURN + Stringify(etom.Values));
+                        break;
+                    case AQL.String:
+                        if (spaceCount != 0)
+                        {
+                            expression.Append(" ");
+                        }
+
+                        expression.Append(etom.Values);
+                        break;
+                    case AQL.Value:
+                        expression.Append(Stringify(etom.Values));
+                        break;
+                    case AQL.Variable:
+                        expression.Append(" " + etom.Values.First());
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            return expression.ToString();
         }
         
         private string ToString(object value)
@@ -207,5 +409,34 @@ namespace Arango.Client
         }
         
         #endregion
+
+        private string Tabulate(int count)
+        {
+            var spaces = new StringBuilder();
+
+            for (int i = 0; i < count; i++)
+            {
+                spaces.Append(" ");
+            }
+
+            return spaces.ToString();
+        }
+
+        private string Stringify(List<object> values)
+        {
+            var expression = new StringBuilder();
+
+            foreach(object value in values)
+            {
+                expression.Append(Join(ToString(value)));
+            }
+
+            return expression.ToString();
+        }
+
+        private string Join(params string[] parts)
+        {
+            return " " + string.Join(" ", parts);
+        }
     }
 }
