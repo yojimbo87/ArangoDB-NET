@@ -17,6 +17,7 @@ namespace Arango.Client.Protocol
         // standard functions
         internal const string DOCUMENT = "DOCUMENT";
         internal const string EDGES = "EDGES";
+        internal const string FIRST = "FIRST";
 
         // symbols
         internal const string And = "&&";

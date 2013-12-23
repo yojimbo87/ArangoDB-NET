@@ -36,6 +36,12 @@ namespace Arango.Console
                     .LET("docVar").DOCUMENT("foo.bar")
                     .LET("docId").DOCUMENT("aaa/123")
                     .LET("docIds").DOCUMENT("aaa/123", "aaa/345")
+                    .LET("firstVar").FIRST(ctxx => ctxx.Variable("var"))
+                    .LET("firstList").FIRST(ctxx => ctxx.List(1, 2, 3))
+                    .LET("firstListContext").FIRST(ctxx => ctxx.List(ctxy => ctxy
+                        .FOR("foo").Collection("bar", ctxz => ctxz
+                            .RETURN.Value("abcd"))
+                    ))
                     .FOR("bar").List(new List<object> { "one", "two", "three" }, ctx2 => ctx2
                         .FILTER("bar.foo")
                         .LET("xxx").List(ctx3 => ctx3
@@ -45,7 +51,7 @@ namespace Arango.Console
                         .RETURN.Object(ctx6 => ctx6
                             .Field("foo").Variable("var")
                             .Field("bar").Value("val")
-                            .Field("baz").List(1, 2, 3 )
+                            .Field("baz").List(1, 2, 3)
                             .Field("boo").List(ctx7 => ctx7
                                 .FOR("x").Collection("coly", ctx8 => ctx8
                                     .FOR("y").Variable("whoa", ctx9 => ctx9
