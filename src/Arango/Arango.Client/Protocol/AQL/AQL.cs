@@ -20,12 +20,14 @@ namespace Arango.Client.Protocol
 
         // symbols
         internal const string And = "&&";
-        internal const string DoubleEquals = "==";
-        internal new const string Equals = "=";
+        internal new const string Equals = "==";
 
         // internal operations
         internal const string Collection = "COLLECTION";
+        internal const string Field = "FIELD";
         internal const string List = "LIST";
+        internal const string ListExpression = "LISTEXPRESSION";
+        internal const string Object = "OBJECT";
         internal const string String = "STRING";
         internal const string Value = "VALUE";
         internal const string Variable = "VARIABLE";
