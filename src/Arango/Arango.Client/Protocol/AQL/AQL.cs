@@ -29,6 +29,7 @@ namespace Arango.Client.Protocol
         internal const string List = "LIST";
         internal const string ListExpression = "LISTEXPRESSION";
         internal const string Object = "OBJECT";
+        internal const string Root = "ROOT";
         internal const string String = "STRING";
         internal const string Value = "VALUE";
         internal const string Variable = "VARIABLE";
