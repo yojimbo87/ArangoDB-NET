@@ -71,6 +71,7 @@ namespace Arango.Console
                     .LET("list2").List(new List<object> { 4, 5, 6})
                     .LET("list3").List(_
                         .LET("val11").Value("sss")
+                        .Aql("LET val12 = 'whoa'")
                         .RETURN.Value("abcd")
                     )
                     .LET("obj").Object(_

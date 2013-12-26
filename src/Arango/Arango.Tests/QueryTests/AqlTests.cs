@@ -10,7 +10,7 @@ namespace Arango.Tests.QueryTests
     public class AqlTests
     {
         [Test()]
-        public void Should_generate_pretty_print_query()
+        public void Should_generate_query()
         {
             var prettyPrintQuery = 
                 "LET concat1 = CONCAT('xxx', foo, 5)\n" +
@@ -20,6 +20,7 @@ namespace Arango.Tests.QueryTests
                 "LET list2 = [4, 5, 6]\n" +
                 "LET list3 = (\n" +
                 "    LET val11 = 'sss'\n" +
+                "    LET val12 = 'whoa'\n" +
                 "    RETURN 'abcd'\n" +
                 ")\n" +
                 "LET obj = {\n" +
@@ -63,7 +64,7 @@ namespace Arango.Tests.QueryTests
                 "    )\n" +
                 "    RETURN list12";
 
-            var shrotQuery = "LET concat1 = CONCAT('xxx', foo, 5) LET val1 = 'string' LET val2 = 123 LET list1 = [1, 2, 3] LET list2 = [4, 5, 6] LET list3 = ( LET val11 = 'sss' RETURN 'abcd' ) LET obj = { 'x': 'y' } LET docVar = DOCUMENT(foo.bar) LET docId = DOCUMENT('aaa/123') LET docIds = DOCUMENT(['aaa/123', 'aaa/345']) LET xxx = ( FOR foo EDGES(colx, 'colc/123', outbound) FOR foo EDGES(colx, xyz, any) RETURN ['one', 'two', 'three'] ) LET firstList = FIRST([1, 2, 3]) LET firstListContext = FIRST(( FOR foo IN bar LET xxx = 'abcd' RETURN xxx )) FOR foo1 IN col1 LET val11 = 'string' LET val12 = 123 LET list11 = [1, 2, 3] LET list12 = ( LET val21 = 'sss' LET val22 = 345 RETURN { 'foo': var, 'bar': 'val', 'baz': [1, 2, 3], 'boo': ( FOR x IN coly FOR y IN whoa RETURN var ), 'obj': { 'foo': 'bar' }, 'xxx': 'yyy' } ) RETURN list12";
+            var shrotQuery = "LET concat1 = CONCAT('xxx', foo, 5) LET val1 = 'string' LET val2 = 123 LET list1 = [1, 2, 3] LET list2 = [4, 5, 6] LET list3 = ( LET val11 = 'sss' LET val12 = 'whoa' RETURN 'abcd' ) LET obj = { 'x': 'y' } LET docVar = DOCUMENT(foo.bar) LET docId = DOCUMENT('aaa/123') LET docIds = DOCUMENT(['aaa/123', 'aaa/345']) LET xxx = ( FOR foo EDGES(colx, 'colc/123', outbound) FOR foo EDGES(colx, xyz, any) RETURN ['one', 'two', 'three'] ) LET firstList = FIRST([1, 2, 3]) LET firstListContext = FIRST(( FOR foo IN bar LET xxx = 'abcd' RETURN xxx )) FOR foo1 IN col1 LET val11 = 'string' LET val12 = 123 LET list11 = [1, 2, 3] LET list12 = ( LET val21 = 'sss' LET val22 = 345 RETURN { 'foo': var, 'bar': 'val', 'baz': [1, 2, 3], 'boo': ( FOR x IN coly FOR y IN whoa RETURN var ), 'obj': { 'foo': 'bar' }, 'xxx': 'yyy' } ) RETURN list12";
             
             ArangoQueryOperation expression = new ArangoQueryOperation()
                 .Aql(_ => _
@@ -74,6 +75,7 @@ namespace Arango.Tests.QueryTests
                     .LET("list2").List(new List<object> { 4, 5, 6})
                     .LET("list3").List(_
                         .LET("val11").Value("sss")
+                        .Aql("LET val12 = 'whoa'")
                         .RETURN.Value("abcd")
                     )
                     .LET("obj").Object(_

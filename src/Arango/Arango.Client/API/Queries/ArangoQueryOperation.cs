@@ -19,8 +19,9 @@ namespace Arango.Client
 
         internal List<Etom> ExpressionTree = new List<Etom>();
         
-        internal ArangoQueryOperation(List<Etom> expressionTree)
+        internal ArangoQueryOperation(CursorOperation cursorOperation, List<Etom> expressionTree)
         {
+        	_cursorOperation = cursorOperation;
         	ExpressionTree.AddRange(expressionTree);
         }
 
@@ -34,21 +35,6 @@ namespace Arango.Client
         }
 
         #region Query settings
-        
-        /// <summary> 
-        /// Appends AQL query.
-        /// </summary>
-        /// <param name="queryString">AQL query string to be appended.</param>
-        public ArangoQueryOperation Aql(string queryStirng)
-        {
-        	var etom = new Etom();
-        	etom.Type = AQL.String;
-            etom.Value = queryStirng;
-
-            ExpressionTree.Add(etom);
-
-            return this;
-        }
         
         /// <summary> 
         /// Specifies maximum number of result documents to be transferred from the server to the client in one roundtrip.
@@ -71,6 +57,30 @@ namespace Arango.Client
             _bindVars.Add(key, value);
             
             return this;
+        }
+
+        #endregion
+
+        #region Aql
+
+        public ArangoQueryOperation Aql(Func<ArangoQueryOperation, ArangoQueryOperation> context)
+        {
+            ExpressionTree.AddRange(context(new ArangoQueryOperation()).ExpressionTree);
+
+            return this;
+        }
+
+        /// <summary> 
+        /// Appends AQL query.
+        /// </summary>
+        /// <param name="queryString">AQL query string to be appended.</param>
+        public ArangoQueryOperation Aql(string queryString)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.String;
+            etom.Value = queryString;
+
+            return AddEtom(etom);
         }
 
         #endregion
@@ -366,7 +376,7 @@ namespace Arango.Client
         /// <param name="count">Variable where will be stored total number of result documents available after execution.</param>
         public List<Document> ToList(out int count)
         {
-            var items = _cursorOperation.Post(ToString(), true, out count, _batchSize, _bindVars);
+            var items = _cursorOperation.Post(ToString(false), true, out count, _batchSize, _bindVars);
             
             return items.Cast<Document>().ToList();
         }
@@ -377,7 +387,7 @@ namespace Arango.Client
         public List<Document> ToList()
         {
             var count = 0;
-            var items = _cursorOperation.Post(ToString(), false, out count, _batchSize, _bindVars);
+            var items = _cursorOperation.Post(ToString(false), false, out count, _batchSize, _bindVars);
             
             return items.Cast<Document>().ToList();
         }
@@ -389,7 +399,7 @@ namespace Arango.Client
         public List<T> ToList<T>(out int count) where T: class, new()
         {
             var type = typeof(T);
-            var items = _cursorOperation.Post(ToString(), true, out count, _batchSize, _bindVars);
+            var items = _cursorOperation.Post(ToString(false), true, out count, _batchSize, _bindVars);
             var genericCollection = new List<T>();
 
             if (type.IsPrimitive ||
@@ -430,7 +440,7 @@ namespace Arango.Client
         {
             var type = typeof(T);
             var count = 0;
-            var items = _cursorOperation.Post(ToString(), false, out count, _batchSize, _bindVars);
+            var items = _cursorOperation.Post(ToString(false), false, out count, _batchSize, _bindVars);
             var genericCollection = new List<T>();
             
             if (type.IsPrimitive ||
@@ -651,6 +661,18 @@ namespace Arango.Client
 
                         expression.Append("}");
                         break;
+                    case AQL.String:
+                        if (prettyPrint)
+                        {
+                            expression.Append("\n" + Tabulate(spaceLevel * _spaceCount));
+                        }
+                        else
+                        {
+                            expression.Append(" ");
+                        }
+
+                        expression.Append(etom.Value);
+                        break;
 	                case AQL.Value:
 	                    expression.Append(ToString(etom.Value));
 	                    break;
@@ -683,7 +705,7 @@ namespace Arango.Client
         {
             ExpressionTree.Add(etom);
 
-            var aqo = new ArangoQueryOperation(ExpressionTree);
+            var aqo = new ArangoQueryOperation(_cursorOperation, ExpressionTree);
 
             ExpressionTree.Clear();
 
@@ -717,13 +739,6 @@ namespace Arango.Client
         private string Join(params string[] parts)
         {
             return " " + string.Join(" ", parts);
-        }
-
-        public ArangoQueryOperation Aql(Func<ArangoQueryOperation, ArangoQueryOperation> context)
-        {
-            ExpressionTree.AddRange(context(new ArangoQueryOperation()).ExpressionTree);
-
-            return this;
         }
     }
 }
