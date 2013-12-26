@@ -15,6 +15,7 @@ namespace Arango.Client.Protocol
         internal const string SORT = "SORT";
 
         // standard functions
+        internal const string CONCAT = "CONCAT";
         internal const string DOCUMENT = "DOCUMENT";
         internal const string EDGES = "EDGES";
         internal const string FIRST = "FIRST";

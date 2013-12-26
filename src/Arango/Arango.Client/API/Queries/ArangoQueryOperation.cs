@@ -159,6 +159,20 @@ namespace Arango.Client
          *  standard functions
          */
 
+        public ArangoQueryOperation CONCAT(params ArangoQueryOperation[] values)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.CONCAT;
+            etom.ChildrenList = new List<List<Etom>>();
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                etom.ChildrenList.Add(values[i].ExpressionTree);
+            }
+
+            return AddEtom(etom);
+        }
+
         #region DOCUMENT
 
         public ArangoQueryOperation DOCUMENT(List<string> documentIds)
@@ -290,7 +304,7 @@ namespace Arango.Client
             {
                 expression.Append(ToString(values[i]));
 
-                if (i < (values.Count() - 1))
+                if (i < (values.Count - 1))
                 {
                     expression.Append(", ");
                 }
@@ -540,6 +554,21 @@ namespace Arango.Client
                         expression.Append(AQL.RETURN + " ");
                         break;
                     // standard functions
+                    case AQL.CONCAT:
+                        expression.Append(AQL.CONCAT + "(");
+
+                        for (int j = 0; j < etom.ChildrenList.Count; j++)
+                        {
+                            expression.Append(ToString(etom.ChildrenList[j], 0, prettyPrint));
+
+                            if (j < (etom.ChildrenList.Count - 1))
+                            {
+                                expression.Append(", ");
+                            }
+                        }
+
+                        expression.Append(")");
+                        break;
                     case AQL.DOCUMENT:
                         expression.Append(AQL.DOCUMENT + "(" + etom.Value + ")");
                         break;

@@ -64,6 +64,7 @@ namespace Arango.Console
                         ))
                 );*/
                 .Aql(_ => _
+                    .LET("concat1").CONCAT(_.Value("xxx"), _.Variable("foo"), _.Value(5))
             	    .LET("val1").Value("string")
             	    .LET("val2").Value(123)
                     .LET("list1").List(1, 2, 3)
