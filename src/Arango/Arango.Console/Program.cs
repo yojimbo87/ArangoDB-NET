@@ -66,8 +66,9 @@ namespace Arango.Console
                 .Aql(_ => _
             	    .LET("val1").Value("string")
             	    .LET("val2").Value(123)
-                    .LET("list1").List(new List<object> { 1, 2, 3})
-                    .LET("list2").List(_
+                    .LET("list1").List(1, 2, 3)
+                    .LET("list2").List(new List<object> { 4, 5, 6})
+                    .LET("list3").List(_
                         .LET("val11").Value("sss")
                         .RETURN.Value("abcd")
                     )
@@ -111,7 +112,14 @@ namespace Arango.Console
                         )
                         .RETURN.Variable("list12"))
                 );
-            System.Console.WriteLine(expression.ToString());
+
+            var pretty = expression.ToString();
+            System.Console.WriteLine(pretty);
+            System.Console.WriteLine(pretty.Length);
+
+            var dirty = expression.ToString(false);
+            System.Console.WriteLine("\n" + dirty);
+            System.Console.WriteLine(dirty.Length);
 
             System.Console.ReadLine();
         }

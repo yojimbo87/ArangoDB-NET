@@ -301,6 +301,11 @@ namespace Arango.Client
             return AddEtom(etom);
         }
 
+        public ArangoQueryOperation List(params object[] values)
+        {
+            return List(values.ToList());
+        }
+
         public ArangoQueryOperation List(ArangoQueryOperation aql)
         {
             var etom = new Etom();
@@ -472,12 +477,14 @@ namespace Arango.Client
         /// <summary> 
         /// Returns AQL query string.
         /// </summary>
-        public override string ToString()
+        public string ToString(bool prettyPrint = true)
         {
-            return ToString(ExpressionTree, 0);
+            var expression = ToString(ExpressionTree, 0, prettyPrint);
+
+            return expression.Trim();
         }
 
-        private string ToString(List<Etom> expressionTree, int spaceLevel)
+        private string ToString(List<Etom> expressionTree, int spaceLevel, bool prettyPrint)
         {
             var expression = new StringBuilder();
             
@@ -489,21 +496,48 @@ namespace Arango.Client
 	            {
 	                // standard high level operations
 	                case AQL.FOR:
-	                	expression.Append("\n" + Tabulate(spaceLevel * _spaceCount) + AQL.FOR + " " + etom.Value + " ");
+                        if (prettyPrint)
+                        {
+                            expression.Append("\n" + Tabulate(spaceLevel * _spaceCount));
+                        }
+                        else
+                        {
+                            expression.Append(" ");
+                        }
+
+	                	expression.Append(AQL.FOR + " " + etom.Value + " ");
 	                    break;
                     case AQL.IN:
                         expression.Append(AQL.IN + " " + etom.Value);
 
                         if (etom.Children.Count > 0)
                         {
-                            expression.Append(ToString(etom.Children, spaceLevel + 1));
+                            expression.Append(ToString(etom.Children, spaceLevel + 1, prettyPrint));
                         }
                         break;
 	                case AQL.LET:
-	                    expression.Append("\n" + Tabulate(spaceLevel * _spaceCount) + AQL.LET + " " + etom.Value + " = ");
+                        if (prettyPrint)
+                        {
+                            expression.Append("\n" + Tabulate(spaceLevel * _spaceCount));
+                        }
+                        else
+                        {
+                            expression.Append(" ");
+                        }
+
+	                    expression.Append(AQL.LET + " " + etom.Value + " = ");
 	                    break;
                     case AQL.RETURN:
-                        expression.Append("\n" + Tabulate(spaceLevel * _spaceCount) + AQL.RETURN + " ");
+                        if (prettyPrint)
+                        {
+                            expression.Append("\n" + Tabulate(spaceLevel * _spaceCount));
+                        }
+                        else
+                        {
+                            expression.Append(" ");
+                        }
+
+                        expression.Append(AQL.RETURN + " ");
                         break;
                     // standard functions
                     case AQL.DOCUMENT:
@@ -514,7 +548,7 @@ namespace Arango.Client
 
                         if (etom.Children.Count > 0)
                         {
-                            expression.Append(ToString(etom.Children, spaceLevel + 1));
+                            expression.Append(ToString(etom.Children, spaceLevel + 1, prettyPrint));
                         }
                         break;
                     case AQL.FIRST:
@@ -522,11 +556,11 @@ namespace Arango.Client
 
                         if ((etom.Children.Count == 1) && (etom.Children.First().Children.Count == 0))
                         {
-                            expression.Append(ToString(etom.Children, 0) + ")");
+                            expression.Append(ToString(etom.Children, 0, prettyPrint) + ")");
                         }
                         else
                         {
-                            expression.Append(ToString(etom.Children, spaceLevel) + ")");
+                            expression.Append(ToString(etom.Children, spaceLevel, prettyPrint) + ")");
                         }
                         break;
 	                // internal operations
@@ -536,7 +570,16 @@ namespace Arango.Client
                             expression.Append(",");
                         }
 
-                        expression.Append("\n" + Tabulate(spaceLevel * _spaceCount) + "'" + etom.Value + "': ");
+                        if (prettyPrint)
+                        {
+                            expression.Append("\n" + Tabulate(spaceLevel * _spaceCount));
+                        }
+                        else
+                        {
+                            expression.Append(" ");
+                        }
+
+                        expression.Append("'" + etom.Value + "': ");
                         break;
                     case AQL.List:
                         expression.Append("[" + etom.Value + "]");
@@ -546,20 +589,38 @@ namespace Arango.Client
 
                         if (etom.Children.Count > 0)
                         {
-                            expression.Append(ToString(etom.Children, spaceLevel + 1));
+                            expression.Append(ToString(etom.Children, spaceLevel + 1, prettyPrint));
                         }
 
-                        expression.Append("\n" + Tabulate(spaceLevel * _spaceCount) + ")");
+                        if (prettyPrint)
+                        {
+                            expression.Append("\n" + Tabulate(spaceLevel * _spaceCount));
+                        }
+                        else
+                        {
+                            expression.Append(" ");
+                        }
+
+                        expression.Append(")");
                         break;
                     case AQL.Object:
                         expression.Append("{");
 
                         if (etom.Children.Count > 0)
                         {
-                            expression.Append(ToString(etom.Children, spaceLevel + 1));
+                            expression.Append(ToString(etom.Children, spaceLevel + 1, prettyPrint));
                         }
 
-                        expression.Append("\n" + Tabulate(spaceLevel * _spaceCount) + "}");
+                        if (prettyPrint)
+                        {
+                            expression.Append("\n" + Tabulate(spaceLevel * _spaceCount));
+                        }
+                        else
+                        {
+                            expression.Append(" ");
+                        }
+
+                        expression.Append("}");
                         break;
 	                case AQL.Value:
 	                    expression.Append(ToString(etom.Value));
