@@ -89,6 +89,15 @@ namespace Arango.Client
          *  standard high level operations
          */
 
+        public ArangoQueryOperation COLLECT(string criteria)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.COLLECT;
+            etom.Value = criteria;
+
+            return AddEtom(etom);
+        }
+
         public ArangoQueryOperation FILTER(string condition)
         {
             var etom = new Etom();
@@ -145,6 +154,15 @@ namespace Arango.Client
         }
 
         #endregion
+
+        public ArangoQueryOperation INTO(string group)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.INTO;
+            etom.Value = group;
+
+            return AddEtom(etom);
+        }
 
         #region LET
 
@@ -568,6 +586,18 @@ namespace Arango.Client
 	            switch (etom.Type)
 	            {
 	                // standard high level operations
+                    case AQL.COLLECT:
+                        if (prettyPrint)
+                        {
+                            expression.Append("\n" + Tabulate(spaceLevel * _spaceCount));
+                        }
+                        else
+                        {
+                            expression.Append(" ");
+                        }
+
+                        expression.Append(AQL.COLLECT + " " + etom.Value);
+                        break;
                     case AQL.FILTER:
                         if (prettyPrint)
                         {
@@ -599,6 +629,9 @@ namespace Arango.Client
                         {
                             expression.Append(ToString(etom.Children, spaceLevel + 1, prettyPrint));
                         }
+                        break;
+                    case AQL.INTO:
+                        expression.Append(" " + AQL.INTO + " " + etom.Value);
                         break;
 	                case AQL.LET:
                         if (prettyPrint)

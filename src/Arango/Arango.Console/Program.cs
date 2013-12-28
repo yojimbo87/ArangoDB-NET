@@ -121,6 +121,8 @@ namespace Arango.Console
                             )
                         )
                         .FILTER("val11 > 123 && val12 == 'foo'")
+                        .COLLECT("city = u.city")
+                        .COLLECT("first = u.firstName, age = u.age").INTO("g")
                         .RETURN.Variable("list12"))
                 );
 
