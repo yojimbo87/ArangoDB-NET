@@ -123,6 +123,8 @@ namespace Arango.Console
                         .FILTER("val11 > 123 && val12 == 'foo'")
                         .COLLECT("city = u.city")
                         .COLLECT("first = u.firstName, age = u.age").INTO("g")
+                        .SORT(_.Variable("var1")).Direction(ArangoSortDirection.ASC)
+                        .SORT(_.Variable("var1"), _.TO_NUMBER(_.Variable("var2"))).Direction(ArangoSortDirection.DESC)
                         .LIMIT(5)
                         .LIMIT(0, 5)
                         .LIMIT("@count")

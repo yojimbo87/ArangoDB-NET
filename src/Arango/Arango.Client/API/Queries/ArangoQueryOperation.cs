@@ -214,6 +214,20 @@ namespace Arango.Client
 
         #endregion
 
+        public ArangoQueryOperation SORT(params ArangoQueryOperation[] criteria)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.SORT;
+            etom.ChildrenList = new List<List<Etom>>();
+
+            for (int i = 0; i < criteria.Length; i++)
+            {
+                etom.ChildrenList.Add(criteria[i].ExpressionTree);
+            }
+
+            return AddEtom(etom);
+        }
+
         /*
          *  standard functions
          */
@@ -380,6 +394,15 @@ namespace Arango.Client
         /*
          *  internal operations
          */
+
+        public ArangoQueryOperation Direction(ArangoSortDirection sortDirection)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.SortDirection;
+            etom.Value = sortDirection.ToString();
+
+            return AddEtom(etom);
+        }
 
         public ArangoQueryOperation Field(string name)
         {
@@ -691,6 +714,30 @@ namespace Arango.Client
 
                         expression.Append(AQL.RETURN + " ");
                         break;
+                    case AQL.SORT:
+                        if (prettyPrint)
+                        {
+                            expression.Append("\n" + Tabulate(spaceLevel * _spaceCount));
+                        }
+                        else
+                        {
+                            expression.Append(" ");
+                        }
+
+                        expression.Append(AQL.SORT + " ");
+
+                        for (int j = 0; j < etom.ChildrenList.Count; j++)
+                        {
+                            expression.Append(ToString(etom.ChildrenList[j], 0, prettyPrint));
+
+                            if (j < (etom.ChildrenList.Count - 1))
+                            {
+                                expression.Append(", ");
+                            }
+                        }
+
+                        expression.Append(" ");
+                        break;
                     // standard functions
                     case AQL.CONCAT:
                         expression.Append(AQL.CONCAT + "(");
@@ -804,6 +851,9 @@ namespace Arango.Client
                         }
 
                         expression.Append("}");
+                        break;
+                    case AQL.SortDirection:
+                        expression.Append(etom.Value);
                         break;
                     case AQL.String:
                         if (prettyPrint)
