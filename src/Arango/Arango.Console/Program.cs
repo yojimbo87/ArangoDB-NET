@@ -36,6 +36,8 @@ namespace Arango.Console
                         .Aql("LET val12 = 'whoa'")
                         .RETURN.Val("abcd")
                     )
+                    .LET("len1").LENGTH(_.Var("var1"))
+                    .LET("len2").LENGTH(_.List(1, 2, 3))
                     .LET("obj").Object(_
                         .Field("x").Val("y")
                     )

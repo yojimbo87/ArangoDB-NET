@@ -378,6 +378,16 @@ namespace Arango.Client
             return AddEtom(etom);
         }
 
+        public ArangoQueryOperation LENGTH(ArangoQueryOperation aql)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.LENGTH;
+
+            etom.Children = aql.ExpressionTree;
+
+            return AddEtom(etom);
+        }
+
         public ArangoQueryOperation TO_BOOL(ArangoQueryOperation aql)
         {
             var etom = new Etom();
@@ -847,6 +857,10 @@ namespace Arango.Client
                         {
                             expression.Append(ToString(etom.Children, spaceLevel, prettyPrint) + ")");
                         }
+                        break;
+                    case AQL.LENGTH:
+                        expression.Append(AQL.LENGTH + "(");
+                        expression.Append(ToString(etom.Children, 0, prettyPrint) + ")");
                         break;
                     case AQL.TO_BOOL:
                         expression.Append(AQL.TO_BOOL + "(");

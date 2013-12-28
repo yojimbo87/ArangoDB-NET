@@ -23,6 +23,8 @@ namespace Arango.Tests.QueryTests
                 "    LET val12 = 'whoa'\n" +
                 "    RETURN 'abcd'\n" +
                 ")\n" +
+                "LET len1 = LENGTH(var1)\n" +
+                "LET len2 = LENGTH([1, 2, 3])\n" +
                 "LET obj = {\n" +
                 "    'x': 'y'\n" +
                 "}\n" +
@@ -81,7 +83,7 @@ namespace Arango.Tests.QueryTests
                 "    LIMIT @offset, @count\n" +
                 "    RETURN list12";
 
-            var shrotQuery = "LET concat1 = CONCAT('xxx', 5, foo, TO_STRING(bar)) LET val1 = 'string' LET val2 = 123 LET list1 = [1, 2, 3] LET list2 = [4, 5, 6] LET list3 = ( LET val11 = 'sss' LET val12 = 'whoa' RETURN 'abcd' ) LET obj = { 'x': 'y' } LET boolVar = TO_BOOL(b) LET boolVal = TO_BOOL(0) LET listVar = TO_LIST(b) LET listVal = TO_LIST('a') LET numberVar = TO_NUMBER(b) LET numberVal = TO_NUMBER('3') LET stringVar = TO_STRING(b) LET stringVal = TO_NUMBER(4) LET docVar = DOCUMENT(foo.bar) LET docId = DOCUMENT('aaa/123') LET docIds = DOCUMENT(['aaa/123', 'aaa/345']) LET xxx = ( FOR foo EDGES(colx, 'colc/123', outbound) FOR foo EDGES(colx, xyz, any) RETURN ['one', 'two', 'three'] ) LET firstList = FIRST([1, 2, 3]) LET firstListContext = FIRST(( FOR foo IN bar LET xxx = 'abcd' RETURN xxx )) FOR foo1 IN col1 LET val11 = 'string' LET val12 = 123 LET list11 = [1, 2, 3] LET list12 = ( LET val21 = 'sss' LET val22 = 345 RETURN { 'foo': var, 'bar': 'val', 'baz': [1, 2, 3], 'boo': ( FOR x IN coly FOR y IN whoa RETURN var ), 'obj': { 'foo': 'bar' }, 'xxx': 'yyy' } ) FILTER val11 > 123 && val12 == 'foo' || 44 IN val13 COLLECT city = u.city COLLECT first = u.firstName, age = u.age INTO g SORT var1 ASC SORT var1, TO_NUMBER(var2) DESC LIMIT 5 LIMIT 0, 5 LIMIT @count LIMIT @offset, @count RETURN list12";
+            var shrotQuery = "LET concat1 = CONCAT('xxx', 5, foo, TO_STRING(bar)) LET val1 = 'string' LET val2 = 123 LET list1 = [1, 2, 3] LET list2 = [4, 5, 6] LET list3 = ( LET val11 = 'sss' LET val12 = 'whoa' RETURN 'abcd' ) LET len1 = LENGTH(var1) LET len2 = LENGTH([1, 2, 3]) LET obj = { 'x': 'y' } LET boolVar = TO_BOOL(b) LET boolVal = TO_BOOL(0) LET listVar = TO_LIST(b) LET listVal = TO_LIST('a') LET numberVar = TO_NUMBER(b) LET numberVal = TO_NUMBER('3') LET stringVar = TO_STRING(b) LET stringVal = TO_NUMBER(4) LET docVar = DOCUMENT(foo.bar) LET docId = DOCUMENT('aaa/123') LET docIds = DOCUMENT(['aaa/123', 'aaa/345']) LET xxx = ( FOR foo EDGES(colx, 'colc/123', outbound) FOR foo EDGES(colx, xyz, any) RETURN ['one', 'two', 'three'] ) LET firstList = FIRST([1, 2, 3]) LET firstListContext = FIRST(( FOR foo IN bar LET xxx = 'abcd' RETURN xxx )) FOR foo1 IN col1 LET val11 = 'string' LET val12 = 123 LET list11 = [1, 2, 3] LET list12 = ( LET val21 = 'sss' LET val22 = 345 RETURN { 'foo': var, 'bar': 'val', 'baz': [1, 2, 3], 'boo': ( FOR x IN coly FOR y IN whoa RETURN var ), 'obj': { 'foo': 'bar' }, 'xxx': 'yyy' } ) FILTER val11 > 123 && val12 == 'foo' || 44 IN val13 COLLECT city = u.city COLLECT first = u.firstName, age = u.age INTO g SORT var1 ASC SORT var1, TO_NUMBER(var2) DESC LIMIT 5 LIMIT 0, 5 LIMIT @count LIMIT @offset, @count RETURN list12";
             
             ArangoQueryOperation expression = new ArangoQueryOperation()
                 .Aql(_ => _
@@ -95,6 +97,8 @@ namespace Arango.Tests.QueryTests
                         .Aql("LET val12 = 'whoa'")
                         .RETURN.Val("abcd")
                     )
+                    .LET("len1").LENGTH(_.Var("var1"))
+                    .LET("len2").LENGTH(_.List(1, 2, 3))
                     .LET("obj").Object(_
                         .Field("x").Val("y")
                     )

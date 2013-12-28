@@ -19,6 +19,7 @@ namespace Arango.Client.Protocol
         internal const string DOCUMENT = "DOCUMENT";
         internal const string EDGES = "EDGES";
         internal const string FIRST = "FIRST";
+        internal const string LENGTH = "LENGTH";
         internal const string TO_BOOL = "TO_BOOL";
         internal const string TO_LIST = "TO_LIST";
         internal const string TO_NUMBER = "TO_NUMBER";
