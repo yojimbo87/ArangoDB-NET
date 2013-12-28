@@ -287,6 +287,46 @@ namespace Arango.Client
 
             return AddEtom(etom);
         }
+
+        public ArangoQueryOperation TO_BOOL(ArangoQueryOperation aql)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.TO_BOOL;
+
+            etom.Children = aql.ExpressionTree;
+
+            return AddEtom(etom);
+        }
+
+        public ArangoQueryOperation TO_LIST(ArangoQueryOperation aql)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.TO_LIST;
+
+            etom.Children = aql.ExpressionTree;
+
+            return AddEtom(etom);
+        }
+
+        public ArangoQueryOperation TO_NUMBER(ArangoQueryOperation aql)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.TO_NUMBER;
+
+            etom.Children = aql.ExpressionTree;
+
+            return AddEtom(etom);
+        }
+
+        public ArangoQueryOperation TO_STRING(ArangoQueryOperation aql)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.TO_STRING;
+
+            etom.Children = aql.ExpressionTree;
+
+            return AddEtom(etom);
+        }
         
         /*
          *  internal operations
@@ -601,6 +641,22 @@ namespace Arango.Client
                         {
                             expression.Append(ToString(etom.Children, spaceLevel, prettyPrint) + ")");
                         }
+                        break;
+                    case AQL.TO_BOOL:
+                        expression.Append(AQL.TO_BOOL + "(");
+                        expression.Append(ToString(etom.Children, 0, prettyPrint) + ")");
+                        break;
+                    case AQL.TO_LIST:
+                        expression.Append(AQL.TO_LIST + "(");
+                        expression.Append(ToString(etom.Children, 0, prettyPrint) + ")");
+                        break;
+                    case AQL.TO_NUMBER:
+                        expression.Append(AQL.TO_NUMBER + "(");
+                        expression.Append(ToString(etom.Children, 0, prettyPrint) + ")");
+                        break;
+                    case AQL.TO_STRING:
+                        expression.Append(AQL.TO_STRING + "(");
+                        expression.Append(ToString(etom.Children, 0, prettyPrint) + ")");
                         break;
 	                // internal operations
                     case AQL.Field:
