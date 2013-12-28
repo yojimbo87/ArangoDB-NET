@@ -13,7 +13,7 @@ namespace Arango.Tests.QueryTests
         public void Should_generate_query()
         {
             var prettyPrintQuery = 
-                "LET concat1 = CONCAT('xxx', foo, 5)\n" +
+                "LET concat1 = CONCAT('xxx', 5, foo, TO_STRING(bar))\n" +
                 "LET val1 = 'string'\n" +
                 "LET val2 = 123\n" +
                 "LET list1 = [1, 2, 3]\n" +
@@ -73,13 +73,17 @@ namespace Arango.Tests.QueryTests
                 "    FILTER val11 > 123 && val12 == 'foo'\n" + 
                 "    COLLECT city = u.city\n" +
                 "    COLLECT first = u.firstName, age = u.age INTO g\n" +
+                "    LIMIT 5\n" +
+                "    LIMIT 0, 5\n" +
+                "    LIMIT @count\n" +
+                "    LIMIT @offset, @count\n" +
                 "    RETURN list12";
 
-            var shrotQuery = "LET concat1 = CONCAT('xxx', foo, 5) LET val1 = 'string' LET val2 = 123 LET list1 = [1, 2, 3] LET list2 = [4, 5, 6] LET list3 = ( LET val11 = 'sss' LET val12 = 'whoa' RETURN 'abcd' ) LET obj = { 'x': 'y' } LET boolVar = TO_BOOL(b) LET boolVal = TO_BOOL(0) LET listVar = TO_LIST(b) LET listVal = TO_LIST('a') LET numberVar = TO_NUMBER(b) LET numberVal = TO_NUMBER('3') LET stringVar = TO_STRING(b) LET stringVal = TO_NUMBER(4) LET docVar = DOCUMENT(foo.bar) LET docId = DOCUMENT('aaa/123') LET docIds = DOCUMENT(['aaa/123', 'aaa/345']) LET xxx = ( FOR foo EDGES(colx, 'colc/123', outbound) FOR foo EDGES(colx, xyz, any) RETURN ['one', 'two', 'three'] ) LET firstList = FIRST([1, 2, 3]) LET firstListContext = FIRST(( FOR foo IN bar LET xxx = 'abcd' RETURN xxx )) FOR foo1 IN col1 LET val11 = 'string' LET val12 = 123 LET list11 = [1, 2, 3] LET list12 = ( LET val21 = 'sss' LET val22 = 345 RETURN { 'foo': var, 'bar': 'val', 'baz': [1, 2, 3], 'boo': ( FOR x IN coly FOR y IN whoa RETURN var ), 'obj': { 'foo': 'bar' }, 'xxx': 'yyy' } ) FILTER val11 > 123 && val12 == 'foo' COLLECT city = u.city COLLECT first = u.firstName, age = u.age INTO g RETURN list12";
+            var shrotQuery = "LET concat1 = CONCAT('xxx', 5, foo, TO_STRING(bar)) LET val1 = 'string' LET val2 = 123 LET list1 = [1, 2, 3] LET list2 = [4, 5, 6] LET list3 = ( LET val11 = 'sss' LET val12 = 'whoa' RETURN 'abcd' ) LET obj = { 'x': 'y' } LET boolVar = TO_BOOL(b) LET boolVal = TO_BOOL(0) LET listVar = TO_LIST(b) LET listVal = TO_LIST('a') LET numberVar = TO_NUMBER(b) LET numberVal = TO_NUMBER('3') LET stringVar = TO_STRING(b) LET stringVal = TO_NUMBER(4) LET docVar = DOCUMENT(foo.bar) LET docId = DOCUMENT('aaa/123') LET docIds = DOCUMENT(['aaa/123', 'aaa/345']) LET xxx = ( FOR foo EDGES(colx, 'colc/123', outbound) FOR foo EDGES(colx, xyz, any) RETURN ['one', 'two', 'three'] ) LET firstList = FIRST([1, 2, 3]) LET firstListContext = FIRST(( FOR foo IN bar LET xxx = 'abcd' RETURN xxx )) FOR foo1 IN col1 LET val11 = 'string' LET val12 = 123 LET list11 = [1, 2, 3] LET list12 = ( LET val21 = 'sss' LET val22 = 345 RETURN { 'foo': var, 'bar': 'val', 'baz': [1, 2, 3], 'boo': ( FOR x IN coly FOR y IN whoa RETURN var ), 'obj': { 'foo': 'bar' }, 'xxx': 'yyy' } ) FILTER val11 > 123 && val12 == 'foo' COLLECT city = u.city COLLECT first = u.firstName, age = u.age INTO g LIMIT 5 LIMIT 0, 5 LIMIT @count LIMIT @offset, @count RETURN list12";
             
             ArangoQueryOperation expression = new ArangoQueryOperation()
                 .Aql(_ => _
-                    .LET("concat1").CONCAT(_.Value("xxx"), _.Variable("foo"), _.Value(5))
+                    .LET("concat1").CONCAT(_.Value("xxx"), _.Value(5), _.Variable("foo"), _.TO_STRING(_.Variable("bar")))
                     .LET("val1").Value("string")
                     .LET("val2").Value(123)
                     .LET("list1").List(1, 2, 3)
@@ -138,6 +142,10 @@ namespace Arango.Tests.QueryTests
                         .FILTER("val11 > 123 && val12 == 'foo'")
                         .COLLECT("city = u.city")
                         .COLLECT("first = u.firstName, age = u.age").INTO("g")
+                        .LIMIT(5)
+                        .LIMIT(0, 5)
+                        .LIMIT("@count")
+                        .LIMIT("@offset", "@count")
                         .RETURN.Variable("list12"))
                 );
             

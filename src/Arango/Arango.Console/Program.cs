@@ -64,7 +64,7 @@ namespace Arango.Console
                         ))
                 );*/
                 .Aql(_ => _
-                    .LET("concat1").CONCAT(_.Value("xxx"), _.Variable("foo"), _.Value(5))
+                    .LET("concat1").CONCAT(_.Value("xxx"), _.Value(5), _.Variable("foo"), _.TO_STRING(_.Variable("bar")))
             	    .LET("val1").Value("string")
             	    .LET("val2").Value(123)
                     .LET("list1").List(1, 2, 3)
@@ -123,6 +123,10 @@ namespace Arango.Console
                         .FILTER("val11 > 123 && val12 == 'foo'")
                         .COLLECT("city = u.city")
                         .COLLECT("first = u.firstName, age = u.age").INTO("g")
+                        .LIMIT(5)
+                        .LIMIT(0, 5)
+                        .LIMIT("@count")
+                        .LIMIT("@offset", "@count")
                         .RETURN.Variable("list12"))
                 );
 

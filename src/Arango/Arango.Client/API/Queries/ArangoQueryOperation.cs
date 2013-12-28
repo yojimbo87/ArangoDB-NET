@@ -177,6 +177,28 @@ namespace Arango.Client
 
         #endregion
 
+        #region LIMIT
+
+        public ArangoQueryOperation LIMIT(object count)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.LIMIT;
+            etom.Value = count.ToString();
+
+            return AddEtom(etom);
+        }
+
+        public ArangoQueryOperation LIMIT(object offset, object count)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.LIMIT;
+            etom.Value = offset.ToString() + ", " + count.ToString();
+
+            return AddEtom(etom);
+        }
+
+        #endregion
+
         #region RETURN
 
         public ArangoQueryOperation RETURN 
@@ -645,6 +667,18 @@ namespace Arango.Client
 
 	                    expression.Append(AQL.LET + " " + etom.Value + " = ");
 	                    break;
+                    case AQL.LIMIT:
+                        if (prettyPrint)
+                        {
+                            expression.Append("\n" + Tabulate(spaceLevel * _spaceCount));
+                        }
+                        else
+                        {
+                            expression.Append(" ");
+                        }
+
+                        expression.Append(AQL.LIMIT + " " + etom.Value);
+                        break;
                     case AQL.RETURN:
                         if (prettyPrint)
                         {
