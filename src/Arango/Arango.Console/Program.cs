@@ -25,44 +25,6 @@ namespace Arango.Console
             System.Console.WriteLine(aql);*/
 
             ArangoQueryOperation expression = new ArangoQueryOperation()
-                /*.FOR("foo").Collection("col", ctx => ctx
-                    .FILTER("foo.bar")
-                    .LET("val").Val("aaa")
-                    .LET("var").Var("foo.bar")
-                    .LET("obj").Object(ctxx => ctxx
-                        .Field("x").Val("y")
-                    )
-                    .LET("array").List("x", "y", "z")
-                    .LET("docVar").DOCUMENT("foo.bar")
-                    .LET("docId").DOCUMENT("aaa/123")
-                    .LET("docIds").DOCUMENT("aaa/123", "aaa/345")
-                    .LET("firstVar").FIRST(ctxx => ctxx.Var("var"))
-                    .LET("firstList").FIRST(ctxx => ctxx.List(1, 2, 3))
-                    .LET("firstListContext").FIRST(ctxx => ctxx.List(ctxy => ctxy
-                        .FOR("foo").Collection("bar", ctxz => ctxz
-                            .RETURN.Val("abcd"))
-                    ))
-                    .FOR("bar").List(new List<object> { "one", "two", "three" }, ctx2 => ctx2
-                        .FILTER("bar.foo")
-                        .LET("xxx").List(ctx3 => ctx3
-                            .FOR("foo").EDGES("colx", "colc/123", ArangoEdgeDirection.Out, ctx4 => ctx4
-                                .FOR("foo").EDGES("colx", "xyz", ArangoEdgeDirection.Any, ctx5 => ctx5
-                                    .RETURN.List(7, 8, 9))))
-                        .RETURN.Object(ctx6 => ctx6
-                            .Field("foo").Var("var")
-                            .Field("bar").Val("val")
-                            .Field("baz").List(1, 2, 3)
-                            .Field("boo").List(ctx7 => ctx7
-                                .FOR("x").Collection("coly", ctx8 => ctx8
-                                    .FOR("y").Var("whoa", ctx9 => ctx9
-                                        .RETURN.Var("var")))
-                            )
-                            .Field("obj").Object(ctx10 => ctx10
-                                .Field("foo").Val("bar")
-                            )
-                            .Field("xxx").Val("yyy")
-                        ))
-                );*/
                 .Aql(_ => _
                     .LET("concat1").CONCAT(_.Val("xxx"), _.Val(5), _.Var("foo"), _.TO_STRING(_.Var("bar")))
             	    .LET("val1").Val("string")
