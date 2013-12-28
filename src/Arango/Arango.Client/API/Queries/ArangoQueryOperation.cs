@@ -89,6 +89,15 @@ namespace Arango.Client
          *  standard high level operations
          */
 
+        public ArangoQueryOperation FILTER(string condition)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.FILTER;
+            etom.Value = condition;
+
+            return AddEtom(etom);
+        }
+
         public ArangoQueryOperation FOR(string variableName)
         {
             var etom = new Etom();
@@ -559,6 +568,18 @@ namespace Arango.Client
 	            switch (etom.Type)
 	            {
 	                // standard high level operations
+                    case AQL.FILTER:
+                        if (prettyPrint)
+                        {
+                            expression.Append("\n" + Tabulate(spaceLevel * _spaceCount));
+                        }
+                        else
+                        {
+                            expression.Append(" ");
+                        }
+
+                        expression.Append(AQL.FILTER + " " + etom.Value);
+                        break;
 	                case AQL.FOR:
                         if (prettyPrint)
                         {

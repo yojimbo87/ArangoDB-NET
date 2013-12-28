@@ -120,6 +120,7 @@ namespace Arango.Console
                                 .Field("xxx").Value("yyy")
                             )
                         )
+                        .FILTER("val11 > 123 && val12 == 'foo'")
                         .RETURN.Variable("list12"))
                 );
 
