@@ -89,6 +89,18 @@ namespace Arango.Client
          *  standard high level operations
          */
 
+        public ArangoQueryOperation AND(ArangoQueryOperation leftOperand, ArangoOperator conditionOperator, ArangoQueryOperation rightOperand)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.AND;
+            etom.Value = conditionOperator;
+
+            etom.Children.AddRange(leftOperand.ExpressionTree);
+            etom.Children.AddRange(rightOperand.ExpressionTree);
+
+            return AddEtom(etom);
+        }
+
         public ArangoQueryOperation COLLECT(string criteria)
         {
             var etom = new Etom();
@@ -98,11 +110,14 @@ namespace Arango.Client
             return AddEtom(etom);
         }
 
-        public ArangoQueryOperation FILTER(string condition)
+        public ArangoQueryOperation FILTER(ArangoQueryOperation leftOperand, ArangoOperator conditionOperator, ArangoQueryOperation rightOperand)
         {
             var etom = new Etom();
             etom.Type = AQL.FILTER;
-            etom.Value = condition;
+            etom.Value = conditionOperator;
+
+            etom.Children.AddRange(leftOperand.ExpressionTree);
+            etom.Children.AddRange(rightOperand.ExpressionTree);
 
             return AddEtom(etom);
         }
@@ -198,6 +213,18 @@ namespace Arango.Client
         }
 
         #endregion
+
+        public ArangoQueryOperation OR(ArangoQueryOperation leftOperand, ArangoOperator conditionOperator, ArangoQueryOperation rightOperand)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.OR;
+            etom.Value = conditionOperator;
+
+            etom.Children.AddRange(leftOperand.ExpressionTree);
+            etom.Children.AddRange(rightOperand.ExpressionTree);
+
+            return AddEtom(etom);
+        }
 
         #region RETURN
 
@@ -462,19 +489,19 @@ namespace Arango.Client
             return AddEtom(etom);
         }
         
-        public ArangoQueryOperation Value(object value)
+        public ArangoQueryOperation Val(object value)
         {
             var etom = new Etom();
-            etom.Type = AQL.Value;
+            etom.Type = AQL.Val;
             etom.Value = value;
 
             return AddEtom(etom);
         }
         
-        public ArangoQueryOperation Variable(string name)
+        public ArangoQueryOperation Var(string name)
         {
             var etom = new Etom();
-            etom.Type = AQL.Variable;
+            etom.Type = AQL.Var;
             etom.Value = name;
 
             return AddEtom(etom);
@@ -628,9 +655,9 @@ namespace Arango.Client
             {
                 var etom = expressionTree[i];
 
-	            switch (etom.Type)
-	            {
-	                // standard high level operations
+                switch (etom.Type)
+                {
+                // standard high level operations
                     case AQL.COLLECT:
                         if (prettyPrint)
                         {
@@ -644,16 +671,60 @@ namespace Arango.Client
                         expression.Append(AQL.COLLECT + " " + etom.Value);
                         break;
                     case AQL.FILTER:
-                        if (prettyPrint)
+                    case AQL.AND:
+                    case AQL.OR:
+                        if (etom.Type == AQL.FILTER)
                         {
-                            expression.Append("\n" + Tabulate(spaceLevel * _spaceCount));
+                            if (prettyPrint)
+                            {
+                                expression.Append("\n" + Tabulate(spaceLevel * _spaceCount));
+                            }
+                            else
+                            {
+                                expression.Append(" ");
+                            }
+
+                            expression.Append(AQL.FILTER + " ");
                         }
-                        else
+                        else if (etom.Type == AQL.AND)
                         {
-                            expression.Append(" ");
+                            expression.Append(" " + AQL.AND + " ");
+                        }
+                        else if (etom.Type == AQL.OR)
+                        {
+                            expression.Append(" " + AQL.OR + " ");
                         }
 
-                        expression.Append(AQL.FILTER + " " + etom.Value);
+                        expression.Append(ToString(etom.Children.Take(1).ToList(), 0, prettyPrint) + " ");
+
+                        switch ((ArangoOperator)etom.Value)
+                        {
+                            case ArangoOperator.Equal:
+                                expression.Append("==");
+                                break;
+                            case ArangoOperator.Greater:
+                                expression.Append(">");
+                                break;
+                            case ArangoOperator.GreaterOrEqual:
+                                expression.Append(">=");
+                                break;
+                            case ArangoOperator.In:
+                                expression.Append("IN");
+                                break;
+                            case ArangoOperator.Lesser:
+                                expression.Append("<");
+                                break;
+                            case ArangoOperator.LesserOrEqual:
+                                expression.Append("<=");
+                                break;
+                            case ArangoOperator.NotEqual:
+                                expression.Append("!=");
+                                break;
+                            default:
+                                break;
+                        }
+
+                        expression.Append(" " + ToString(etom.Children.Skip(1).ToList(), 0, prettyPrint));
                         break;
 	                case AQL.FOR:
                         if (prettyPrint)
@@ -867,10 +938,10 @@ namespace Arango.Client
 
                         expression.Append(etom.Value);
                         break;
-	                case AQL.Value:
+	                case AQL.Val:
 	                    expression.Append(ToString(etom.Value));
 	                    break;
-	                case AQL.Variable:
+	                case AQL.Var:
 	                    expression.Append(etom.Value);
 	                    break;
 	                default:

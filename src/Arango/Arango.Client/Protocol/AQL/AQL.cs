@@ -25,11 +25,12 @@ namespace Arango.Client.Protocol
         internal const string TO_STRING = "TO_STRING";
 
         // symbols
-        internal const string And = "&&";
-        internal new const string Equals = "==";
+        internal const string AND = "&&";
+        internal const string OR = "||";
 
         // internal operations
         internal const string Collection = "COLLECTION";
+        internal const string Condition = "CONDITION";
         internal const string Field = "FIELD";
         internal const string List = "LIST";
         internal const string ListExpression = "LISTEXPRESSION";
@@ -37,7 +38,7 @@ namespace Arango.Client.Protocol
         internal const string Root = "ROOT";
         internal const string SortDirection = "SORTDIRECTION";
         internal const string String = "STRING";
-        internal const string Value = "VALUE";
-        internal const string Variable = "VARIABLE";
+        internal const string Val = "VAL";
+        internal const string Var = "VAR";
     }
 }

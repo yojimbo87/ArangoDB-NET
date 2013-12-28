@@ -27,20 +27,20 @@ namespace Arango.Console
             ArangoQueryOperation expression = new ArangoQueryOperation()
                 /*.FOR("foo").Collection("col", ctx => ctx
                     .FILTER("foo.bar")
-                    .LET("val").Value("aaa")
-                    .LET("var").Variable("foo.bar")
+                    .LET("val").Val("aaa")
+                    .LET("var").Var("foo.bar")
                     .LET("obj").Object(ctxx => ctxx
-                        .Field("x").Value("y")
+                        .Field("x").Val("y")
                     )
                     .LET("array").List("x", "y", "z")
                     .LET("docVar").DOCUMENT("foo.bar")
                     .LET("docId").DOCUMENT("aaa/123")
                     .LET("docIds").DOCUMENT("aaa/123", "aaa/345")
-                    .LET("firstVar").FIRST(ctxx => ctxx.Variable("var"))
+                    .LET("firstVar").FIRST(ctxx => ctxx.Var("var"))
                     .LET("firstList").FIRST(ctxx => ctxx.List(1, 2, 3))
                     .LET("firstListContext").FIRST(ctxx => ctxx.List(ctxy => ctxy
                         .FOR("foo").Collection("bar", ctxz => ctxz
-                            .RETURN.Value("abcd"))
+                            .RETURN.Val("abcd"))
                     ))
                     .FOR("bar").List(new List<object> { "one", "two", "three" }, ctx2 => ctx2
                         .FILTER("bar.foo")
@@ -49,42 +49,42 @@ namespace Arango.Console
                                 .FOR("foo").EDGES("colx", "xyz", ArangoEdgeDirection.Any, ctx5 => ctx5
                                     .RETURN.List(7, 8, 9))))
                         .RETURN.Object(ctx6 => ctx6
-                            .Field("foo").Variable("var")
-                            .Field("bar").Value("val")
+                            .Field("foo").Var("var")
+                            .Field("bar").Val("val")
                             .Field("baz").List(1, 2, 3)
                             .Field("boo").List(ctx7 => ctx7
                                 .FOR("x").Collection("coly", ctx8 => ctx8
-                                    .FOR("y").Variable("whoa", ctx9 => ctx9
-                                        .RETURN.Variable("var")))
+                                    .FOR("y").Var("whoa", ctx9 => ctx9
+                                        .RETURN.Var("var")))
                             )
                             .Field("obj").Object(ctx10 => ctx10
-                                .Field("foo").Value("bar")
+                                .Field("foo").Val("bar")
                             )
-                            .Field("xxx").Value("yyy")
+                            .Field("xxx").Val("yyy")
                         ))
                 );*/
                 .Aql(_ => _
-                    .LET("concat1").CONCAT(_.Value("xxx"), _.Value(5), _.Variable("foo"), _.TO_STRING(_.Variable("bar")))
-            	    .LET("val1").Value("string")
-            	    .LET("val2").Value(123)
+                    .LET("concat1").CONCAT(_.Val("xxx"), _.Val(5), _.Var("foo"), _.TO_STRING(_.Var("bar")))
+            	    .LET("val1").Val("string")
+            	    .LET("val2").Val(123)
                     .LET("list1").List(1, 2, 3)
                     .LET("list2").List(new List<object> { 4, 5, 6})
                     .LET("list3").List(_
-                        .LET("val11").Value("sss")
+                        .LET("val11").Val("sss")
                         .Aql("LET val12 = 'whoa'")
-                        .RETURN.Value("abcd")
+                        .RETURN.Val("abcd")
                     )
                     .LET("obj").Object(_
-                        .Field("x").Value("y")
+                        .Field("x").Val("y")
                     )
-                    .LET("boolVar").TO_BOOL(_.Variable("b"))
-                    .LET("boolVal").TO_BOOL(_.Value(0))
-                    .LET("listVar").TO_LIST(_.Variable("b"))
-                    .LET("listVal").TO_LIST(_.Value("a"))
-                    .LET("numberVar").TO_NUMBER(_.Variable("b"))
-                    .LET("numberVal").TO_NUMBER(_.Value("3"))
-                    .LET("stringVar").TO_STRING(_.Variable("b"))
-                    .LET("stringVal").TO_NUMBER(_.Value(4))
+                    .LET("boolVar").TO_BOOL(_.Var("b"))
+                    .LET("boolVal").TO_BOOL(_.Val(0))
+                    .LET("listVar").TO_LIST(_.Var("b"))
+                    .LET("listVal").TO_LIST(_.Val("a"))
+                    .LET("numberVar").TO_NUMBER(_.Var("b"))
+                    .LET("numberVal").TO_NUMBER(_.Val("3"))
+                    .LET("stringVar").TO_STRING(_.Var("b"))
+                    .LET("stringVal").TO_NUMBER(_.Val(4))
                     .LET("docVar").DOCUMENT("foo.bar")
                     .LET("docId").DOCUMENT("aaa/123")
                     .LET("docIds").DOCUMENT("aaa/123", "aaa/345")
@@ -95,41 +95,47 @@ namespace Arango.Console
                     .LET("firstList").FIRST(_.List(new List<object> { 1, 2, 3}))
                     .LET("firstListContext").FIRST(_.List(_
                         .FOR("foo").IN("bar", _
-                            .LET("xxx").Value("abcd")
-                            .RETURN.Variable("xxx"))
+                            .LET("xxx").Val("abcd")
+                            .RETURN.Var("xxx"))
                     ))
                     .FOR("foo1").IN("col1", _
-                        .LET("val11").Value("string")
-                        .LET("val12").Value(123)
+                        .LET("val11").Val("string")
+                        .LET("val12").Val(123)
                         .LET("list11").List(new List<object> { 1, 2, 3})
                         .LET("list12").List(_
-                            .LET("val21").Value("sss")
-                            .LET("val22").Value(345)
+                            .LET("val21").Val("sss")
+                            .LET("val22").Val(345)
                             .RETURN.Object(_
-                                .Field("foo").Variable("var")
-                                .Field("bar").Value("val")
+                                .Field("foo").Var("var")
+                                .Field("bar").Val("val")
                                 .Field("baz").List(new List<object> { 1, 2, 3})
                                 .Field("boo").List(_
                                     .FOR("x").IN("coly", _
                                         .FOR("y").IN("whoa", _
-                                            .RETURN.Variable("var")))
+                                            .RETURN.Var("var")))
                                 )
                                 .Field("obj").Object(_
-                                    .Field("foo").Value("bar")
+                                    .Field("foo").Val("bar")
                                 )
-                                .Field("xxx").Value("yyy")
+                                .Field("xxx").Val("yyy")
                             )
                         )
-                        .FILTER("val11 > 123 && val12 == 'foo'")
+                        .FILTER(
+                            _.Var("val11"), ArangoOperator.Greater, _.Val(123)
+                        ).AND(
+                            _.Var("val12"), ArangoOperator.Equal, _.Val("foo")
+                        ).OR(
+                            _.Val(44), ArangoOperator.In, _.Var("val13")
+                        )
                         .COLLECT("city = u.city")
                         .COLLECT("first = u.firstName, age = u.age").INTO("g")
-                        .SORT(_.Variable("var1")).Direction(ArangoSortDirection.ASC)
-                        .SORT(_.Variable("var1"), _.TO_NUMBER(_.Variable("var2"))).Direction(ArangoSortDirection.DESC)
+                        .SORT(_.Var("var1")).Direction(ArangoSortDirection.ASC)
+                        .SORT(_.Var("var1"), _.TO_NUMBER(_.Var("var2"))).Direction(ArangoSortDirection.DESC)
                         .LIMIT(5)
                         .LIMIT(0, 5)
                         .LIMIT("@count")
                         .LIMIT("@offset", "@count")
-                        .RETURN.Variable("list12"))
+                        .RETURN.Var("list12"))
                 );
 
             var pretty = expression.ToString();
