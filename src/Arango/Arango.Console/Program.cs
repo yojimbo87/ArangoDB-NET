@@ -38,6 +38,8 @@ namespace Arango.Console
                     )
                     .LET("len1").LENGTH(_.Var("var1"))
                     .LET("len2").LENGTH(_.List(1, 2, 3))
+                    .LET("contains1").CONTAINS(_.Val("abc"), _.Var("foo"))
+                    .LET("contains2").CONTAINS(_.Val("abc"), _.Var("foo"), true)
                     .LET("obj").Object(_
                         .Field("x").Val("y")
                     )

@@ -273,6 +273,27 @@ namespace Arango.Client
             return AddEtom(etom);
         }
 
+        #region CONTAINS
+
+        public ArangoQueryOperation CONTAINS(ArangoQueryOperation text, ArangoQueryOperation search, bool returnIndex)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.CONTAINS;
+            etom.Value = returnIndex;
+            etom.ChildrenList = new List<List<Etom>>();
+            etom.ChildrenList.Add(text.ExpressionTree);
+            etom.ChildrenList.Add(search.ExpressionTree);
+
+            return AddEtom(etom);
+        }
+
+        public ArangoQueryOperation CONTAINS(ArangoQueryOperation text, ArangoQueryOperation search)
+        {
+            return CONTAINS(text, search, false);
+        }
+
+        #endregion
+
         #region DOCUMENT
 
         public ArangoQueryOperation DOCUMENT(List<string> documentIds)
@@ -831,6 +852,23 @@ namespace Arango.Client
                             {
                                 expression.Append(", ");
                             }
+                        }
+
+                        expression.Append(")");
+                        break;
+                    case AQL.CONTAINS:
+                        expression.Append(AQL.CONTAINS + "(");
+
+                        // text expression
+                        expression.Append(ToString(etom.ChildrenList[0], 0, prettyPrint) + ", ");
+
+                        // search expression
+                        expression.Append(ToString(etom.ChildrenList[1], 0, prettyPrint));
+
+                        // return index parameter
+                        if ((bool)etom.Value == true)
+                        {
+                            expression.Append(", true");
                         }
 
                         expression.Append(")");
