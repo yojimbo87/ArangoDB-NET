@@ -94,6 +94,8 @@ namespace Arango.Console
                             _.Var("val12"), ArangoOperator.Equal, _.Val("foo")
                         ).OR(
                             _.Val(44), ArangoOperator.In, _.Var("val13")
+                        ).AND(
+                            _.NOT(_.Var("foo"), ArangoOperator.In, _.Var("bar"))
                         )
                         .FILTER(
                             _.CONTAINS(_.Var("foo"), _.Val("abc"))
@@ -103,6 +105,8 @@ namespace Arango.Console
                         )
                         .OR(
                             _.CONTAINS(_.Var("baz"), _.Val("def"))
+                        ).AND(
+                            _.NOT(_.CONTAINS(_.Var("baz"), _.Val("def")))
                         )
                         .COLLECT("city = u.city")
                         .COLLECT("first = u.firstName, age = u.age").INTO("g")

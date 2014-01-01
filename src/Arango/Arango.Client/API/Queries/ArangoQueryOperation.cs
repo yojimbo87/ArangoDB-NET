@@ -242,6 +242,32 @@ namespace Arango.Client
 
         #endregion
 
+        #region NOT
+
+        public ArangoQueryOperation NOT(ArangoQueryOperation leftOperand, ArangoOperator conditionOperator, ArangoQueryOperation rightOperand)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.NOT;
+            etom.Value = conditionOperator;
+
+            etom.Children.AddRange(leftOperand.ExpressionTree);
+            etom.Children.AddRange(rightOperand.ExpressionTree);
+
+            return AddEtom(etom);
+        }
+
+        public ArangoQueryOperation NOT(ArangoQueryOperation expression)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.NOT;
+
+            etom.Children.AddRange(expression.ExpressionTree);
+
+            return AddEtom(etom);
+        }
+
+        #endregion
+
         #region OR
 
         public ArangoQueryOperation OR(ArangoQueryOperation leftOperand, ArangoOperator conditionOperator, ArangoQueryOperation rightOperand)
@@ -765,6 +791,7 @@ namespace Arango.Client
                         break;
                     case AQL.FILTER:
                     case AQL.AND:
+                    case AQL.NOT:
                     case AQL.OR:
                         if (etom.Type == AQL.FILTER)
                         {
@@ -783,6 +810,10 @@ namespace Arango.Client
                         {
                             expression.Append(" " + AQL.AND + " ");
                         }
+                        else if (etom.Type == AQL.NOT)
+                        {
+                            expression.Append(AQL.NOT);
+                        }
                         else if (etom.Type == AQL.OR)
                         {
                             expression.Append(" " + AQL.OR + " ");
@@ -796,6 +827,7 @@ namespace Arango.Client
                         // two operands and operator, e.g. foo == 123
                         else
                         {
+                            expression.Append("(");
                             expression.Append(ToString(etom.Children.Take(1).ToList(), 0, prettyPrint) + " ");
 
                             switch ((ArangoOperator)etom.Value)
@@ -826,6 +858,7 @@ namespace Arango.Client
                             }
 
                             expression.Append(" " + ToString(etom.Children.Skip(1).ToList(), 0, prettyPrint));
+                            expression.Append(")");
                         }
                         break;
 	                case AQL.FOR:

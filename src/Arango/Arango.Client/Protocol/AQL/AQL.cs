@@ -30,6 +30,7 @@ namespace Arango.Client.Protocol
 
         // symbols
         internal const string AND = "&&";
+        internal const string NOT = "!";
         internal const string OR = "||";
 
         // internal operations
