@@ -95,6 +95,15 @@ namespace Arango.Console
                         ).OR(
                             _.Val(44), ArangoOperator.In, _.Var("val13")
                         )
+                        .FILTER(
+                            _.CONTAINS(_.Var("foo"), _.Val("abc"))
+                        )
+                        .AND(
+                            _.CONTAINS(_.Var("bar"), _.Val(123))
+                        )
+                        .OR(
+                            _.CONTAINS(_.Var("baz"), _.Val("def"))
+                        )
                         .COLLECT("city = u.city")
                         .COLLECT("first = u.firstName, age = u.age").INTO("g")
                         .SORT(_.Var("var1")).Direction(ArangoSortDirection.ASC)

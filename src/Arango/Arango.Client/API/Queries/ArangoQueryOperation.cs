@@ -89,6 +89,8 @@ namespace Arango.Client
          *  standard high level operations
          */
 
+        #region AND
+
         public ArangoQueryOperation AND(ArangoQueryOperation leftOperand, ArangoOperator conditionOperator, ArangoQueryOperation rightOperand)
         {
             var etom = new Etom();
@@ -101,6 +103,18 @@ namespace Arango.Client
             return AddEtom(etom);
         }
 
+        public ArangoQueryOperation AND(ArangoQueryOperation expression)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.AND;
+
+            etom.Children.AddRange(expression.ExpressionTree);
+
+            return AddEtom(etom);
+        }
+
+        #endregion
+
         public ArangoQueryOperation COLLECT(string criteria)
         {
             var etom = new Etom();
@@ -109,6 +123,8 @@ namespace Arango.Client
 
             return AddEtom(etom);
         }
+
+        #region FILTER
 
         public ArangoQueryOperation FILTER(ArangoQueryOperation leftOperand, ArangoOperator conditionOperator, ArangoQueryOperation rightOperand)
         {
@@ -121,6 +137,18 @@ namespace Arango.Client
 
             return AddEtom(etom);
         }
+
+        public ArangoQueryOperation FILTER(ArangoQueryOperation expression)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.FILTER;
+
+            etom.Children.AddRange(expression.ExpressionTree);
+
+            return AddEtom(etom);
+        }
+
+        #endregion
 
         public ArangoQueryOperation FOR(string variableName)
         {
@@ -214,6 +242,8 @@ namespace Arango.Client
 
         #endregion
 
+        #region OR
+
         public ArangoQueryOperation OR(ArangoQueryOperation leftOperand, ArangoOperator conditionOperator, ArangoQueryOperation rightOperand)
         {
             var etom = new Etom();
@@ -225,6 +255,18 @@ namespace Arango.Client
 
             return AddEtom(etom);
         }
+
+        public ArangoQueryOperation OR(ArangoQueryOperation expression)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.OR;
+
+            etom.Children.AddRange(expression.ExpressionTree);
+
+            return AddEtom(etom);
+        }
+
+        #endregion
 
         #region RETURN
 
@@ -746,36 +788,45 @@ namespace Arango.Client
                             expression.Append(" " + AQL.OR + " ");
                         }
 
-                        expression.Append(ToString(etom.Children.Take(1).ToList(), 0, prettyPrint) + " ");
-
-                        switch ((ArangoOperator)etom.Value)
+                        // single expression, e.g. CONTAINS(...)
+                        if (etom.Children.Count == 1)
                         {
-                            case ArangoOperator.Equal:
-                                expression.Append("==");
-                                break;
-                            case ArangoOperator.Greater:
-                                expression.Append(">");
-                                break;
-                            case ArangoOperator.GreaterOrEqual:
-                                expression.Append(">=");
-                                break;
-                            case ArangoOperator.In:
-                                expression.Append("IN");
-                                break;
-                            case ArangoOperator.Lesser:
-                                expression.Append("<");
-                                break;
-                            case ArangoOperator.LesserOrEqual:
-                                expression.Append("<=");
-                                break;
-                            case ArangoOperator.NotEqual:
-                                expression.Append("!=");
-                                break;
-                            default:
-                                break;
+                            expression.Append(ToString(etom.Children.Take(1).ToList(), 0, prettyPrint));
                         }
+                        // two operands and operator, e.g. foo == 123
+                        else
+                        {
+                            expression.Append(ToString(etom.Children.Take(1).ToList(), 0, prettyPrint) + " ");
 
-                        expression.Append(" " + ToString(etom.Children.Skip(1).ToList(), 0, prettyPrint));
+                            switch ((ArangoOperator)etom.Value)
+                            {
+                                case ArangoOperator.Equal:
+                                    expression.Append("==");
+                                    break;
+                                case ArangoOperator.Greater:
+                                    expression.Append(">");
+                                    break;
+                                case ArangoOperator.GreaterOrEqual:
+                                    expression.Append(">=");
+                                    break;
+                                case ArangoOperator.In:
+                                    expression.Append("IN");
+                                    break;
+                                case ArangoOperator.Lesser:
+                                    expression.Append("<");
+                                    break;
+                                case ArangoOperator.LesserOrEqual:
+                                    expression.Append("<=");
+                                    break;
+                                case ArangoOperator.NotEqual:
+                                    expression.Append("!=");
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            expression.Append(" " + ToString(etom.Children.Skip(1).ToList(), 0, prettyPrint));
+                        }
                         break;
 	                case AQL.FOR:
                         if (prettyPrint)
