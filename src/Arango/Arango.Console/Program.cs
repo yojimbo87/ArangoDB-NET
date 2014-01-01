@@ -29,6 +29,8 @@ namespace Arango.Console
                     .LET("concat1").CONCAT(_.Val("xxx"), _.Val(5), _.Var("foo"), _.TO_STRING(_.Var("bar")))
             	    .LET("val1").Val("string")
             	    .LET("val2").Val(123)
+                    .LET("lower").LOWER(_.Val("ABC"))
+                    .LET("upper").UPPER(_.Var("foo"))
                     .LET("list1").List(1, 2, 3)
                     .LET("list2").List(new List<object> { 4, 5, 6})
                     .LET("list3").List(_

@@ -409,6 +409,16 @@ namespace Arango.Client
             return AddEtom(etom);
         }
 
+        public ArangoQueryOperation LOWER(ArangoQueryOperation aql)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.LOWER;
+
+            etom.Children = aql.ExpressionTree;
+
+            return AddEtom(etom);
+        }
+
         public ArangoQueryOperation TO_BOOL(ArangoQueryOperation aql)
         {
             var etom = new Etom();
@@ -443,6 +453,16 @@ namespace Arango.Client
         {
             var etom = new Etom();
             etom.Type = AQL.TO_STRING;
+
+            etom.Children = aql.ExpressionTree;
+
+            return AddEtom(etom);
+        }
+
+        public ArangoQueryOperation UPPER(ArangoQueryOperation aql)
+        {
+            var etom = new Etom();
+            etom.Type = AQL.UPPER;
 
             etom.Children = aql.ExpressionTree;
 
@@ -900,6 +920,10 @@ namespace Arango.Client
                         expression.Append(AQL.LENGTH + "(");
                         expression.Append(ToString(etom.Children, 0, prettyPrint) + ")");
                         break;
+                    case AQL.LOWER:
+                        expression.Append(AQL.LOWER + "(");
+                        expression.Append(ToString(etom.Children, 0, prettyPrint) + ")");
+                        break;
                     case AQL.TO_BOOL:
                         expression.Append(AQL.TO_BOOL + "(");
                         expression.Append(ToString(etom.Children, 0, prettyPrint) + ")");
@@ -914,6 +938,10 @@ namespace Arango.Client
                         break;
                     case AQL.TO_STRING:
                         expression.Append(AQL.TO_STRING + "(");
+                        expression.Append(ToString(etom.Children, 0, prettyPrint) + ")");
+                        break;
+                    case AQL.UPPER:
+                        expression.Append(AQL.UPPER + "(");
                         expression.Append(ToString(etom.Children, 0, prettyPrint) + ")");
                         break;
 	                // internal operations

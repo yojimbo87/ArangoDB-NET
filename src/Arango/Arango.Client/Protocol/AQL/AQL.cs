@@ -21,10 +21,12 @@ namespace Arango.Client.Protocol
         internal const string EDGES = "EDGES";
         internal const string FIRST = "FIRST";
         internal const string LENGTH = "LENGTH";
+        internal const string LOWER = "LOWER";
         internal const string TO_BOOL = "TO_BOOL";
         internal const string TO_LIST = "TO_LIST";
         internal const string TO_NUMBER = "TO_NUMBER";
         internal const string TO_STRING = "TO_STRING";
+        internal const string UPPER = "UPPER";
 
         // symbols
         internal const string AND = "&&";
