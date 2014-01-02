@@ -658,8 +658,25 @@ namespace Arango.Client
         /// <param name="count">Variable where will be stored total number of result objects available after execution.</param>
         public List<T> ToList<T>(out int count) where T: class, new()
         {
-            var type = typeof(T);
             var items = _cursorOperation.Post(ToString(false), true, out count, _batchSize, _bindVars);
+
+            return ToGenericList<T>(items);
+        }
+        
+        /// <summary> 
+        /// Executes AQL query and returns list of objects.
+        /// </summary>
+        public List<T> ToList<T>()
+        {
+            var count = 0;
+            var items = _cursorOperation.Post(ToString(false), false, out count, _batchSize, _bindVars);
+
+            return ToGenericList<T>(items);
+        }
+
+        private List<T> ToGenericList<T>(List<object> items)
+        {
+            var type = typeof(T);
             var genericCollection = new List<T>();
 
             if (type.IsPrimitive ||
@@ -682,55 +699,14 @@ namespace Arango.Client
                 {
                     var document = (Document)item;
                     var genericObject = Activator.CreateInstance(type);
-                    
+
                     document.ToObject(genericObject);
                     document.MapAttributesTo(genericObject);
-                    
+
                     genericCollection.Add((T)genericObject);
                 }
             }
-            
-            return genericCollection;
-        }
-        
-        /// <summary> 
-        /// Executes AQL query and returns list of objects.
-        /// </summary>
-        public List<T> ToList<T>()
-        {
-            var type = typeof(T);
-            var count = 0;
-            var items = _cursorOperation.Post(ToString(false), false, out count, _batchSize, _bindVars);
-            var genericCollection = new List<T>();
-            
-            if (type.IsPrimitive ||
-                (type == typeof(string)) ||
-                (type == typeof(DateTime)) ||
-                (type == typeof(decimal)))
-            {
-                foreach (object item in items)
-                {
-                    genericCollection.Add((T)Convert.ChangeType(item, type));
-                }
-            }
-            else if (type == typeof(Document))
-            {
-                genericCollection = items.Cast<T>().ToList();
-            }
-            else
-            {
-                foreach (object item in items)
-                {
-                    var document = (Document)item;
-                    var genericObject = Activator.CreateInstance(type);
-                    
-                    document.ToObject(genericObject);
-                    document.MapAttributesTo(genericObject);
-                    
-                    genericCollection.Add((T)genericObject);
-                }
-            }
-            
+
             return genericCollection;
         }
         
