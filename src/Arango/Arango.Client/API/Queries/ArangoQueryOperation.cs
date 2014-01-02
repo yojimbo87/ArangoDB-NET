@@ -871,10 +871,10 @@ namespace Arango.Client
                             expression.Append(" ");
                         }
 
-	                	expression.Append(AQL.FOR + " " + etom.Value + " ");
+                        expression.Append(AQL.FOR + " " + etom.Value + " " + AQL.IN + " ");
 	                    break;
                     case AQL.IN:
-                        expression.Append(AQL.IN + " " + etom.Value);
+                        expression.Append(etom.Value);
 
                         if (etom.Children.Count > 0)
                         {
