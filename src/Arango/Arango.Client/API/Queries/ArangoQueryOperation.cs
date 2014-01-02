@@ -432,7 +432,7 @@ namespace Arango.Client
                 expression.Append(vertexId);
             }
 
-            expression.Append(", ");
+            expression.Append(", '");
 
             switch (edgeDirection)
             {
@@ -448,6 +448,8 @@ namespace Arango.Client
                 default:
                     break;
             }
+
+            expression.Append("'");
 
             etom.Value = expression;
             etom.Children = aql.ExpressionTree;
