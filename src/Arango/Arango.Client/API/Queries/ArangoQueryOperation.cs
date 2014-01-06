@@ -980,7 +980,15 @@ namespace Arango.Client
                         break;
                     case AQL.LENGTH:
                         expression.Append(AQL.LENGTH + "(");
-                        expression.Append(ToString(etom.Children, 0, prettyPrint) + ")");
+
+                        if ((etom.Children.Count == 1) && (etom.Children.First().Children.Count == 0))
+                        {
+                            expression.Append(ToString(etom.Children, 0, prettyPrint) + ")");
+                        }
+                        else
+                        {
+                            expression.Append(ToString(etom.Children, spaceLevel, prettyPrint) + ")");
+                        }
                         break;
                     case AQL.LOWER:
                         expression.Append(AQL.LOWER + "(");
