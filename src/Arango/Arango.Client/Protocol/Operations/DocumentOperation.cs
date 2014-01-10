@@ -59,7 +59,14 @@ namespace Arango.Client.Protocol
         {
             var request = new Request(RequestType.Document, HttpMethod.Post);
             request.RelativeUri = _apiUri;
-            request.Body = document.Except("_id", "_key", "_rev").Serialize();
+	    request.Body = document.Serialize();
+            if (
+                request.Body.Contains("_id")
+                || request.Body.Contains("_key")
+                || request.Body.Contains("_rev")
+            ) {
+                request.Body = document.Except("_id", "_key", "_rev").Serialize();
+	    }
             
             // set collection name where the document will be created
             request.QueryString.Add("collection", collection);
