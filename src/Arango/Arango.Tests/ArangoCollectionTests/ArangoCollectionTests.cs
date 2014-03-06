@@ -223,6 +223,44 @@ namespace Arango.Tests.ArangoCollectionTests
             Assert.AreEqual(5, returnedCollection.NumberOfShards);
         }        
         
+        
+        [Test()]
+        public void Should_create_collection_with_shard_keys()
+        {            
+            var db = Database.GetTestDatabase();
+            
+            if (! db.Server.Role().IsCluster())
+            {
+            	// do not execute this test in non-cluster mode
+            	return;
+            }
+
+            Database.DeleteTestCollection(Database.TestDocumentCollectionName);
+            	
+            // set collection data
+            var collection = new ArangoCollection();
+            collection.Name = Database.TestDocumentCollectionName;
+            collection.NumberOfShards = 2;
+            List<string> shardKeys = new List<string>();
+            shardKeys.Add("a");
+            shardKeys.Add("b");
+            collection.ShardKeys = shardKeys;
+            
+            // create collection in database
+            db.Collection.Create(collection);
+            
+            // get collection from database
+            ArangoCollection returnedCollection = db.Collection.Properties(Database.TestDocumentCollectionName);
+            
+            // get collection properties from database
+            Assert.AreEqual(collection.Id, returnedCollection.Id);
+            Assert.AreEqual(collection.Name, returnedCollection.Name);            
+            Assert.AreEqual(false, returnedCollection.IsVolatile);
+            Assert.AreEqual(false, returnedCollection.IsSystem);
+            Assert.AreEqual(2, returnedCollection.NumberOfShards);
+            Assert.AreEqual(shardKeys, returnedCollection.ShardKeys);
+        }                
+        
         public void Dispose()
         {
             Database.DeleteTestCollection(Database.TestDocumentCollectionName);
