@@ -68,6 +68,7 @@
     <Compile Include="FunctionTests\ArangoFunctionTests.cs" />
     <Compile Include="QueryTests\AqlTests.cs" />
     <Compile Include="QueryTests\CursorTests.cs" />
+    <Compile Include="VersionTests\VersionTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

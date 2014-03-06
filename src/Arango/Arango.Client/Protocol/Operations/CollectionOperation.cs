@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using Arango.Client.Protocol;
 
@@ -53,6 +54,55 @@ namespace Arango.Client.Protocol
         
         #endregion
         
+        #region PROPERTIES
+        
+        internal ArangoCollection Properties(string name)
+        {
+            var request = new Request(RequestType.Collection, HttpMethod.Get);
+            request.RelativeUri = string.Join("/", _apiUri, name, "properties");
+            
+            var response = _connection.Process(request);
+            var collection = new ArangoCollection();
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    collection.Id = response.Document.String("id");
+                    collection.Name = response.Document.String("name");
+                    collection.Status = response.Document.Enum<ArangoCollectionStatus>("status");
+                    collection.Type = response.Document.Enum<ArangoCollectionType>("type");
+                    collection.WaitForSync = response.Document.Bool("waitForSync");
+                    collection.IsSystem = response.Document.Bool("isSystem");
+                    collection.IsVolatile = response.Document.Bool("isVolatile");                    
+                    collection.JournalSize = response.Document.Int("journalSize");      
+                    if (response.Document.Has("numberOfShards")) {
+                    	collection.NumberOfShards = response.Document.Int("numberOfShards");
+                    }
+                    if (response.Document.Has("shardKeys")) {
+                    	collection.ShardKeys = (List<string>) response.Document.List<string>("shardKeys");
+                    }
+                    break;
+                case HttpStatusCode.NotFound:
+                    collection = null;
+                    break;
+                default:
+                    if (response.IsException)
+                    {
+                        throw new ArangoException(
+                            response.StatusCode,
+                            response.Document.String("driverErrorMessage"),
+                            response.Document.String("driverExceptionMessage"),
+                            response.Document.Object<Exception>("driverInnerException")
+                        );
+                    }
+                    break;
+            }
+
+            return collection;
+        }
+        
+        #endregion        
+        
         #region POST
         
         internal void Post(ArangoCollection collection)
@@ -93,6 +143,16 @@ namespace Arango.Client.Protocol
             if (collection.IsVolatile)
             {
                 document.Bool("isVolatile", collection.IsVolatile);
+            }
+            
+            if (collection.NumberOfShards != null)
+            {
+            	document.Int("numberOfShards", (int) collection.NumberOfShards);
+            }
+            
+            if (collection.ShardKeys != null)
+            {
+            	document.List("shardKeys", collection.ShardKeys);
             }
             
             // (optional) set keyOptions

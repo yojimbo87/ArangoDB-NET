@@ -1,4 +1,4 @@
-﻿
+﻿using System.Collections.Generic;
 
 namespace Arango.Client
 {
@@ -36,6 +36,16 @@ namespace Arango.Client
         /// Maximum size setting for journals/datafiles.
         /// </summary>
         public int JournalSize { get; set; }
+
+        /// <summary>
+        /// Number of shards for the collection
+        /// </summary>        
+        public int? NumberOfShards { get; set; }
+
+        /// <summary>
+        /// Specifies the shard keys of a collection.
+        /// </summary>        
+        public List<string> ShardKeys { get; set; }
         
         /// <summary>
         /// Collection status.

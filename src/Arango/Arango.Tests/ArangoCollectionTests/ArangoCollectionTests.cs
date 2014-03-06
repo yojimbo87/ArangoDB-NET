@@ -102,10 +102,16 @@ namespace Arango.Tests.ArangoCollectionTests
         
         [Test()]
         public void Should_create_autoincrement_collection()
-        {
-            Database.DeleteTestCollection(Database.TestDocumentCollectionName);
-            
+        {            
             var db = Database.GetTestDatabase();
+            
+            if (db.Server.Role().IsCluster())
+            {
+            	// do not execute this test on a coordinator
+            	return;
+            }
+        	
+            Database.DeleteTestCollection(Database.TestDocumentCollectionName);
             
             // set collection data
             var collection = new ArangoCollection();
@@ -134,6 +140,88 @@ namespace Arango.Tests.ArangoCollectionTests
             // check if the created document key is autoincremented to 2
             Assert.AreEqual("2", document2.String("_key"));
         }
+        
+        [Test()]
+        public void Should_create_volatile_collection()
+        {
+            Database.DeleteTestCollection(Database.TestDocumentCollectionName);
+            
+            var db = Database.GetTestDatabase();
+            
+            // set collection data
+            var collection = new ArangoCollection();
+            collection.Name = Database.TestDocumentCollectionName;
+            collection.IsVolatile = true;
+            
+            // create collection in database
+            db.Collection.Create(collection);
+            
+            // get collection from database
+            ArangoCollection returnedCollection = db.Collection.Properties(Database.TestDocumentCollectionName);
+            
+            // get collection properties from database
+            Assert.AreEqual(collection.Id, returnedCollection.Id);
+            Assert.AreEqual(collection.Name, returnedCollection.Name);            
+            Assert.AreEqual(false, returnedCollection.WaitForSync);
+            Assert.AreEqual(true, returnedCollection.IsVolatile);
+        }          
+
+        [Test()]
+        public void Should_create_synchronous_collection()
+        {
+            Database.DeleteTestCollection(Database.TestDocumentCollectionName);
+            
+            var db = Database.GetTestDatabase();
+            
+            // set collection data
+            var collection = new ArangoCollection();
+            collection.Name = Database.TestDocumentCollectionName;
+            collection.WaitForSync = true;
+            
+            // create collection in database
+            db.Collection.Create(collection);
+            
+            // get collection from database
+            ArangoCollection returnedCollection = db.Collection.Properties(Database.TestDocumentCollectionName);
+            
+            // get collection properties from database
+            Assert.AreEqual(collection.Id, returnedCollection.Id);
+            Assert.AreEqual(collection.Name, returnedCollection.Name);            
+            Assert.AreEqual(true, returnedCollection.WaitForSync);
+            Assert.AreEqual(false, returnedCollection.IsVolatile);
+        }
+        
+        [Test()]
+        public void Should_create_sharded_collection()
+        {            
+            var db = Database.GetTestDatabase();
+            
+            if (! db.Server.Role().IsCluster())
+            {
+            	// do not execute this test in non-cluster mode
+            	return;
+            }
+
+            Database.DeleteTestCollection(Database.TestDocumentCollectionName);
+            	
+            // set collection data
+            var collection = new ArangoCollection();
+            collection.Name = Database.TestDocumentCollectionName;
+            collection.NumberOfShards = 5;
+            
+            // create collection in database
+            db.Collection.Create(collection);
+            
+            // get collection from database
+            ArangoCollection returnedCollection = db.Collection.Properties(Database.TestDocumentCollectionName);
+            
+            // get collection properties from database
+            Assert.AreEqual(collection.Id, returnedCollection.Id);
+            Assert.AreEqual(collection.Name, returnedCollection.Name);            
+            Assert.AreEqual(false, returnedCollection.IsVolatile);
+            Assert.AreEqual(false, returnedCollection.IsSystem);
+            Assert.AreEqual(5, returnedCollection.NumberOfShards);
+        }        
         
         public void Dispose()
         {
