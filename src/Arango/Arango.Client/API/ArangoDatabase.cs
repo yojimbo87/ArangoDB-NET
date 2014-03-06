@@ -65,6 +65,28 @@ namespace Arango.Client
             }
         }
 
+        /// <summary> 
+        /// Expose server functionality
+        /// </summary>
+        public ArangoServerOperation Server
+        {
+            get
+            {
+                return new ArangoServerOperation(new ServerOperation(_connection));
+            }
+        }               
+                
+        /// <summary> 
+        /// Expose version functionality
+        /// </summary>
+        public ArangoVersionOperation Version
+        {
+            get
+            {
+                return new ArangoVersionOperation(new VersionOperation(_connection));
+            }
+        }        
+
         /// <summary>
         /// Creates Arango database object with specified alias connection.
         /// </summary>

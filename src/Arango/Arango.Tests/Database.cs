@@ -26,7 +26,7 @@ namespace Arango.Tests
             TestDocumentCollectionName = "testDocumentCollection001xyzLatif";
             TestEdgeCollectionName = "testEdgeCollection001xyzLatif";
             
-            Hostname = "localhost";
+            Hostname = "127.0.0.1";
             Port = 8529;
             IsSecured = false;
             DatabaseName = TestDatabaseGeneral;
@@ -52,13 +52,13 @@ namespace Arango.Tests
         
         public static void CreateTestDatabase(string databaseName)
         {
-            DeleteTestDatabase(Database.TestDatabaseGeneral);
+            DeleteTestDatabase(databaseName);
             
             ArangoClient.CreateDatabase(
                 Database.Hostname,
                 Database.Port,
                 Database.IsSecured,
-                Database.TestDatabaseGeneral,
+                databaseName,
                 Database.UserName,
                 Database.Password
             );
@@ -74,13 +74,13 @@ namespace Arango.Tests
                 Database.Password
             );
             
-            if (databases.Contains(Database.TestDatabaseGeneral))
+            if (databases.Contains(databaseName))
             {
                 ArangoClient.DeleteDatabase(
                     Database.Hostname,
                     Database.Port,
                     Database.IsSecured,
-                    Database.TestDatabaseGeneral,
+                    databaseName,
                     Database.UserName,
                     Database.Password
                 );

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-# SharpDevelop 4.3
+# SharpDevelop 4.4
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arango.Client", "Arango.Client\Arango.Client.csproj", "{9B3F90DF-4E2C-4171-86B3-5C0FF4B3B07E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arango.Console", "Arango.Console\Arango.Console.csproj", "{D742C87C-7CBC-4333-B32C-7EAC619762CC}"

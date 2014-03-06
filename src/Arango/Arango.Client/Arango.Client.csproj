@@ -38,6 +38,10 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\Admin\ArangoServerOperation.cs" />
+    <Compile Include="API\Admin\ArangoServerRole.cs" />
+    <Compile Include="API\Admin\ArangoVersion.cs" />
+    <Compile Include="API\Admin\ArangoVersionOperation.cs" />
     <Compile Include="API\ArangoClient.cs" />
     <Compile Include="API\ArangoSettings.cs" />
     <Compile Include="API\Collections\ArangoCollection.cs" />
@@ -66,6 +70,8 @@
     <Compile Include="Protocol\Operations\DatabaseOperation.cs" />
     <Compile Include="Protocol\Operations\EdgeOperation.cs" />
     <Compile Include="Protocol\Operations\FunctionOperation.cs" />
+    <Compile Include="Protocol\Operations\ServerOperation.cs" />
+    <Compile Include="Protocol\Operations\VersionOperation.cs" />
     <Compile Include="Protocol\Request.cs" />
     <Compile Include="Protocol\RequestType.cs" />
     <Compile Include="Protocol\Response.cs" />
@@ -81,6 +87,7 @@
   <ItemGroup>
     <Folder Include="Protocol\" />
     <Folder Include="API\" />
+    <Folder Include="API\Admin\" />
     <Folder Include="API\Documents\" />
   </ItemGroup>
   <ItemGroup>

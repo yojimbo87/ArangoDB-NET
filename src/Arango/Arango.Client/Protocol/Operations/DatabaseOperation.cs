@@ -67,7 +67,10 @@ namespace Arango.Client.Protocol
 
             switch (response.StatusCode)
             {
+                // ArangoDB 1.4 returns 200 (Ok)
+                // whereas ArangoDB 2.0 returns 201 (Created)
                 case HttpStatusCode.OK:
+            	case HttpStatusCode.Created:
                     created = response.Document.Bool("result");
                     break;
                 default:

@@ -24,6 +24,15 @@ namespace Arango.Client
         }
         
         /// <summary>
+        /// Retrieves properties of collection with specified name.
+        /// </summary>
+        /// <param name="name">Collection name.</param>
+        public ArangoCollection Properties(string name)
+        {
+            return _collectionOperation.Properties(name);
+        }        
+        
+        /// <summary>
         /// Creates collection with specified configuration.
         /// </summary>
         /// <param name="collection">Collection object which contains configuration.</param>
