@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Arango.Client.Protocol;
-using Dictator;
 
 namespace Arango.Client
 {

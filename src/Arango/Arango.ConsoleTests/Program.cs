@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Arango.Client;
 using Arango.fastJSON;
-using Dictator;
 
 namespace Arango.ConsoleTests
 {
@@ -22,8 +21,8 @@ namespace Arango.ConsoleTests
             
             // TODO: tests for create document operation
             //GetCurrentDatabase();
-            //GetAccessibleDatabases();
-            GetAllDatabases();
+            GetAccessibleDatabases();
+            //GetAllDatabases();
             //CreateDocument();
             
             Console.Write("Press any key to continue . . . ");

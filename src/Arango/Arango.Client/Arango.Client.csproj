@@ -31,9 +31,6 @@
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dictator">
-      <HintPath>..\..\..\..\dictator\src\Dictator\Dictator\bin\Debug\Dictator.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
@@ -48,6 +45,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExternalLibraries\dictator\DateTimeFormat.cs" />
+    <Compile Include="ExternalLibraries\dictator\Dictator.cs" />
+    <Compile Include="ExternalLibraries\dictator\DictatorSettings.cs" />
+    <Compile Include="ExternalLibraries\dictator\DictionaryExtensions.cs" />
+    <Compile Include="ExternalLibraries\dictator\EnumFormat.cs" />
+    <Compile Include="ExternalLibraries\dictator\InvalidFieldException.cs" />
+    <Compile Include="ExternalLibraries\dictator\InvalidFieldTypeException.cs" />
+    <Compile Include="ExternalLibraries\dictator\NonExistingFieldException.cs" />
     <Compile Include="ExternalLibraries\fastJSON\dynamic.cs" />
     <Compile Include="ExternalLibraries\fastJSON\Formatter.cs" />
     <Compile Include="ExternalLibraries\fastJSON\Getters.cs" />
@@ -72,6 +77,7 @@
   <ItemGroup>
     <Folder Include="ExternalLibraries" />
     <Folder Include="ExternalLibraries\fastJSON" />
+    <Folder Include="ExternalLibraries\dictator" />
     <Folder Include="Protocol" />
     <Folder Include="Public" />
   </ItemGroup>

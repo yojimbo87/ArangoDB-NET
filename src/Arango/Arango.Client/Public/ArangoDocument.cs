@@ -1,7 +1,6 @@
 ﻿﻿using System.Collections.Generic;
 using Arango.Client.Protocol;
 using Arango.fastJSON;
-using Dictator;
 
 namespace Arango.Client
 {
