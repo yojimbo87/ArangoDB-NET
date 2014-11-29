@@ -19,11 +19,13 @@ namespace Arango.ConsoleTests
                 "_system"
             );
             
-            // TODO: tests for create document operation
+            // TODO: tests for database operations
             //GetCurrentDatabase();
             //GetAccessibleDatabases();
             //GetAllDatabases();
             //CreateDatabase();
+            //DropDatabase();
+            
             //CreateDocument();
             
             Console.Write("Press any key to continue . . . ");
@@ -83,6 +85,22 @@ namespace Arango.ConsoleTests
             var db = new ArangoDatabase(_alias);
             
             var result = db.Create("whoa");
+
+            if (!result.Success)
+            {
+                Console.WriteLine(result.Error.Message);
+                
+                return;
+            }
+            
+            Console.WriteLine(JSON.ToNiceJSON(result.Value, new JSONParameters()));
+        }
+        
+        static void DropDatabase()
+        {
+            var db = new ArangoDatabase(_alias);
+            
+            var result = db.Drop("whoa");
 
             if (!result.Success)
             {

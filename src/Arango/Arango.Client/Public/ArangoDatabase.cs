@@ -176,5 +176,36 @@ namespace Arango.Client
         }
         
         #endregion
+        
+        #region Drop (DELETE)
+        
+        public ArangoResult<bool> Drop(string databaseName)
+        {
+            var request = new Request(HttpMethod.DELETE, _apiUri, "/" + databaseName);
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<bool>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>).Bool("result");
+                    }
+                    break;
+                case 400:
+                case 403:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            return result;
+        }
+        
+        #endregion
     }
 }
