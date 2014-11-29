@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+# SharpDevelop 5.0
+VisualStudioVersion = 12.0.20827.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arango.Client", "Arango.Client\Arango.Client.csproj", "{BBB9A46E-C8DF-4A19-948D-02E2AF83765A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arango.ConsoleTests", "Arango.ConsoleTests\Arango.ConsoleTests.csproj", "{A4DB13E7-92D6-4576-9F7C-63FC67DA0328}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BBB9A46E-C8DF-4A19-948D-02E2AF83765A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBB9A46E-C8DF-4A19-948D-02E2AF83765A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBB9A46E-C8DF-4A19-948D-02E2AF83765A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBB9A46E-C8DF-4A19-948D-02E2AF83765A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4DB13E7-92D6-4576-9F7C-63FC67DA0328}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4DB13E7-92D6-4576-9F7C-63FC67DA0328}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4DB13E7-92D6-4576-9F7C-63FC67DA0328}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4DB13E7-92D6-4576-9F7C-63FC67DA0328}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
