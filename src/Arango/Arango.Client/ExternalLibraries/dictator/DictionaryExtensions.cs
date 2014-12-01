@@ -155,7 +155,7 @@ namespace Arango.Client
             return (Dictionary<string, object>)fieldValue;
         }
         /// <summary>
-        /// Retrieves enum type value from specified field path. Value is converted to enum if it is int or string type. 
+        /// Retrieves enum type value from specified field path. Value is converted to enum if it is byte, sbyte, short, ushort, int, uint, long, ulong or string type. 
         /// </summary>
         /// <exception cref="NonExistingFieldException">Field does not exist in specified path.</exception>
         /// <exception cref="InvalidFieldException">Field path contains field which is not traversable.</exception>
@@ -170,9 +170,12 @@ namespace Arango.Client
             {
                 fieldEnum = (T)fieldValue;
             }
-            else if (fieldValue is int)
+            else if ((fieldValue is byte) || (fieldValue is sbyte) ||
+                    (fieldValue is short) || (fieldValue is ushort) ||
+                    (fieldValue is int) || (fieldValue is uint) ||
+                    (fieldValue is long) || (fieldValue is ulong))
             {
-                fieldEnum = (T)System.Enum.ToObject(type, (int)fieldValue);
+                fieldEnum = (T)System.Enum.ToObject(type, fieldValue);
             }
             else if (fieldValue is string)
             {
