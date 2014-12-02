@@ -124,6 +124,28 @@ namespace Arango.Tests
             Assert.AreEqual(createResult.Value.String("id"), deleteResult.Value.String("id"));
         }
         
+        [Test()]
+        public void Should_truncate_collection()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
+
+            var clearResult = db.Collection
+                .Truncate(createResult.Value.String("name"));
+            
+            Assert.AreEqual(200, clearResult.StatusCode);
+            Assert.AreEqual(true, clearResult.Success);
+            Assert.AreEqual(createResult.Value.String("id"), clearResult.Value.String("id"));
+            Assert.AreEqual(createResult.Value.String("name"), clearResult.Value.String("name"));
+            Assert.AreEqual(createResult.Value.Bool("isSystem"), clearResult.Value.Bool("isSystem"));
+            Assert.AreEqual(createResult.Value.Int("status"), clearResult.Value.Int("status"));
+            Assert.AreEqual(createResult.Value.Int("type"), clearResult.Value.Int("type"));
+        }
+        
         public void Dispose()
         {
             Database.CleanupTestDatabases();
