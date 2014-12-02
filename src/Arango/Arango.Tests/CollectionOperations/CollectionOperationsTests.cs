@@ -106,6 +106,24 @@ namespace Arango.Tests
         
         #endregion
         
+        [Test()]
+        public void Should_delete_collection()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
+            
+            var deleteResult = db.Collection
+                .Delete(createResult.Value.String("name"));
+            
+            Assert.AreEqual(200, deleteResult.StatusCode);
+            Assert.AreEqual(true, deleteResult.Success);
+            Assert.AreEqual(createResult.Value.String("id"), deleteResult.Value.String("id"));
+        }
+        
         public void Dispose()
         {
             Database.CleanupTestDatabases();

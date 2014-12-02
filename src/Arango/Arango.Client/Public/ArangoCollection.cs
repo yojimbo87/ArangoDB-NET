@@ -166,5 +166,31 @@ namespace Arango.Client
         }
         
         #endregion
+        
+        public ArangoResult<Dictionary<string, object>> Delete(string collectionName)
+        {
+            var request = new Request(HttpMethod.DELETE, _apiUri, "/" + collectionName);
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<Dictionary<string, object>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>);
+                    }
+                    break;
+                case 400:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            return result;
+        }
     }
 }
