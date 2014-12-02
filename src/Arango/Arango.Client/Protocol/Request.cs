@@ -44,11 +44,19 @@ namespace Arango.Client.Protocol
             return uri.ToString();
         }
         
-        internal void TrySetQueryStringParameter(string parameterName, Dictionary<string, string> parameters)
+        internal void TrySetQueryStringParameter(string parameterName, Dictionary<string, object> parameters)
         {
             if (parameters.ContainsKey(parameterName))
             {
-                QueryString.Add(parameterName, parameters[parameterName]);
+                QueryString.Add(parameterName, parameters.String(parameterName));
+            }
+        }
+        
+        internal static void TrySetParameter(string parameterName, Dictionary<string, object> source, Dictionary<string, object> destination)
+        {
+            if (source.ContainsKey(parameterName))
+            {
+                destination.Add(parameterName, source.Object(parameterName));
             }
         }
     }

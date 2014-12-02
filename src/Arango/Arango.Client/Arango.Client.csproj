@@ -68,12 +68,16 @@
     <Compile Include="Protocol\ParameterName.cs" />
     <Compile Include="Protocol\Request.cs" />
     <Compile Include="Protocol\Response.cs" />
+    <Compile Include="Public\ArangoCollection.cs" />
+    <Compile Include="Public\ArangoCollectionStatus.cs" />
+    <Compile Include="Public\ArangoCollectionType.cs" />
     <Compile Include="Public\ArangoDatabase.cs" />
     <Compile Include="Public\ArangoDocument.cs" />
     <Compile Include="Public\ArangoError.cs" />
+    <Compile Include="Public\ArangoKeyGeneratorType.cs" />
     <Compile Include="Public\ArangoResult.cs" />
     <Compile Include="Public\ArangoSettings.cs" />
-    <Compile Include="Public\DatabaseUser.cs" />
+    <Compile Include="Public\ArangoUser.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ExternalLibraries" />

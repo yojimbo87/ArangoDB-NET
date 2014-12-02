@@ -79,10 +79,10 @@ namespace Arango.Tests
         	
             var db = new ArangoDatabase(Database.SystemAlias);
 
-            var users = new List<DatabaseUser>()
+            var users = new List<ArangoUser>()
             {
-                new DatabaseUser { Username = "admin", Password = "secret", Active = true },
-                new DatabaseUser { Username = "tester001", Password = "test001", Active = false } 
+                new ArangoUser { Username = "admin", Password = "secret", Active = true },
+                new ArangoUser { Username = "tester001", Password = "test001", Active = false } 
             };
             
             var resultCreate = db.Create(Database.TestDatabaseOneTime, users);

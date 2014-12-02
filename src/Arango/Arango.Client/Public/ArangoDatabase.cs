@@ -9,6 +9,14 @@ namespace Arango.Client
         const string _apiUri = "_api/database";
         readonly Connection _connection;
         
+        public ArangoCollection Collection
+        {
+            get
+            {
+                return new ArangoCollection(_connection);
+            }
+        }
+        
         public ArangoDocument Document
         {
             get
@@ -110,13 +118,13 @@ namespace Arango.Client
             return Create(databaseName, null);
         }
         
-        public ArangoResult<bool> Create(string databaseName, List<DatabaseUser> users)
+        public ArangoResult<bool> Create(string databaseName, List<ArangoUser> users)
         {
             var request = new Request(HttpMethod.POST, _apiUri, "");
-            var body = new Dictionary<string, object>();
+            var bodyDocument = new Dictionary<string, object>();
             
             // required: database name
-            body.String("name", databaseName);
+            bodyDocument.String("name", databaseName);
             
             // optional: list of users
             if ((users != null) && (users.Count > 0))
@@ -147,10 +155,10 @@ namespace Arango.Client
                     userList.Add(userItem);
                 }
                 
-                body.List("users", userList);
+                bodyDocument.List("users", userList);
             }
             
-            request.Body = JSON.ToJSON(body);
+            request.Body = JSON.ToJSON(bodyDocument);
             
             var response = _connection.Send(request);
             var result = new ArangoResult<bool>(response);

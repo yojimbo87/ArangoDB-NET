@@ -7,7 +7,7 @@ namespace Arango.Client
     public class ArangoDocument
     {
         const string _apiUri = "_api/document";
-        readonly Dictionary<string, string> _parameters = new Dictionary<string, string>();
+        readonly Dictionary<string, object> _parameters = new Dictionary<string, object>();
         readonly Connection _connection;
         
         internal ArangoDocument(Connection connection)
@@ -19,14 +19,16 @@ namespace Arango.Client
         
         public ArangoDocument CreateCollection(bool value)
         {
-            _parameters[ParameterName.CreateCollection] = value.ToString().ToLower();
+            // string because value will be stored in query string
+            _parameters.String(ParameterName.CreateCollection, value.ToString().ToLower());
         	
         	return this;
         }
         
         public ArangoDocument WaitForSync(bool value)
         {
-            _parameters[ParameterName.WaitForSync] = value.ToString().ToLower();
+            // string because value will be stored in query string
+            _parameters.String(ParameterName.WaitForSync, value.ToString().ToLower());
         	
         	return this;
         }
@@ -67,6 +69,8 @@ namespace Arango.Client
                     // Arango error
                     break;
             }
+            
+            _parameters.Clear();
             
             return result;
         }
