@@ -19,7 +19,6 @@ namespace Arango.ConsoleTests
                 "_system"
             );
             
-            // TODO: tests for database operations
             //GetCurrentDatabase();
             //GetAccessibleDatabases();
             //GetAllDatabases();

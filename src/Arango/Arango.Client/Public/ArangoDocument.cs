@@ -6,7 +6,6 @@ namespace Arango.Client
 {
     public class ArangoDocument
     {
-        const string _apiUri = "_api/document";
         readonly Dictionary<string, object> _parameters = new Dictionary<string, object>();
         readonly Connection _connection;
         
@@ -39,7 +38,7 @@ namespace Arango.Client
         
         public ArangoResult<Dictionary<string, object>> Create(string collection, Dictionary<string, object> document)
         {
-            var request = new Request(HttpMethod.POST, _apiUri, "");
+            var request = new Request(HttpMethod.POST, ApiBaseUri.Document, "");
             
             // required: target collection name
             request.QueryString.Add(ParameterName.Collection, collection);

@@ -6,7 +6,6 @@ namespace Arango.Client
 {
     public class ArangoCollection
     {
-        const string _apiUri = "_api/collection";
         readonly Dictionary<string, object> _parameters = new Dictionary<string, object>();
         readonly Connection _connection;
         
@@ -17,23 +16,29 @@ namespace Arango.Client
         
         #region Parameters
         
-        public ArangoCollection WaitForSync(bool value)
+        #region Checksum options
+        
+        public ArangoCollection WithRevisions(bool value)
         {
-            _parameters.Bool(ParameterName.WaitForSync, value);
+            // needs to be in string format
+            _parameters.String(ParameterName.WithRevisions, value.ToString().ToLower());
         	
         	return this;
         }
+        
+        public ArangoCollection WithData(bool value)
+        {
+            // needs to be in string format
+            _parameters.String(ParameterName.WithData, value.ToString().ToLower());
+        	
+        	return this;
+        }
+        
+        #endregion
         
         public ArangoCollection DoCompact(bool value)
         {
             _parameters.Bool(ParameterName.DoCompact, value);
-        	
-        	return this;
-        }
-        
-        public ArangoCollection JournalSize(long value)
-        {
-            _parameters.Long(ParameterName.JournalSize, value);
         	
         	return this;
         }
@@ -52,39 +57,26 @@ namespace Arango.Client
         	return this;
         }
         
-        public ArangoCollection Type(ArangoCollectionType value)
+        public ArangoCollection JournalSize(long value)
         {
-            _parameters.Enum(ParameterName.Type, value);
-        	
-        	return this;
-        }
-        
-        public ArangoCollection NumberOfShards(int value)
-        {
-            _parameters.Int(ParameterName.NumberOfShards, value);
-        	
-        	return this;
-        }
-        
-        public ArangoCollection ShardKeys(List<string> value)
-        {
-            _parameters.List(ParameterName.ShardKeys, value);
+            _parameters.Long(ParameterName.JournalSize, value);
         	
         	return this;
         }
         
         #region Key options
         
-        public ArangoCollection KeyGeneratorType(ArangoKeyGeneratorType value)
+        public ArangoCollection AllowUserKeys(bool value)
         {
-            _parameters.Enum(ParameterName.KeyOptionsType, value);
+            _parameters.Bool(ParameterName.KeyOptionsAllowUserKeys, value);
         	
         	return this;
         }
         
-        public ArangoCollection AllowUserKeys(bool value)
+        public ArangoCollection KeyGeneratorType(ArangoKeyGeneratorType value)
         {
-            _parameters.Bool(ParameterName.KeyOptionsAllowUserKeys, value);
+            // needs to be in string format
+            _parameters.Enum(ParameterName.KeyOptionsType, value.ToString().ToLower());
         	
         	return this;
         }
@@ -105,13 +97,41 @@ namespace Arango.Client
         
         #endregion
         
+        public ArangoCollection NumberOfShards(int value)
+        {
+            _parameters.Int(ParameterName.NumberOfShards, value);
+        	
+        	return this;
+        }
+        
+        public ArangoCollection ShardKeys(List<string> value)
+        {
+            _parameters.List(ParameterName.ShardKeys, value);
+        	
+        	return this;
+        }
+        
+        public ArangoCollection Type(ArangoCollectionType value)
+        {
+            _parameters.Enum(ParameterName.Type, value);
+        	
+        	return this;
+        }
+        
+        public ArangoCollection WaitForSync(bool value)
+        {
+            _parameters.Bool(ParameterName.WaitForSync, value);
+        	
+        	return this;
+        }
+        
         #endregion
         
-        #region Create (POST)
+        #region Create collection (POST)
         
         public ArangoResult<Dictionary<string, object>> Create(string collectionName)
         {
-            var request = new Request(HttpMethod.POST, _apiUri, "");
+            var request = new Request(HttpMethod.POST, ApiBaseUri.Collection, "");
             var bodyDocument = new Dictionary<string, object>();
             
             // required: collection name
@@ -167,11 +187,11 @@ namespace Arango.Client
         
         #endregion
         
-        #region Delete (DELETE)
+        #region Delete collection (DELETE)
         
         public ArangoResult<Dictionary<string, object>> Delete(string collectionName)
         {
-            var request = new Request(HttpMethod.DELETE, _apiUri, "/" + collectionName);
+            var request = new Request(HttpMethod.DELETE, ApiBaseUri.Collection, "/" + collectionName);
             
             var response = _connection.Send(request);
             var result = new ArangoResult<Dictionary<string, object>>(response);
@@ -192,16 +212,18 @@ namespace Arango.Client
                     break;
             }
             
+            _parameters.Clear();
+            
             return result;
         }
         
         #endregion
         
-        #region Truncate (PUT)
+        #region Truncate collection (PUT)
         
         public ArangoResult<Dictionary<string, object>> Truncate(string collectionName)
         {
-            var request = new Request(HttpMethod.PUT, _apiUri, "/" + collectionName + "/truncate");
+            var request = new Request(HttpMethod.PUT, ApiBaseUri.Collection, "/" + collectionName + "/truncate");
             
             var response = _connection.Send(request);
             var result = new ArangoResult<Dictionary<string, object>>(response);
@@ -219,6 +241,204 @@ namespace Arango.Client
                     // Arango error
                     break;
             }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Get collection (GET)
+        
+        public ArangoResult<Dictionary<string, object>> Get(string collectionName)
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "/" + collectionName);
+
+            var response = _connection.Send(request);
+            var result = new ArangoResult<Dictionary<string, object>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>);
+                    }
+                    break;
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Get collection properties (GET)
+        
+        public ArangoResult<Dictionary<string, object>> GetProperties(string collectionName)
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "/" + collectionName + "/properties");
+
+            var response = _connection.Send(request);
+            var result = new ArangoResult<Dictionary<string, object>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>);
+                    }
+                    break;
+                case 400:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Get collection documents count (GET)
+        
+        public ArangoResult<Dictionary<string, object>> GetCount(string collectionName)
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "/" + collectionName + "/count");
+
+            var response = _connection.Send(request);
+            var result = new ArangoResult<Dictionary<string, object>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>);
+                    }
+                    break;
+                case 400:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Get collection figures (GET)
+        
+        public ArangoResult<Dictionary<string, object>> GetFigures(string collectionName)
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "/" + collectionName + "/figures");
+
+            var response = _connection.Send(request);
+            var result = new ArangoResult<Dictionary<string, object>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>);
+                    }
+                    break;
+                case 400:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Get collection revision (GET)
+        
+        public ArangoResult<Dictionary<string, object>> GetRevision(string collectionName)
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "/" + collectionName + "/revision");
+
+            var response = _connection.Send(request);
+            var result = new ArangoResult<Dictionary<string, object>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>);
+                    }
+                    break;
+                case 400:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Get collection checksum (GET)
+        
+        public ArangoResult<Dictionary<string, object>> GetChecksum(string collectionName)
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "/" + collectionName + "/checksum");
+
+            // optional: whether or not to include document body data in the checksum calculation
+            request.TrySetQueryStringParameter(ParameterName.WithData, _parameters);
+            // optional: whether or not to include document revision ids in the checksum calculation
+            request.TrySetQueryStringParameter(ParameterName.WithRevisions, _parameters);
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<Dictionary<string, object>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>);
+                    }
+                    break;
+                case 400:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
             
             return result;
         }

@@ -7,6 +7,7 @@ namespace Arango.Client.Protocol
         internal const string Collection = "collection";
         internal const string CreateCollection = "createCollection";
         internal const string DoCompact = "doCompact";
+        internal const string ExcludeSystem = "excludeSystem";
         internal const string IsSystem = "isSystem";
         internal const string IsVolatile = "isVolatile";
         internal const string JournalSize = "journalSize";
@@ -19,5 +20,7 @@ namespace Arango.Client.Protocol
         internal const string ShardKeys = "shardKeys";
         internal const string Type = "type";
         internal const string WaitForSync = "waitForSync";
+        internal const string WithRevisions = "withRevisions";
+        internal const string WithData = "withData";
     }
 }

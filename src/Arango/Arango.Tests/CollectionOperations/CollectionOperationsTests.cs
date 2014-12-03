@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using Arango.Client;
 
@@ -144,6 +145,190 @@ namespace Arango.Tests
             Assert.AreEqual(createResult.Value.Bool("isSystem"), clearResult.Value.Bool("isSystem"));
             Assert.AreEqual(createResult.Value.Int("status"), clearResult.Value.Int("status"));
             Assert.AreEqual(createResult.Value.Int("type"), clearResult.Value.Int("type"));
+        }
+        
+        [Test()]
+        public void Should_get_collection()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
+
+            var getResult = db.Collection
+                .Get(createResult.Value.String("name"));
+            
+            Assert.AreEqual(200, getResult.StatusCode);
+            Assert.AreEqual(true, getResult.Success);
+            Assert.AreEqual(createResult.Value.String("id"), getResult.Value.String("id"));
+            Assert.AreEqual(createResult.Value.String("name"), getResult.Value.String("name"));
+            Assert.AreEqual(createResult.Value.Bool("isSystem"), getResult.Value.Bool("isSystem"));
+            Assert.AreEqual(createResult.Value.Int("status"), getResult.Value.Int("status"));
+            Assert.AreEqual(createResult.Value.Int("type"), getResult.Value.Int("type"));
+        }
+        
+        [Test()]
+        public void Should_get_collection_properties()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
+
+            var getResult = db.Collection
+                .GetProperties(createResult.Value.String("name"));
+            
+            Assert.AreEqual(200, getResult.StatusCode);
+            Assert.AreEqual(true, getResult.Success);
+            Assert.AreEqual(createResult.Value.String("id"), getResult.Value.String("id"));
+            Assert.AreEqual(createResult.Value.String("name"), getResult.Value.String("name"));
+            Assert.AreEqual(createResult.Value.Bool("isSystem"), getResult.Value.Bool("isSystem"));
+            Assert.AreEqual(createResult.Value.Bool("isVolatile"), getResult.Value.Bool("isVolatile"));
+            Assert.AreEqual(createResult.Value.Int("status"), getResult.Value.Int("status"));
+            Assert.AreEqual(createResult.Value.Int("type"), getResult.Value.Int("type"));
+            Assert.AreEqual(createResult.Value.Bool("waitForSync"), getResult.Value.Bool("waitForSync"));
+            Assert.IsTrue(getResult.Value.Bool("doCompact"));
+            Assert.IsTrue(getResult.Value.Long("journalSize") > 1);
+            Assert.AreEqual(ArangoKeyGeneratorType.Traditional, getResult.Value.Enum<ArangoKeyGeneratorType>("keyOptions.type"));
+            Assert.AreEqual(true, getResult.Value.Bool("keyOptions.allowUserKeys"));
+        }
+        
+        [Test()]
+        public void Should_get_collection_count()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
+
+            var getResult = db.Collection
+                .GetCount(createResult.Value.String("name"));
+            
+            Assert.AreEqual(200, getResult.StatusCode);
+            Assert.AreEqual(true, getResult.Success);
+            Assert.AreEqual(createResult.Value.String("id"), getResult.Value.String("id"));
+            Assert.AreEqual(createResult.Value.String("name"), getResult.Value.String("name"));
+            Assert.AreEqual(createResult.Value.Bool("isSystem"), getResult.Value.Bool("isSystem"));
+            Assert.AreEqual(createResult.Value.Bool("isVolatile"), getResult.Value.Bool("isVolatile"));
+            Assert.AreEqual(createResult.Value.Int("status"), getResult.Value.Int("status"));
+            Assert.AreEqual(createResult.Value.Int("type"), getResult.Value.Int("type"));
+            Assert.AreEqual(createResult.Value.Bool("waitForSync"), getResult.Value.Bool("waitForSync"));
+            Assert.IsTrue(getResult.Value.Bool("doCompact"));
+            Assert.IsTrue(getResult.Value.Long("journalSize") > 1);
+            Assert.AreEqual(ArangoKeyGeneratorType.Traditional, getResult.Value.Enum<ArangoKeyGeneratorType>("keyOptions.type"));
+            Assert.AreEqual(true, getResult.Value.Bool("keyOptions.allowUserKeys"));
+            Assert.AreEqual(0, getResult.Value.Long("count"));
+        }
+        
+        [Test()]
+        public void Should_get_collection_figures()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
+
+            var getResult = db.Collection
+                .GetFigures(createResult.Value.String("name"));
+            
+            Assert.AreEqual(200, getResult.StatusCode);
+            Assert.AreEqual(true, getResult.Success);
+            Assert.AreEqual(createResult.Value.String("id"), getResult.Value.String("id"));
+            Assert.AreEqual(createResult.Value.String("name"), getResult.Value.String("name"));
+            Assert.AreEqual(createResult.Value.Bool("isSystem"), getResult.Value.Bool("isSystem"));
+            Assert.AreEqual(createResult.Value.Bool("isVolatile"), getResult.Value.Bool("isVolatile"));
+            Assert.AreEqual(createResult.Value.Int("status"), getResult.Value.Int("status"));
+            Assert.AreEqual(createResult.Value.Int("type"), getResult.Value.Int("type"));
+            Assert.AreEqual(createResult.Value.Bool("waitForSync"), getResult.Value.Bool("waitForSync"));
+            Assert.IsTrue(getResult.Value.Bool("doCompact"));
+            Assert.IsTrue(getResult.Value.Long("journalSize") > 0);
+            Assert.AreEqual(ArangoKeyGeneratorType.Traditional, getResult.Value.Enum<ArangoKeyGeneratorType>("keyOptions.type"));
+            Assert.AreEqual(true, getResult.Value.Bool("keyOptions.allowUserKeys"));
+            Assert.AreEqual(0, getResult.Value.Long("count"));
+            Assert.IsTrue(getResult.Value.Document("figures").Count > 0);
+        }
+        
+        [Test()]
+        public void Should_get_collection_revision()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
+
+            var getResult = db.Collection
+                .GetRevision(createResult.Value.String("name"));
+            
+            Assert.AreEqual(200, getResult.StatusCode);
+            Assert.AreEqual(true, getResult.Success);
+            Assert.AreEqual(createResult.Value.String("id"), getResult.Value.String("id"));
+            Assert.AreEqual(createResult.Value.String("name"), getResult.Value.String("name"));
+            Assert.AreEqual(createResult.Value.Bool("isSystem"), getResult.Value.Bool("isSystem"));
+            Assert.AreEqual(createResult.Value.Int("status"), getResult.Value.Int("status"));
+            Assert.AreEqual(createResult.Value.Int("type"), getResult.Value.Int("type"));
+            Assert.IsTrue(getResult.Value.IsString("revision"));
+        }
+        
+        [Test()]
+        public void Should_get_collection_cehcksum()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
+
+            var getResult = db.Collection
+                .WithData(true)
+                .WithRevisions(true)
+                .GetChecksum(createResult.Value.String("name"));
+            
+            Assert.AreEqual(200, getResult.StatusCode);
+            Assert.AreEqual(true, getResult.Success);
+            Assert.AreEqual(createResult.Value.String("id"), getResult.Value.String("id"));
+            Assert.AreEqual(createResult.Value.String("name"), getResult.Value.String("name"));
+            Assert.AreEqual(createResult.Value.Bool("isSystem"), getResult.Value.Bool("isSystem"));
+            Assert.AreEqual(createResult.Value.Int("status"), getResult.Value.Int("status"));
+            Assert.AreEqual(createResult.Value.Int("type"), getResult.Value.Int("type"));
+            Assert.IsTrue(getResult.Value.IsString("revision"));
+            Assert.IsTrue(getResult.Value.IsLong("checksum"));
+        }
+        
+        [Test()]
+        public void Should_all_collections()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
+
+            var getResult = db
+                .ExcludeSystem(true)
+                .GetAllCollections();
+            
+            Assert.AreEqual(200, getResult.StatusCode);
+            Assert.AreEqual(true, getResult.Success);
+            
+            var foundCreatedCollection = getResult.Value.FirstOrDefault(col => col.String("name") == createResult.Value.String("name"));
+            
+            Assert.IsNotNull(foundCreatedCollection);
+            
+            var foundSystemCollection = getResult.Value.FirstOrDefault(col => col.String("name") == "_system");
+            
+            Assert.IsNull(foundSystemCollection);
         }
         
         public void Dispose()

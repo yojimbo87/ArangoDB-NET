@@ -65,6 +65,7 @@
     <Compile Include="Protocol\Connection.cs" />
     <Compile Include="Protocol\DataType.cs" />
     <Compile Include="Protocol\HttpMethod.cs" />
+    <Compile Include="Protocol\ApiBaseUri.cs" />
     <Compile Include="Protocol\ParameterName.cs" />
     <Compile Include="Protocol\Request.cs" />
     <Compile Include="Protocol\Response.cs" />

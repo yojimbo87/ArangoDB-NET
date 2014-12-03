@@ -6,8 +6,20 @@ namespace Arango.Client
 {
     public class ArangoDatabase
     {
-        const string _apiUri = "_api/database";
+        readonly Dictionary<string, object> _parameters = new Dictionary<string, object>();
         readonly Connection _connection;
+        
+        #region Parameters
+        
+        public ArangoDatabase ExcludeSystem(bool value)
+        {
+            // string because value will be stored in query string
+            _parameters.String(ParameterName.ExcludeSystem, value.ToString().ToLower());
+        	
+        	return this;
+        }
+        
+        #endregion
         
         public ArangoCollection Collection
         {
@@ -30,11 +42,11 @@ namespace Arango.Client
             _connection = ArangoSettings.GetConnection(alias);
         }
         
-        #region GET
+        #region Get current database (GET)
         
         public ArangoResult<Dictionary<string, object>> GetCurrent()
         {
-            var request = new Request(HttpMethod.GET, _apiUri, "/current");
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Database, "/current");
             
             var response = _connection.Send(request);
             var result = new ArangoResult<Dictionary<string, object>>(response);
@@ -55,12 +67,18 @@ namespace Arango.Client
                     break;
             }
             
+            _parameters.Clear();
+            
             return result;
         }
         
+        #endregion
+        
+        #region Get list of accessible databases (GET)
+        
         public ArangoResult<List<string>> GetAccessibleDatabases()
         {
-            var request = new Request(HttpMethod.GET, _apiUri, "/user");
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Database, "/user");
             
             var response = _connection.Send(request);
             var result = new ArangoResult<List<string>>(response);
@@ -80,12 +98,18 @@ namespace Arango.Client
                     break;
             }
             
+            _parameters.Clear();
+            
             return result;
         }
         
+        #endregion
+        
+        #region Get list of all databases (GET)
+        
         public ArangoResult<List<string>> GetAllDatabases()
         {
-            var request = new Request(HttpMethod.GET, _apiUri, "");
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Database, "");
             
             var response = _connection.Send(request);
             var result = new ArangoResult<List<string>>(response);
@@ -106,12 +130,49 @@ namespace Arango.Client
                     break;
             }
             
+            _parameters.Clear();
+            
             return result;
         }
         
         #endregion
         
-        #region Create (POST)
+        #region Get list of all collections (GET)
+        
+        public ArangoResult<List<Dictionary<string, object>>> GetAllCollections()
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "");
+            
+            // optional: whether or not system collections should be excluded from the result
+            request.TrySetQueryStringParameter(ParameterName.ExcludeSystem, _parameters);
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<List<Dictionary<string, object>>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>).List<Dictionary<string, object>>("collections");
+                    }
+                    break;
+                case 400:
+                case 403:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Create database (POST)
         
         public ArangoResult<bool> Create(string databaseName)
         {
@@ -120,7 +181,7 @@ namespace Arango.Client
         
         public ArangoResult<bool> Create(string databaseName, List<ArangoUser> users)
         {
-            var request = new Request(HttpMethod.POST, _apiUri, "");
+            var request = new Request(HttpMethod.POST, ApiBaseUri.Database, "");
             var bodyDocument = new Dictionary<string, object>();
             
             // required: database name
@@ -180,16 +241,18 @@ namespace Arango.Client
                     break;
             }
             
+            _parameters.Clear();
+            
             return result;
         }
         
         #endregion
         
-        #region Drop (DELETE)
+        #region Drop database (DELETE)
         
         public ArangoResult<bool> Drop(string databaseName)
         {
-            var request = new Request(HttpMethod.DELETE, _apiUri, "/" + databaseName);
+            var request = new Request(HttpMethod.DELETE, ApiBaseUri.Database, "/" + databaseName);
             
             var response = _connection.Send(request);
             var result = new ArangoResult<bool>(response);
@@ -210,6 +273,8 @@ namespace Arango.Client
                     // Arango error
                     break;
             }
+            
+            _parameters.Clear();
             
             return result;
         }
