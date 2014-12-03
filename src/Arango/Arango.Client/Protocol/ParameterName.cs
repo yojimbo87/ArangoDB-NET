@@ -5,6 +5,7 @@ namespace Arango.Client.Protocol
     internal static class ParameterName
     {
         internal const string Collection = "collection";
+        internal const string Count = "count";
         internal const string CreateCollection = "createCollection";
         internal const string DoCompact = "doCompact";
         internal const string ExcludeSystem = "excludeSystem";

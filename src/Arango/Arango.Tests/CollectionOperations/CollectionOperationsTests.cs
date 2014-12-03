@@ -331,6 +331,146 @@ namespace Arango.Tests
             Assert.IsNull(foundSystemCollection);
         }
         
+        [Test()]
+        public void Should_load_collection()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
+
+            var operationResult = db.Collection
+                .Load(createResult.Value.String("name"));
+            
+            Assert.AreEqual(200, operationResult.StatusCode);
+            Assert.AreEqual(true, operationResult.Success);
+            Assert.AreEqual(createResult.Value.String("id"), operationResult.Value.String("id"));
+            Assert.AreEqual(createResult.Value.String("name"), operationResult.Value.String("name"));
+            Assert.AreEqual(createResult.Value.Bool("isSystem"), operationResult.Value.Bool("isSystem"));
+            Assert.AreEqual(createResult.Value.Int("status"), operationResult.Value.Int("status"));
+            Assert.AreEqual(createResult.Value.Int("type"), operationResult.Value.Int("type"));
+            Assert.IsTrue(operationResult.Value.Long("count") == 0);
+        }
+        
+        [Test()]
+        public void Should_load_collection_without_count()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
+
+            var operationResult = db.Collection
+                .Count(false)
+                .Load(createResult.Value.String("name"));
+            
+            Assert.AreEqual(200, operationResult.StatusCode);
+            Assert.AreEqual(true, operationResult.Success);
+            Assert.AreEqual(createResult.Value.String("id"), operationResult.Value.String("id"));
+            Assert.AreEqual(createResult.Value.String("name"), operationResult.Value.String("name"));
+            Assert.AreEqual(createResult.Value.Bool("isSystem"), operationResult.Value.Bool("isSystem"));
+            Assert.AreEqual(ArangoCollectionStatus.Loaded, operationResult.Value.Enum<ArangoCollectionStatus>("status"));
+            Assert.AreEqual(createResult.Value.Int("type"), operationResult.Value.Int("type"));
+            Assert.IsFalse(operationResult.Value.Has("count"));
+        }
+        
+        [Test()]
+        public void Should_unload_collection()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
+
+            var operationResult = db.Collection
+                .Unload(createResult.Value.String("name"));
+            
+            Assert.AreEqual(200, operationResult.StatusCode);
+            Assert.AreEqual(true, operationResult.Success);
+            Assert.AreEqual(createResult.Value.String("id"), operationResult.Value.String("id"));
+            Assert.AreEqual(createResult.Value.String("name"), operationResult.Value.String("name"));
+            Assert.AreEqual(createResult.Value.Bool("isSystem"), operationResult.Value.Bool("isSystem"));
+            Assert.IsTrue(operationResult.Value.Enum<ArangoCollectionStatus>("status") == ArangoCollectionStatus.Unloaded || operationResult.Value.Enum<ArangoCollectionStatus>("status") == ArangoCollectionStatus.Unloading);
+            Assert.AreEqual(createResult.Value.Int("type"), operationResult.Value.Int("type"));
+        }
+        
+        [Test()]
+        public void Should_change_collection_properties()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
+
+            const long journalSize = 199999999;
+            
+            var operationResult = db.Collection
+                .WaitForSync(true)
+                .JournalSize(journalSize)
+                .ChangeProperties(createResult.Value.String("name"));
+            
+            Assert.AreEqual(200, operationResult.StatusCode);
+            Assert.AreEqual(true, operationResult.Success);
+            Assert.AreEqual(createResult.Value.String("id"), operationResult.Value.String("id"));
+            Assert.AreEqual(createResult.Value.String("name"), operationResult.Value.String("name"));
+            Assert.AreEqual(createResult.Value.Bool("isSystem"), operationResult.Value.Bool("isSystem"));
+            Assert.AreEqual(createResult.Value.Int("status"), operationResult.Value.Int("status"));
+            Assert.AreEqual(createResult.Value.Int("type"), operationResult.Value.Int("type"));
+            Assert.IsFalse(operationResult.Value.Bool("isVolatile"));
+            Assert.IsTrue(operationResult.Value.Bool("doCompact"));
+            Assert.AreEqual(ArangoKeyGeneratorType.Traditional, operationResult.Value.Enum<ArangoKeyGeneratorType>("keyOptions.type"));
+            Assert.IsTrue(operationResult.Value.Bool("keyOptions.allowUserKeys"));
+            Assert.IsTrue(operationResult.Value.Bool("waitForSync"));
+            Assert.IsTrue(operationResult.Value.Long("journalSize") == journalSize);
+        }
+        
+        [Test()]
+        public void Should_rename_collection()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
+
+            var operationResult = db.Collection
+                .Rename(createResult.Value.String("name"), Database.TestEdgeCollectionName);
+            
+            Assert.AreEqual(200, operationResult.StatusCode);
+            Assert.AreEqual(true, operationResult.Success);
+            Assert.AreEqual(createResult.Value.String("id"), operationResult.Value.String("id"));
+            Assert.AreEqual(Database.TestEdgeCollectionName, operationResult.Value.String("name"));
+            Assert.AreEqual(createResult.Value.Bool("isSystem"), operationResult.Value.Bool("isSystem"));
+            Assert.AreEqual(createResult.Value.Int("status"), operationResult.Value.Int("status"));
+            Assert.AreEqual(createResult.Value.Int("type"), operationResult.Value.Int("type"));
+        }
+        
+        [Test()]
+        public void Should_fail_to_rotate_collection_journal()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
+
+            var operationResult = db.Collection
+                .RotateJournal(createResult.Value.String("name"));
+            
+            Assert.AreEqual(400, operationResult.StatusCode);
+            Assert.IsFalse(operationResult.Success);
+        }
+        
         public void Dispose()
         {
             Database.CleanupTestDatabases();

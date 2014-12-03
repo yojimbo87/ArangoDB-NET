@@ -36,6 +36,13 @@ namespace Arango.Client
         
         #endregion
         
+        public ArangoCollection Count(bool value)
+        {
+            _parameters.Bool(ParameterName.Count, value);
+        	
+        	return this;
+        }
+        
         public ArangoCollection DoCompact(bool value)
         {
             _parameters.Bool(ParameterName.DoCompact, value);
@@ -237,6 +244,184 @@ namespace Arango.Client
                         result.Value = (response.Data as Dictionary<string, object>);
                     }
                     break;
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Load collection (PUT)
+        
+        public ArangoResult<Dictionary<string, object>> Load(string collectionName)
+        {
+            var request = new Request(HttpMethod.PUT, ApiBaseUri.Collection, "/" + collectionName + "/load");
+            
+            if (_parameters.Has(ParameterName.Count))
+            {
+                var bodyDocument = new Dictionary<string, object>();
+                
+                // optional: controls whether the return value should include the number of documents in the collection
+                Request.TrySetParameter(ParameterName.Count, _parameters, bodyDocument);
+                
+                request.Body = JSON.ToJSON(bodyDocument);
+            }
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<Dictionary<string, object>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>);
+                    }
+                    break;
+                case 400:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Unload collection (PUT)
+        
+        public ArangoResult<Dictionary<string, object>> Unload(string collectionName)
+        {
+            var request = new Request(HttpMethod.PUT, ApiBaseUri.Collection, "/" + collectionName + "/unload");
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<Dictionary<string, object>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>);
+                    }
+                    break;
+                case 400:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Change collection properties (PUT)
+        
+        public ArangoResult<Dictionary<string, object>> ChangeProperties(string collectionName)
+        {
+            var request = new Request(HttpMethod.PUT, ApiBaseUri.Collection, "/" + collectionName + "/properties");
+            var bodyDocument = new Dictionary<string, object>();
+            
+            // optional: if true then creating or changing a document will wait until the data has been synchronised to disk
+            Request.TrySetParameter(ParameterName.WaitForSync, _parameters, bodyDocument);
+            // optional: the maximal size of a journal or datafile in bytes
+            Request.TrySetParameter(ParameterName.JournalSize, _parameters, bodyDocument);
+            
+            request.Body = JSON.ToJSON(bodyDocument);
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<Dictionary<string, object>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>);
+                    }
+                    break;
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Rename collection (PUT)
+        
+        public ArangoResult<Dictionary<string, object>> Rename(string collectionName, string newCollectionName)
+        {
+            var request = new Request(HttpMethod.PUT, ApiBaseUri.Collection, "/" + collectionName + "/rename");
+            var bodyDocument = new Dictionary<string, object>()
+                .String(ParameterName.Name, newCollectionName);
+            
+            request.Body = JSON.ToJSON(bodyDocument);
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<Dictionary<string, object>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>);
+                    }
+                    break;
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Rotate journal of a collection (PUT)
+        
+        public ArangoResult<bool> RotateJournal(string collectionName)
+        {
+            var request = new Request(HttpMethod.PUT, ApiBaseUri.Collection, "/" + collectionName + "/rotate");
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<bool>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>).Bool("result");
+                    }
+                    break;
+                case 400:
+                case 404:
                 default:
                     // Arango error
                     break;
