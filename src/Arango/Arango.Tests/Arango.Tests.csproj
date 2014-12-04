@@ -50,6 +50,7 @@
     <Compile Include="CollectionOperations\CollectionOperationsTests.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="DatabaseOperations\DatabaseOperationsTests.cs" />
+    <Compile Include="DocumentOperations\DocumentOperationsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -64,6 +65,7 @@
   <ItemGroup>
     <Folder Include="DatabaseOperations" />
     <Folder Include="CollectionOperations" />
+    <Folder Include="DocumentOperations" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

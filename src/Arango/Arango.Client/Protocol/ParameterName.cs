@@ -9,6 +9,8 @@ namespace Arango.Client.Protocol
         internal const string CreateCollection = "createCollection";
         internal const string DoCompact = "doCompact";
         internal const string ExcludeSystem = "excludeSystem";
+        internal const string IfMatch = "If-Match";
+        internal const string IfNoneMatch = "If-None-Match";
         internal const string IsSystem = "isSystem";
         internal const string IsVolatile = "isVolatile";
         internal const string JournalSize = "journalSize";

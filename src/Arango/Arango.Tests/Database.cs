@@ -90,5 +90,65 @@ namespace Arango.Tests
             Database.DeleteTestDatabase(Database.TestDatabaseGeneral);
             Database.DeleteTestDatabase(Database.TestDatabaseOneTime);
         }
+        
+        public static void CreateTestCollection(string collectionName, ArangoCollectionType collectionType)
+        {
+        	DeleteTestCollection(collectionName);
+        	
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Type(collectionType)
+                .Create(collectionName);
+        }
+        
+        public static void ClearTestCollection(string collectionName)
+        {
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Truncate(collectionName);
+        }
+        
+        public static List<Dictionary<string, object>> ClearCollectionAndFetchTestDocumentData(string collectionName)
+        {
+            ClearTestCollection(collectionName);
+            
+            var documents = new List<Dictionary<string, object>>();
+        	var db = new ArangoDatabase(Alias);
+        	
+        	var document1 = new Dictionary<string, object>()
+        		.String("foo", "string value one")
+        		.Int("bar", 1);
+        	
+        	var document2 = new Dictionary<string, object>()
+        		.String("foo", "string value two")
+        		.Int("bar", 2);
+        	
+        	var createResult1 = db.Document.Create(TestDocumentCollectionName, document1);
+        	
+        	document1.Merge(createResult1.Value);
+        	
+        	var createResult2 = db.Document.Create(TestDocumentCollectionName, document2);
+        	
+        	document2.Merge(createResult2.Value);
+        	
+        	documents.Add(document1);
+        	documents.Add(document2);
+        	
+        	return documents;
+        }
+
+        public static void DeleteTestCollection(string collectionName)
+        {
+            var db = new ArangoDatabase(Database.Alias);
+
+            var resultGet = db.Collection.Get(collectionName);
+            
+            if (resultGet.Success && (resultGet.Value.String("name") == collectionName))
+            {
+                db.Collection.Delete(collectionName);
+            }
+        }
     }
 }
