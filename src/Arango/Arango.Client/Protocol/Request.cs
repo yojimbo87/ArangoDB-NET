@@ -44,6 +44,14 @@ namespace Arango.Client.Protocol
             return uri.ToString();
         }
         
+        internal void TrySetHeaderParameter(string parameterName, Dictionary<string, object> parameters)
+        {
+            if (parameters.ContainsKey(parameterName))
+            {
+                Headers.Add(parameterName, parameters.String(parameterName));
+            }
+        }
+        
         internal void TrySetQueryStringParameter(string parameterName, Dictionary<string, object> parameters)
         {
             if (parameters.ContainsKey(parameterName))
