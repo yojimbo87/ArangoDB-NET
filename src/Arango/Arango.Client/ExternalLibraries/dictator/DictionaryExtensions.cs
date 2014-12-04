@@ -917,6 +917,19 @@ namespace Arango.Client
         #endregion
 
         /// <summary>
+        /// Includes fields from specified document into current dictionary. Existing fields will be overwritten.
+        /// </summary>
+        public static void Merge(this Dictionary<string, object> dictionary, Dictionary<string, object> document)
+        {
+            foreach (var field in document)
+            {
+                dictionary[field.Key] = field.Value;
+            }
+        }
+        
+        #region Private methods
+        
+        /// <summary>
         /// Retrieves value from specified field path.
         /// </summary>
         /// <exception cref="NonExistingFieldException">Field does not exist in specified path.</exception>
@@ -1005,5 +1018,7 @@ namespace Arango.Client
                 }
             }
         }
+        
+        #endregion
     }
 }
