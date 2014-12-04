@@ -147,7 +147,7 @@ namespace Arango.Client.Protocol
                     response.Error = new ArangoError();
                     response.Error.StatusCode = response.StatusCode;
                     response.Error.Number = 0;
-                    response.Error.Message = "ArangoDB server response was empty.";
+                    response.Error.Message = "Protocol error: " + webException.Message;
                     response.Error.Exception = webException;
 
                     if (response.DataType == DataType.Document)
