@@ -917,13 +917,33 @@ namespace Arango.Client
         #endregion
 
         /// <summary>
-        /// Includes fields from specified document into current dictionary. Existing fields will be overwritten.
+        /// Merges fields from specified document into current dictionary. Field merge behavior depends on settings.
         /// </summary>
         public static void Merge(this Dictionary<string, object> dictionary, Dictionary<string, object> document)
         {
+            dictionary.Merge(document, Dictator.Settings.MergeBehavior);
+        }
+        
+        /// <summary>
+        /// Merges fields from specified document into current dictionary with given field merge behavior.
+        /// </summary>
+        public static void Merge(this Dictionary<string, object> dictionary, Dictionary<string, object> document, MergeBehavior mergeBehavior)
+        {
             foreach (var field in document)
             {
-                dictionary[field.Key] = field.Value;
+                switch (mergeBehavior)
+                {
+                    case MergeBehavior.KeepFields:
+                        if (!dictionary.ContainsKey(field.Key))
+                        {
+                            dictionary.Add(field.Key, field.Value);
+                        }
+                        break;
+                    case MergeBehavior.OverwriteFields:
+                    default:
+                        dictionary[field.Key] = field.Value;
+                        break;
+                }
             }
         }
         

@@ -52,6 +52,7 @@
     <Compile Include="ExternalLibraries\dictator\EnumFormat.cs" />
     <Compile Include="ExternalLibraries\dictator\InvalidFieldException.cs" />
     <Compile Include="ExternalLibraries\dictator\InvalidFieldTypeException.cs" />
+    <Compile Include="ExternalLibraries\dictator\MergeBehavior.cs" />
     <Compile Include="ExternalLibraries\dictator\NonExistingFieldException.cs" />
     <Compile Include="ExternalLibraries\fastJSON\dynamic.cs" />
     <Compile Include="ExternalLibraries\fastJSON\Formatter.cs" />
