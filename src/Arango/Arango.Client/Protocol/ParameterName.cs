@@ -20,6 +20,7 @@ namespace Arango.Client.Protocol
         internal const string KeyOptionsOffset = "keyOptions.offset";
         internal const string Name = "name";
         internal const string NumberOfShards = "numberOfShards";
+        internal const string Policy = "policy";
         internal const string ShardKeys = "shardKeys";
         internal const string Type = "type";
         internal const string WaitForSync = "waitForSync";

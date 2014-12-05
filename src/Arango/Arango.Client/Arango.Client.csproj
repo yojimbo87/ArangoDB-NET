@@ -79,6 +79,7 @@
     <Compile Include="Public\ArangoKeyGeneratorType.cs" />
     <Compile Include="Public\ArangoResult.cs" />
     <Compile Include="Public\ArangoSettings.cs" />
+    <Compile Include="Public\ArangoUpdatePolicy.cs" />
     <Compile Include="Public\ArangoUser.cs" />
   </ItemGroup>
   <ItemGroup>
