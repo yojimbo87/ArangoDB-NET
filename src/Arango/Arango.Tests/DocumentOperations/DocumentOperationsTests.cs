@@ -55,7 +55,7 @@ namespace Arango.Tests
         }
         
         [Test()]
-        public void Should_get_document_with_ifMatch_and_return_return_412()
+        public void Should_get_document_with_ifMatch_and_return_412()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
         	var db = new ArangoDatabase(Database.Alias);
@@ -260,7 +260,7 @@ namespace Arango.Tests
         }
         
         [Test()]
-        public void Should_replace_document_with_ifMatch_and_return_return_412()
+        public void Should_replace_document_with_ifMatch_and_return_412()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
@@ -433,7 +433,7 @@ namespace Arango.Tests
         }
         
         [Test()]
-        public void Should_update_document_with_ifMatch_and_return_return_412()
+        public void Should_update_document_with_ifMatch_and_return_412()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
@@ -758,7 +758,7 @@ namespace Arango.Tests
         }
         
         [Test()]
-        public void Should_delete_document_with_ifMatch_and_return_return_412()
+        public void Should_delete_document_with_ifMatch_and_return_412()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
@@ -789,6 +789,84 @@ namespace Arango.Tests
             Assert.AreEqual(deleteResult.Value.String("_id"), documents[0].String("_id"));
             Assert.AreEqual(deleteResult.Value.String("_key"), documents[0].String("_key"));
             Assert.AreEqual(deleteResult.Value.String("_rev"), documents[0].String("_rev"));
+        }
+        
+        #endregion
+        
+        #region Check
+        
+        [Test()]
+        public void Should_check_document()
+        {
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+            
+            var checkResult = db.Document
+                .Check(documents[0].String("_id"));
+            
+            Assert.AreEqual(200, checkResult.StatusCode);
+            Assert.IsTrue(checkResult.Success);
+            Assert.AreEqual(checkResult.Value, documents[0].String("_rev"));
+        }
+        
+        [Test()]
+        public void Should_check_document_with_ifMatch()
+        {
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+            
+            var checkResult = db.Document
+                .IfMatch(documents[0].String("_rev"))
+                .Check(documents[0].String("_id"));
+            
+            Assert.AreEqual(200, checkResult.StatusCode);
+            Assert.IsTrue(checkResult.Success);
+            Assert.AreEqual(checkResult.Value, documents[0].String("_rev"));
+        }
+        
+        [Test()]
+        public void Should_check_document_with_ifMatch_and_return_412()
+        {
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+            
+            var checkResult = db.Document
+                .IfMatch("123456789")
+                .Check(documents[0].String("_id"));
+            
+            Assert.AreEqual(412, checkResult.StatusCode);
+            Assert.IsFalse(checkResult.Success);
+            Assert.AreEqual(checkResult.Value, documents[0].String("_rev"));
+        }
+        
+        [Test()]
+        public void Should_check_document_with_ifNoneMatch()
+        {
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+            
+            var checkResult = db.Document
+                .IfNoneMatch("123456789")
+                .Check(documents[0].String("_id"));
+            
+            Assert.AreEqual(200, checkResult.StatusCode);
+            Assert.IsTrue(checkResult.Success);
+            Assert.AreEqual(checkResult.Value, documents[0].String("_rev"));
+        }
+        
+        [Test()]
+        public void Should_check_document_with_ifNoneMatch_and_return_304()
+        {
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+            
+            var checkResult = db.Document
+                .IfNoneMatch(documents[0].String("_rev"))
+                .Check(documents[0].String("_id"));
+            
+            Assert.AreEqual(304, checkResult.StatusCode);
+            Assert.IsFalse(checkResult.Success);
+            Assert.AreEqual(checkResult.Value, documents[0].String("_rev"));
         }
         
         #endregion
