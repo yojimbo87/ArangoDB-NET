@@ -47,6 +47,22 @@ namespace Arango.Client
         	return this;
         }
         
+        public ArangoDocument KeepNull(bool value)
+        {
+            // needs to be string value
+            _parameters.String(ParameterName.KeepNull, value.ToString().ToLower());
+        	
+        	return this;
+        }
+        
+        public ArangoDocument MergeArrays(bool value)
+        {
+            // needs to be string value
+            _parameters.String(ParameterName.MergeArrays, value.ToString().ToLower());
+        	
+        	return this;
+        }
+        
         public ArangoDocument WaitForSync(bool value)
         {
             // needs to be string value
@@ -150,14 +166,71 @@ namespace Arango.Client
             
             // optional: conditionally replace a document based on a target revision id
             request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
-            // optional: wait until data are synchronised to disk
-            request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
             // optional: if revision was provided - check the presence of update policy parameter
             if (_parameters.Has(ParameterName.IfMatch))
             {
                 request.TrySetQueryStringParameter(ParameterName.Policy, _parameters);
             }
+            // optional: wait until data are synchronised to disk
+            request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
             // required: serialize replacing document
+            request.Body = JSON.ToJSON(document);
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<Dictionary<string, object>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 201:
+                case 202:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>);
+                    }
+                    break;
+                case 412:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Value = (response.Data as Dictionary<string, object>);
+                    }
+                    break;
+                case 400:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Update (PATCH)
+        
+        public ArangoResult<Dictionary<string, object>> Update(string handle, Dictionary<string, object> document)
+        {
+            var request = new Request(HttpMethod.PATCH, ApiBaseUri.Document, "/" + handle);
+            
+            // optional: conditionally replace a document based on a target revision id
+            request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
+            // optional: if revision was provided - check the presence of update policy parameter
+            if (_parameters.Has(ParameterName.IfMatch))
+            {
+                request.TrySetQueryStringParameter(ParameterName.Policy, _parameters);
+            }
+            // optional: remove any attributes from the existing document that are contained in the patch document 
+            // with an attribute value of null
+            request.TrySetQueryStringParameter(ParameterName.KeepNull, _parameters);
+            // optional: If set to false, the value in the patch document will overwrite the existing document's value. 
+            // If set to true, arrays will be merged.
+            request.TrySetQueryStringParameter(ParameterName.MergeArrays, _parameters);
+            // optional: wait until data are synchronised to disk
+            request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
+            // required: serialize updating document
             request.Body = JSON.ToJSON(document);
             
             var response = _connection.Send(request);

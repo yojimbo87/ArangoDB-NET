@@ -14,11 +14,13 @@ namespace Arango.Client.Protocol
         internal const string IsSystem = "isSystem";
         internal const string IsVolatile = "isVolatile";
         internal const string JournalSize = "journalSize";
+        internal const string KeepNull = "keepNull";
         internal const string KeyOptionsType = "keyOptions.type";
         internal const string KeyOptionsAllowUserKeys = "keyOptions.allowUserKeys";
         internal const string KeyOptionsIncrement = "keyOptions.increment";
         internal const string KeyOptionsOffset = "keyOptions.offset";
         internal const string Name = "name";
+        internal const string MergeArrays = "mergeArrays";
         internal const string NumberOfShards = "numberOfShards";
         internal const string Policy = "policy";
         internal const string ShardKeys = "shardKeys";

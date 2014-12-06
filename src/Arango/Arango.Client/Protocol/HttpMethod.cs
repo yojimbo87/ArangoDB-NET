@@ -8,6 +8,7 @@ namespace Arango.Client.Protocol
         GET,
         HEAD,
         OPTIONS,
+        PATCH,
         POST,
         PUT,
         TRACE

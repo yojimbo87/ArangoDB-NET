@@ -75,7 +75,7 @@ namespace Arango.Tests
             Assert.AreEqual(ArangoCollectionStatus.Loaded, createResult.Value.Enum<ArangoCollectionStatus>("status"));
             Assert.AreEqual(ArangoCollectionType.Document, createResult.Value.Enum<ArangoCollectionType>("type"));
 
-            // TODO:
+            // TODO: test if documents are incremented correctly
 			// create documents and test if their key are incremented accordingly
             
 //            var document1 = new JObject();
