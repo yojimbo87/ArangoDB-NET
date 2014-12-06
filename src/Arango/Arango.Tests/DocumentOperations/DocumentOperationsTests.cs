@@ -705,6 +705,94 @@ namespace Arango.Tests
         
         #endregion
         
+        #region Delete
+        
+        [Test()]
+        public void Should_delete_document()
+        {
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+            
+            var deleteResult = db.Document
+                .Delete(documents[0].String("_id"));
+            
+            Assert.AreEqual(202, deleteResult.StatusCode);
+            Assert.IsTrue(deleteResult.Success);
+            Assert.AreEqual(deleteResult.Value.String("_id"), documents[0].String("_id"));
+            Assert.AreEqual(deleteResult.Value.String("_key"), documents[0].String("_key"));
+            Assert.AreEqual(deleteResult.Value.String("_rev"), documents[0].String("_rev"));
+        }
+        
+        [Test()]
+        public void Should_delete_document_with_waitForSync()
+        {
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+            
+            var deleteResult = db.Document
+                .WaitForSync(true)
+                .Delete(documents[0].String("_id"));
+            
+            Assert.AreEqual(200, deleteResult.StatusCode);
+            Assert.IsTrue(deleteResult.Success);
+            Assert.AreEqual(deleteResult.Value.String("_id"), documents[0].String("_id"));
+            Assert.AreEqual(deleteResult.Value.String("_key"), documents[0].String("_key"));
+            Assert.AreEqual(deleteResult.Value.String("_rev"), documents[0].String("_rev"));
+        }
+        
+        [Test()]
+        public void Should_delete_document_with_ifMatch()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+            
+            var deleteResult = db.Document
+                .IfMatch(documents[0].String("_rev"))
+                .Delete(documents[0].String("_id"));
+            
+            Assert.AreEqual(202, deleteResult.StatusCode);
+            Assert.IsTrue(deleteResult.Success);
+            Assert.AreEqual(deleteResult.Value.String("_id"), documents[0].String("_id"));
+            Assert.AreEqual(deleteResult.Value.String("_key"), documents[0].String("_key"));
+            Assert.AreEqual(deleteResult.Value.String("_rev"), documents[0].String("_rev"));
+        }
+        
+        [Test()]
+        public void Should_delete_document_with_ifMatch_and_return_return_412()
+        {
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var deleteResult = db.Document
+                .IfMatch("123456789")
+                .Delete(documents[0].String("_id"));
+            
+            Assert.AreEqual(412, deleteResult.StatusCode);
+            Assert.IsFalse(deleteResult.Success);
+            Assert.AreEqual(deleteResult.Value.String("_id"), documents[0].String("_id"));
+            Assert.AreEqual(deleteResult.Value.String("_key"), documents[0].String("_key"));
+            Assert.AreEqual(deleteResult.Value.String("_rev"), documents[0].String("_rev"));
+        }
+        
+        [Test()]
+        public void Should_delete_document_with_ifMatch_and_lastUpdatePolicy()
+        {
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+            
+            var deleteResult = db.Document
+                .IfMatch(documents[0].String("_rev"), ArangoUpdatePolicy.Last)
+                .Delete(documents[0].String("_id"));
+            
+            Assert.AreEqual(202, deleteResult.StatusCode);
+            Assert.IsTrue(deleteResult.Success);
+            Assert.AreEqual(deleteResult.Value.String("_id"), documents[0].String("_id"));
+            Assert.AreEqual(deleteResult.Value.String("_key"), documents[0].String("_key"));
+            Assert.AreEqual(deleteResult.Value.String("_rev"), documents[0].String("_rev"));
+        }
+        
+        #endregion
+        
         public void Dispose()
         {
             Database.DeleteTestDatabase(Database.TestDatabaseGeneral);

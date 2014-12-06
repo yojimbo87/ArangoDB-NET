@@ -215,7 +215,7 @@ namespace Arango.Client
         {
             var request = new Request(HttpMethod.PATCH, ApiBaseUri.Document, "/" + handle);
             
-            // optional: conditionally replace a document based on a target revision id
+            // optional: conditionally update a document based on a target revision id
             request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
             // optional: if revision was provided - check the presence of update policy parameter
             if (_parameters.Has(ParameterName.IfMatch))
@@ -253,6 +253,54 @@ namespace Arango.Client
                     }
                     break;
                 case 400:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Delete (DELETE)
+        
+        public ArangoResult<Dictionary<string, object>> Delete(string handle)
+        {
+            var request = new Request(HttpMethod.DELETE, ApiBaseUri.Document, "/" + handle);
+            
+            // optional: conditionally replace a document based on a target revision id
+            request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
+            // optional: if revision was provided - check the presence of update policy parameter
+            if (_parameters.Has(ParameterName.IfMatch))
+            {
+                request.TrySetQueryStringParameter(ParameterName.Policy, _parameters);
+            }
+            // optional: wait until data are synchronised to disk
+            request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<Dictionary<string, object>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                case 202:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>);
+                    }
+                    break;
+                case 412:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Value = (response.Data as Dictionary<string, object>);
+                    }
+                    break;
                 case 404:
                 default:
                     // Arango error
