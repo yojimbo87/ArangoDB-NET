@@ -471,6 +471,62 @@ namespace Arango.Tests
             Assert.IsFalse(operationResult.Success);
         }
         
+        [Test()]
+        public void Should_get_all_documents_in_collection()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+            Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
+            Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+
+            var db = new ArangoDatabase(Database.Alias);
+            
+            var operationResult = db.Collection
+                .GetAllDocuments(Database.TestDocumentCollectionName);
+            
+            Assert.AreEqual(200, operationResult.StatusCode);
+            Assert.IsTrue(operationResult.Success);
+            Assert.AreEqual(operationResult.Value.Count, 2);
+            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
+        }
+        
+        [Test()]
+        public void Should_get_all_document_IDs_in_collection()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+            Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
+            Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+
+            var db = new ArangoDatabase(Database.Alias);
+            
+            var operationResult = db.Collection
+                .ReturnListType(ArangoReturnListType.ID)
+                .GetAllDocuments(Database.TestDocumentCollectionName);
+            
+            Assert.AreEqual(200, operationResult.StatusCode);
+            Assert.IsTrue(operationResult.Success);
+            Assert.AreEqual(operationResult.Value.Count, 2);
+            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
+        }
+        
+        [Test()]
+        public void Should_get_all_document_keys_in_collection()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+            Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
+            Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+
+            var db = new ArangoDatabase(Database.Alias);
+            
+            var operationResult = db.Collection
+                .ReturnListType(ArangoReturnListType.Key)
+                .GetAllDocuments(Database.TestDocumentCollectionName);
+            
+            Assert.AreEqual(200, operationResult.StatusCode);
+            Assert.IsTrue(operationResult.Success);
+            Assert.AreEqual(operationResult.Value.Count, 2);
+            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
+        }
+        
         public void Dispose()
         {
             Database.CleanupTestDatabases();

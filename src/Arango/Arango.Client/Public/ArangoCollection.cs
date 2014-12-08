@@ -111,6 +111,14 @@ namespace Arango.Client
         	return this;
         }
         
+        public ArangoCollection ReturnListType(ArangoReturnListType value)
+        {
+            // needs to be string value
+            _parameters.String(ParameterName.Type, value.ToString().ToLower());
+        	
+        	return this;
+        }
+        
         public ArangoCollection ShardKeys(List<string> value)
         {
             _parameters.List(ParameterName.ShardKeys, value);
@@ -617,6 +625,42 @@ namespace Arango.Client
                     }
                     break;
                 case 400:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Get all documents (GET)
+        
+        public ArangoResult<List<string>> GetAllDocuments(string collectionName)
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Document, "");
+
+            // required: collection name
+            request.QueryString.Add(ParameterName.Collection, collectionName);
+            // optional: whether or not to include document body data in the checksum calculation
+            request.TrySetQueryStringParameter(ParameterName.Type, _parameters);
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<List<string>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>).List<string>("documents");
+                    }
+                    break;
                 case 404:
                 default:
                     // Arango error
