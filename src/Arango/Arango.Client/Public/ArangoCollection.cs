@@ -673,5 +673,41 @@ namespace Arango.Client
         }
         
         #endregion
+        
+        #region Get all edges (GET)
+        
+        public ArangoResult<List<string>> GetAllEdges(string collectionName)
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Edge, "");
+
+            // required: collection name
+            request.QueryString.Add(ParameterName.Collection, collectionName);
+            // optional: whether or not to include document body data in the checksum calculation
+            request.TrySetQueryStringParameter(ParameterName.Type, _parameters);
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<List<string>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>).List<string>("documents");
+                    }
+                    break;
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
     }
 }

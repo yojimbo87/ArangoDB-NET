@@ -471,6 +471,8 @@ namespace Arango.Tests
             Assert.IsFalse(operationResult.Success);
         }
         
+        #region Get all documents
+        
         [Test()]
         public void Should_get_all_documents_in_collection()
         {
@@ -487,6 +489,7 @@ namespace Arango.Tests
             Assert.IsTrue(operationResult.Success);
             Assert.AreEqual(operationResult.Value.Count, 2);
             Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
+            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
         }
         
         [Test()]
@@ -506,6 +509,7 @@ namespace Arango.Tests
             Assert.IsTrue(operationResult.Success);
             Assert.AreEqual(operationResult.Value.Count, 2);
             Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
+            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
         }
         
         [Test()]
@@ -525,6 +529,32 @@ namespace Arango.Tests
             Assert.IsTrue(operationResult.Success);
             Assert.AreEqual(operationResult.Value.Count, 2);
             Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
+            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
+        }
+        
+        #endregion
+        
+        [Test()]
+        public void Should_get_all_edges_in_collection()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+            Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
+            Database.CreateTestCollection(Database.TestEdgeCollectionName, ArangoCollectionType.Edge);
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+
+            var db = new ArangoDatabase(Database.Alias);
+            
+            db.Edge.Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"));
+            db.Edge.Create(Database.TestEdgeCollectionName, documents[1].String("_id"), documents[0].String("_id"));
+            
+            var operationResult = db.Collection
+                .GetAllEdges(Database.TestEdgeCollectionName);
+            
+            Assert.AreEqual(200, operationResult.StatusCode);
+            Assert.IsTrue(operationResult.Success);
+            Assert.AreEqual(operationResult.Value.Count, 2);
+            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
+            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
         }
         
         public void Dispose()
