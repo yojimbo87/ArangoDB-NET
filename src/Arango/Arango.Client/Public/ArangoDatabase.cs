@@ -37,6 +37,14 @@ namespace Arango.Client
             }
         }
         
+        public ArangoEdge Edge
+        {
+            get
+            {
+                return new ArangoEdge(_connection);
+            }
+        }
+        
         public ArangoDatabase(string alias)
         {
             _connection = ArangoSettings.GetConnection(alias);

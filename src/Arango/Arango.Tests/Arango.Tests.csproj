@@ -51,6 +51,7 @@
     <Compile Include="Database.cs" />
     <Compile Include="DatabaseOperations\DatabaseOperationsTests.cs" />
     <Compile Include="DocumentOperations\DocumentOperationsTests.cs" />
+    <Compile Include="EdgeOperations\EdgeOperationsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -66,6 +67,7 @@
     <Folder Include="DatabaseOperations" />
     <Folder Include="CollectionOperations" />
     <Folder Include="DocumentOperations" />
+    <Folder Include="EdgeOperations" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

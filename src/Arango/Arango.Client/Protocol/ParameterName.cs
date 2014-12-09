@@ -9,6 +9,7 @@ namespace Arango.Client.Protocol
         internal const string CreateCollection = "createCollection";
         internal const string DoCompact = "doCompact";
         internal const string ExcludeSystem = "excludeSystem";
+        internal const string From = "from";
         internal const string IfMatch = "If-Match";
         internal const string IfNoneMatch = "If-None-Match";
         internal const string IsSystem = "isSystem";
@@ -24,6 +25,7 @@ namespace Arango.Client.Protocol
         internal const string NumberOfShards = "numberOfShards";
         internal const string Policy = "policy";
         internal const string ShardKeys = "shardKeys";
+        internal const string To = "to";
         internal const string Type = "type";
         internal const string WaitForSync = "waitForSync";
         internal const string WithRevisions = "withRevisions";
