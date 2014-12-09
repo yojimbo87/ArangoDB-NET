@@ -152,29 +152,29 @@ namespace Arango.Client
             // required: collection name
             bodyDocument.String(ParameterName.Name, collectionName);
             // optional: wait until data are synchronised to disk
-            Request.TrySetParameter(ParameterName.WaitForSync, _parameters, bodyDocument);
+            Request.TrySetBodyParameter(ParameterName.WaitForSync, _parameters, bodyDocument);
             // optional: whether or not the collection will be compacted
-            Request.TrySetParameter(ParameterName.DoCompact, _parameters, bodyDocument);
+            Request.TrySetBodyParameter(ParameterName.DoCompact, _parameters, bodyDocument);
             // optional: maximal size of a journal or datafile in bytes
-            Request.TrySetParameter(ParameterName.JournalSize, _parameters, bodyDocument);
+            Request.TrySetBodyParameter(ParameterName.JournalSize, _parameters, bodyDocument);
             // optional: if true, create a system collection
-            Request.TrySetParameter(ParameterName.IsSystem, _parameters, bodyDocument);
+            Request.TrySetBodyParameter(ParameterName.IsSystem, _parameters, bodyDocument);
             // optional: if true, collection data is kept in-memory only and not made persistent
-            Request.TrySetParameter(ParameterName.IsVolatile, _parameters, bodyDocument);
+            Request.TrySetBodyParameter(ParameterName.IsVolatile, _parameters, bodyDocument);
             // optional: the type of the collection to create
-            Request.TrySetParameter(ParameterName.Type, _parameters, bodyDocument);
+            Request.TrySetBodyParameter(ParameterName.Type, _parameters, bodyDocument);
             // optional: in a cluster, this value determines the number of shards to create for the collection
-            Request.TrySetParameter(ParameterName.NumberOfShards, _parameters, bodyDocument);
+            Request.TrySetBodyParameter(ParameterName.NumberOfShards, _parameters, bodyDocument);
             // optional: in a cluster, this attribute determines which document attributes are used to determine the target shard for documents
-            Request.TrySetParameter(ParameterName.ShardKeys, _parameters, bodyDocument);
+            Request.TrySetBodyParameter(ParameterName.ShardKeys, _parameters, bodyDocument);
             // optional: specifies the type of the key generator
-            Request.TrySetParameter(ParameterName.KeyOptionsType, _parameters, bodyDocument);
+            Request.TrySetBodyParameter(ParameterName.KeyOptionsType, _parameters, bodyDocument);
             // optional: if set to true, then it is allowed to supply own key values in the _key attribute of a document
-            Request.TrySetParameter(ParameterName.KeyOptionsAllowUserKeys, _parameters, bodyDocument);
+            Request.TrySetBodyParameter(ParameterName.KeyOptionsAllowUserKeys, _parameters, bodyDocument);
             // optional: increment value for autoincrement key generator
-            Request.TrySetParameter(ParameterName.KeyOptionsIncrement, _parameters, bodyDocument);
+            Request.TrySetBodyParameter(ParameterName.KeyOptionsIncrement, _parameters, bodyDocument);
             // optional: initial offset value for autoincrement key generator
-            Request.TrySetParameter(ParameterName.KeyOptionsOffset, _parameters, bodyDocument);
+            Request.TrySetBodyParameter(ParameterName.KeyOptionsOffset, _parameters, bodyDocument);
             
             request.Body = JSON.ToJSON(bodyDocument);
             
@@ -275,7 +275,7 @@ namespace Arango.Client
                 var bodyDocument = new Dictionary<string, object>();
                 
                 // optional: controls whether the return value should include the number of documents in the collection
-                Request.TrySetParameter(ParameterName.Count, _parameters, bodyDocument);
+                Request.TrySetBodyParameter(ParameterName.Count, _parameters, bodyDocument);
                 
                 request.Body = JSON.ToJSON(bodyDocument);
             }
@@ -346,9 +346,9 @@ namespace Arango.Client
             var bodyDocument = new Dictionary<string, object>();
             
             // optional: if true then creating or changing a document will wait until the data has been synchronised to disk
-            Request.TrySetParameter(ParameterName.WaitForSync, _parameters, bodyDocument);
+            Request.TrySetBodyParameter(ParameterName.WaitForSync, _parameters, bodyDocument);
             // optional: the maximal size of a journal or datafile in bytes
-            Request.TrySetParameter(ParameterName.JournalSize, _parameters, bodyDocument);
+            Request.TrySetBodyParameter(ParameterName.JournalSize, _parameters, bodyDocument);
             
             request.Body = JSON.ToJSON(bodyDocument);
             

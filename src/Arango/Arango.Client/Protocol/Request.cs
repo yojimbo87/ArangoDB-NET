@@ -60,11 +60,11 @@ namespace Arango.Client.Protocol
             }
         }
         
-        internal static void TrySetParameter(string parameterName, Dictionary<string, object> source, Dictionary<string, object> destination)
+        internal static void TrySetBodyParameter(string parameterName, Dictionary<string, object> source, Dictionary<string, object> destination)
         {
-            if (source.ContainsKey(parameterName))
+            if (source.Has(parameterName))
             {
-                destination.Add(parameterName, source.Object(parameterName));
+                destination.Object(parameterName, source.Object(parameterName));
             }
         }
     }

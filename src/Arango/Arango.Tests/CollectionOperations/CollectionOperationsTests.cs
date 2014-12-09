@@ -75,34 +75,30 @@ namespace Arango.Tests
             Assert.AreEqual(ArangoCollectionStatus.Loaded, createResult.Value.Enum<ArangoCollectionStatus>("status"));
             Assert.AreEqual(ArangoCollectionType.Document, createResult.Value.Enum<ArangoCollectionType>("type"));
 
-            // TODO: test if documents are incremented correctly
+
 			// create documents and test if their key are incremented accordingly
+			
+            var newDocument = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Document("bar", new Dictionary<string, object>().String("foo", "string value"));
             
-//            var document1 = new JObject();
-//            document1.Add("foo", "foo string value");
-//
-//            var createDocument1Result = db.Document.Create(Database.TestDocumentCollectionName, document1);
-//            
-//            Assert.AreEqual(202, createDocument1Result.StatusCode);
-//            Assert.AreEqual(true, createDocument1Result.Success);
-//            Assert.AreEqual(true, Handle.IsValid(createDocument1Result.Value.ID));
-//            Assert.AreEqual(Database.TestDocumentCollectionName + "/" + 1, createDocument1Result.Value.ID);
-//            Assert.AreEqual(Database.TestDocumentCollectionName, createDocument1Result.Value.Collection);
-//            Assert.AreEqual(1, createDocument1Result.Value.Key);
-//            Assert.AreEqual(false, string.IsNullOrEmpty(createDocument1Result.Value.Revision));
-//            
-//            var document2 = new JObject();
-//            document2.Add("foo", "foo string value");
-//            
-//            var createDocument2Result = db.Document.Create(Database.TestDocumentCollectionName, document2);
-//            
-//            Assert.AreEqual(202, createDocument2Result.StatusCode);
-//            Assert.AreEqual(true, createDocument2Result.Success);
-//            Assert.AreEqual(true, Handle.IsValid(createDocument2Result.Value.ID));
-//            Assert.AreEqual(Database.TestDocumentCollectionName + "/" + 2, createDocument2Result.Value.ID);
-//            Assert.AreEqual(Database.TestDocumentCollectionName, createDocument2Result.Value.Collection);
-//            Assert.AreEqual(2, createDocument2Result.Value.Key);
-//            Assert.AreEqual(false, string.IsNullOrEmpty(createDocument2Result.Value.Revision));
+            var doc1Result = db.Document
+                .Create(Database.TestDocumentCollectionName, newDocument);
+            
+            Assert.AreEqual(202, doc1Result.StatusCode);
+            Assert.IsTrue(doc1Result.Success);
+            Assert.AreEqual(Database.TestDocumentCollectionName + "/" + 1, doc1Result.Value.String("_id"));
+            Assert.AreEqual("1", doc1Result.Value.String("_key"));
+            Assert.IsFalse(string.IsNullOrEmpty(doc1Result.Value.String("_rev")));
+            
+            var doc2Result = db.Document
+                .Create(Database.TestDocumentCollectionName, newDocument);
+            
+            Assert.AreEqual(202, doc2Result.StatusCode);
+            Assert.IsTrue(doc2Result.Success);
+            Assert.AreEqual(Database.TestDocumentCollectionName + "/" + 2, doc2Result.Value.String("_id"));
+            Assert.AreEqual("2", doc2Result.Value.String("_key"));
+            Assert.IsFalse(string.IsNullOrEmpty(doc2Result.Value.String("_rev")));
         }
         
         #endregion
