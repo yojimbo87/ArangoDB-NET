@@ -42,6 +42,8 @@ namespace Arango.Tests
             Assert.AreEqual(getResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(getResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreEqual(getResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.IsTrue(getResult.Value.IsString("_from"));
+            Assert.IsTrue(getResult.Value.IsString("_to"));
             Assert.IsTrue(getResult.Value.IsString("foo"));
             // integers are by default parsed as long type
             Assert.IsTrue(getResult.Value.IsLong("bar"));
@@ -68,6 +70,8 @@ namespace Arango.Tests
             Assert.AreEqual(getResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(getResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreEqual(getResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.IsTrue(getResult.Value.IsString("_from"));
+            Assert.IsTrue(getResult.Value.IsString("_to"));
             Assert.IsTrue(getResult.Value.IsString("foo"));
             // integers are by default parsed as long type
             Assert.IsTrue(getResult.Value.IsLong("bar"));
@@ -117,6 +121,8 @@ namespace Arango.Tests
             Assert.AreEqual(getResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(getResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreEqual(getResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.IsTrue(getResult.Value.IsString("_from"));
+            Assert.IsTrue(getResult.Value.IsString("_to"));
             Assert.IsTrue(getResult.Value.IsString("foo"));
             // integers are by default parsed as long type
             Assert.IsTrue(getResult.Value.IsLong("bar"));
@@ -209,9 +215,363 @@ namespace Arango.Tests
             Assert.AreEqual(getResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(getResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreEqual(getResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.IsTrue(getResult.Value.IsString("_from"));
+            Assert.IsTrue(getResult.Value.IsString("_to"));
             Assert.IsTrue(getResult.Value.IsString("foo"));
             // integers are by default parsed as long type
             Assert.IsTrue(getResult.Value.IsLong("bar"));
+        }
+        
+        #endregion
+        
+        #region Update
+        
+        [Test()]
+        public void Should_update_edge()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            var newDocument = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Int("bar", 54321)
+                .Int("baz", 12345);
+            
+            var updateResult = db.Edge
+                .Update(createResult.Value.String("_id"), newDocument);
+            
+            Assert.AreEqual(202, updateResult.StatusCode);
+            Assert.IsTrue(updateResult.Success);
+            Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
+            Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
+            Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            
+            var getResult = db.Edge
+                .Get(updateResult.Value.String("_id"));
+            
+            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
+            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
+            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            
+            Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
+            Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
+            
+            Assert.AreNotEqual(getResult.Value.Int("bar"), document.Int("bar"));
+            Assert.AreEqual(getResult.Value.Int("bar"), newDocument.Int("bar"));
+            
+            // by default JSON integers are deserialized to long type
+            Assert.IsTrue(getResult.Value.IsLong("baz"));
+        }
+        
+        [Test()]
+        public void Should_update_edge_with_waitForSync()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            var newDocument = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Int("bar", 54321)
+                .Int("baz", 12345);
+            
+            var updateResult = db.Edge
+                .WaitForSync(true)
+                .Update(createResult.Value.String("_id"), newDocument);
+            
+            Assert.AreEqual(201, updateResult.StatusCode);
+            Assert.IsTrue(updateResult.Success);
+            Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
+            Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
+            Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            
+            var getResult = db.Edge
+                .Get(updateResult.Value.String("_id"));
+            
+            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
+            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
+            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            
+            Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
+            Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
+            
+            Assert.AreNotEqual(getResult.Value.Int("bar"), document.Int("bar"));
+            Assert.AreEqual(getResult.Value.Int("bar"), newDocument.Int("bar"));
+            
+            // by default JSON integers are deserialized to long type
+            Assert.IsTrue(getResult.Value.IsLong("baz"));
+        }
+        
+        [Test()]
+        public void Should_update_edge_with_ifMatch()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            var newDocument = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Int("bar", 54321)
+                .Int("baz", 12345);
+            
+            var updateResult = db.Edge
+                .IfMatch(createResult.Value.String("_rev"))
+                .Update(createResult.Value.String("_id"), newDocument);
+            
+            Assert.AreEqual(202, updateResult.StatusCode);
+            Assert.IsTrue(updateResult.Success);
+            Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
+            Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
+            Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            
+            var getResult = db.Edge
+                .Get(updateResult.Value.String("_id"));
+            
+            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
+            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
+            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            
+            Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
+            Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
+            
+            Assert.AreNotEqual(getResult.Value.Int("bar"), document.Int("bar"));
+            Assert.AreEqual(getResult.Value.Int("bar"), newDocument.Int("bar"));
+            
+            // by default JSON integers are deserialized to long type
+            Assert.IsTrue(getResult.Value.IsLong("baz"));
+        }
+        
+        [Test()]
+        public void Should_update_edge_with_ifMatch_and_return_412()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            var newDocument = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Int("bar", 54321)
+                .Int("baz", 12345);
+            
+            var updateResult = db.Edge
+                .IfMatch("123456789")
+                .Update(createResult.Value.String("_id"), newDocument);
+            
+            Assert.AreEqual(412, updateResult.StatusCode);
+            Assert.IsFalse(updateResult.Success);
+            Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
+            Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
+            Assert.AreEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
+        }
+        
+        [Test()]
+        public void Should_update_edge_with_ifMatch_and_lastUpdatePolicy()
+        {
+        	Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            var newDocument = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Int("bar", 54321)
+                .Int("baz", 12345);
+            
+            var updateResult = db.Edge
+                .IfMatch("123456789", ArangoUpdatePolicy.Last)
+                .Update(createResult.Value.String("_id"), newDocument);
+            
+            Assert.AreEqual(202, updateResult.StatusCode);
+            Assert.IsTrue(updateResult.Success);
+            Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
+            Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
+            Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            
+            var getResult = db.Document
+                .Get(updateResult.Value.String("_id"));
+            
+            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
+            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
+            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            
+            Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
+            Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
+            
+            Assert.AreNotEqual(getResult.Value.Int("bar"), document.Int("bar"));
+            Assert.AreEqual(getResult.Value.Int("bar"), newDocument.Int("bar"));
+            
+            // by default JSON integers are deserialized to long type
+            Assert.IsTrue(getResult.Value.IsLong("baz"));
+        }
+        
+        [Test()]
+        public void Should_update_edge_with_keepNull()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Object("bar", null);
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            document.Merge(createResult.Value);
+            
+            var newDocument = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Object("baz", null);
+            
+            var updateResult = db.Edge
+                .KeepNull(false)
+                .Update(createResult.Value.String("_id"), newDocument);
+            
+            Assert.AreEqual(202, updateResult.StatusCode);
+            Assert.IsTrue(updateResult.Success);
+            Assert.AreEqual(updateResult.Value.String("_id"), document.String("_id"));
+            Assert.AreEqual(updateResult.Value.String("_key"), document.String("_key"));
+            Assert.AreNotEqual(updateResult.Value.String("_rev"), document.String("_rev"));
+            
+            var getResult = db.Document
+                .Get(updateResult.Value.String("_id"));
+            
+            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
+            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
+            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            
+            Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
+            Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
+            
+            Assert.IsTrue(getResult.Value.Has("bar"));
+            
+            Assert.IsFalse(getResult.Value.Has("baz"));
+        }
+        
+        [Test()]
+        public void Should_update_edge_with_mergeArrays_set_to_true()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Document("bar", new Dictionary<string, object>().String("foo", "string value"));
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            document.Merge(createResult.Value);
+            
+            var newDocument = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Document("bar", new Dictionary<string, object>().String("bar", "other string value"));
+            
+            var updateResult = db.Edge
+                .MergeArrays(true) // this is also default behavior
+                .Update(createResult.Value.String("_id"), newDocument);
+            
+            Assert.AreEqual(202, updateResult.StatusCode);
+            Assert.IsTrue(updateResult.Success);
+            Assert.AreEqual(updateResult.Value.String("_id"), document.String("_id"));
+            Assert.AreEqual(updateResult.Value.String("_key"), document.String("_key"));
+            Assert.AreNotEqual(updateResult.Value.String("_rev"), document.String("_rev"));
+            
+            var getResult = db.Document
+                .Get(updateResult.Value.String("_id"));
+            
+            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
+            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
+            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            
+            Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
+            Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
+            
+            Assert.IsTrue(getResult.Value.Has("bar.foo"));
+            
+            Assert.IsTrue(getResult.Value.Has("bar.bar"));
+        }
+        
+        [Test()]
+        public void Should_update_edge_with_mergeArrays_set_to_false()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Document("bar", new Dictionary<string, object>().String("foo", "string value"));
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            document.Merge(createResult.Value);
+            
+            var newDocument = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Document("bar", new Dictionary<string, object>().String("bar", "other string value"));
+            
+            var updateResult = db.Edge
+                .MergeArrays(false)
+                .Update(createResult.Value.String("_id"), newDocument);
+            
+            Assert.AreEqual(202, updateResult.StatusCode);
+            Assert.IsTrue(updateResult.Success);
+            Assert.AreEqual(updateResult.Value.String("_id"), document.String("_id"));
+            Assert.AreEqual(updateResult.Value.String("_key"), document.String("_key"));
+            Assert.AreNotEqual(updateResult.Value.String("_rev"), document.String("_rev"));
+            
+            var getResult = db.Document
+                .Get(updateResult.Value.String("_id"));
+            
+            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
+            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
+            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            
+            Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
+            Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
+            
+            Assert.IsFalse(getResult.Value.Has("bar.foo"));
+            
+            Assert.IsTrue(getResult.Value.Has("bar.bar"));
         }
         
         #endregion
