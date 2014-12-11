@@ -576,6 +576,216 @@ namespace Arango.Tests
         
         #endregion
         
+        #region Replace
+        
+        [Test()]
+        public void Should_replace_edge()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            var newDocument = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Int("baz", 54321);
+            
+            var replaceResult = db.Edge
+                .Replace(createResult.Value.String("_id"), newDocument);
+            
+            Assert.AreEqual(202, replaceResult.StatusCode);
+            Assert.IsTrue(replaceResult.Success);
+            Assert.AreEqual(replaceResult.Value.String("_id"), createResult.Value.String("_id"));
+            Assert.AreEqual(replaceResult.Value.String("_key"), createResult.Value.String("_key"));
+            Assert.AreNotEqual(replaceResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            
+            var getResult = db.Edge
+                .Get(replaceResult.Value.String("_id"));
+            
+            Assert.AreEqual(getResult.Value.String("_id"), replaceResult.Value.String("_id"));
+            Assert.AreEqual(getResult.Value.String("_key"), replaceResult.Value.String("_key"));
+            Assert.AreEqual(getResult.Value.String("_rev"), replaceResult.Value.String("_rev"));
+            
+            Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
+            Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
+            
+            Assert.AreEqual(getResult.Value.Int("baz"), newDocument.Int("baz"));
+
+            Assert.IsFalse(getResult.Value.Has("bar"));
+        }
+        
+        [Test()]
+        public void Should_replace_edge_with_waitForSync()
+        {
+        	Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            var newDocument = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Int("baz", 54321);
+            
+            var replaceResult = db.Edge
+                .WaitForSync(true)
+                .Replace(createResult.Value.String("_id"), newDocument);
+            
+            Assert.AreEqual(201, replaceResult.StatusCode);
+            Assert.IsTrue(replaceResult.Success);
+            Assert.AreEqual(replaceResult.Value.String("_id"), createResult.Value.String("_id"));
+            Assert.AreEqual(replaceResult.Value.String("_key"), createResult.Value.String("_key"));
+            Assert.AreNotEqual(replaceResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            
+            var getResult = db.Edge
+                .Get(replaceResult.Value.String("_id"));
+            
+            Assert.AreEqual(getResult.Value.String("_id"), replaceResult.Value.String("_id"));
+            Assert.AreEqual(getResult.Value.String("_key"), replaceResult.Value.String("_key"));
+            Assert.AreEqual(getResult.Value.String("_rev"), replaceResult.Value.String("_rev"));
+            
+            Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
+            Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
+            
+            Assert.AreEqual(getResult.Value.Int("baz"), newDocument.Int("baz"));
+
+            Assert.IsFalse(getResult.Value.Has("bar"));
+        }
+        
+        [Test()]
+        public void Should_replace_edge_with_ifMatch()
+        {
+        	Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            document.Merge(createResult.Value);
+            
+            var newDocument = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Int("baz", 54321);
+            
+            var replaceResult = db.Edge
+                .IfMatch(document.String("_rev"))
+                .Replace(createResult.Value.String("_id"), newDocument);
+            
+            Assert.AreEqual(202, replaceResult.StatusCode);
+            Assert.IsTrue(replaceResult.Success);
+            Assert.AreEqual(replaceResult.Value.String("_id"), document.String("_id"));
+            Assert.AreEqual(replaceResult.Value.String("_key"), document.String("_key"));
+            Assert.AreNotEqual(replaceResult.Value.String("_rev"), document.String("_rev"));
+            
+            var getResult = db.Edge
+                .Get(replaceResult.Value.String("_id"));
+            
+            Assert.AreEqual(getResult.Value.String("_id"), replaceResult.Value.String("_id"));
+            Assert.AreEqual(getResult.Value.String("_key"), replaceResult.Value.String("_key"));
+            Assert.AreEqual(getResult.Value.String("_rev"), replaceResult.Value.String("_rev"));
+            
+            Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
+            Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
+            
+            Assert.AreEqual(getResult.Value.Int("baz"), newDocument.Int("baz"));
+            
+            Assert.IsFalse(getResult.Value.Has("bar"));
+        }
+        
+        [Test()]
+        public void Should_replace_edge_with_ifMatch_and_return_412()
+        {
+        	Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            document.Merge(createResult.Value);
+            
+            var newDocument = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Int("baz", 54321);
+            
+            var replaceResult = db.Edge
+                .IfMatch("123456789")
+                .Replace(createResult.Value.String("_id"), newDocument);
+            
+            Assert.AreEqual(412, replaceResult.StatusCode);
+            Assert.IsFalse(replaceResult.Success);
+            Assert.AreEqual(replaceResult.Value.String("_id"), document.String("_id"));
+            Assert.AreEqual(replaceResult.Value.String("_key"), document.String("_key"));
+            Assert.AreEqual(replaceResult.Value.String("_rev"), document.String("_rev"));
+        }
+        
+        [Test()]
+        public void Should_replace_edge_with_ifMatch_and_lastUpdatePolicy()
+        {
+        	Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            document.Merge(createResult.Value);
+            
+            var newDocument = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Int("baz", 54321);
+            
+            var replaceResult = db.Edge
+                .IfMatch("123456789", ArangoUpdatePolicy.Last)
+                .Replace(createResult.Value.String("_id"), newDocument);
+            
+            Assert.AreEqual(202, replaceResult.StatusCode);
+            Assert.IsTrue(replaceResult.Success);
+            Assert.AreEqual(replaceResult.Value.String("_id"), document.String("_id"));
+            Assert.AreEqual(replaceResult.Value.String("_key"), document.String("_key"));
+            Assert.AreNotEqual(replaceResult.Value.String("_rev"), document.String("_rev"));
+            
+            var getResult = db.Document
+                .Get(replaceResult.Value.String("_id"));
+            
+            Assert.AreEqual(getResult.Value.String("_id"), replaceResult.Value.String("_id"));
+            Assert.AreEqual(getResult.Value.String("_key"), replaceResult.Value.String("_key"));
+            Assert.AreEqual(getResult.Value.String("_rev"), replaceResult.Value.String("_rev"));
+            
+            Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
+            Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
+            
+            Assert.AreEqual(getResult.Value.Int("baz"), newDocument.Int("baz"));
+            
+            Assert.IsFalse(getResult.Value.Has("bar"));
+        }
+        
+        #endregion
+        
         public void Dispose()
         {
             Database.DeleteTestDatabase(Database.TestDatabaseGeneral);
