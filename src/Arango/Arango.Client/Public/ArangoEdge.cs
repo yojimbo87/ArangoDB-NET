@@ -326,5 +326,48 @@ namespace Arango.Client
         }
         
         #endregion
+        
+        #region Check (HEAD)
+        
+        public ArangoResult<string> Check(string handle)
+        {
+            var request = new Request(HttpMethod.HEAD, ApiBaseUri.Edge, "/" + handle);
+            
+            // optional: conditionally fetch a document based on a target revision
+            request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
+            // optional: If revision is different -> HTTP 200. If revision is identical -> HTTP 304.
+            request.TrySetHeaderParameter(ParameterName.IfNoneMatch, _parameters);
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<string>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if ((response.Headers["ETag"] ?? "").Trim().Length > 0)
+                    {
+                        result.Success = true;
+                        result.Value = response.Headers["ETag"].Replace("\"", "");
+                    }
+                    break;
+                case 304:
+                case 412:
+                    if ((response.Headers["ETag"] ?? "").Trim().Length > 0)
+                    {
+                        result.Value = response.Headers["ETag"].Replace("\"", "");
+                    }
+                    break;
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
     }
 }

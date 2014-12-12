@@ -914,6 +914,124 @@ namespace Arango.Tests
         
         #endregion
         
+        #region Check
+        
+        [Test()]
+        public void Should_check_edge()
+        {
+        	Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            var checkResult = db.Edge
+                .Check(createResult.Value.String("_id"));
+            
+            Assert.AreEqual(200, checkResult.StatusCode);
+            Assert.IsTrue(checkResult.Success);
+            Assert.AreEqual(checkResult.Value, createResult.Value.String("_rev"));
+        }
+        
+        [Test()]
+        public void Should_check_edge_with_ifMatch()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            var checkResult = db.Edge
+                .IfMatch(createResult.Value.String("_rev"))
+                .Check(createResult.Value.String("_id"));
+            
+            Assert.AreEqual(200, checkResult.StatusCode);
+            Assert.IsTrue(checkResult.Success);
+            Assert.AreEqual(checkResult.Value, createResult.Value.String("_rev"));
+        }
+        
+        [Test()]
+        public void Should_check_edge_with_ifMatch_and_return_412()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            var checkResult = db.Edge
+                .IfMatch("123456789")
+                .Check(createResult.Value.String("_id"));
+            
+            Assert.AreEqual(412, checkResult.StatusCode);
+            Assert.IsFalse(checkResult.Success);
+            Assert.AreEqual(checkResult.Value, createResult.Value.String("_rev"));
+        }
+        
+        [Test()]
+        public void Should_check_edge_with_ifNoneMatch()
+        {
+        	Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            var checkResult = db.Edge
+                .IfNoneMatch("123456789")
+                .Check(createResult.Value.String("_id"));
+            
+            Assert.AreEqual(200, checkResult.StatusCode);
+            Assert.IsTrue(checkResult.Success);
+            Assert.AreEqual(checkResult.Value, createResult.Value.String("_rev"));
+        }
+        
+        [Test()]
+        public void Should_check_edge_with_ifNoneMatch_and_return_304()
+        {
+        	Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+            
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+            
+            var checkResult = db.Edge
+                .IfNoneMatch(createResult.Value.String("_rev"))
+                .Check(createResult.Value.String("_id"));
+            
+            Assert.AreEqual(304, checkResult.StatusCode);
+            Assert.IsFalse(checkResult.Success);
+            Assert.AreEqual(checkResult.Value, createResult.Value.String("_rev"));
+        }
+        
+        #endregion
+        
         public void Dispose()
         {
             Database.DeleteTestDatabase(Database.TestDatabaseGeneral);
