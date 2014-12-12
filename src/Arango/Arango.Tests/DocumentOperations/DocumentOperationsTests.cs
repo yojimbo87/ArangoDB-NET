@@ -699,7 +699,7 @@ namespace Arango.Tests
             var db = new ArangoDatabase(Database.Alias);
             
             var deleteResult = db.Document
-                .IfMatch(documents[0].String("_rev"), ArangoUpdatePolicy.Last)
+                .IfMatch("123456789", ArangoUpdatePolicy.Last)
                 .Delete(documents[0].String("_id"));
             
             Assert.AreEqual(202, deleteResult.StatusCode);
