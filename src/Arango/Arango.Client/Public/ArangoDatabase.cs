@@ -45,6 +45,14 @@ namespace Arango.Client
             }
         }
         
+        public ArangoQuery Query
+        {
+            get
+            {
+                return new ArangoQuery(_connection);
+            }
+        }
+        
         public ArangoDatabase(string alias)
         {
             _connection = ArangoSettings.GetConnection(alias);

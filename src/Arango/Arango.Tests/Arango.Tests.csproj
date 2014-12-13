@@ -53,6 +53,7 @@
     <Compile Include="DocumentOperations\DocumentOperationsTests.cs" />
     <Compile Include="EdgeOperations\EdgeOperationsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryOperations\QueryOperationsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Arango.Client\Arango.Client.csproj">
@@ -68,6 +69,7 @@
     <Folder Include="CollectionOperations" />
     <Folder Include="DocumentOperations" />
     <Folder Include="EdgeOperations" />
+    <Folder Include="QueryOperations" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

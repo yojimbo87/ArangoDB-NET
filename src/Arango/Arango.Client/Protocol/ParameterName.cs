@@ -4,6 +4,8 @@ namespace Arango.Client.Protocol
 {
     internal static class ParameterName
     {
+        internal const string BatchSize = "batchSize";
+        internal const string BindVars = "bindVars";
         internal const string Collection = "collection";
         internal const string Count = "count";
         internal const string CreateCollection = "createCollection";
@@ -24,9 +26,14 @@ namespace Arango.Client.Protocol
         internal const string Name = "name";
         internal const string MergeArrays = "mergeArrays";
         internal const string NumberOfShards = "numberOfShards";
+        internal const string OptionsFullCount = "options.fullCount";
+        internal const string OptionsMaxPlans = "options.maxPlans";
+        internal const string OptionsOptimizerRules = "options.optimizer.rules";
         internal const string Policy = "policy";
+        internal const string Query = "query";
         internal const string ShardKeys = "shardKeys";
         internal const string To = "to";
+        internal const string TTL = "ttl";
         internal const string Type = "type";
         internal const string Vertex = "vertex";
         internal const string WaitForSync = "waitForSync";
