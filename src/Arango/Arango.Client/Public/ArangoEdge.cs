@@ -116,6 +116,43 @@ namespace Arango.Client
         
         #endregion
         
+        #region Get in/out/any (GET)
+        
+        public ArangoResult<List<Dictionary<string, object>>> Get(string collectionName, string startVertexID, ArangoDirection direction)
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Edges, "/" + collectionName);
+            
+            // required: the id of the start vertex
+            request.QueryString.Add(ParameterName.Vertex, startVertexID);
+            // required: selects in or out direction for edges. If not set, any edges are returned.
+            request.QueryString.Add(ParameterName.Direction, direction.ToString().ToLower());
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<List<Dictionary<string, object>>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>).List<Dictionary<string, object>>("edges");
+                    }
+                    break;
+                case 400:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
         #region Create (POST)
         
         public ArangoResult<Dictionary<string, object>> Create(string collection, string fromHandle, string toHandle)

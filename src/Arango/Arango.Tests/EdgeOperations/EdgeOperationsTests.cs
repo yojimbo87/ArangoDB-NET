@@ -25,6 +25,7 @@ namespace Arango.Tests
         [Test()]
         public void Should_get_edge()
         {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
         	var db = new ArangoDatabase(Database.Alias);
         	
             var document = new Dictionary<string, object>()
@@ -52,6 +53,7 @@ namespace Arango.Tests
         [Test()]
         public void Should_get_edge_with_ifMatch()
         {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
         	var db = new ArangoDatabase(Database.Alias);
         	
             var document = new Dictionary<string, object>()
@@ -80,6 +82,7 @@ namespace Arango.Tests
         [Test()]
         public void Should_get_edge_with_ifMatch_and_return_412()
         {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
         	var db = new ArangoDatabase(Database.Alias);
         	
             var document = new Dictionary<string, object>()
@@ -102,7 +105,8 @@ namespace Arango.Tests
         
         [Test()]
         public void Should_get_edge_with_ifNoneMatch()
-        {   
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
             var db = new ArangoDatabase(Database.Alias);
         	
             var document = new Dictionary<string, object>()
@@ -131,6 +135,7 @@ namespace Arango.Tests
         [Test()]
         public void Should_get_edge_with_ifNoneMatch_and_return_304()
         {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
         	var db = new ArangoDatabase(Database.Alias);
         	
             var document = new Dictionary<string, object>()
@@ -150,13 +155,91 @@ namespace Arango.Tests
         
         #endregion
         
+        #region Get
+        
+        [Test()]
+        public void Should_get_edges_in()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var db = new ArangoDatabase(Database.Alias);
+        	
+            var document = new Dictionary<string, object>()
+        		.String("foo", "foo string value")
+        		.Int("bar", 12345);
+
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, _documents[1].String("_id"), _documents[0].String("_id"), document);
+            
+            var getResult = db.Edge
+                .Get(Database.TestEdgeCollectionName, _documents[0].String("_id"), ArangoDirection.In);
+            
+            Assert.AreEqual(200, getResult.StatusCode);
+            Assert.IsTrue(getResult.Success);
+            Assert.AreEqual(getResult.Value.Count, 1);
+            
+            Assert.AreEqual(getResult.Value[0].String("_id"), createResult.Value.String("_id"));
+            Assert.AreEqual(getResult.Value[0].String("_key"), createResult.Value.String("_key"));
+            Assert.AreEqual(getResult.Value[0].String("_rev"), createResult.Value.String("_rev"));
+        }
+        
+        [Test()]
+        public void Should_get_edges_out()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var db = new ArangoDatabase(Database.Alias);
+        	
+            var document = new Dictionary<string, object>()
+        		.String("foo", "foo string value")
+        		.Int("bar", 12345);
+
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+            
+            var getResult = db.Edge
+                .Get(Database.TestEdgeCollectionName, _documents[0].String("_id"), ArangoDirection.Out);
+            
+            Assert.AreEqual(200, getResult.StatusCode);
+            Assert.IsTrue(getResult.Success);
+            Assert.AreEqual(getResult.Value.Count, 1);
+            
+            Assert.AreEqual(getResult.Value[0].String("_id"), createResult.Value.String("_id"));
+            Assert.AreEqual(getResult.Value[0].String("_key"), createResult.Value.String("_key"));
+            Assert.AreEqual(getResult.Value[0].String("_rev"), createResult.Value.String("_rev"));
+        }
+        
+        [Test()]
+        public void Should_get_edges_any()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+        	var db = new ArangoDatabase(Database.Alias);
+        	
+            var document = new Dictionary<string, object>()
+        		.String("foo", "foo string value")
+        		.Int("bar", 12345);
+
+            var createResult = db.Edge
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+            
+            var getResult = db.Edge
+                .Get(Database.TestEdgeCollectionName, _documents[0].String("_id"), ArangoDirection.Any);
+            
+            Assert.AreEqual(200, getResult.StatusCode);
+            Assert.IsTrue(getResult.Success);
+            Assert.AreEqual(getResult.Value.Count, 1);
+            
+            Assert.AreEqual(getResult.Value[0].String("_id"), createResult.Value.String("_id"));
+            Assert.AreEqual(getResult.Value[0].String("_key"), createResult.Value.String("_key"));
+            Assert.AreEqual(getResult.Value[0].String("_rev"), createResult.Value.String("_rev"));
+        }
+        
+        #endregion
+        
         #region Create
         
         [Test()]
         public void Should_create_empty_edge()
         {
         	Database.ClearTestCollection(Database.TestEdgeCollectionName);
-
             var db = new ArangoDatabase(Database.Alias);
 
             var createResult = db.Edge
@@ -173,7 +256,6 @@ namespace Arango.Tests
         public void Should_create_empty_edge_with_waitForSync()
         {
         	Database.ClearTestCollection(Database.TestEdgeCollectionName);
-
             var db = new ArangoDatabase(Database.Alias);
 
             var createResult = db.Edge
@@ -191,7 +273,6 @@ namespace Arango.Tests
         public void Should_create_edge()
         {
         	Database.ClearTestCollection(Database.TestEdgeCollectionName);
-
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -230,7 +311,6 @@ namespace Arango.Tests
         public void Should_update_edge()
         {
             Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -238,7 +318,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var newDocument = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -275,7 +355,6 @@ namespace Arango.Tests
         public void Should_update_edge_with_waitForSync()
         {
             Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -283,7 +362,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var newDocument = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -321,7 +400,6 @@ namespace Arango.Tests
         public void Should_update_edge_with_ifMatch()
         {
             Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -329,7 +407,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var newDocument = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -367,7 +445,6 @@ namespace Arango.Tests
         public void Should_update_edge_with_ifMatch_and_return_412()
         {
             Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -375,7 +452,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var newDocument = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -397,7 +474,6 @@ namespace Arango.Tests
         public void Should_update_edge_with_ifMatch_and_lastUpdatePolicy()
         {
         	Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -405,7 +481,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var newDocument = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -443,7 +519,6 @@ namespace Arango.Tests
         public void Should_update_edge_with_keepNull()
         {
             Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -451,7 +526,7 @@ namespace Arango.Tests
                 .Object("bar", null);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             document.Merge(createResult.Value);
             
@@ -488,7 +563,6 @@ namespace Arango.Tests
         public void Should_update_edge_with_mergeArrays_set_to_true()
         {
             Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -496,7 +570,7 @@ namespace Arango.Tests
                 .Document("bar", new Dictionary<string, object>().String("foo", "string value"));
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             document.Merge(createResult.Value);
             
@@ -533,7 +607,6 @@ namespace Arango.Tests
         public void Should_update_edge_with_mergeArrays_set_to_false()
         {
             Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -541,7 +614,7 @@ namespace Arango.Tests
                 .Document("bar", new Dictionary<string, object>().String("foo", "string value"));
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             document.Merge(createResult.Value);
             
@@ -582,7 +655,6 @@ namespace Arango.Tests
         public void Should_replace_edge()
         {
             Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -590,7 +662,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var newDocument = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -624,7 +696,6 @@ namespace Arango.Tests
         public void Should_replace_edge_with_waitForSync()
         {
         	Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -632,7 +703,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var newDocument = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -667,7 +738,6 @@ namespace Arango.Tests
         public void Should_replace_edge_with_ifMatch()
         {
         	Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -675,7 +745,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             document.Merge(createResult.Value);
             
@@ -712,7 +782,6 @@ namespace Arango.Tests
         public void Should_replace_edge_with_ifMatch_and_return_412()
         {
         	Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -720,7 +789,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             document.Merge(createResult.Value);
             
@@ -743,7 +812,6 @@ namespace Arango.Tests
         public void Should_replace_edge_with_ifMatch_and_lastUpdatePolicy()
         {
         	Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -751,7 +819,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             document.Merge(createResult.Value);
             
@@ -792,7 +860,6 @@ namespace Arango.Tests
         public void Should_delete_edge()
         {
             Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -800,7 +867,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var deleteResult = db.Document
                 .Delete(createResult.Value.String("_id"));
@@ -816,7 +883,6 @@ namespace Arango.Tests
         public void Should_delete_edge_with_waitForSync()
         {
         	Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -824,7 +890,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var deleteResult = db.Document
                 .WaitForSync(true)
@@ -841,7 +907,6 @@ namespace Arango.Tests
         public void Should_delete_edge_with_ifMatch()
         {
             Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -849,7 +914,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var deleteResult = db.Document
                 .IfMatch(createResult.Value.String("_rev"))
@@ -866,7 +931,6 @@ namespace Arango.Tests
         public void Should_delete_edge_with_ifMatch_and_return_412()
         {
             Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -874,7 +938,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var deleteResult = db.Document
                 .IfMatch("123456789")
@@ -891,7 +955,6 @@ namespace Arango.Tests
         public void Should_delete_edge_with_ifMatch_and_lastUpdatePolicy()
         {
             Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -899,7 +962,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var deleteResult = db.Document
                 .IfMatch("123456789", ArangoUpdatePolicy.Last)
@@ -920,7 +983,6 @@ namespace Arango.Tests
         public void Should_check_edge()
         {
         	Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -928,7 +990,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var checkResult = db.Edge
                 .Check(createResult.Value.String("_id"));
@@ -942,7 +1004,6 @@ namespace Arango.Tests
         public void Should_check_edge_with_ifMatch()
         {
             Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -950,7 +1011,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var checkResult = db.Edge
                 .IfMatch(createResult.Value.String("_rev"))
@@ -965,7 +1026,6 @@ namespace Arango.Tests
         public void Should_check_edge_with_ifMatch_and_return_412()
         {
             Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -973,7 +1033,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var checkResult = db.Edge
                 .IfMatch("123456789")
@@ -988,7 +1048,6 @@ namespace Arango.Tests
         public void Should_check_edge_with_ifNoneMatch()
         {
         	Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -996,7 +1055,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var checkResult = db.Edge
                 .IfNoneMatch("123456789")
@@ -1011,7 +1070,6 @@ namespace Arango.Tests
         public void Should_check_edge_with_ifNoneMatch_and_return_304()
         {
         	Database.ClearTestCollection(Database.TestEdgeCollectionName);
-        	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
@@ -1019,7 +1077,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
             
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var checkResult = db.Edge
                 .IfNoneMatch(createResult.Value.String("_rev"))

@@ -74,6 +74,7 @@
     <Compile Include="Public\ArangoCollectionStatus.cs" />
     <Compile Include="Public\ArangoCollectionType.cs" />
     <Compile Include="Public\ArangoDatabase.cs" />
+    <Compile Include="Public\ArangoDirection.cs" />
     <Compile Include="Public\ArangoDocument.cs" />
     <Compile Include="Public\ArangoEdge.cs" />
     <Compile Include="Public\ArangoError.cs" />
