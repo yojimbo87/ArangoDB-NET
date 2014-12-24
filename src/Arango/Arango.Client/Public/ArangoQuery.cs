@@ -70,21 +70,23 @@ namespace Arango.Client
             var request = new Request(HttpMethod.POST, ApiBaseUri.Cursor, "");
             var bodyDocument = new Dictionary<string, object>();
             
-            // required: 
+            // required: AQL query string
             _parameters.String(ParameterName.Query, _query.ToString());
             Request.TrySetBodyParameter(ParameterName.Query, _parameters, bodyDocument);
-            // optional:
+            // optional: boolean flag that indicates whether the number of documents in the result set should be returned
             Request.TrySetBodyParameter(ParameterName.Count, _parameters, bodyDocument);
-            // optional:
+            // optional: maximum number of result documents to be transferred from the server to the client in one roundtrip
             Request.TrySetBodyParameter(ParameterName.BatchSize, _parameters, bodyDocument);
-            // optional:
+            // optional: time-to-live for the cursor (in seconds)
             Request.TrySetBodyParameter(ParameterName.TTL, _parameters, bodyDocument);
-            // optional:
+            // optional: key/value list of bind parameters
             if (_bindVars.Count > 0)
             {
                 _parameters.Document(ParameterName.BindVars, _bindVars);
                 Request.TrySetBodyParameter(ParameterName.Count, _parameters, bodyDocument);
             }
+            
+            // TODO: options parameter
             
             request.Body = JSON.ToJSON(bodyDocument);
             
@@ -125,6 +127,46 @@ namespace Arango.Client
                 case 400:
                 case 404:
                 case 405:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            _bindVars.Clear();
+            _query.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Parse (POST)
+
+        public ArangoResult<Dictionary<string, object>> Parse()
+        {
+            var request = new Request(HttpMethod.POST, ApiBaseUri.Query, "");
+            var bodyDocument = new Dictionary<string, object>();
+            
+            // required: AQL query string
+            _parameters.String(ParameterName.Query, _query.ToString());
+            Request.TrySetBodyParameter(ParameterName.Query, _parameters, bodyDocument);
+            
+            request.Body = JSON.ToJSON(bodyDocument);
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<Dictionary<string, object>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>).CloneExcept("code", "error");
+                    }
+                    break;
+                case 400:
                 default:
                     // Arango error
                     break;

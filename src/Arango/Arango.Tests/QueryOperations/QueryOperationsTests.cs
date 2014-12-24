@@ -108,6 +108,26 @@ namespace Arango.Tests
             Assert.IsFalse(deleteCursorResult.Value);
         }
         
+        [Test()]
+        public void Should_parse_query()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var parseResult = db.Query
+                .Aql(string.Format(@"
+                FOR item IN {0}
+                    RETURN item
+                ", Database.TestDocumentCollectionName))
+                .Parse();
+            
+            Assert.AreEqual(200, parseResult.StatusCode);
+            Assert.IsTrue(parseResult.Success);
+            Assert.IsTrue(parseResult.Value.IsList("bindVars"));
+            Assert.IsTrue(parseResult.Value.IsList("collections"));
+            Assert.IsTrue(parseResult.Value.IsList("ast"));
+        }
+        
         public void Dispose()
         {
             Database.DeleteTestDatabase(Database.TestDatabaseGeneral);
