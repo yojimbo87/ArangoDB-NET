@@ -101,6 +101,7 @@ namespace Arango.Client
                         result.Success = true;
                         result.Value = new List<object>();
                         result.Value.AddRange(responseDocument.List<object>("result"));
+                        result.Extra = responseDocument.CloneExcept("code", "error", "hasMore", "result");
                         
                         if (responseDocument.IsBool("hasMore") && responseDocument.Bool("hasMore"))
                         {
@@ -182,6 +183,40 @@ namespace Arango.Client
                 default:
                     break;
             }
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Delete cursor (DELETE)
+
+        public ArangoResult<bool> DeleteCursor(string cursorID)
+        {
+            var request = new Request(HttpMethod.DELETE, ApiBaseUri.Cursor, "/" + cursorID);
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<bool>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 202:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = true;
+                    }
+                    break;
+                case 400:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            _bindVars.Clear();
+            _query.Clear();
             
             return result;
         }

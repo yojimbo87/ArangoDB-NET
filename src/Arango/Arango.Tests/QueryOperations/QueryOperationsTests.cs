@@ -8,20 +8,17 @@ namespace Arango.Tests
 {
     [TestFixture()]
     public class QueryOperationsTests : IDisposable
-    {
-        readonly List<Dictionary<string, object>> _documents;
-        
+    {   
         public QueryOperationsTests()
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 			Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
-			
-			_documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
         }
         
         [Test()]
         public void Should_execute_AQL_query_with_list_result()
         {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var queryResult = db.Query
@@ -36,10 +33,10 @@ namespace Arango.Tests
             Assert.AreEqual(queryResult.Value.Count, 2);
         }
         
-        // TODO: ArangoResult must have field for additional data object
         [Test()]
         public void Should_execute_AQL_query_with_list_count()
         {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var queryResult = db.Query
@@ -53,11 +50,13 @@ namespace Arango.Tests
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
             Assert.AreEqual(queryResult.Value.Count, 2);
+            Assert.AreEqual(queryResult.Extra.Long("count"), 2);
         }
         
         [Test()]
         public void Should_execute_AQL_query_with_batchSize()
         {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
 
             var doc3 = new Dictionary<string, object>()
@@ -83,6 +82,30 @@ namespace Arango.Tests
             Assert.AreEqual(200, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
             Assert.AreEqual(queryResult.Value.Count, 4);
+        }
+        
+        [Test()]
+        public void Should_return_404_with_deleteCursor_operation()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var queryResult = db.Query
+                .BatchSize(1)
+                .Aql(string.Format(@"
+                FOR item IN {0}
+                    RETURN item
+                ", Database.TestDocumentCollectionName))
+                .ToList();
+
+            Assert.IsTrue(queryResult.Extra.IsString("id"));
+            
+            var deleteCursorResult = db.Query
+                .DeleteCursor(queryResult.Extra.String("id"));
+            
+            Assert.AreEqual(404, deleteCursorResult.StatusCode);
+            Assert.IsFalse(deleteCursorResult.Success);
+            Assert.IsFalse(deleteCursorResult.Value);
         }
         
         public void Dispose()
