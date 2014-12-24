@@ -155,7 +155,7 @@ namespace Arango.Tests
         
         #endregion
         
-        #region Get
+        #region Get in/out/any
         
         [Test()]
         public void Should_get_edges_in()
