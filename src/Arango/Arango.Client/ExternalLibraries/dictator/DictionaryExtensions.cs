@@ -205,6 +205,23 @@ namespace Arango.Client
             
             return ((IEnumerable)fieldValue).Cast<T>().ToList();
         }
+        /// <summary>
+        /// Retrieves number of list items from specified field path.
+        /// </summary>
+        /// <exception cref="NonExistingFieldException">Field does not exist in specified path.</exception>
+        /// <exception cref="InvalidFieldException">Field path contains field which is not traversable.</exception>
+        /// <exception cref="InvalidFieldTypeException">Field value is not List type.</exception>
+        public static int ListSize(this Dictionary<string, object> dictionary, string fieldPath)
+        {
+            var fieldValue = GetFieldValue(dictionary, fieldPath);
+            
+            if (!(fieldValue.GetType().IsGenericType && (fieldValue is IList)))
+            {
+                throw new InvalidFieldTypeException(string.Format("Field path '{0}' value does not contain list type.", fieldPath));
+            }
+            
+            return ((IList)fieldValue).Count;
+        }
         
         #endregion
         
@@ -917,17 +934,142 @@ namespace Arango.Client
         #endregion
 
         /// <summary>
+        /// Creates a deep clone of current dictionary.
+        /// </summary>
+        public static Dictionary<string, object> Clone(this Dictionary<string, object> dictionary)
+        {
+            var clone = new Dictionary<string, object>();
+            
+            foreach (var field in dictionary)
+            {
+                var fieldType = field.Value.GetType();
+                
+                if (fieldType.IsValueType || fieldType.IsEnum || fieldType.Equals(typeof(System.String)))
+                {
+                    clone.Add(field.Key, field.Value);
+                }
+                else if (fieldType.Equals(typeof(Dictionary<string, object>)))
+                {
+                    clone.Add(field.Key, Clone((Dictionary<string, object>)field.Value));
+                }
+                else
+                {
+                    clone.Add(field.Key, Activator.CreateInstance(fieldType, new object[] { field.Value }));
+                }
+            }
+            
+            return clone;
+        }
+        /// <summary>
+        /// Creates a deep clone of current dictionary without specified fields. Nonexisting fields are ingored.
+        /// </summary>
+        public static Dictionary<string, object> CloneExcept(this Dictionary<string, object> dictionary, params string[] fieldPaths)
+        {
+            var clone = Clone(dictionary);
+            
+            foreach (var fieldPath in fieldPaths)
+            {
+                clone.Drop(fieldPath);
+            }
+            
+            return clone;
+        }
+        /// <summary>
+        /// Creates a deep clone of current dictionary including only specified fields. Nonexisting fields are ingored.
+        /// </summary>
+        public static Dictionary<string, object> CloneOnly(this Dictionary<string, object> dictionary, params string[] fieldPaths)
+        {
+            var clone = new Dictionary<string, object>();
+            
+            foreach (var fieldPath in fieldPaths)
+            {
+                try
+                {
+                    var fieldValue = GetFieldValue(dictionary, fieldPath);
+                    var fieldType = fieldValue.GetType();
+                    
+                    if (fieldType.IsValueType || fieldType.IsEnum || fieldType.Equals(typeof(System.String)))
+                    {
+                        clone.Object(fieldPath, fieldValue);
+                    }
+                    else if (fieldType.Equals(typeof(Dictionary<string, object>)))
+                    {
+                        clone.Object(fieldPath, Clone((Dictionary<string, object>)fieldValue));
+                    }
+                    else
+                    {
+                        clone.Object(fieldPath, Activator.CreateInstance(fieldType, new object[] { fieldValue }));
+                    }
+                }
+                catch (Exception)
+                {
+                }
+            }
+            
+            return clone;
+        }
+        /// <summary>
+        /// Drops specified fields. Nonexisting fields are ignored.
+        /// </summary>
+        public static Dictionary<string, object> Drop(this Dictionary<string, object> dictionary, params string[] fieldPaths)
+        {
+            foreach (var fieldPath in fieldPaths)
+            {
+                var fieldNames = new [] { fieldPath };
+                var parentDictionary = dictionary;                
+                
+                // split field path to separate field name elements if necessary
+                if (fieldPath.Contains("."))
+                {
+                    fieldNames = fieldPath.Split('.');
+                }
+                
+                for (int i = 0; i < fieldNames.Length; i++)
+                {
+                    var fieldName = fieldNames[i];
+    
+                    // field is not present in dictionary - next field path iteration
+                    if (!parentDictionary.ContainsKey(fieldName))
+                    {
+                        break;
+                    }
+    
+                    // current field name is final - drop field
+                    if (i == (fieldNames.Length - 1))
+                    {                       
+                        parentDictionary.Remove(fieldName);
+                        
+                        break;
+                    }
+                    
+                    // descendant field is dictionary - set is as current parent dictionary
+                    if (parentDictionary[fieldName] is Dictionary<string, object>)
+                    {
+                        parentDictionary = (Dictionary<string, object>)parentDictionary[fieldName];
+                    }
+                    // can not continue with processing - next field path iteration
+                    else
+                    {
+                        break;
+                    }
+                } 
+            }
+            
+            return dictionary;
+        }
+        /// <summary>
         /// Merges fields from specified document into current dictionary. Field merge behavior depends on settings.
         /// </summary>
-        public static void Merge(this Dictionary<string, object> dictionary, Dictionary<string, object> document)
+        public static Dictionary<string, object> Merge(this Dictionary<string, object> dictionary, Dictionary<string, object> document)
         {
             dictionary.Merge(document, Dictator.Settings.MergeBehavior);
+            
+            return dictionary;
         }
-        
         /// <summary>
         /// Merges fields from specified document into current dictionary with given field merge behavior.
         /// </summary>
-        public static void Merge(this Dictionary<string, object> dictionary, Dictionary<string, object> document, MergeBehavior mergeBehavior)
+        public static Dictionary<string, object> Merge(this Dictionary<string, object> dictionary, Dictionary<string, object> document, MergeBehavior mergeBehavior)
         {
             foreach (var field in document)
             {
@@ -945,6 +1087,8 @@ namespace Arango.Client
                         break;
                 }
             }
+            
+            return dictionary;
         }
         
         #region Private methods
