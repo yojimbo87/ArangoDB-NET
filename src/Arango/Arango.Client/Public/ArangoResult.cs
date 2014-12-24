@@ -1,4 +1,5 @@
-﻿using Arango.Client.Protocol;
+﻿using System.Collections.Generic;
+using Arango.Client.Protocol;
 
 namespace Arango.Client
 {
@@ -8,6 +9,7 @@ namespace Arango.Client
         public int StatusCode { get; set; }
         public T Value { get; set; }
         public ArangoError Error { get; set; }
+        public Dictionary<string, object> Extra { get; set; }
         
         internal ArangoResult(Response response)
         {
