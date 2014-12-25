@@ -45,6 +45,14 @@ namespace Arango.Client
             }
         }
         
+        public ArangoFunction Function
+        {
+            get
+            {
+                return new ArangoFunction(_connection);
+            }
+        }
+        
         public ArangoQuery Query
         {
             get

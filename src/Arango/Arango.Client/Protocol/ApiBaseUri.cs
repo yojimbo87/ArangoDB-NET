@@ -4,6 +4,7 @@ namespace Arango.Client.Protocol
 {
     internal static class ApiBaseUri
     {
+        internal static string AqlFunction = "_api/aqlfunction";
         internal static string Collection = "_api/collection";
         internal static string Cursor = "_api/cursor";
         internal static string Database = "_api/database";
