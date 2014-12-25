@@ -115,11 +115,10 @@ namespace Arango.Tests
             var db = new ArangoDatabase(Database.Alias);
 
             var parseResult = db.Query
-                .Aql(string.Format(@"
+                .Parse(string.Format(@"
                 FOR item IN {0}
                     RETURN item
-                ", Database.TestDocumentCollectionName))
-                .Parse();
+                ", Database.TestDocumentCollectionName));
             
             Assert.AreEqual(200, parseResult.StatusCode);
             Assert.IsTrue(parseResult.Success);

@@ -71,8 +71,7 @@ namespace Arango.Client
             var bodyDocument = new Dictionary<string, object>();
             
             // required: AQL query string
-            _parameters.String(ParameterName.Query, _query.ToString());
-            Request.TrySetBodyParameter(ParameterName.Query, _parameters, bodyDocument);
+            bodyDocument.String(ParameterName.Query, _query.ToString());
             // optional: boolean flag that indicates whether the number of documents in the result set should be returned
             Request.TrySetBodyParameter(ParameterName.Count, _parameters, bodyDocument);
             // optional: maximum number of result documents to be transferred from the server to the client in one roundtrip
@@ -82,8 +81,7 @@ namespace Arango.Client
             // optional: key/value list of bind parameters
             if (_bindVars.Count > 0)
             {
-                _parameters.Document(ParameterName.BindVars, _bindVars);
-                Request.TrySetBodyParameter(ParameterName.Count, _parameters, bodyDocument);
+                bodyDocument.Document(ParameterName.BindVars, _bindVars);
             }
             
             // TODO: options parameter
@@ -143,14 +141,13 @@ namespace Arango.Client
         
         #region Parse (POST)
 
-        public ArangoResult<Dictionary<string, object>> Parse()
+        public ArangoResult<Dictionary<string, object>> Parse(string query)
         {
             var request = new Request(HttpMethod.POST, ApiBaseUri.Query, "");
             var bodyDocument = new Dictionary<string, object>();
             
             // required: AQL query string
-            _parameters.String(ParameterName.Query, _query.ToString());
-            Request.TrySetBodyParameter(ParameterName.Query, _parameters, bodyDocument);
+            bodyDocument.String(ParameterName.Query, CleanAqlString(query));
             
             request.Body = JSON.ToJSON(bodyDocument);
             
