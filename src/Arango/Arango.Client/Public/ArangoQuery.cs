@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Arango.Client.Protocol;
 using Arango.fastJSON;
@@ -63,8 +65,110 @@ namespace Arango.Client
         
         #endregion
         
-        #region ToList (POST)
+        #region ToDocument/ToDocuments
 
+        public ArangoResult<Dictionary<string, object>> ToDocument()
+        {
+            var type = typeof(Dictionary<string, object>);
+            var listResult = ToList();
+            var result = new ArangoResult<Dictionary<string, object>>();
+            
+            result.StatusCode = listResult.StatusCode;
+            result.Success = listResult.Success;
+            result.Extra = listResult.Extra;
+            result.Error = listResult.Error;
+            
+            if (listResult.Success && (listResult.Value != null))
+            {
+                result.Value = (Dictionary<string, object>)Convert.ChangeType(listResult.Value[0], type);
+            }
+            
+            return result;
+        }
+        
+        public ArangoResult<List<Dictionary<string, object>>> ToDocuments()
+        {
+            var type = typeof(Dictionary<string, object>);
+            var listResult = ToList();
+            var result = new ArangoResult<List<Dictionary<string, object>>>();
+            
+            result.StatusCode = listResult.StatusCode;
+            result.Success = listResult.Success;
+            result.Extra = listResult.Extra;
+            result.Error = listResult.Error;
+            
+            if (listResult.Success && (listResult.Value != null))
+            {
+                result.Value = listResult.Value.Select(o => Convert.ChangeType(o, type)).Cast<Dictionary<string, object>>().ToList();
+            }
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region ToObject
+
+        public ArangoResult<T> ToObject<T>()
+        {
+            var type = typeof(T);
+            var listResult = ToList();
+            var result = new ArangoResult<T>();
+            
+            result.StatusCode = listResult.StatusCode;
+            result.Success = listResult.Success;
+            result.Extra = listResult.Extra;
+            result.Error = listResult.Error;
+            
+            if (listResult.Success && (listResult.Value != null))
+            {
+                result.Value = (T)Convert.ChangeType(listResult.Value[0], type);
+            }
+            
+            return result;
+        }
+        
+        public ArangoResult<object> ToObject()
+        {
+            var listResult = ToList();
+            var result = new ArangoResult<object>();
+            
+            result.StatusCode = listResult.StatusCode;
+            result.Success = listResult.Success;
+            result.Extra = listResult.Extra;
+            result.Error = listResult.Error;
+            
+            if (listResult.Success && (listResult.Value != null))
+            {
+                result.Value = listResult.Value[0];
+            }
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region ToList (POST)
+        
+        public ArangoResult<List<T>> ToList<T>()
+        {
+            var type = typeof(T);
+            var listResult = ToList();
+            var result = new ArangoResult<List<T>>();
+            
+            result.StatusCode = listResult.StatusCode;
+            result.Success = listResult.Success;
+            result.Extra = listResult.Extra;
+            result.Error = listResult.Error;
+            
+            if (listResult.Success && (listResult.Value != null))
+            {
+                result.Value = listResult.Value.Select(o => Convert.ChangeType(o, type)).Cast<T>().ToList();
+            }
+            
+            return result;
+        }
+        
         public ArangoResult<List<object>> ToList()
         {
             var request = new Request(HttpMethod.POST, ApiBaseUri.Cursor, "");

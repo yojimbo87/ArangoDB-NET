@@ -11,6 +11,8 @@ namespace Arango.Client
         public ArangoError Error { get; set; }
         public Dictionary<string, object> Extra { get; set; }
         
+        internal ArangoResult() { }
+        
         internal ArangoResult(Response response)
         {
             StatusCode = response.StatusCode;

@@ -15,6 +15,118 @@ namespace Arango.Tests
 			Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
         }
         
+        #region ToDocument(s)
+        
+        [Test()]
+        public void Should_execute_AQL_query_with_document_result()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var queryResult = db.Query
+                .Aql(string.Format(@"
+                FOR item IN {0}
+                    LIMIT 1
+                    RETURN item
+                ", Database.TestDocumentCollectionName))
+                .ToDocument();
+
+            Assert.AreEqual(201, queryResult.StatusCode);
+            Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.Value.IsString("foo"));
+            Assert.IsTrue(queryResult.Value.IsLong("bar"));
+        }
+        
+        [Test()]
+        public void Should_execute_AQL_query_with_document_list_result()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var queryResult = db.Query
+                .Aql(string.Format(@"
+                FOR item IN {0}
+                    RETURN item
+                ", Database.TestDocumentCollectionName))
+                .ToDocuments();
+
+            Assert.AreEqual(201, queryResult.StatusCode);
+            Assert.IsTrue(queryResult.Success);
+            Assert.AreEqual(2, queryResult.Value.Count, 2);
+            Assert.IsTrue(queryResult.Value[0].IsString("foo"));
+            Assert.IsTrue(queryResult.Value[0].IsLong("bar"));
+            Assert.IsTrue(queryResult.Value[1].IsString("foo"));
+            Assert.IsTrue(queryResult.Value[1].IsLong("bar"));
+        }
+        
+        #endregion
+        
+        #region ToObject
+        
+        [Test()]
+        public void Should_execute_AQL_query_with_single_object_result()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var queryResult = db.Query
+                .Aql(string.Format(@"
+                FOR item IN {0}
+                    LIMIT 1
+                    RETURN item
+                ", Database.TestDocumentCollectionName))
+                .ToObject();
+
+            Assert.AreEqual(201, queryResult.StatusCode);
+            Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.Value != null);
+        }
+        
+        [Test()]
+        public void Should_execute_AQL_query_with_single_primitive_object_result()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var queryResult = db.Query
+                .Aql(string.Format(@"
+                FOR item IN {0}
+                    SORT item.bar
+                    LIMIT 1
+                    RETURN item.bar
+                ", Database.TestDocumentCollectionName))
+                .ToObject<int>();
+
+            Assert.AreEqual(201, queryResult.StatusCode);
+            Assert.IsTrue(queryResult.Success);
+            Assert.AreEqual(1, queryResult.Value);
+        }
+        
+        [Test()]
+        public void Should_execute_AQL_query_with_single_generic_object_result()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var queryResult = db.Query
+                .Aql(string.Format(@"
+                FOR item IN {0}
+                    SORT item.bar
+                    LIMIT 1
+                    RETURN item
+                ", Database.TestDocumentCollectionName))
+                .ToObject<Dictionary<string, object>>();
+
+            Assert.AreEqual(201, queryResult.StatusCode);
+            Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.Value.IsString("foo"));
+            Assert.IsTrue(queryResult.Value.IsLong("bar"));
+        }
+        
+        #endregion
+        
+        #region ToList
+        
         [Test()]
         public void Should_execute_AQL_query_with_list_result()
         {
@@ -30,11 +142,56 @@ namespace Arango.Tests
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
-            Assert.AreEqual(queryResult.Value.Count, 2);
+            Assert.AreEqual(2, queryResult.Value.Count);
         }
         
         [Test()]
-        public void Should_execute_AQL_query_with_list_count()
+        public void Should_execute_AQL_query_with_primitive_list_result()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var queryResult = db.Query
+                .Aql(string.Format(@"
+                FOR item IN {0}
+                    SORT item.bar
+                    RETURN item.bar
+                ", Database.TestDocumentCollectionName))
+                .ToList<int>();
+
+            Assert.AreEqual(201, queryResult.StatusCode);
+            Assert.IsTrue(queryResult.Success);
+            Assert.AreEqual(2, queryResult.Value.Count, 2);
+            Assert.AreEqual(1, queryResult.Value[0]);
+            Assert.AreEqual(2, queryResult.Value[1]);
+        }
+        
+        [Test()]
+        public void Should_execute_AQL_query_with_generic_list_result()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var queryResult = db.Query
+                .Aql(string.Format(@"
+                FOR item IN {0}
+                    RETURN item
+                ", Database.TestDocumentCollectionName))
+                .ToList<Dictionary<string, object>>();
+
+            Assert.AreEqual(201, queryResult.StatusCode);
+            Assert.IsTrue(queryResult.Success);
+            Assert.AreEqual(2, queryResult.Value.Count, 2);
+            Assert.IsTrue(queryResult.Value[0].IsString("foo"));
+            Assert.IsTrue(queryResult.Value[0].IsLong("bar"));
+            Assert.IsTrue(queryResult.Value[1].IsString("foo"));
+            Assert.IsTrue(queryResult.Value[1].IsLong("bar"));
+        }
+        
+        #endregion
+        
+        [Test()]
+        public void Should_execute_AQL_query_with_count()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
