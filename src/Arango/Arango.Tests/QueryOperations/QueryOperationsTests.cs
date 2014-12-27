@@ -103,7 +103,7 @@ namespace Arango.Tests
         }
         
         [Test()]
-        public void Should_execute_AQL_query_with_single_generic_object_result()
+        public void Should_execute_AQL_query_with_single_dictionary_object_result()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
@@ -121,6 +121,27 @@ namespace Arango.Tests
             Assert.IsTrue(queryResult.Success);
             Assert.IsTrue(queryResult.Value.IsString("foo"));
             Assert.IsTrue(queryResult.Value.IsLong("bar"));
+        }
+        
+        [Test()]
+        public void Should_execute_AQL_query_with_single_strongly_typed_object_result()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var queryResult = db.Query
+                .Aql(string.Format(@"
+                FOR item IN {0}
+                    SORT item.bar
+                    LIMIT 1
+                    RETURN item
+                ", Database.TestDocumentCollectionName))
+                .ToObject<Dummy>();
+
+            Assert.AreEqual(201, queryResult.StatusCode);
+            Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(documents.First(q => q.String("foo") == queryResult.Value.foo) != null);
+            Assert.IsTrue(documents.First(q => q.Int("bar") == queryResult.Value.bar) != null);
         }
         
         #endregion
@@ -167,7 +188,7 @@ namespace Arango.Tests
         }
         
         [Test()]
-        public void Should_execute_AQL_query_with_generic_list_result()
+        public void Should_execute_AQL_query_with_dictionary_list_result()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
             var db = new ArangoDatabase(Database.Alias);
@@ -181,11 +202,34 @@ namespace Arango.Tests
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
-            Assert.AreEqual(2, queryResult.Value.Count, 2);
+            Assert.AreEqual(2, queryResult.Value.Count);
             Assert.IsTrue(queryResult.Value[0].IsString("foo"));
             Assert.IsTrue(queryResult.Value[0].IsLong("bar"));
             Assert.IsTrue(queryResult.Value[1].IsString("foo"));
             Assert.IsTrue(queryResult.Value[1].IsLong("bar"));
+        }
+        
+        [Test()]
+        public void Should_execute_AQL_query_with_strongly_typed_list_result()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var queryResult = db.Query
+                .Aql(string.Format(@"
+                FOR item IN {0}
+                    SORT item.bar
+                    RETURN item
+                ", Database.TestDocumentCollectionName))
+                .ToList<Dummy>();
+
+            Assert.AreEqual(201, queryResult.StatusCode);
+            Assert.IsTrue(queryResult.Success);
+            Assert.AreEqual(2, queryResult.Value.Count);
+            Assert.AreEqual(documents[0].String("foo"), queryResult.Value[0].foo);
+            Assert.AreEqual(documents[0].Int("bar"), queryResult.Value[0].bar);
+            Assert.AreEqual(documents[1].String("foo"), queryResult.Value[1].foo);
+            Assert.AreEqual(documents[1].Int("bar"), queryResult.Value[1].bar);
         }
         
         #endregion

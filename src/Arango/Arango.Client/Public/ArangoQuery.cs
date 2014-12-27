@@ -111,8 +111,7 @@ namespace Arango.Client
 
         public ArangoResult<T> ToObject<T>()
         {
-            var type = typeof(T);
-            var listResult = ToList();
+            var listResult = ToList<T>();
             var result = new ArangoResult<T>();
             
             result.StatusCode = listResult.StatusCode;
@@ -122,7 +121,7 @@ namespace Arango.Client
             
             if (listResult.Success && (listResult.Value != null))
             {
-                result.Value = (T)Convert.ChangeType(listResult.Value[0], type);
+                result.Value = (T)listResult.Value[0];
             }
             
             return result;
@@ -163,7 +162,21 @@ namespace Arango.Client
             
             if (listResult.Success && (listResult.Value != null))
             {
-                result.Value = listResult.Value.Select(o => Convert.ChangeType(o, type)).Cast<T>().ToList();
+                if (type.IsPrimitive ||
+        		    (type == typeof(string)) ||
+	                (type == typeof(DateTime)) ||
+	                (type == typeof(decimal)))
+        		{
+        			result.Value = listResult.Value.Select(o => Convert.ChangeType(o, type)).Cast<T>().ToList();
+        		}
+                else if (type.IsClass && (type.Name != "String"))
+                {
+                    result.Value = listResult.Value.Select(o => ((Dictionary<string, object>)o).ToObject<T>()).ToList();
+                }
+                else
+        		{
+        			result.Value = listResult.Value.Select(o => Convert.ChangeType(o, type)).Cast<T>().ToList();
+        		}
             }
             
             return result;

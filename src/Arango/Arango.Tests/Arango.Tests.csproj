@@ -51,6 +51,7 @@
     <Compile Include="Database.cs" />
     <Compile Include="DatabaseOperations\DatabaseOperationsTests.cs" />
     <Compile Include="DocumentOperations\DocumentOperationsTests.cs" />
+    <Compile Include="Dummy.cs" />
     <Compile Include="EdgeOperations\EdgeOperationsTests.cs" />
     <Compile Include="FunctionOperations\FunctionOperationsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
