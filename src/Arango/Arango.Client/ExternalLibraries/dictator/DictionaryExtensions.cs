@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 
 namespace Arango.Client
 {
@@ -1090,6 +1091,13 @@ namespace Arango.Client
             
             return dictionary;
         }
+        /// <summary>
+        /// Converts current dictionary into strongly typed object.
+        /// </summary>
+        public static T ToObject<T>(this Dictionary<string, object> dictionary)
+        {
+            return (T)ConvertToObject(dictionary, typeof(T));
+        }
         
         #region Private methods
         
@@ -1181,6 +1189,157 @@ namespace Arango.Client
                     parentDictionary = newDictionary;
                 }
             }
+        }
+        /// <summary>
+        /// Converts specified dictionary into strongly typed object.
+        /// </summary>
+        static object ConvertToObject(Dictionary<string, object> dictionary, Type objectType)
+        {
+            var stronglyTypedObject = Activator.CreateInstance(objectType);
+            
+            if (objectType == typeof(Dictionary<string, object>))
+            {
+                foreach (var item in dictionary)
+                {
+                    (stronglyTypedObject as Dictionary<string, object>).Object(item.Key, item.Value);
+                }
+            }
+            else
+            {
+                foreach (var propertyInfo in objectType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                {
+                    object fieldValue = null;
+                    Type fieldType = null;
+                    
+                    if (dictionary.Has(propertyInfo.Name))
+                    {
+                        fieldValue = GetFieldValue(dictionary, propertyInfo.Name);
+                        
+                        if (fieldValue != null)
+                        {
+                            fieldType = fieldValue.GetType();
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                    
+                    if (propertyInfo.PropertyType == typeof(Dictionary<string, object>))
+                    {
+                        propertyInfo.SetValue(stronglyTypedObject, ConvertToObject((Dictionary<string, object>)fieldValue, propertyInfo.PropertyType), null);
+                    }
+                    // property is a collection
+                    else if ((propertyInfo.PropertyType.IsArray || propertyInfo.PropertyType.IsGenericType) && (fieldValue is IList))
+                    {
+                        var instance = Activator.CreateInstance(propertyInfo.PropertyType);
+                            
+                        propertyInfo.SetValue(
+                            stronglyTypedObject,
+                            ConvertToCollection(instance, (IList)fieldValue, propertyInfo.PropertyType),
+                            null
+                        );
+                    }
+                    // property is class except the string type since string values are parsed differently
+                    else if (propertyInfo.PropertyType.IsClass && (propertyInfo.PropertyType.Name != "String"))
+                    {
+                        if (fieldType == typeof(Dictionary<string, object>))
+                        {
+                            var instance = Activator.CreateInstance(propertyInfo.PropertyType);
+                            
+                            propertyInfo.SetValue(stronglyTypedObject, ConvertToObject((Dictionary<string, object>)fieldValue, propertyInfo.PropertyType), null);
+                        }
+                        else
+                        {
+                            propertyInfo.SetValue(stronglyTypedObject, fieldValue, null);
+                        }
+                    }
+                    // property is basic type
+                    else
+                    {
+                        if ((fieldValue == null) || (propertyInfo.PropertyType == fieldType))
+                        {
+                            propertyInfo.SetValue(stronglyTypedObject, fieldValue, null);
+                        } 
+                        else
+                        {
+                            propertyInfo.SetValue(stronglyTypedObject, Convert.ChangeType(fieldValue, propertyInfo.PropertyType), null);
+                        }
+                    }
+                }
+            }
+            
+            return stronglyTypedObject;
+        }
+        /// <summary>
+        /// Converts specified object into collection of items of specified type.
+        /// </summary>
+        static object ConvertToCollection(object collectionObject, IList collection, Type collectionType)
+        {
+            if (collection == null)
+            {
+                return null;
+            }
+            
+            if (collection.Count > 0)
+            {
+                // create instance of property type
+                var collectionInstance = Activator.CreateInstance(collectionType, collection.Count);
+
+                for (int i = 0; i < collection.Count; i++)
+                {
+                    var elementType = collection[i].GetType();
+                    
+                    // collection is simple array
+                    if (collectionType.IsArray)
+                    {
+                        ((IList)collectionObject).Add(collection[i]);
+                    }
+                    // collection is generic
+                    else if (collectionType.IsGenericType && (collection is IEnumerable))
+                    {
+                        // generic collection consists of basic types
+                        if (elementType.IsPrimitive ||
+                            (elementType == typeof(string)) ||
+                            (elementType == typeof(DateTime)) ||
+                            (elementType == typeof(decimal)))
+                        {
+                            ((IList)collectionObject).Add(collection[i]);
+                        }
+                        // generic collection consists of generic type which should be parsed
+                        else
+                        {
+                            // create instance object based on first element of generic collection
+                            var instance = Activator.CreateInstance(collectionType.GetGenericArguments().First(), null);
+                            var instanceType = instance.GetType();
+                            
+                            if (elementType == typeof(Dictionary<string, object>))
+                            {
+                                ((IList)collectionObject).Add(ConvertToObject((Dictionary<string, object>)collection[i], instanceType));
+                            }
+                            else
+                            {
+                                if (elementType == instanceType)
+                                {
+                                    ((IList)collectionObject).Add(collection[i]);
+                                } 
+                                else
+                                {
+                                    ((IList)collectionObject).Add(Convert.ChangeType(collection[i], collectionType));
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var obj = Activator.CreateInstance(elementType, collection[i]);
+
+                        ((IList)collectionObject).Add(obj);
+                    }
+                }
+            }
+            
+            return collectionObject;
         }
         
         #endregion
