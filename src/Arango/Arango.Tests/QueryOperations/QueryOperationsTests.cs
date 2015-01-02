@@ -286,6 +286,58 @@ namespace Arango.Tests
         }
         
         [Test()]
+        public void Should_execute_AQL_query_with_bindVar()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var queryResult = db.Query
+                .BindVar("barNumber", 1)
+                .Aql(string.Format(@"
+                FOR item IN {0}
+                    FILTER item.bar == @barNumber
+                    RETURN item
+                ", Database.TestDocumentCollectionName))
+                .ToList();
+
+            Assert.AreEqual(201, queryResult.StatusCode);
+            Assert.IsTrue(queryResult.Success);
+            Assert.AreEqual(queryResult.Value.Count, 1);
+        }
+        
+        [Test()]
+        public void Should_execute_AQL_query_fluent()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+            var useCount = true;
+            var useBatchSize = true;
+            
+            var queryOperation = db.Query
+                .Aql(string.Format(@"
+                FOR item IN {0}
+                    RETURN item
+                ", Database.TestDocumentCollectionName));
+            
+            if (useCount)
+            {
+                queryOperation.Count(true);
+            }
+            
+            if (useBatchSize)
+            {
+                queryOperation.BatchSize(1);
+            }
+            
+            var queryResult = queryOperation.ToList();
+
+            Assert.AreEqual(200, queryResult.StatusCode);
+            Assert.IsTrue(queryResult.Success);
+            Assert.AreEqual(queryResult.Value.Count, 2);
+            Assert.AreEqual(queryResult.Extra.Long("count"), 2);
+        }
+        
+        [Test()]
         public void Should_return_404_with_deleteCursor_operation()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
