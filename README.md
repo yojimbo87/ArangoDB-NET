@@ -15,8 +15,17 @@ ArangoDB-NET is a C# driver for [ArangoDB](https://www.arangodb.com/) NoSQL mult
   - [Retrieve current database](#retrieve-current-database)
   - [Retrieve accessible databases](#retrieve-accessible-databases)
   - [Retrieve all databases](#retrieve-all-databases)
+  - [Retrieve database collections](#retrieve-database-collections)
   - [Delete database](#delete-database)
 - [Collection operations]()
+  - [Create collection](#create-collection)
+  - [Retrieve collection](#retrieve-collection)
+  - [Retrieve collection properties](#)
+  - [Retrieve collection count](#)
+  - [Retrieve collection figures](#)
+  - [Retrieve collection revision](#)
+  - [Retrieve collection checksum](#)
+  - [](#)
 - [Document operations]()
 - [Edge operations]()
 - [AQL query cursors execution]()
@@ -88,9 +97,11 @@ JSON objects are by default represented as `Dictionary<string, object>`. In orde
 
 ## Database operations
 
-Database management operations can only be accessed via the default `_system` database.
+Most operations which are focused on management of database instances can only be performed through connection set to default `_system` database.
 
 ### Create database
+
+Creates new database with given name and optional user list.
 
 ```csharp
 var db = new ArangoDatabase("systemDatabaseAlias");
@@ -110,6 +121,8 @@ var createDatabaseResult2 = db.Create("myDatabase2", users),
 
 ### Retrieve current database
 
+Retrieves information about currently connected database.
+
 ```csharp
 var db = new ArangoDatabase("systemDatabaseAlias");
 
@@ -125,6 +138,8 @@ if (currentDatabaseResult.Success)
 ```
 
 ### Retrieve accessible databases
+
+Retrieves list of accessible databases which current user can access without specifying a different username or password.
 
 ```csharp
 var db = new ArangoDatabase("systemDatabaseAlias");
@@ -142,6 +157,8 @@ if (accessibleDatabasesResult.Success)
 
 ### Retrieve all databases
 
+Retrieves the list of all existing databases.
+
 ```csharp
 var db = new ArangoDatabase("systemDatabaseAlias");
 
@@ -156,7 +173,33 @@ if (allDatabasesResult.Success)
 }
 ```
 
+### Retrieve database collections
+
+Retrieves information about collections in current database connection.
+
+Applicable optional parameters:
+
+- `ExcludeSystem(bool value)` - indicates whether or not system collections should be excluded from the result
+
+```csharp
+var db = new ArangoDatabase("systemDatabaseAlias");
+
+var databaseCollectionsResult = db
+    .ExcludeSystem(true)
+    .GetAllCollections();
+    
+if (databaseCollectionsResult.Success)
+{
+    foreach (var collection in databaseCollectionsResult.Value)
+    {
+        var name = collection.String("name");
+    }
+}
+```
+
 ### Delete database
+
+Deletes specified database.
 
 ```csharp
 var db = new ArangoDatabase("systemDatabaseAlias");
@@ -168,3 +211,10 @@ if (deleteDatabaseResult.Success)
     var isDeleted = deleteDatabaseResult.Value;
 }
 ```
+
+## Collection operations
+
+Collection operations are focused on management of document and edge type collections within located in specific database.
+
+### Create collection
+
