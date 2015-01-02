@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using Arango.Client;
 
@@ -56,6 +57,33 @@ namespace Arango.Tests
             Assert.AreEqual(false, string.IsNullOrEmpty(resultCurrent.Value.String("id")));
             Assert.AreEqual(false, string.IsNullOrEmpty(resultCurrent.Value.String("path")));
             Assert.AreEqual(true, resultCurrent.Value.Bool("isSystem"));
+        }
+        
+        [Test()]
+        public void Should_get_database_collections()
+        {
+            Database.CleanupTestDatabases();
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
+
+            var getResult = db
+                .ExcludeSystem(true)
+                .GetAllCollections();
+            
+            Assert.AreEqual(200, getResult.StatusCode);
+            Assert.AreEqual(true, getResult.Success);
+            
+            var foundCreatedCollection = getResult.Value.FirstOrDefault(col => col.String("name") == createResult.Value.String("name"));
+            
+            Assert.IsNotNull(foundCreatedCollection);
+            
+            var foundSystemCollection = getResult.Value.FirstOrDefault(col => col.String("name") == "_system");
+            
+            Assert.IsNull(foundSystemCollection);
         }
         
         [Test()]

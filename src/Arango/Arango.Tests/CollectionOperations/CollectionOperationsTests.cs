@@ -302,32 +302,6 @@ namespace Arango.Tests
         }
         
         [Test()]
-        public void Should_all_collections()
-        {
-            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-
-            var db = new ArangoDatabase(Database.Alias);
-
-            var createResult = db.Collection
-                .Create(Database.TestDocumentCollectionName);
-
-            var getResult = db
-                .ExcludeSystem(true)
-                .GetAllCollections();
-            
-            Assert.AreEqual(200, getResult.StatusCode);
-            Assert.AreEqual(true, getResult.Success);
-            
-            var foundCreatedCollection = getResult.Value.FirstOrDefault(col => col.String("name") == createResult.Value.String("name"));
-            
-            Assert.IsNotNull(foundCreatedCollection);
-            
-            var foundSystemCollection = getResult.Value.FirstOrDefault(col => col.String("name") == "_system");
-            
-            Assert.IsNull(foundSystemCollection);
-        }
-        
-        [Test()]
         public void Should_load_collection()
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
