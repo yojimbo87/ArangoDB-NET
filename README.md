@@ -105,23 +105,26 @@ Driver is heavily using [fluent API](http://en.wikipedia.org/wiki/Fluent_interfa
 ```csharp
 // initialize new database context
 var db = new ArangoDatabase("myDatabaseAlias");
-            
+// operation core
 var queryOperation = db.Query
     .Aql("FOR item IN myCollection RETURN item");
 
+// add optional parameter
 if (... condition whether to use count query parameter ...)
 {
     queryOperation.Count(true);
 }
 
+// add another optional parameter
 if (... condition whether to use batch size query parameter ...)
 {
     queryOperation.BatchSize(1);
 }
 
+// execute query operation
 var queryResult1 = queryOperation.ToList();
 
-// more concise query operation
+// more concise example of query operation
 var queryResult2 = db.Query
     .Count(true)
     .BatchSize(1)
