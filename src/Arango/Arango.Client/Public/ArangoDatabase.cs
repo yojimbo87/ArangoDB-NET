@@ -11,6 +11,9 @@ namespace Arango.Client
         
         #region Parameters
         
+        /// <summary>
+        /// Indicates whether or not system collections should be excluded from the result.
+        /// </summary>
         public ArangoDatabase ExcludeSystem(bool value)
         {
             // string because value will be stored in query string
@@ -61,148 +64,27 @@ namespace Arango.Client
             }
         }
         
+        /// <summary>
+        /// Initializes new database context to perform operations on remote database identified by specified alias.
+        /// </summary>
         public ArangoDatabase(string alias)
         {
             _connection = ArangoSettings.GetConnection(alias);
         }
         
-        #region Get current database (GET)
-        
-        public ArangoResult<Dictionary<string, object>> GetCurrent()
-        {
-            var request = new Request(HttpMethod.GET, ApiBaseUri.Database, "/current");
-            
-            var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
-            
-            switch (response.StatusCode)
-            {
-                case 200:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Success = true;
-                        result.Value = (response.Data as Dictionary<string, object>).Document("result");
-                    }
-                    break;
-                case 400:
-                case 404:
-                default:
-                    // Arango error
-                    break;
-            }
-            
-            _parameters.Clear();
-            
-            return result;
-        }
-        
-        #endregion
-        
-        #region Get list of accessible databases (GET)
-        
-        public ArangoResult<List<string>> GetAccessibleDatabases()
-        {
-            var request = new Request(HttpMethod.GET, ApiBaseUri.Database, "/user");
-            
-            var response = _connection.Send(request);
-            var result = new ArangoResult<List<string>>(response);
-            
-            switch (response.StatusCode)
-            {
-                case 200:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Success = true;
-                        result.Value = (response.Data as Dictionary<string, object>).List<string>("result");
-                    }
-                    break;
-                case 400:
-                default:
-                    // Arango error
-                    break;
-            }
-            
-            _parameters.Clear();
-            
-            return result;
-        }
-        
-        #endregion
-        
-        #region Get list of all databases (GET)
-        
-        public ArangoResult<List<string>> GetAllDatabases()
-        {
-            var request = new Request(HttpMethod.GET, ApiBaseUri.Database, "");
-            
-            var response = _connection.Send(request);
-            var result = new ArangoResult<List<string>>(response);
-            
-            switch (response.StatusCode)
-            {
-                case 200:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Success = true;
-                        result.Value = (response.Data as Dictionary<string, object>).List<string>("result");
-                    }
-                    break;
-                case 400:
-                case 403:
-                default:
-                    // Arango error
-                    break;
-            }
-            
-            _parameters.Clear();
-            
-            return result;
-        }
-        
-        #endregion
-        
-        #region Get list of all collections (GET)
-        
-        public ArangoResult<List<Dictionary<string, object>>> GetAllCollections()
-        {
-            var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "");
-            
-            // optional: whether or not system collections should be excluded from the result
-            request.TrySetQueryStringParameter(ParameterName.ExcludeSystem, _parameters);
-            
-            var response = _connection.Send(request);
-            var result = new ArangoResult<List<Dictionary<string, object>>>(response);
-            
-            switch (response.StatusCode)
-            {
-                case 200:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Success = true;
-                        result.Value = (response.Data as Dictionary<string, object>).List<Dictionary<string, object>>("collections");
-                    }
-                    break;
-                case 400:
-                case 403:
-                default:
-                    // Arango error
-                    break;
-            }
-            
-            _parameters.Clear();
-            
-            return result;
-        }
-        
-        #endregion
-        
         #region Create database (POST)
         
+        /// <summary>
+        /// Creates new database with given name.
+        /// </summary>
         public ArangoResult<bool> Create(string databaseName)
         {
             return Create(databaseName, null);
         }
         
+        /// <summary>
+        /// Creates new database with given name and user list.
+        /// </summary>
         public ArangoResult<bool> Create(string databaseName, List<ArangoUser> users)
         {
             var request = new Request(HttpMethod.POST, ApiBaseUri.Database, "");
@@ -272,8 +154,153 @@ namespace Arango.Client
         
         #endregion
         
+        #region Get current database (GET)
+        
+        /// <summary>
+        /// Retrieves information about currently connected database.
+        /// </summary>
+        public ArangoResult<Dictionary<string, object>> GetCurrent()
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Database, "/current");
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<Dictionary<string, object>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>).Document("result");
+                    }
+                    break;
+                case 400:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Get list of accessible databases (GET)
+        
+        /// <summary>
+        /// Retrieves list of accessible databases which current user can access without specifying a different username or password.
+        /// </summary>
+        public ArangoResult<List<string>> GetAccessibleDatabases()
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Database, "/user");
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<List<string>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>).List<string>("result");
+                    }
+                    break;
+                case 400:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Get list of all databases (GET)
+        
+        /// <summary>
+        /// Retrieves the list of all existing databases.
+        /// </summary>
+        public ArangoResult<List<string>> GetAllDatabases()
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Database, "");
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<List<string>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>).List<string>("result");
+                    }
+                    break;
+                case 400:
+                case 403:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Get list of all collections (GET)
+        
+        /// <summary>
+        /// Retrieves information about collections in current database connection.
+        /// </summary>
+        public ArangoResult<List<Dictionary<string, object>>> GetAllCollections()
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "");
+            
+            // optional: indicates whether or not system collections should be excluded from the result
+            request.TrySetQueryStringParameter(ParameterName.ExcludeSystem, _parameters);
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<List<Dictionary<string, object>>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>).List<Dictionary<string, object>>("collections");
+                    }
+                    break;
+                case 400:
+                case 403:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
         #region Drop database (DELETE)
         
+        /// <summary>
+        /// Deletes specified database.
+        /// </summary>
         public ArangoResult<bool> Drop(string databaseName)
         {
             var request = new Request(HttpMethod.DELETE, ApiBaseUri.Database, "/" + databaseName);
