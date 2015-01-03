@@ -9,7 +9,7 @@ namespace Arango.Tests
     [TestFixture()]
     public class CollectionOperationsTests : IDisposable
     {
-        #region Create collections
+        #region Create operations
     	
         [Test()]
         public void Should_create_document_collection()
@@ -103,45 +103,7 @@ namespace Arango.Tests
         
         #endregion
         
-        [Test()]
-        public void Should_delete_collection()
-        {
-            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-
-            var db = new ArangoDatabase(Database.Alias);
-
-            var createResult = db.Collection
-                .Create(Database.TestDocumentCollectionName);
-            
-            var deleteResult = db.Collection
-                .Delete(createResult.Value.String("name"));
-            
-            Assert.AreEqual(200, deleteResult.StatusCode);
-            Assert.AreEqual(true, deleteResult.Success);
-            Assert.AreEqual(createResult.Value.String("id"), deleteResult.Value.String("id"));
-        }
-        
-        [Test()]
-        public void Should_truncate_collection()
-        {
-            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-
-            var db = new ArangoDatabase(Database.Alias);
-
-            var createResult = db.Collection
-                .Create(Database.TestDocumentCollectionName);
-
-            var clearResult = db.Collection
-                .Truncate(createResult.Value.String("name"));
-            
-            Assert.AreEqual(200, clearResult.StatusCode);
-            Assert.AreEqual(true, clearResult.Success);
-            Assert.AreEqual(createResult.Value.String("id"), clearResult.Value.String("id"));
-            Assert.AreEqual(createResult.Value.String("name"), clearResult.Value.String("name"));
-            Assert.AreEqual(createResult.Value.Bool("isSystem"), clearResult.Value.Bool("isSystem"));
-            Assert.AreEqual(createResult.Value.Int("status"), clearResult.Value.Int("status"));
-            Assert.AreEqual(createResult.Value.Int("type"), clearResult.Value.Int("type"));
-        }
+        #region Get operations
         
         [Test()]
         public void Should_get_collection()
@@ -302,6 +264,114 @@ namespace Arango.Tests
         }
         
         [Test()]
+        public void Should_get_all_documents_in_collection()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+            Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
+            Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+
+            var db = new ArangoDatabase(Database.Alias);
+            
+            var operationResult = db.Collection
+                .GetAllDocuments(Database.TestDocumentCollectionName);
+            
+            Assert.AreEqual(200, operationResult.StatusCode);
+            Assert.IsTrue(operationResult.Success);
+            Assert.AreEqual(operationResult.Value.Count, 2);
+            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
+            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
+        }
+        
+        [Test()]
+        public void Should_get_all_document_IDs_in_collection()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+            Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
+            Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+
+            var db = new ArangoDatabase(Database.Alias);
+            
+            var operationResult = db.Collection
+                .ReturnListType(ArangoReturnListType.ID)
+                .GetAllDocuments(Database.TestDocumentCollectionName);
+            
+            Assert.AreEqual(200, operationResult.StatusCode);
+            Assert.IsTrue(operationResult.Success);
+            Assert.AreEqual(operationResult.Value.Count, 2);
+            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
+            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
+        }
+        
+        [Test()]
+        public void Should_get_all_document_keys_in_collection()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+            Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
+            Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+
+            var db = new ArangoDatabase(Database.Alias);
+            
+            var operationResult = db.Collection
+                .ReturnListType(ArangoReturnListType.Key)
+                .GetAllDocuments(Database.TestDocumentCollectionName);
+            
+            Assert.AreEqual(200, operationResult.StatusCode);
+            Assert.IsTrue(operationResult.Success);
+            Assert.AreEqual(operationResult.Value.Count, 2);
+            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
+            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
+        }
+        
+        [Test()]
+        public void Should_get_all_edges_in_collection()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+            Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
+            Database.CreateTestCollection(Database.TestEdgeCollectionName, ArangoCollectionType.Edge);
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+
+            var db = new ArangoDatabase(Database.Alias);
+            
+            db.Edge.Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"));
+            db.Edge.Create(Database.TestEdgeCollectionName, documents[1].String("_id"), documents[0].String("_id"));
+            
+            var operationResult = db.Collection
+                .GetAllEdges(Database.TestEdgeCollectionName);
+            
+            Assert.AreEqual(200, operationResult.StatusCode);
+            Assert.IsTrue(operationResult.Success);
+            Assert.AreEqual(operationResult.Value.Count, 2);
+            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
+            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
+        }
+        
+        #endregion
+        
+        #region Update/change operations
+        
+        [Test()]
+        public void Should_truncate_collection()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+
+            var db = new ArangoDatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
+
+            var clearResult = db.Collection
+                .Truncate(createResult.Value.String("name"));
+            
+            Assert.AreEqual(200, clearResult.StatusCode);
+            Assert.AreEqual(true, clearResult.Success);
+            Assert.AreEqual(createResult.Value.String("id"), clearResult.Value.String("id"));
+            Assert.AreEqual(createResult.Value.String("name"), clearResult.Value.String("name"));
+            Assert.AreEqual(createResult.Value.Bool("isSystem"), clearResult.Value.Bool("isSystem"));
+            Assert.AreEqual(createResult.Value.Int("status"), clearResult.Value.Int("status"));
+            Assert.AreEqual(createResult.Value.Int("type"), clearResult.Value.Int("type"));
+        }
+        
+        [Test()]
         public void Should_load_collection()
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
@@ -441,91 +511,29 @@ namespace Arango.Tests
             Assert.IsFalse(operationResult.Success);
         }
         
-        #region Get all documents
+        #endregion
+        
+        #region Delete operations
         
         [Test()]
-        public void Should_get_all_documents_in_collection()
+        public void Should_delete_collection()
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-            Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
-            Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
 
             var db = new ArangoDatabase(Database.Alias);
-            
-            var operationResult = db.Collection
-                .GetAllDocuments(Database.TestDocumentCollectionName);
-            
-            Assert.AreEqual(200, operationResult.StatusCode);
-            Assert.IsTrue(operationResult.Success);
-            Assert.AreEqual(operationResult.Value.Count, 2);
-            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
-            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
-        }
-        
-        [Test()]
-        public void Should_get_all_document_IDs_in_collection()
-        {
-            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-            Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
-            Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var createResult = db.Collection
+                .Create(Database.TestDocumentCollectionName);
             
-            var operationResult = db.Collection
-                .ReturnListType(ArangoReturnListType.ID)
-                .GetAllDocuments(Database.TestDocumentCollectionName);
+            var deleteResult = db.Collection
+                .Delete(createResult.Value.String("name"));
             
-            Assert.AreEqual(200, operationResult.StatusCode);
-            Assert.IsTrue(operationResult.Success);
-            Assert.AreEqual(operationResult.Value.Count, 2);
-            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
-            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
-        }
-        
-        [Test()]
-        public void Should_get_all_document_keys_in_collection()
-        {
-            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-            Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
-            Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-
-            var db = new ArangoDatabase(Database.Alias);
-            
-            var operationResult = db.Collection
-                .ReturnListType(ArangoReturnListType.Key)
-                .GetAllDocuments(Database.TestDocumentCollectionName);
-            
-            Assert.AreEqual(200, operationResult.StatusCode);
-            Assert.IsTrue(operationResult.Success);
-            Assert.AreEqual(operationResult.Value.Count, 2);
-            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
-            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
+            Assert.AreEqual(200, deleteResult.StatusCode);
+            Assert.AreEqual(true, deleteResult.Success);
+            Assert.AreEqual(createResult.Value.String("id"), deleteResult.Value.String("id"));
         }
         
         #endregion
-        
-        [Test()]
-        public void Should_get_all_edges_in_collection()
-        {
-            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-            Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
-            Database.CreateTestCollection(Database.TestEdgeCollectionName, ArangoCollectionType.Edge);
-            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-
-            var db = new ArangoDatabase(Database.Alias);
-            
-            db.Edge.Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"));
-            db.Edge.Create(Database.TestEdgeCollectionName, documents[1].String("_id"), documents[0].String("_id"));
-            
-            var operationResult = db.Collection
-                .GetAllEdges(Database.TestEdgeCollectionName);
-            
-            Assert.AreEqual(200, operationResult.StatusCode);
-            Assert.IsTrue(operationResult.Success);
-            Assert.AreEqual(operationResult.Value.Count, 2);
-            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
-            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
-        }
         
         public void Dispose()
         {
