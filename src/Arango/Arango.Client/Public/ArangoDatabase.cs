@@ -12,7 +12,7 @@ namespace Arango.Client
         #region Parameters
         
         /// <summary>
-        /// Indicates whether or not system collections should be excluded from the result.
+        /// Determines whether system collections should be excluded from the result.
         /// </summary>
         public ArangoDatabase ExcludeSystem(bool value)
         {
@@ -267,7 +267,7 @@ namespace Arango.Client
         {
             var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "");
             
-            // optional: indicates whether or not system collections should be excluded from the result
+            // optional
             request.TrySetQueryStringParameter(ParameterName.ExcludeSystem, _parameters);
             
             var response = _connection.Send(request);
