@@ -5,7 +5,6 @@ ArangoDB-NET is a C# driver for [ArangoDB](https://www.arangodb.com/) NoSQL mult
 ## Docs contents
 
 - [Installation](#installation)
-- [Connection management](#connection-management)
 - [Basic usage](docs/BasicUsage.md)
   - [Connection management](docs/BasicUsage.md#connection-management)
   - [Database context](docs/BasicUsage.md#database-context)
