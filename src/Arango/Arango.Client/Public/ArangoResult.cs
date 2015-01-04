@@ -46,7 +46,7 @@ namespace Arango.Client
         /// </summary>
         public Dictionary<string, object> Extra { get; set; }
         
-        internal ArangoResult() { }
+        public ArangoResult() { }
         
         internal ArangoResult(Response response)
         {

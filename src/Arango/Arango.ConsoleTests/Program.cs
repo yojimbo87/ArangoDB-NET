@@ -19,6 +19,7 @@ namespace Arango.ConsoleTests
                 "_system"
             );
             
+            ValueTypeNullCheck();
             //GetCurrentDatabase();
             //GetAccessibleDatabases();
             //GetAllDatabases();
@@ -29,6 +30,15 @@ namespace Arango.ConsoleTests
             
             Console.Write("Press any key to continue . . . ");
             Console.ReadKey(true);
+        }
+        
+        static void ValueTypeNullCheck()
+        {
+            var result = new ArangoResult<bool>();
+            result.Success = true;
+            result.Value = true;
+
+            Console.WriteLine(result.HasValue);
         }
         
         static void GetCurrentDatabase()
