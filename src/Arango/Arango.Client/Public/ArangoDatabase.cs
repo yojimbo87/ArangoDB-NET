@@ -24,6 +24,9 @@ namespace Arango.Client
         
         #endregion
         
+        /// <summary>
+        /// Provides access to collection operations in current database context.
+        /// </summary>
         public ArangoCollection Collection
         {
             get
@@ -32,6 +35,9 @@ namespace Arango.Client
             }
         }
         
+        /// <summary>
+        /// Provides access to document operations in current database context.
+        /// </summary>
         public ArangoDocument Document
         {
             get
@@ -40,6 +46,9 @@ namespace Arango.Client
             }
         }
         
+        /// <summary>
+        /// Provides access to edge operations in current database context.
+        /// </summary>
         public ArangoEdge Edge
         {
             get
