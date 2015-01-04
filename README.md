@@ -56,7 +56,7 @@ There are following ways to install the driver:
   - [Create edge](docs/EdgeOperations.md#create-edge)
   - [Check edge existence](docs/EdgeOperations.md#check-edge-existence)
   - [Retrieve edge](docs/EdgeOperations.md#retrieve-edge)
-  - [Retrieve vertex edges](docs/EdgeOperations.md#retrieve-vertex-edge)
+  - [Retrieve vertex edges](docs/EdgeOperations.md#retrieve-vertex-edges)
   - [Update edge](docs/EdgeOperations.md#update-edge)
   - [Replace edge](docs/EdgeOperations.md#replace-edge)
   - [Delete edge](docs/EdgeOperations.md#delete-edge)

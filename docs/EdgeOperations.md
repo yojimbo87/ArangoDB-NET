@@ -3,7 +3,7 @@
 - [Create edge](#create-edge)
 - [Check edge existence](#check-edge-existence)
 - [Retrieve edge](#retrieve-edge)
-- [Retrieve vertex edges](#retrieve-vertex-edge)
+- [Retrieve vertex edges](#retrieve-vertex-edges)
 - [Update edge](#update-edge)
 - [Replace edge](#replace-edge)
 - [Delete edge](#delete-edge)
