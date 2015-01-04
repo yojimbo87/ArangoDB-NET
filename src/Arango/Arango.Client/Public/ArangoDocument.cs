@@ -16,6 +16,9 @@ namespace Arango.Client
         
         #region Parameters
         
+        /// <summary>
+        /// Determines whether collection should be created if it does not exist. Default value: false.
+        /// </summary>
         public ArangoDocument CreateCollection(bool value)
         {
             // needs to be string value
@@ -24,6 +27,20 @@ namespace Arango.Client
         	return this;
         }
         
+        /// <summary>
+        /// Determines whether or not to wait until data are synchronised to disk. Default value: false.
+        /// </summary>
+        public ArangoDocument WaitForSync(bool value)
+        {
+            // needs to be string value
+            _parameters.String(ParameterName.WaitForSync, value.ToString().ToLower());
+        	
+        	return this;
+        }
+        
+        /// <summary>
+        /// Conditionally operate on document with specified revision.
+        /// </summary>
         public ArangoDocument IfMatch(string revision)
         {
             _parameters.String(ParameterName.IfMatch, revision);
@@ -31,6 +48,9 @@ namespace Arango.Client
         	return this;
         }
         
+        /// <summary>
+        /// Conditionally operate on document with specified revision and update policy.
+        /// </summary>
         public ArangoDocument IfMatch(string revision, ArangoUpdatePolicy updatePolicy)
         {
             _parameters.String(ParameterName.IfMatch, revision);
@@ -40,6 +60,9 @@ namespace Arango.Client
         	return this;
         }
         
+        /// <summary>
+        /// Conditionally operate on document which current revision does not match specified revision.
+        /// </summary>
         public ArangoDocument IfNoneMatch(string revision)
         {
             _parameters.String(ParameterName.IfNoneMatch, revision);
@@ -47,6 +70,9 @@ namespace Arango.Client
         	return this;
         }
         
+        /// <summary>
+        /// Determines whether to keep any attributes from existing document that are contained in the patch document which contains null value. Default value: true.
+        /// </summary>
         public ArangoDocument KeepNull(bool value)
         {
             // needs to be string value
@@ -55,6 +81,9 @@ namespace Arango.Client
         	return this;
         }
         
+        /// <summary>
+        /// Determines whether the value in the patch document will overwrite the existing document's value. Default value: true.
+        /// </summary>
         public ArangoDocument MergeArrays(bool value)
         {
             // needs to be string value
@@ -63,23 +92,109 @@ namespace Arango.Client
         	return this;
         }
         
-        public ArangoDocument WaitForSync(bool value)
+        #endregion
+        
+        #region Create (POST)
+        
+        /// <summary>
+        /// Creates new document within specified collection in current database context.
+        /// </summary>
+        public ArangoResult<Dictionary<string, object>> Create(string collection, Dictionary<string, object> document)
         {
-            // needs to be string value
-            _parameters.String(ParameterName.WaitForSync, value.ToString().ToLower());
-        	
-        	return this;
+            var request = new Request(HttpMethod.POST, ApiBaseUri.Document, "");
+            
+            // required
+            request.QueryString.Add(ParameterName.Collection, collection);
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.CreateCollection, _parameters);
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
+
+            request.Body = JSON.ToJSON(document);
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<Dictionary<string, object>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 201:
+                case 202:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = (response.Data as Dictionary<string, object>);
+                    }
+                    break;
+                case 400:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Check (HEAD)
+        
+        /// <summary>
+        /// Checks for existence of specified document.
+        /// </summary>
+        public ArangoResult<string> Check(string handle)
+        {
+            var request = new Request(HttpMethod.HEAD, ApiBaseUri.Document, "/" + handle);
+            
+            // optional
+            request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
+            // optional: If revision is different -> HTTP 200. If revision is identical -> HTTP 304.
+            request.TrySetHeaderParameter(ParameterName.IfNoneMatch, _parameters);
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<string>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if ((response.Headers["ETag"] ?? "").Trim().Length > 0)
+                    {
+                        result.Success = true;
+                        result.Value = response.Headers["ETag"].Replace("\"", "");
+                    }
+                    break;
+                case 304:
+                case 412:
+                    if ((response.Headers["ETag"] ?? "").Trim().Length > 0)
+                    {
+                        result.Value = response.Headers["ETag"].Replace("\"", "");
+                    }
+                    break;
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
         }
         
         #endregion
         
         #region Get (GET)
         
+        /// <summary>
+        /// Retrieves specified document.
+        /// </summary>
         public ArangoResult<Dictionary<string, object>> Get(string handle)
         {
             var request = new Request(HttpMethod.GET, ApiBaseUri.Document, "/" + handle);
             
-            // optional: conditionally fetch a document based on a target revision
+            // optional
             request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
             // optional: If revision is different -> HTTP 200. If revision is identical -> HTTP 304.
             request.TrySetHeaderParameter(ParameterName.IfNoneMatch, _parameters);
@@ -116,64 +231,29 @@ namespace Arango.Client
         
         #endregion
         
-        #region Create (POST)
+        #region Update (PATCH)
         
-        public ArangoResult<Dictionary<string, object>> Create(string collection, Dictionary<string, object> document)
+        /// <summary>
+        /// Updates existing document identified by its handle with new document data.
+        /// </summary>
+        public ArangoResult<Dictionary<string, object>> Update(string handle, Dictionary<string, object> document)
         {
-            var request = new Request(HttpMethod.POST, ApiBaseUri.Document, "");
+            var request = new Request(HttpMethod.PATCH, ApiBaseUri.Document, "/" + handle);
             
-            // required: target collection name
-            request.QueryString.Add(ParameterName.Collection, collection);
-            // optional: determines if target collection should be created if it doesn't exist
-            request.TrySetQueryStringParameter(ParameterName.CreateCollection, _parameters);
-            // optional: wait until data are synchronised to disk
+            // optional
             request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
-            // required: document to be created
-            request.Body = JSON.ToJSON(document);
-            
-            var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
-            
-            switch (response.StatusCode)
-            {
-                case 201:
-                case 202:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Success = true;
-                        result.Value = (response.Data as Dictionary<string, object>);
-                    }
-                    break;
-                case 400:
-                case 404:
-                default:
-                    // Arango error
-                    break;
-            }
-            
-            _parameters.Clear();
-            
-            return result;
-        }
-        
-        #endregion
-        
-        #region Replace (PUT)
-        
-        public ArangoResult<Dictionary<string, object>> Replace(string handle, Dictionary<string, object> document)
-        {
-            var request = new Request(HttpMethod.PUT, ApiBaseUri.Document, "/" + handle);
-            
-            // optional: conditionally replace a document based on a target revision id
+            // optional
             request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
-            // optional: if revision was provided - check the presence of update policy parameter
+            // optional
             if (_parameters.Has(ParameterName.IfMatch))
             {
                 request.TrySetQueryStringParameter(ParameterName.Policy, _parameters);
             }
-            // optional: wait until data are synchronised to disk
-            request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
-            // required: serialize replacing document
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.KeepNull, _parameters);
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.MergeArrays, _parameters);
+
             request.Body = JSON.ToJSON(document);
             
             var response = _connection.Send(request);
@@ -209,28 +289,25 @@ namespace Arango.Client
         
         #endregion
         
-        #region Update (PATCH)
+        #region Replace (PUT)
         
-        public ArangoResult<Dictionary<string, object>> Update(string handle, Dictionary<string, object> document)
+        /// <summary>
+        /// Completely replaces existing document identified by its handle with new document data.
+        /// </summary>
+        public ArangoResult<Dictionary<string, object>> Replace(string handle, Dictionary<string, object> document)
         {
-            var request = new Request(HttpMethod.PATCH, ApiBaseUri.Document, "/" + handle);
+            var request = new Request(HttpMethod.PUT, ApiBaseUri.Document, "/" + handle);
             
-            // optional: conditionally update a document based on a target revision id
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
+            // optional
             request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
-            // optional: if revision was provided - check the presence of update policy parameter
+            // optional
             if (_parameters.Has(ParameterName.IfMatch))
             {
                 request.TrySetQueryStringParameter(ParameterName.Policy, _parameters);
             }
-            // optional: remove any attributes from the existing document that are contained in the patch document 
-            // with an attribute value of null
-            request.TrySetQueryStringParameter(ParameterName.KeepNull, _parameters);
-            // optional: If set to false, the value in the patch document will overwrite the existing document's value. 
-            // If set to true, arrays will be merged.
-            request.TrySetQueryStringParameter(ParameterName.MergeArrays, _parameters);
-            // optional: wait until data are synchronised to disk
-            request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
-            // required: serialize updating document
+            
             request.Body = JSON.ToJSON(document);
             
             var response = _connection.Send(request);
@@ -268,19 +345,22 @@ namespace Arango.Client
         
         #region Delete (DELETE)
         
+        /// <summary>
+        /// Deletes specified document.
+        /// </summary>
         public ArangoResult<Dictionary<string, object>> Delete(string handle)
         {
             var request = new Request(HttpMethod.DELETE, ApiBaseUri.Document, "/" + handle);
             
-            // optional: conditionally replace a document based on a target revision id
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
+            // optional
             request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
-            // optional: if revision was provided - check the presence of update policy parameter
+            // optional
             if (_parameters.Has(ParameterName.IfMatch))
             {
                 request.TrySetQueryStringParameter(ParameterName.Policy, _parameters);
             }
-            // optional: wait until data are synchronised to disk
-            request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
             
             var response = _connection.Send(request);
             var result = new ArangoResult<Dictionary<string, object>>(response);
@@ -299,49 +379,6 @@ namespace Arango.Client
                     if (response.DataType == DataType.Document)
                     {
                         result.Value = (response.Data as Dictionary<string, object>);
-                    }
-                    break;
-                case 404:
-                default:
-                    // Arango error
-                    break;
-            }
-            
-            _parameters.Clear();
-            
-            return result;
-        }
-        
-        #endregion
-        
-        #region Check (HEAD)
-        
-        public ArangoResult<string> Check(string handle)
-        {
-            var request = new Request(HttpMethod.HEAD, ApiBaseUri.Document, "/" + handle);
-            
-            // optional: conditionally fetch a document based on a target revision
-            request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
-            // optional: If revision is different -> HTTP 200. If revision is identical -> HTTP 304.
-            request.TrySetHeaderParameter(ParameterName.IfNoneMatch, _parameters);
-            
-            var response = _connection.Send(request);
-            var result = new ArangoResult<string>(response);
-            
-            switch (response.StatusCode)
-            {
-                case 200:
-                    if ((response.Headers["ETag"] ?? "").Trim().Length > 0)
-                    {
-                        result.Success = true;
-                        result.Value = response.Headers["ETag"].Replace("\"", "");
-                    }
-                    break;
-                case 304:
-                case 412:
-                    if ((response.Headers["ETag"] ?? "").Trim().Length > 0)
-                    {
-                        result.Value = response.Headers["ETag"].Replace("\"", "");
                     }
                     break;
                 case 404:
