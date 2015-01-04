@@ -47,20 +47,20 @@ var getResult = db.Document.Get("myCollection/123");
 
 Once the operation is executed, returned data are contained within `ArangoResult` object which consists of following properties:
 
-- `Success` - boolean value indicating if the operation ended with success
-- `StatusCode` - integer value of the operation response HTTP status code 
-- `Value` - generic object which type and value depends on performed operation
-- `Error` - if operation ended with failure, this property would contain instance of `ArangoError` object which contains further information about the error
-- `Extra` - `Dictionary<string, object>` which might contain additional information on performed operation
+- `Success` - Determines whether the operation ended with success.
+- `StatusCode` - Integer value of the operation response HTTP status code.
+- `Value` - Generic object which type and value depends on performed operation.
+- `Error` - If operation ended with failure, this property would contain instance of `ArangoError` object which contains further information about the error.
+- `Extra` - Document which might contain additional information on performed operation.
 
 ## ArangoError object
 
 In case of operation failure driver doesn't throw exceptions explicitely, but `ArangoResult` object `Error` property would contain instance of `ArangoError` object with following properties:
 
-- `StatusCode` - integer value of the operation response HTTP status code 
-- `Number` - integer value indicating [ArangoDB internal error code](https://docs.arangodb.com/ErrorCodes/README.html)
-- `Message` - string value containing error description
-- `Exception` - exception object with further information about failure
+- `StatusCode` - Integer value of the operation response HTTP status code.
+- `Number` - Integer value indicating [ArangoDB internal error code](https://docs.arangodb.com/ErrorCodes/README.html).
+- `Message` - String value containing error description.
+- `Exception` - Exception object with further information about failure.
 
 ## JSON representation
 
