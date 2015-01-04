@@ -16,6 +16,22 @@ namespace Arango.Client
         public int StatusCode { get; set; }
         
         /// <summary>
+        /// Determines if the operation ended with success and contains value other than null.
+        /// </summary>
+        public bool HasValue
+        {
+            get 
+            {
+                if (Success && (Value != null))
+                {
+                    return true;
+                }
+                
+                return false;
+            }
+        }
+        
+        /// <summary>
         /// Generic object which type and value depends on performed operation.
         /// </summary>
         public T Value { get; set; }

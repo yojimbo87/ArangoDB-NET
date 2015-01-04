@@ -49,6 +49,7 @@ Once the operation is executed, returned data are contained within `ArangoResult
 
 - `Success` - Determines whether the operation ended with success.
 - `StatusCode` - Integer value of the operation response HTTP status code.
+- `HasValue` - Determines if the operation ended with success and contains value other than null.
 - `Value` - Generic object which type and value depends on performed operation.
 - `Error` - If operation ended with failure, this property would contain instance of `ArangoError` object which contains further information about the error.
 - `Extra` - Document which might contain additional information on performed operation.
