@@ -140,8 +140,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.List)
                     {
-                        result.Success = true;
                         result.Value = ((IEnumerable)response.Data).Cast<Dictionary<string, object>>().ToList();
+                        result.Success = (result.Value != null);
                     }
                     break;
                 default:

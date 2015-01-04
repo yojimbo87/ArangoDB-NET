@@ -215,26 +215,30 @@ namespace Arango.Client
                     {
                         var responseDocument = (response.Data as Dictionary<string, object>);
                         
-                        result.Success = true;
-                        result.Value = new List<object>();
-                        result.Value.AddRange(responseDocument.List<object>("result"));
-                        result.Extra = responseDocument.CloneExcept("code", "error", "hasMore", "result");
+                        result.Success = (responseDocument != null);
                         
-                        if (responseDocument.IsBool("hasMore") && responseDocument.Bool("hasMore"))
+                        if (result.Success)
                         {
-                            var cursorID = responseDocument.String("id");
-                            var putResult = Put(cursorID);
+                            result.Value = new List<object>();
+                            result.Value.AddRange(responseDocument.List<object>("result"));
+                            result.Extra = responseDocument.CloneExcept("code", "error", "hasMore", "result");
                             
-                            result.Success = putResult.Success;
-                            result.StatusCode = putResult.StatusCode;
-                            
-                            if (putResult.Success)
+                            if (responseDocument.IsBool("hasMore") && responseDocument.Bool("hasMore"))
                             {
-                                result.Value.AddRange(putResult.Value);
-                            }
-                            else
-                            {
-                                result.Error = putResult.Error;
+                                var cursorID = responseDocument.String("id");
+                                var putResult = Put(cursorID);
+                                
+                                result.Success = putResult.Success;
+                                result.StatusCode = putResult.StatusCode;
+                                
+                                if (putResult.Success)
+                                {
+                                    result.Value.AddRange(putResult.Value);
+                                }
+                                else
+                                {
+                                    result.Error = putResult.Error;
+                                }
                             }
                         }
                     }
@@ -276,8 +280,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>).CloneExcept("code", "error");
+                        result.Success = (result.Value != null);
                     }
                     break;
                 case 400:
@@ -311,25 +315,29 @@ namespace Arango.Client
                     {
                         var responseDocument = (response.Data as Dictionary<string, object>);
                         
-                        result.Success = true;
-                        result.Value = new List<object>();
-                        result.Value.AddRange(responseDocument.List<object>("result"));
+                        result.Success = (responseDocument != null);
                         
-                        if (responseDocument.IsBool("hasMore") && responseDocument.Bool("hasMore"))
+                        if (result.Success)
                         {
-                            var resultCursorID = responseDocument.String("id");
-                            var putResult = Put(resultCursorID);
+                            result.Value = new List<object>();
+                            result.Value.AddRange(responseDocument.List<object>("result"));
                             
-                            result.Success = putResult.Success;
-                            result.StatusCode = putResult.StatusCode;
-                            
-                            if (putResult.Success)
+                            if (responseDocument.IsBool("hasMore") && responseDocument.Bool("hasMore"))
                             {
-                                result.Value.AddRange(putResult.Value);
-                            }
-                            else
-                            {
-                                result.Error = putResult.Error;
+                                var resultCursorID = responseDocument.String("id");
+                                var putResult = Put(resultCursorID);
+                                
+                                result.Success = putResult.Success;
+                                result.StatusCode = putResult.StatusCode;
+                                
+                                if (putResult.Success)
+                                {
+                                    result.Value.AddRange(putResult.Value);
+                                }
+                                else
+                                {
+                                    result.Error = putResult.Error;
+                                }
                             }
                         }
                     }

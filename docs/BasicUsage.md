@@ -47,9 +47,9 @@ var getResult = db.Document.Get("myCollection/123");
 
 Once the operation is executed, returned data are contained within `ArangoResult` object which consists of following properties:
 
-- `Success` - Determines whether the operation ended with success.
+- `Success` - Determines whether the operation ended with success and returned result value is other than null.
 - `StatusCode` - Integer value of the operation response HTTP status code.
-- `HasValue` - Determines if the operation ended with success and contains value other than null.
+- `HasValue` - Determines if the operation contains value other than null.
 - `Value` - Generic object which type and value depends on performed operation.
 - `Error` - If operation ended with failure, this property would contain instance of `ArangoError` object which contains further information about the error.
 - `Extra` - Document which might contain additional information on performed operation.

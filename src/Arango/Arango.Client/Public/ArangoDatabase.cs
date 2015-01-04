@@ -144,8 +144,8 @@ namespace Arango.Client
                 case 201:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>).Bool("result");
+                        result.Success = result.Value;
                     }
                     break;
                 case 400:
@@ -180,8 +180,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>).Document("result");
+                        result.Success = (result.Value != null);
                     }
                     break;
                 case 400:
@@ -215,8 +215,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>).List<string>("result");
+                        result.Success = (result.Value != null);
                     }
                     break;
                 case 400:
@@ -249,8 +249,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>).List<string>("result");
+                        result.Success = (result.Value != null);
                     }
                     break;
                 case 400:
@@ -287,8 +287,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>).List<Dictionary<string, object>>("collections");
+                        result.Success = (result.Value != null);
                     }
                     break;
                 case 400:
@@ -322,8 +322,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>).Bool("result");
+                        result.Success = result.Value;
                     }
                     break;
                 case 400:

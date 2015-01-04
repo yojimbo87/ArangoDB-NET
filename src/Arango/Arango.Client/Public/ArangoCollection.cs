@@ -237,8 +237,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>);
+                        result.Success = (result.Value != null);
                     }
                     break;
                 default:
@@ -270,8 +270,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>);
+                        result.Success = (result.Value != null);
                     }
                     break;
                 case 404:
@@ -304,8 +304,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>);
+                        result.Success = (result.Value != null);
                     }
                     break;
                 case 400:
@@ -339,8 +339,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>);
+                        result.Success = (result.Value != null);
                     }
                     break;
                 case 400:
@@ -374,8 +374,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>);
+                        result.Success = (result.Value != null);
                     }
                     break;
                 case 400:
@@ -409,8 +409,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>);
+                        result.Success = (result.Value != null);
                     }
                     break;
                 case 400:
@@ -449,8 +449,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>);
+                        result.Success = (result.Value != null);
                     }
                     break;
                 case 400:
@@ -489,8 +489,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>).List<string>("documents");
+                        result.Success = (result.Value != null);
                     }
                     break;
                 case 404:
@@ -528,8 +528,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>).List<string>("documents");
+                        result.Success = (result.Value != null);
                     }
                     break;
                 case 404:
@@ -562,8 +562,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>);
+                        result.Success = (result.Value != null);
                     }
                     break;
                 default:
@@ -605,8 +605,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>);
+                        result.Success = (result.Value != null);
                     }
                     break;
                 case 400:
@@ -640,8 +640,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>);
+                        result.Success = (result.Value != null);
                     }
                     break;
                 case 400:
@@ -683,8 +683,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>);
+                        result.Success = (result.Value != null);
                     }
                     break;
                 default:
@@ -720,8 +720,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>);
+                        result.Success = (result.Value != null);
                     }
                     break;
                 default:
@@ -753,8 +753,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>).Bool("result");
+                        result.Success = result.Value;
                     }
                     break;
                 case 400:
@@ -788,8 +788,8 @@ namespace Arango.Client
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
                         result.Value = (response.Data as Dictionary<string, object>);
+                        result.Success = (result.Value != null);
                     }
                     break;
                 case 400:
