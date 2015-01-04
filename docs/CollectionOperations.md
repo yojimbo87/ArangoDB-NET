@@ -16,6 +16,7 @@
 - [Rename collection](#rename-collection)
 - [Rotate collection journal](#rotate-collection-journal)
 - [Delete collection](#delete-collection)
+- [More examples](#more-examples)
 
 Collection operations are focused on management of document and edge type collections which are accessible through `Collection` property in database context object.
 
@@ -400,3 +401,7 @@ if (deleteCollectionResult.Success)
     var id = deleteCollectionResult.Value.String("id");
 }
 ```
+
+## More examples
+
+More examples regarding collection operations can be found in [unit tests](../src/Arango/Arango.Tests/CollectionOperations/CollectionOperations.cs).

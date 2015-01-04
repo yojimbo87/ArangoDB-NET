@@ -6,6 +6,7 @@
 - [Update document](#update-document)
 - [Replace document](#replace-document)
 - [Delete document](#delete-document)
+- [More examples](#more-examples)
 
 Document operations are focused on management of documents in document type collections. These operations are accessible through `Document` property in database context object.
 
@@ -166,3 +167,7 @@ if (deleteDocumentResult.Success)
     var revision = deleteDocumentResult.Value.String("_rev");
 }
 ```
+
+## More examples
+
+More examples regarding document operations can be found in [unit tests](../src/Arango/Arango.Tests/DocumentOperations/DocumentOperationsTests.cs).
