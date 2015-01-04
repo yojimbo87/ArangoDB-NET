@@ -22,7 +22,8 @@ namespace Arango.Tests
                 .Create(Database.TestDocumentCollectionName);
 
             Assert.AreEqual(200, createResult.StatusCode);
-            Assert.AreEqual(true, createResult.Success);
+            Assert.IsTrue(createResult.Success);
+            Assert.IsTrue(createResult.HasValue);
             Assert.AreEqual(true, createResult.Value.IsString("id"));
             Assert.AreEqual(Database.TestDocumentCollectionName, createResult.Value.String("name"));
             Assert.AreEqual(false, createResult.Value.Bool("waitForSync"));
@@ -44,7 +45,8 @@ namespace Arango.Tests
                 .Create(Database.TestEdgeCollectionName);
 
             Assert.AreEqual(200, createResult.StatusCode);
-            Assert.AreEqual(true, createResult.Success);
+            Assert.IsTrue(createResult.Success);
+            Assert.IsTrue(createResult.HasValue);
             Assert.AreEqual(true, createResult.Value.IsString("id"));
             Assert.AreEqual(Database.TestEdgeCollectionName, createResult.Value.String("name"));
             Assert.AreEqual(false, createResult.Value.Bool("waitForSync"));
@@ -66,7 +68,8 @@ namespace Arango.Tests
                 .Create(Database.TestDocumentCollectionName);
             
             Assert.AreEqual(200, createResult.StatusCode);
-            Assert.AreEqual(true, createResult.Success);
+            Assert.IsTrue(createResult.Success);
+            Assert.IsTrue(createResult.HasValue);
             Assert.AreEqual(true, createResult.Value.IsString("id"));
             Assert.AreEqual(Database.TestDocumentCollectionName, createResult.Value.String("name"));
             Assert.AreEqual(false, createResult.Value.Bool("waitForSync"));
@@ -87,6 +90,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(202, doc1Result.StatusCode);
             Assert.IsTrue(doc1Result.Success);
+            Assert.IsTrue(doc1Result.HasValue);
             Assert.AreEqual(Database.TestDocumentCollectionName + "/" + 1, doc1Result.Value.String("_id"));
             Assert.AreEqual("1", doc1Result.Value.String("_key"));
             Assert.IsFalse(string.IsNullOrEmpty(doc1Result.Value.String("_rev")));
@@ -96,6 +100,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(202, doc2Result.StatusCode);
             Assert.IsTrue(doc2Result.Success);
+            Assert.IsTrue(doc2Result.HasValue);
             Assert.AreEqual(Database.TestDocumentCollectionName + "/" + 2, doc2Result.Value.String("_id"));
             Assert.AreEqual("2", doc2Result.Value.String("_key"));
             Assert.IsFalse(string.IsNullOrEmpty(doc2Result.Value.String("_rev")));
@@ -119,7 +124,8 @@ namespace Arango.Tests
                 .Get(createResult.Value.String("name"));
             
             Assert.AreEqual(200, getResult.StatusCode);
-            Assert.AreEqual(true, getResult.Success);
+            Assert.IsTrue(getResult.Success);
+            Assert.IsTrue(getResult.HasValue);
             Assert.AreEqual(createResult.Value.String("id"), getResult.Value.String("id"));
             Assert.AreEqual(createResult.Value.String("name"), getResult.Value.String("name"));
             Assert.AreEqual(createResult.Value.Bool("isSystem"), getResult.Value.Bool("isSystem"));
@@ -141,7 +147,8 @@ namespace Arango.Tests
                 .GetProperties(createResult.Value.String("name"));
             
             Assert.AreEqual(200, getResult.StatusCode);
-            Assert.AreEqual(true, getResult.Success);
+            Assert.IsTrue(getResult.Success);
+            Assert.IsTrue(getResult.HasValue);
             Assert.AreEqual(createResult.Value.String("id"), getResult.Value.String("id"));
             Assert.AreEqual(createResult.Value.String("name"), getResult.Value.String("name"));
             Assert.AreEqual(createResult.Value.Bool("isSystem"), getResult.Value.Bool("isSystem"));
@@ -169,7 +176,8 @@ namespace Arango.Tests
                 .GetCount(createResult.Value.String("name"));
             
             Assert.AreEqual(200, getResult.StatusCode);
-            Assert.AreEqual(true, getResult.Success);
+            Assert.IsTrue(getResult.Success);
+            Assert.IsTrue(getResult.HasValue);
             Assert.AreEqual(createResult.Value.String("id"), getResult.Value.String("id"));
             Assert.AreEqual(createResult.Value.String("name"), getResult.Value.String("name"));
             Assert.AreEqual(createResult.Value.Bool("isSystem"), getResult.Value.Bool("isSystem"));
@@ -198,7 +206,8 @@ namespace Arango.Tests
                 .GetFigures(createResult.Value.String("name"));
             
             Assert.AreEqual(200, getResult.StatusCode);
-            Assert.AreEqual(true, getResult.Success);
+            Assert.IsTrue(getResult.Success);
+            Assert.IsTrue(getResult.HasValue);
             Assert.AreEqual(createResult.Value.String("id"), getResult.Value.String("id"));
             Assert.AreEqual(createResult.Value.String("name"), getResult.Value.String("name"));
             Assert.AreEqual(createResult.Value.Bool("isSystem"), getResult.Value.Bool("isSystem"));
@@ -228,7 +237,8 @@ namespace Arango.Tests
                 .GetRevision(createResult.Value.String("name"));
             
             Assert.AreEqual(200, getResult.StatusCode);
-            Assert.AreEqual(true, getResult.Success);
+            Assert.IsTrue(getResult.Success);
+            Assert.IsTrue(getResult.HasValue);
             Assert.AreEqual(createResult.Value.String("id"), getResult.Value.String("id"));
             Assert.AreEqual(createResult.Value.String("name"), getResult.Value.String("name"));
             Assert.AreEqual(createResult.Value.Bool("isSystem"), getResult.Value.Bool("isSystem"));
@@ -253,7 +263,8 @@ namespace Arango.Tests
                 .GetChecksum(createResult.Value.String("name"));
             
             Assert.AreEqual(200, getResult.StatusCode);
-            Assert.AreEqual(true, getResult.Success);
+            Assert.IsTrue(getResult.Success);
+            Assert.IsTrue(getResult.HasValue);
             Assert.AreEqual(createResult.Value.String("id"), getResult.Value.String("id"));
             Assert.AreEqual(createResult.Value.String("name"), getResult.Value.String("name"));
             Assert.AreEqual(createResult.Value.Bool("isSystem"), getResult.Value.Bool("isSystem"));
@@ -277,6 +288,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(200, operationResult.StatusCode);
             Assert.IsTrue(operationResult.Success);
+            Assert.IsTrue(operationResult.HasValue);
             Assert.AreEqual(operationResult.Value.Count, 2);
             Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
             Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
@@ -297,6 +309,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(200, operationResult.StatusCode);
             Assert.IsTrue(operationResult.Success);
+            Assert.IsTrue(operationResult.HasValue);
             Assert.AreEqual(operationResult.Value.Count, 2);
             Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
             Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
@@ -317,6 +330,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(200, operationResult.StatusCode);
             Assert.IsTrue(operationResult.Success);
+            Assert.IsTrue(operationResult.HasValue);
             Assert.AreEqual(operationResult.Value.Count, 2);
             Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
             Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
@@ -340,6 +354,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(200, operationResult.StatusCode);
             Assert.IsTrue(operationResult.Success);
+            Assert.IsTrue(operationResult.HasValue);
             Assert.AreEqual(operationResult.Value.Count, 2);
             Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
             Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
@@ -363,7 +378,8 @@ namespace Arango.Tests
                 .Truncate(createResult.Value.String("name"));
             
             Assert.AreEqual(200, clearResult.StatusCode);
-            Assert.AreEqual(true, clearResult.Success);
+            Assert.IsTrue(clearResult.Success);
+            Assert.IsTrue(clearResult.HasValue);
             Assert.AreEqual(createResult.Value.String("id"), clearResult.Value.String("id"));
             Assert.AreEqual(createResult.Value.String("name"), clearResult.Value.String("name"));
             Assert.AreEqual(createResult.Value.Bool("isSystem"), clearResult.Value.Bool("isSystem"));
@@ -385,7 +401,8 @@ namespace Arango.Tests
                 .Load(createResult.Value.String("name"));
             
             Assert.AreEqual(200, operationResult.StatusCode);
-            Assert.AreEqual(true, operationResult.Success);
+            Assert.IsTrue(operationResult.Success);
+            Assert.IsTrue(operationResult.HasValue);
             Assert.AreEqual(createResult.Value.String("id"), operationResult.Value.String("id"));
             Assert.AreEqual(createResult.Value.String("name"), operationResult.Value.String("name"));
             Assert.AreEqual(createResult.Value.Bool("isSystem"), operationResult.Value.Bool("isSystem"));
@@ -409,7 +426,8 @@ namespace Arango.Tests
                 .Load(createResult.Value.String("name"));
             
             Assert.AreEqual(200, operationResult.StatusCode);
-            Assert.AreEqual(true, operationResult.Success);
+            Assert.IsTrue(operationResult.Success);
+            Assert.IsTrue(operationResult.HasValue);
             Assert.AreEqual(createResult.Value.String("id"), operationResult.Value.String("id"));
             Assert.AreEqual(createResult.Value.String("name"), operationResult.Value.String("name"));
             Assert.AreEqual(createResult.Value.Bool("isSystem"), operationResult.Value.Bool("isSystem"));
@@ -432,7 +450,8 @@ namespace Arango.Tests
                 .Unload(createResult.Value.String("name"));
             
             Assert.AreEqual(200, operationResult.StatusCode);
-            Assert.AreEqual(true, operationResult.Success);
+            Assert.IsTrue(operationResult.Success);
+            Assert.IsTrue(operationResult.HasValue);
             Assert.AreEqual(createResult.Value.String("id"), operationResult.Value.String("id"));
             Assert.AreEqual(createResult.Value.String("name"), operationResult.Value.String("name"));
             Assert.AreEqual(createResult.Value.Bool("isSystem"), operationResult.Value.Bool("isSystem"));
@@ -458,7 +477,8 @@ namespace Arango.Tests
                 .ChangeProperties(createResult.Value.String("name"));
             
             Assert.AreEqual(200, operationResult.StatusCode);
-            Assert.AreEqual(true, operationResult.Success);
+            Assert.IsTrue(operationResult.Success);
+            Assert.IsTrue(operationResult.HasValue);
             Assert.AreEqual(createResult.Value.String("id"), operationResult.Value.String("id"));
             Assert.AreEqual(createResult.Value.String("name"), operationResult.Value.String("name"));
             Assert.AreEqual(createResult.Value.Bool("isSystem"), operationResult.Value.Bool("isSystem"));
@@ -486,7 +506,8 @@ namespace Arango.Tests
                 .Rename(createResult.Value.String("name"), Database.TestEdgeCollectionName);
             
             Assert.AreEqual(200, operationResult.StatusCode);
-            Assert.AreEqual(true, operationResult.Success);
+            Assert.IsTrue(operationResult.Success);
+            Assert.IsTrue(operationResult.HasValue);
             Assert.AreEqual(createResult.Value.String("id"), operationResult.Value.String("id"));
             Assert.AreEqual(Database.TestEdgeCollectionName, operationResult.Value.String("name"));
             Assert.AreEqual(createResult.Value.Bool("isSystem"), operationResult.Value.Bool("isSystem"));
@@ -509,6 +530,8 @@ namespace Arango.Tests
             
             Assert.AreEqual(400, operationResult.StatusCode);
             Assert.IsFalse(operationResult.Success);
+            Assert.IsTrue(operationResult.HasValue);
+            Assert.IsFalse(operationResult.Value);
         }
         
         #endregion
@@ -529,7 +552,8 @@ namespace Arango.Tests
                 .Delete(createResult.Value.String("name"));
             
             Assert.AreEqual(200, deleteResult.StatusCode);
-            Assert.AreEqual(true, deleteResult.Success);
+            Assert.IsTrue(deleteResult.Success);
+            Assert.IsTrue(deleteResult.HasValue);
             Assert.AreEqual(createResult.Value.String("id"), deleteResult.Value.String("id"));
         }
         

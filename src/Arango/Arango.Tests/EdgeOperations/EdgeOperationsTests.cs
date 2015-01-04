@@ -33,6 +33,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(202, createResult.StatusCode);
             Assert.IsTrue(createResult.Success);
+            Assert.IsTrue(createResult.HasValue);
             Assert.IsTrue(createResult.Value.IsString("_id"));
             Assert.IsTrue(createResult.Value.IsString("_key"));
             Assert.IsTrue(createResult.Value.IsString("_rev"));
@@ -50,6 +51,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(201, createResult.StatusCode);
             Assert.IsTrue(createResult.Success);
+            Assert.IsTrue(createResult.HasValue);
             Assert.IsTrue(createResult.Value.IsString("_id"));
             Assert.IsTrue(createResult.Value.IsString("_key"));
             Assert.IsTrue(createResult.Value.IsString("_rev"));
@@ -70,6 +72,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(202, createResult.StatusCode);
             Assert.IsTrue(createResult.Success);
+            Assert.IsTrue(createResult.HasValue);
             Assert.IsTrue(createResult.Value.IsString("_id"));
             Assert.IsTrue(createResult.Value.IsString("_key"));
             Assert.IsTrue(createResult.Value.IsString("_rev"));
@@ -79,6 +82,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
+            Assert.IsTrue(getResult.HasValue);
             Assert.AreEqual(getResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(getResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreEqual(getResult.Value.String("_rev"), createResult.Value.String("_rev"));
@@ -111,6 +115,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(200, checkResult.StatusCode);
             Assert.IsTrue(checkResult.Success);
+            Assert.IsTrue(checkResult.HasValue);
             Assert.AreEqual(checkResult.Value, createResult.Value.String("_rev"));
         }
         
@@ -133,6 +138,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(200, checkResult.StatusCode);
             Assert.IsTrue(checkResult.Success);
+            Assert.IsTrue(checkResult.HasValue);
             Assert.AreEqual(checkResult.Value, createResult.Value.String("_rev"));
         }
         
@@ -155,6 +161,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(412, checkResult.StatusCode);
             Assert.IsFalse(checkResult.Success);
+            Assert.IsTrue(checkResult.HasValue);
             Assert.AreEqual(checkResult.Value, createResult.Value.String("_rev"));
         }
         
@@ -177,6 +184,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(200, checkResult.StatusCode);
             Assert.IsTrue(checkResult.Success);
+            Assert.IsTrue(checkResult.HasValue);
             Assert.AreEqual(checkResult.Value, createResult.Value.String("_rev"));
         }
         
@@ -199,6 +207,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(304, checkResult.StatusCode);
             Assert.IsFalse(checkResult.Success);
+            Assert.IsTrue(checkResult.HasValue);
             Assert.AreEqual(checkResult.Value, createResult.Value.String("_rev"));
         }
         
@@ -224,6 +233,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
+            Assert.IsTrue(getResult.HasValue);
             Assert.AreEqual(getResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(getResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreEqual(getResult.Value.String("_rev"), createResult.Value.String("_rev"));
@@ -253,6 +263,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
+            Assert.IsTrue(getResult.HasValue);
             Assert.AreEqual(getResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(getResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreEqual(getResult.Value.String("_rev"), createResult.Value.String("_rev"));
@@ -282,6 +293,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(412, getResult.StatusCode);
             Assert.IsFalse(getResult.Success);
+            Assert.IsTrue(getResult.HasValue);
             Assert.AreEqual(getResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(getResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreEqual(getResult.Value.String("_rev"), createResult.Value.String("_rev"));
@@ -306,6 +318,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
+            Assert.IsTrue(getResult.HasValue);
             Assert.AreEqual(getResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(getResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreEqual(getResult.Value.String("_rev"), createResult.Value.String("_rev"));
@@ -335,6 +348,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(304, getResult.StatusCode);
             Assert.IsFalse(getResult.Success);
+            Assert.IsFalse(getResult.HasValue);
         }
         
         #endregion
@@ -359,6 +373,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
+            Assert.IsTrue(getResult.HasValue);
             Assert.AreEqual(getResult.Value.Count, 1);
             
             Assert.AreEqual(getResult.Value[0].String("_id"), createResult.Value.String("_id"));
@@ -384,6 +399,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
+            Assert.IsTrue(getResult.HasValue);
             Assert.AreEqual(getResult.Value.Count, 1);
             
             Assert.AreEqual(getResult.Value[0].String("_id"), createResult.Value.String("_id"));
@@ -409,6 +425,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
+            Assert.IsTrue(getResult.HasValue);
             Assert.AreEqual(getResult.Value.Count, 1);
             
             Assert.AreEqual(getResult.Value[0].String("_id"), createResult.Value.String("_id"));
@@ -443,6 +460,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
+            Assert.IsTrue(updateResult.HasValue);
             Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
@@ -488,6 +506,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(201, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
+            Assert.IsTrue(updateResult.HasValue);
             Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
@@ -533,6 +552,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
+            Assert.IsTrue(updateResult.HasValue);
             Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
@@ -578,6 +598,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(412, updateResult.StatusCode);
             Assert.IsFalse(updateResult.Success);
+            Assert.IsTrue(updateResult.HasValue);
             Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
@@ -607,6 +628,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
+            Assert.IsTrue(updateResult.HasValue);
             Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
@@ -653,6 +675,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
+            Assert.IsTrue(updateResult.HasValue);
             Assert.AreEqual(updateResult.Value.String("_id"), document.String("_id"));
             Assert.AreEqual(updateResult.Value.String("_key"), document.String("_key"));
             Assert.AreNotEqual(updateResult.Value.String("_rev"), document.String("_rev"));
@@ -697,6 +720,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
+            Assert.IsTrue(updateResult.HasValue);
             Assert.AreEqual(updateResult.Value.String("_id"), document.String("_id"));
             Assert.AreEqual(updateResult.Value.String("_key"), document.String("_key"));
             Assert.AreNotEqual(updateResult.Value.String("_rev"), document.String("_rev"));
@@ -741,6 +765,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
+            Assert.IsTrue(updateResult.HasValue);
             Assert.AreEqual(updateResult.Value.String("_id"), document.String("_id"));
             Assert.AreEqual(updateResult.Value.String("_key"), document.String("_key"));
             Assert.AreNotEqual(updateResult.Value.String("_rev"), document.String("_rev"));
@@ -786,6 +811,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(202, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
+            Assert.IsTrue(replaceResult.HasValue);
             Assert.AreEqual(replaceResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(replaceResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreNotEqual(replaceResult.Value.String("_rev"), createResult.Value.String("_rev"));
@@ -828,6 +854,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(201, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
+            Assert.IsTrue(replaceResult.HasValue);
             Assert.AreEqual(replaceResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(replaceResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreNotEqual(replaceResult.Value.String("_rev"), createResult.Value.String("_rev"));
@@ -872,6 +899,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(202, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
+            Assert.IsTrue(replaceResult.HasValue);
             Assert.AreEqual(replaceResult.Value.String("_id"), document.String("_id"));
             Assert.AreEqual(replaceResult.Value.String("_key"), document.String("_key"));
             Assert.AreNotEqual(replaceResult.Value.String("_rev"), document.String("_rev"));
@@ -916,6 +944,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(412, replaceResult.StatusCode);
             Assert.IsFalse(replaceResult.Success);
+            Assert.IsTrue(replaceResult.HasValue);
             Assert.AreEqual(replaceResult.Value.String("_id"), document.String("_id"));
             Assert.AreEqual(replaceResult.Value.String("_key"), document.String("_key"));
             Assert.AreEqual(replaceResult.Value.String("_rev"), document.String("_rev"));
@@ -946,6 +975,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(202, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
+            Assert.IsTrue(replaceResult.HasValue);
             Assert.AreEqual(replaceResult.Value.String("_id"), document.String("_id"));
             Assert.AreEqual(replaceResult.Value.String("_key"), document.String("_key"));
             Assert.AreNotEqual(replaceResult.Value.String("_rev"), document.String("_rev"));
@@ -987,6 +1017,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(202, deleteResult.StatusCode);
             Assert.IsTrue(deleteResult.Success);
+            Assert.IsTrue(deleteResult.HasValue);
             Assert.AreEqual(deleteResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(deleteResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreEqual(deleteResult.Value.String("_rev"), createResult.Value.String("_rev"));
@@ -1011,6 +1042,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(200, deleteResult.StatusCode);
             Assert.IsTrue(deleteResult.Success);
+            Assert.IsTrue(deleteResult.HasValue);
             Assert.AreEqual(deleteResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(deleteResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreEqual(deleteResult.Value.String("_rev"), createResult.Value.String("_rev"));
@@ -1035,6 +1067,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(202, deleteResult.StatusCode);
             Assert.IsTrue(deleteResult.Success);
+            Assert.IsTrue(deleteResult.HasValue);
             Assert.AreEqual(deleteResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(deleteResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreEqual(deleteResult.Value.String("_rev"), createResult.Value.String("_rev"));
@@ -1059,6 +1092,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(412, deleteResult.StatusCode);
             Assert.IsFalse(deleteResult.Success);
+            Assert.IsTrue(deleteResult.HasValue);
             Assert.AreEqual(deleteResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(deleteResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreEqual(deleteResult.Value.String("_rev"), createResult.Value.String("_rev"));
@@ -1083,6 +1117,7 @@ namespace Arango.Tests
             
             Assert.AreEqual(202, deleteResult.StatusCode);
             Assert.IsTrue(deleteResult.Success);
+            Assert.IsTrue(deleteResult.HasValue);
             Assert.AreEqual(deleteResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(deleteResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreEqual(deleteResult.Value.String("_rev"), createResult.Value.String("_rev"));

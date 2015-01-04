@@ -21,8 +21,9 @@ namespace Arango.Tests
             var resultList = db.GetAccessibleDatabases();
 
             Assert.AreEqual(200, resultList.StatusCode);
-            Assert.AreEqual(true, resultList.Success);
-            Assert.AreEqual(true, resultList.Value.Contains(Database.TestDatabaseOneTime));
+            Assert.IsTrue(resultList.Success);
+            Assert.IsTrue(resultList.HasValue);
+            Assert.IsTrue(resultList.Value.Contains(Database.TestDatabaseOneTime));
         }
         
         [Test()]
@@ -37,9 +38,10 @@ namespace Arango.Tests
             var resultList = db.GetAllDatabases();
 
             Assert.AreEqual(200, resultList.StatusCode);
-            Assert.AreEqual(true, resultList.Success);
-            Assert.AreEqual(true, resultList.Value.Contains(Database.TestDatabaseOneTime));
-            Assert.AreEqual(true, resultList.Value.Contains("_system"));
+            Assert.IsTrue(resultList.Success);
+            Assert.IsTrue(resultList.HasValue);
+            Assert.IsTrue(resultList.Value.Contains(Database.TestDatabaseOneTime));
+            Assert.IsTrue(resultList.Value.Contains("_system"));
         }
         
         [Test()]
@@ -52,7 +54,8 @@ namespace Arango.Tests
             var resultCurrent = db.GetCurrent();
 
             Assert.AreEqual(200, resultCurrent.StatusCode);
-            Assert.AreEqual(true, resultCurrent.Success);
+            Assert.IsTrue(resultCurrent.Success);
+            Assert.IsTrue(resultCurrent.HasValue);
             Assert.AreEqual("_system", resultCurrent.Value.String("name"));
             Assert.AreEqual(false, string.IsNullOrEmpty(resultCurrent.Value.String("id")));
             Assert.AreEqual(false, string.IsNullOrEmpty(resultCurrent.Value.String("path")));
@@ -75,7 +78,8 @@ namespace Arango.Tests
                 .GetAllCollections();
             
             Assert.AreEqual(200, getResult.StatusCode);
-            Assert.AreEqual(true, getResult.Success);
+            Assert.IsTrue(getResult.Success);
+            Assert.IsTrue(getResult.HasValue);
             
             var foundCreatedCollection = getResult.Value.FirstOrDefault(col => col.String("name") == createResult.Value.String("name"));
             
@@ -93,11 +97,12 @@ namespace Arango.Tests
         	
             var db = new ArangoDatabase(Database.SystemAlias);
 
-            var resultCreate = db.Create(Database.TestDatabaseOneTime);
+            var createResult = db.Create(Database.TestDatabaseOneTime);
 
-            Assert.AreEqual(201, resultCreate.StatusCode);
-            Assert.AreEqual(true, resultCreate.Success);
-            Assert.AreEqual(true, resultCreate.Value);
+            Assert.AreEqual(201, createResult.StatusCode);
+            Assert.IsTrue(createResult.Success);
+            Assert.IsTrue(createResult.HasValue);
+            Assert.IsTrue(createResult.Value);
         }
         
         [Test()]
@@ -113,11 +118,12 @@ namespace Arango.Tests
                 new ArangoUser { Username = "tester001", Password = "test001", Active = false } 
             };
             
-            var resultCreate = db.Create(Database.TestDatabaseOneTime, users);
+            var createResult = db.Create(Database.TestDatabaseOneTime, users);
 
-            Assert.AreEqual(201, resultCreate.StatusCode);
-            Assert.AreEqual(true, resultCreate.Success);
-            Assert.AreEqual(true, resultCreate.Value);
+            Assert.AreEqual(201, createResult.StatusCode);
+            Assert.IsTrue(createResult.Success);
+            Assert.IsTrue(createResult.HasValue);
+            Assert.IsTrue(createResult.Value);
         }
         
         [Test()]
@@ -127,13 +133,15 @@ namespace Arango.Tests
         	
             var db = new ArangoDatabase(Database.SystemAlias);
 
-            var resultCreate = db.Create(Database.TestDatabaseGeneral);
+            var createResult = db.Create(Database.TestDatabaseGeneral);
             
-            var resultCreate2 = db.Create(Database.TestDatabaseGeneral);
+            var createResult2 = db.Create(Database.TestDatabaseGeneral);
 
-            Assert.AreEqual(409, resultCreate2.StatusCode);
-            Assert.AreEqual(false, resultCreate2.Success);
-            Assert.IsNotNull(resultCreate2.Error);
+            Assert.AreEqual(409, createResult2.StatusCode);
+            Assert.IsFalse(createResult2.Success);
+            Assert.IsTrue(createResult2.HasValue);
+            Assert.IsFalse(createResult2.Value);
+            Assert.IsNotNull(createResult2.Error);
         }
         
         [Test()]
@@ -143,15 +151,17 @@ namespace Arango.Tests
         	
             var db = new ArangoDatabase(Database.SystemAlias);
 
-            var resultCreate = db.Create(Database.TestDatabaseGeneral);
+            var createResult = db.Create(Database.TestDatabaseGeneral);
 
             var nonSystemDatabase = new ArangoDatabase(Database.Alias);
             
-            var resultCreate2 = nonSystemDatabase.Create(Database.TestDatabaseOneTime);
+            var createResult2 = nonSystemDatabase.Create(Database.TestDatabaseOneTime);
 
-            Assert.AreEqual(403, resultCreate2.StatusCode);
-            Assert.AreEqual(false, resultCreate2.Success);
-            Assert.IsNotNull(resultCreate2.Error);
+            Assert.AreEqual(403, createResult2.StatusCode);
+            Assert.IsFalse(createResult2.Success);
+            Assert.IsTrue(createResult2.HasValue);
+            Assert.IsFalse(createResult2.Value);
+            Assert.IsNotNull(createResult2.Error);
         }
         
         [Test()]
@@ -161,13 +171,14 @@ namespace Arango.Tests
         	
             var db = new ArangoDatabase(Database.SystemAlias);
 
-            var resultCreate = db.Create(Database.TestDatabaseGeneral);
+            var createResult = db.Create(Database.TestDatabaseGeneral);
             
-            var resultDelete = db.Drop(Database.TestDatabaseGeneral);
+            var deleteResult = db.Drop(Database.TestDatabaseGeneral);
 
-            Assert.AreEqual(200, resultDelete.StatusCode);
-            Assert.AreEqual(true, resultDelete.Success);
-            Assert.AreEqual(true, resultDelete.Value);
+            Assert.AreEqual(200, deleteResult.StatusCode);
+            Assert.IsTrue(deleteResult.Success);
+            Assert.IsTrue(deleteResult.HasValue);
+            Assert.IsTrue(deleteResult.Value);
         }
         
         public void Dispose()
