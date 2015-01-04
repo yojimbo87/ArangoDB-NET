@@ -6,6 +6,7 @@
 - [Retrieve all databases](#retrieve-all-databases)
 - [Retrieve database collections](#retrieve-database-collections)
 - [Delete database](#delete-database)
+- [More examples](#more-examples)
 
 Most operations which are focused on management of database instances can only be performed through connection set to default `_system` database.
 
@@ -121,3 +122,7 @@ if (deleteDatabaseResult.Success)
     var isDeleted = deleteDatabaseResult.Value;
 }
 ```
+
+## More examples
+
+More examples regarding database operations can be found in [unit tests](../src/Arango/Arango.Tests/DatabaseOperations/DatabaseOperationsTests.cs).

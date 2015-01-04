@@ -404,4 +404,4 @@ if (deleteCollectionResult.Success)
 
 ## More examples
 
-More examples regarding collection operations can be found in [unit tests](../src/Arango/Arango.Tests/CollectionOperations/CollectionOperations.cs).
+More examples regarding collection operations can be found in [unit tests](../src/Arango/Arango.Tests/CollectionOperations/CollectionOperationsTests.cs).

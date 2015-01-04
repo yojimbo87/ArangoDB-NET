@@ -25,6 +25,7 @@ There are following ways to install the driver:
   - [Retrieve all databases](docs/DatabaseOperations.md#retrieve-all-databases)
   - [Retrieve database collections](docs/DatabaseOperations.md#retrieve-database-collections)
   - [Delete database](docs/DatabaseOperations.md#delete-database)
+  - [More examples](docs/DatabaseOperations.md#more-examples)
 - [Collection operations](docs/CollectionOperations.md)
   - [Create collection](docs/CollectionOperations.md#create-collection)
   - [Retrieve collection](docs/CollectionOperations.md#retrieve-collection)
