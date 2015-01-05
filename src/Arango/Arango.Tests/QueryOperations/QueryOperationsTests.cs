@@ -33,6 +33,7 @@ namespace Arango.Tests
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.HasValue);
             Assert.IsTrue(queryResult.Value.IsString("foo"));
             Assert.IsTrue(queryResult.Value.IsLong("bar"));
         }
@@ -52,7 +53,8 @@ namespace Arango.Tests
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
-            Assert.AreEqual(2, queryResult.Value.Count, 2);
+            Assert.IsTrue(queryResult.HasValue);
+            Assert.AreEqual(2, queryResult.Value.Count);
             Assert.IsTrue(queryResult.Value[0].IsString("foo"));
             Assert.IsTrue(queryResult.Value[0].IsLong("bar"));
             Assert.IsTrue(queryResult.Value[1].IsString("foo"));
@@ -79,6 +81,7 @@ namespace Arango.Tests
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.HasValue);
             Assert.IsTrue(queryResult.Value != null);
         }
         
@@ -99,6 +102,7 @@ namespace Arango.Tests
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.HasValue);
             Assert.AreEqual(1, queryResult.Value);
         }
         
@@ -119,6 +123,7 @@ namespace Arango.Tests
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.HasValue);
             Assert.IsTrue(queryResult.Value.IsString("foo"));
             Assert.IsTrue(queryResult.Value.IsLong("bar"));
         }
@@ -140,6 +145,7 @@ namespace Arango.Tests
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.HasValue);
             Assert.IsTrue(documents.First(q => q.String("foo") == queryResult.Value.foo) != null);
             Assert.IsTrue(documents.First(q => q.Int("bar") == queryResult.Value.bar) != null);
         }
@@ -163,6 +169,7 @@ namespace Arango.Tests
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.HasValue);
             Assert.AreEqual(2, queryResult.Value.Count);
         }
         
@@ -182,7 +189,8 @@ namespace Arango.Tests
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
-            Assert.AreEqual(2, queryResult.Value.Count, 2);
+            Assert.IsTrue(queryResult.HasValue);
+            Assert.AreEqual(2, queryResult.Value.Count);
             Assert.AreEqual(1, queryResult.Value[0]);
             Assert.AreEqual(2, queryResult.Value[1]);
         }
@@ -202,6 +210,7 @@ namespace Arango.Tests
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.HasValue);
             Assert.AreEqual(2, queryResult.Value.Count);
             Assert.IsTrue(queryResult.Value[0].IsString("foo"));
             Assert.IsTrue(queryResult.Value[0].IsLong("bar"));
@@ -225,6 +234,7 @@ namespace Arango.Tests
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.HasValue);
             Assert.AreEqual(2, queryResult.Value.Count);
             Assert.AreEqual(documents[0].String("foo"), queryResult.Value[0].foo);
             Assert.AreEqual(documents[0].Int("bar"), queryResult.Value[0].bar);
@@ -250,6 +260,7 @@ namespace Arango.Tests
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.HasValue);
             Assert.AreEqual(queryResult.Value.Count, 2);
             Assert.AreEqual(queryResult.Extra.Long("count"), 2);
         }
@@ -282,6 +293,7 @@ namespace Arango.Tests
 
             Assert.AreEqual(200, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.HasValue);
             Assert.AreEqual(queryResult.Value.Count, 4);
         }
         
@@ -302,6 +314,7 @@ namespace Arango.Tests
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.HasValue);
             Assert.AreEqual(queryResult.Value.Count, 1);
         }
         
@@ -333,8 +346,40 @@ namespace Arango.Tests
 
             Assert.AreEqual(200, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.HasValue);
             Assert.AreEqual(queryResult.Value.Count, 2);
             Assert.AreEqual(queryResult.Extra.Long("count"), 2);
+        }
+        
+        [Test()]
+        public void Should_parse_query()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ArangoDatabase(Database.Alias);
+
+            var parseResult = db.Query
+                .Parse(string.Format(@"
+                FOR item IN {0}
+                    RETURN item
+                ", Database.TestDocumentCollectionName));
+            
+            Assert.AreEqual(200, parseResult.StatusCode);
+            Assert.IsTrue(parseResult.Success);
+            Assert.IsTrue(parseResult.HasValue);
+            Assert.IsTrue(parseResult.Value.IsList("bindVars"));
+            Assert.IsTrue(parseResult.Value.IsList("collections"));
+            Assert.IsTrue(parseResult.Value.IsList("ast"));
+        }
+        
+        [Test()]
+        public void Should_minify_query()
+        {
+            var singleLineQuery = ArangoQuery.Minify(@"
+            FOR item IN MyDocumentCollection
+                RETURN item
+            ");
+            
+            Assert.AreEqual("FOR item IN MyDocumentCollection\nRETURN item\n", singleLineQuery);
         }
         
         [Test()]
@@ -358,26 +403,8 @@ namespace Arango.Tests
             
             Assert.AreEqual(404, deleteCursorResult.StatusCode);
             Assert.IsFalse(deleteCursorResult.Success);
+            Assert.IsTrue(deleteCursorResult.HasValue);
             Assert.IsFalse(deleteCursorResult.Value);
-        }
-        
-        [Test()]
-        public void Should_parse_query()
-        {
-            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
-
-            var parseResult = db.Query
-                .Parse(string.Format(@"
-                FOR item IN {0}
-                    RETURN item
-                ", Database.TestDocumentCollectionName));
-            
-            Assert.AreEqual(200, parseResult.StatusCode);
-            Assert.IsTrue(parseResult.Success);
-            Assert.IsTrue(parseResult.Value.IsList("bindVars"));
-            Assert.IsTrue(parseResult.Value.IsList("collections"));
-            Assert.IsTrue(parseResult.Value.IsList("ast"));
         }
         
         public void Dispose()
