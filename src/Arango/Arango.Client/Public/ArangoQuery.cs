@@ -21,9 +21,12 @@ namespace Arango.Client
         
         #region Parameters
         
+        /// <summary>
+        /// Sets AQL query code.
+        /// </summary>
         public ArangoQuery Aql(string query)
         {
-        	var cleanQuery = CleanAqlString(query);
+        	var cleanQuery = Minify(query);
         	
         	if (_query.Length > 0)
         	{
@@ -35,27 +38,9 @@ namespace Arango.Client
             return this;
         }
         
-        public ArangoQuery Count(bool value)
-        {
-        	_parameters.Bool(ParameterName.Count, value);
-        	
-        	return this;
-        }
-        
-        public ArangoQuery BatchSize(int value)
-        {
-        	_parameters.Int(ParameterName.BatchSize, value);
-        	
-        	return this;
-        }
-        
-        public ArangoQuery Ttl(int value)
-        {
-        	_parameters.Int(ParameterName.TTL, value);
-        	
-        	return this;
-        }
-        
+        /// <summary>
+        /// Maps key/value bind parameter to the AQL query.
+        /// </summary>
         public ArangoQuery BindVar(string key, object value)
         {
             _bindVars.Object(key, value);
@@ -63,29 +48,43 @@ namespace Arango.Client
             return this;
         }
         
-        #endregion
-        
-        #region ToDocument/ToDocuments
-
-        public ArangoResult<Dictionary<string, object>> ToDocument()
+        /// <summary>
+        /// Determines whether the number of retrieved documents should be returned in `Extra` property of `ArangoResult` instance. Default value: false.
+        /// </summary>
+        public ArangoQuery Count(bool value)
         {
-            var type = typeof(Dictionary<string, object>);
-            var listResult = ToList();
-            var result = new ArangoResult<Dictionary<string, object>>();
-            
-            result.StatusCode = listResult.StatusCode;
-            result.Success = listResult.Success;
-            result.Extra = listResult.Extra;
-            result.Error = listResult.Error;
-            
-            if (listResult.Success && (listResult.Value != null))
-            {
-                result.Value = (Dictionary<string, object>)Convert.ChangeType(listResult.Value[0], type);
-            }
-            
-            return result;
+        	_parameters.Bool(ParameterName.Count, value);
+        	
+        	return this;
         }
         
+        /// <summary>
+        /// Determines whether the number of documents in the result set should be returned. Default value: false.
+        /// </summary>
+        public ArangoQuery Ttl(int value)
+        {
+        	_parameters.Int(ParameterName.TTL, value);
+        	
+        	return this;
+        }
+        
+        /// <summary>
+        /// Determines maximum number of result documents to be transferred from the server to the client in one roundtrip. If not set this value is server-controlled.
+        /// </summary>
+        public ArangoQuery BatchSize(int value)
+        {
+        	_parameters.Int(ParameterName.BatchSize, value);
+        	
+        	return this;
+        }
+        
+        #endregion
+        
+        #region Retrieve list result (POST)
+        
+        /// <summary>
+        /// Retrieves result value as list of documents.
+        /// </summary>
         public ArangoResult<List<Dictionary<string, object>>> ToDocuments()
         {
             var type = typeof(Dictionary<string, object>);
@@ -105,50 +104,9 @@ namespace Arango.Client
             return result;
         }
         
-        #endregion
-        
-        #region ToObject
-
-        public ArangoResult<T> ToObject<T>()
-        {
-            var listResult = ToList<T>();
-            var result = new ArangoResult<T>();
-            
-            result.StatusCode = listResult.StatusCode;
-            result.Success = listResult.Success;
-            result.Extra = listResult.Extra;
-            result.Error = listResult.Error;
-            
-            if (listResult.Success && (listResult.Value != null))
-            {
-                result.Value = (T)listResult.Value[0];
-            }
-            
-            return result;
-        }
-        
-        public ArangoResult<object> ToObject()
-        {
-            var listResult = ToList();
-            var result = new ArangoResult<object>();
-            
-            result.StatusCode = listResult.StatusCode;
-            result.Success = listResult.Success;
-            result.Extra = listResult.Extra;
-            result.Error = listResult.Error;
-            
-            if (listResult.Success && (listResult.Value != null))
-            {
-                result.Value = listResult.Value[0];
-            }
-            
-            return result;
-        }
-        
-        #endregion
-        
-        #region ToList (POST)
-        
+        /// <summary>
+        /// Retrieves result value as list of generic objects.
+        /// </summary>
         public ArangoResult<List<T>> ToList<T>()
         {
             var type = typeof(T);
@@ -182,20 +140,23 @@ namespace Arango.Client
             return result;
         }
         
+        /// <summary>
+        /// Retrieves result value as list of objects.
+        /// </summary>
         public ArangoResult<List<object>> ToList()
         {
             var request = new Request(HttpMethod.POST, ApiBaseUri.Cursor, "");
             var bodyDocument = new Dictionary<string, object>();
             
-            // required: AQL query string
+            // required
             bodyDocument.String(ParameterName.Query, _query.ToString());
-            // optional: boolean flag that indicates whether the number of documents in the result set should be returned
+            // optional
             Request.TrySetBodyParameter(ParameterName.Count, _parameters, bodyDocument);
-            // optional: maximum number of result documents to be transferred from the server to the client in one roundtrip
+            // optional
             Request.TrySetBodyParameter(ParameterName.BatchSize, _parameters, bodyDocument);
-            // optional: time-to-live for the cursor (in seconds)
+            // optional
             Request.TrySetBodyParameter(ParameterName.TTL, _parameters, bodyDocument);
-            // optional: key/value list of bind parameters
+            // optional
             if (_bindVars.Count > 0)
             {
                 bodyDocument.Document(ParameterName.BindVars, _bindVars);
@@ -260,46 +221,75 @@ namespace Arango.Client
         
         #endregion
         
-        #region Parse (POST)
+        #region Retrieve single result (POST)
 
-        public ArangoResult<Dictionary<string, object>> Parse(string query)
+        /// <summary>
+        /// Retrieves result value as single document.
+        /// </summary>
+        public ArangoResult<Dictionary<string, object>> ToDocument()
         {
-            var request = new Request(HttpMethod.POST, ApiBaseUri.Query, "");
-            var bodyDocument = new Dictionary<string, object>();
+            var type = typeof(Dictionary<string, object>);
+            var listResult = ToList();
+            var result = new ArangoResult<Dictionary<string, object>>();
             
-            // required: AQL query string
-            bodyDocument.String(ParameterName.Query, CleanAqlString(query));
+            result.StatusCode = listResult.StatusCode;
+            result.Success = listResult.Success;
+            result.Extra = listResult.Extra;
+            result.Error = listResult.Error;
             
-            request.Body = JSON.ToJSON(bodyDocument);
-            
-            var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
-            
-            switch (response.StatusCode)
+            if (listResult.Success && (listResult.Value != null))
             {
-                case 200:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Value = (response.Data as Dictionary<string, object>).CloneExcept("code", "error");
-                        result.Success = (result.Value != null);
-                    }
-                    break;
-                case 400:
-                default:
-                    // Arango error
-                    break;
+                result.Value = (Dictionary<string, object>)Convert.ChangeType(listResult.Value[0], type);
             }
             
-            _parameters.Clear();
-            _bindVars.Clear();
-            _query.Clear();
+            return result;
+        }
+        
+        /// <summary>
+        /// Retrieves result value as single generic object.
+        /// </summary>
+        public ArangoResult<T> ToObject<T>()
+        {
+            var listResult = ToList<T>();
+            var result = new ArangoResult<T>();
+            
+            result.StatusCode = listResult.StatusCode;
+            result.Success = listResult.Success;
+            result.Extra = listResult.Extra;
+            result.Error = listResult.Error;
+            
+            if (listResult.Success && (listResult.Value != null))
+            {
+                result.Value = (T)listResult.Value[0];
+            }
+            
+            return result;
+        }
+        
+        /// <summary>
+        /// Retrieves result value as single object.
+        /// </summary>
+        public ArangoResult<object> ToObject()
+        {
+            var listResult = ToList();
+            var result = new ArangoResult<object>();
+            
+            result.StatusCode = listResult.StatusCode;
+            result.Success = listResult.Success;
+            result.Extra = listResult.Extra;
+            result.Error = listResult.Error;
+            
+            if (listResult.Success && (listResult.Value != null))
+            {
+                result.Value = listResult.Value[0];
+            }
             
             return result;
         }
         
         #endregion
         
-        #region PUT
+        #region More results in cursor (PUT)
         
         internal ArangoResult<List<object>> Put(string cursorID)
         {
@@ -353,26 +343,34 @@ namespace Arango.Client
         
         #endregion
         
-        #region Delete cursor (DELETE)
+        #region Parse (POST)
 
-        public ArangoResult<bool> DeleteCursor(string cursorID)
+        /// <summary>
+        /// Analyzes specified AQL query.
+        /// </summary>
+        public ArangoResult<Dictionary<string, object>> Parse(string query)
         {
-            var request = new Request(HttpMethod.DELETE, ApiBaseUri.Cursor, "/" + cursorID);
+            var request = new Request(HttpMethod.POST, ApiBaseUri.Query, "");
+            var bodyDocument = new Dictionary<string, object>();
+            
+            // required
+            bodyDocument.String(ParameterName.Query, Minify(query));
+            
+            request.Body = JSON.ToJSON(bodyDocument);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<bool>(response);
+            var result = new ArangoResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
-                case 202:
+                case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Success = true;
-                        result.Value = true;
+                        result.Value = (response.Data as Dictionary<string, object>).CloneExcept("code", "error");
+                        result.Success = (result.Value != null);
                     }
                     break;
                 case 400:
-                case 404:
                 default:
                     // Arango error
                     break;
@@ -387,9 +385,12 @@ namespace Arango.Client
         
         #endregion
         
-        public static string CleanAqlString(string dirtyQuery)
+        /// <summary>
+        /// Transforms specified query into minified version with removed leading and trailing whitespaces except new line characters.
+        /// </summary>
+        public static string Minify(string inputQuery)
         {
-        	var query = dirtyQuery.Replace("\r", "");
+        	var query = inputQuery.Replace("\r", "");
         	
         	var cleanQuery = new StringBuilder();
 
@@ -432,5 +433,42 @@ namespace Arango.Client
         	
         	return cleanQuery.ToString();
         }
+        
+        #region Delete cursor (DELETE)
+
+        /// <summary>
+        /// Deletes specified AQL query cursor.
+        /// </summary>
+        public ArangoResult<bool> DeleteCursor(string cursorID)
+        {
+            var request = new Request(HttpMethod.DELETE, ApiBaseUri.Cursor, "/" + cursorID);
+            
+            var response = _connection.Send(request);
+            var result = new ArangoResult<bool>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 202:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = true;
+                    }
+                    break;
+                case 400:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            _bindVars.Clear();
+            _query.Clear();
+            
+            return result;
+        }
+        
+        #endregion
     }
 }
