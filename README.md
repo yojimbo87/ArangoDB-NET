@@ -62,4 +62,8 @@ There are following ways to install the driver:
   - [Delete edge](docs/EdgeOperations.md#delete-edge)
   - [More examples](docs/EdgeOperations.md#more-examples)
 - [AQL query cursors execution]()
-- [AQL user functions management]()
+- [AQL user functions management](docs/FunctionOperations.md)
+  - [Register function](docs/FunctionOperations.md#register-function)
+  - [Retrieve function list](docs/FunctionOperations.md#retrieve-function-list)
+  - [Unregister function](docs/FunctionOperations.md#unregister-function)
+    
