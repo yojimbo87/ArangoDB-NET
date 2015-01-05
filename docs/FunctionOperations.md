@@ -3,6 +3,7 @@
 - [Register function](#register-function)
 - [Retrieve function list](#retrieve-function-list)
 - [Unregister function](#unregister-function)
+- [More examples](#more-examples)
 
 Function operations are focused on AQL user functions management operations. These operations are accessible through `Function` property in database context object.
 
@@ -69,3 +70,7 @@ if (unregisterFunctionResult.Success)
     var isFunctionUnregistered = unregisterFunctionResult.Value;
 }
 ```
+
+## More examples
+
+More examples regarding AQL user function management operations can be found in [unit tests](../src/Arango/Arango.Tests/FunctionOperations/FunctionOperationsTests.cs).

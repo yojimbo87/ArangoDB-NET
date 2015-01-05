@@ -66,4 +66,4 @@ There are following ways to install the driver:
   - [Register function](docs/FunctionOperations.md#register-function)
   - [Retrieve function list](docs/FunctionOperations.md#retrieve-function-list)
   - [Unregister function](docs/FunctionOperations.md#unregister-function)
-    
+  - [More examples](docs/FunctionOperations.md#more-examples)
