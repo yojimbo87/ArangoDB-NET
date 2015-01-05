@@ -57,6 +57,9 @@ namespace Arango.Client
             }
         }
         
+        /// <summary>
+        /// Provides access to query operations in current database context.
+        /// </summary>
         public ArangoQuery Query
         {
             get
@@ -66,7 +69,7 @@ namespace Arango.Client
         }
 
         /// <summary>
-        /// Provides access to AQL user function management operations.
+        /// Provides access to AQL user function management operations in current database context.
         /// </summary>
         public ArangoFunction Function
         {
