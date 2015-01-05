@@ -57,19 +57,22 @@ namespace Arango.Client
             }
         }
         
-        public ArangoFunction Function
-        {
-            get
-            {
-                return new ArangoFunction(_connection);
-            }
-        }
-        
         public ArangoQuery Query
         {
             get
             {
                 return new ArangoQuery(_connection);
+            }
+        }
+
+        /// <summary>
+        /// Provides access to AQL user function management operations.
+        /// </summary>
+        public ArangoFunction Function
+        {
+            get
+            {
+                return new ArangoFunction(_connection);
             }
         }
         
