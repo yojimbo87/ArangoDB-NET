@@ -108,6 +108,7 @@ FOR item IN MyDocumentCollection
 
 Deletes specified AQL query cursor.
 
+```csharp
 var db = new ArangoDatabase("myDatabaseAlias");
 
 var deleteCursorResult = db.Query
@@ -117,6 +118,7 @@ if (deleteCursorResult.Success)
 {
     var isCursorDeleted = deleteCursorResult.Value;
 }
+```
 
 ## More examples
 
