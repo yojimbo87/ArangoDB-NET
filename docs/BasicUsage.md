@@ -65,7 +65,9 @@ In case of operation failure driver doesn't throw exceptions explicitely, but `A
 
 ## JSON representation
 
-JSON objects are by default represented as `Dictionary<string, object>`. In order to simplify usage of dictionaries, driver comes equipped with [dictator library](https://github.com/yojimbo87/dictator) which provide helpful set of methods to provide easier way to handle data stored in these objects.
+JSON objects are by default represented as `Dictionary<string, object>`. In order to simplify the usage of dictionaries (aka documents), driver comes equipped with embedded [dictator library](https://github.com/yojimbo87/dictator) which provide helpful set of methods to provide easier way to handle data stored in these objects. Dictator also provides methods for [conversion](https://github.com/yojimbo87/dictator#convert-document-to-strongly-typed-object) of documents to generic objects and [vice versa](https://github.com/yojimbo87/dictator#convert-strongly-typed-object-to-document). Custom classes can also take advantage of several [property attributes](https://github.com/yojimbo87/dictator#property-attributes).
+
+Internal serialization and deserialization of JSON documents is done by embedded [fastJSON library](http://www.codeproject.com/Articles/159450/fastJSON) which functionality is accessible through `Arango.fastJSON` namespace.
 
 ## Fluent API
 
