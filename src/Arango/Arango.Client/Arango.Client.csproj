@@ -45,11 +45,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExternalLibraries\dictator\AliasField.cs" />
     <Compile Include="ExternalLibraries\dictator\DateTimeFormat.cs" />
     <Compile Include="ExternalLibraries\dictator\Dictator.cs" />
     <Compile Include="ExternalLibraries\dictator\DictatorSettings.cs" />
     <Compile Include="ExternalLibraries\dictator\DictionaryExtensions.cs" />
     <Compile Include="ExternalLibraries\dictator\EnumFormat.cs" />
+    <Compile Include="ExternalLibraries\dictator\IgnoreField.cs" />
+    <Compile Include="ExternalLibraries\dictator\IgnoreNullValue.cs" />
     <Compile Include="ExternalLibraries\dictator\InvalidFieldException.cs" />
     <Compile Include="ExternalLibraries\dictator\InvalidFieldTypeException.cs" />
     <Compile Include="ExternalLibraries\dictator\MergeBehavior.cs" />

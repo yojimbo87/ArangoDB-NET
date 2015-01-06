@@ -876,6 +876,13 @@ namespace Arango.Client
         /// <summary>
         /// Checks if specified field has given type value.
         /// </summary>
+        public static bool IsType<T>(this Dictionary<string, object> dictionary, string fieldPath)
+        {
+            return IsType(dictionary, fieldPath, typeof(T));
+        }
+        /// <summary>
+        /// Checks if specified field has given type value.
+        /// </summary>
         public static bool IsType(this Dictionary<string, object> dictionary, string fieldPath, Type type)
         {
             var isValid = false;
@@ -1208,16 +1215,39 @@ namespace Arango.Client
             {
                 foreach (var propertyInfo in objectType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
                 {
+                    // skip property if it should be ignored
+                    if (propertyInfo.IsDefined(typeof(IgnoreField)))
+                    {
+                        continue;
+                    }
+                    
+                    var fieldName = propertyInfo.Name;
                     object fieldValue = null;
                     Type fieldType = null;
                     
-                    if (dictionary.Has(propertyInfo.Name))
+                    // set field name to property alias if present
+                    if (propertyInfo.IsDefined(typeof(AliasField)))
                     {
-                        fieldValue = GetFieldValue(dictionary, propertyInfo.Name);
+                        var aliasFieldAttribute = (AliasField)propertyInfo.GetCustomAttribute(typeof(AliasField));
+                        
+                        fieldName = aliasFieldAttribute.Alias;
+                    }
+                    
+                    if (dictionary.Has(fieldName))
+                    {
+                        fieldValue = GetFieldValue(dictionary, fieldName);
                         
                         if (fieldValue != null)
                         {
                             fieldType = fieldValue.GetType();
+                        }
+                        else
+                        {
+                            // skip property if it should ingore null value
+                            if (propertyInfo.IsDefined(typeof(IgnoreNullValue)))
+                            {
+                                continue;
+                            }
                         }
                     }
                     else

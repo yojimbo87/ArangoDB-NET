@@ -8,6 +8,9 @@ namespace Arango.Client
 {
     public static class Dictator
     {
+        /// <summary>
+        /// Contains global settings which affects various operations.
+        /// </summary>
         public static DictatorSettings Settings { get; private set; }
         
         public static Dictionary<string, object> New()
@@ -49,31 +52,53 @@ namespace Arango.Client
             else
             {
                 foreach (var propertyInfo in inputObjectType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
-                {
+                {                    
+                    // skip property if it should be ingored
+                    if (propertyInfo.IsDefined(typeof(IgnoreField)))
+                    {
+                        continue;
+                    }
+                    
                     var propertyValue = propertyInfo.GetValue(obj);
+                    
+                    // skip property if it should ingore null value
+                    if (propertyInfo.IsDefined(typeof(IgnoreNullValue)) && (propertyValue == null))
+                    {
+                        continue;
+                    }
+                    
+                    var fieldName = propertyInfo.Name;
+                    
+                    // set field name as property alias if present
+                    if (propertyInfo.IsDefined(typeof(AliasField)))
+                    {
+                        var aliasFieldAttribute = (AliasField)propertyInfo.GetCustomAttribute(typeof(AliasField));
+                        
+                        fieldName = aliasFieldAttribute.Alias;
+                    }
                     
                     if (propertyValue == null)
                     {
-                        document.Object(propertyInfo.Name, null);
+                        document.Object(fieldName, null);
                     }
                     else if (propertyValue is IDictionary)
                     {
-                        document.Object(propertyInfo.Name, propertyValue);
+                        document.Object(fieldName, propertyValue);
                     }
                     // property is array or collection
                     else if ((propertyInfo.PropertyType.IsArray || propertyInfo.PropertyType.IsGenericType) && (propertyValue is IList))
                     {
-                        document.List(propertyInfo.Name, ToList(propertyValue));
+                        document.List(fieldName, ToList(propertyValue));
                     }
                     // property is class except the string type since string values are parsed differently
                     else if (propertyInfo.PropertyType.IsClass && (propertyInfo.PropertyType.Name != "String"))
                     {
-                        document.Object(propertyInfo.Name, ToDocument(propertyValue));
+                        document.Object(fieldName, ToDocument(propertyValue));
                     }
                     // property is basic type
                     else
                     {
-                        document.Object(propertyInfo.Name, propertyValue);
+                        document.Object(fieldName, propertyValue);
                     }
                 }
             }
