@@ -146,8 +146,8 @@ namespace Arango.Tests
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
             Assert.IsTrue(queryResult.HasValue);
-            Assert.IsTrue(documents.First(q => q.String("foo") == queryResult.Value.foo) != null);
-            Assert.IsTrue(documents.First(q => q.Int("bar") == queryResult.Value.bar) != null);
+            Assert.IsTrue(documents.First(q => q.String("foo") == queryResult.Value.Foo) != null);
+            Assert.IsTrue(documents.First(q => q.Int("bar") == queryResult.Value.Bar) != null);
         }
         
         #endregion
@@ -236,10 +236,10 @@ namespace Arango.Tests
             Assert.IsTrue(queryResult.Success);
             Assert.IsTrue(queryResult.HasValue);
             Assert.AreEqual(2, queryResult.Value.Count);
-            Assert.AreEqual(documents[0].String("foo"), queryResult.Value[0].foo);
-            Assert.AreEqual(documents[0].Int("bar"), queryResult.Value[0].bar);
-            Assert.AreEqual(documents[1].String("foo"), queryResult.Value[1].foo);
-            Assert.AreEqual(documents[1].Int("bar"), queryResult.Value[1].bar);
+            Assert.AreEqual(documents[0].String("foo"), queryResult.Value[0].Foo);
+            Assert.AreEqual(documents[0].Int("bar"), queryResult.Value[0].Bar);
+            Assert.AreEqual(documents[1].String("foo"), queryResult.Value[1].Foo);
+            Assert.AreEqual(documents[1].Int("bar"), queryResult.Value[1].Bar);
         }
         
         #endregion

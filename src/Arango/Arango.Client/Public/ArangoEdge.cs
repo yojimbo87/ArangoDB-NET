@@ -154,6 +154,14 @@ namespace Arango.Client
             return result;
         }
         
+        /// <summary>
+        /// Creates new edge with document data within specified collection between two document vertices in current database context.
+        /// </summary>
+        public ArangoResult<Dictionary<string, object>> Create<T>(string collection, string fromHandle, string toHandle, T obj)
+        {
+            return Create(collection, fromHandle, toHandle, Dictator.ToDocument(obj));
+        }
+        
         #endregion
         
         #region Check (HEAD)
@@ -242,6 +250,27 @@ namespace Arango.Client
             }
             
             _parameters.Clear();
+            
+            return result;
+        }
+        
+        /// <summary>
+        /// Retrieves specified edge.
+        /// </summary>
+        public ArangoResult<T> Get<T>(string handle)
+        {
+            var getResult = Get(handle);
+            var result = new ArangoResult<T>();
+            
+            result.StatusCode = getResult.StatusCode;
+            result.Success = getResult.Success;
+            result.Extra = getResult.Extra;
+            result.Error = getResult.Error;
+            
+            if (getResult.Success)
+            {
+                result.Value = getResult.Value.ToObject<T>();
+            }
             
             return result;
         }
@@ -344,6 +373,14 @@ namespace Arango.Client
             return result;
         }
         
+        /// <summary>
+        /// Updates existing edge identified by its handle with new edge data.
+        /// </summary>
+        public ArangoResult<Dictionary<string, object>> Update<T>(string handle, T obj)
+        {
+            return Update(handle, Dictator.ToDocument(obj));
+        }
+        
         #endregion
         
         #region Replace (PUT)
@@ -396,6 +433,14 @@ namespace Arango.Client
             _parameters.Clear();
             
             return result;
+        }
+        
+        /// <summary>
+        /// Completely replaces existing edge identified by its handle with new edge data.
+        /// </summary>
+        public ArangoResult<Dictionary<string, object>> Replace<T>(string handle, T obj)
+        {
+            return Replace(handle, Dictator.ToDocument(obj));
         }
         
         #endregion

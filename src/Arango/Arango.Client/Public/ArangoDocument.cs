@@ -95,7 +95,7 @@ namespace Arango.Client
         #endregion
         
         #region Create (POST)
-        
+                
         /// <summary>
         /// Creates new document within specified collection in current database context.
         /// </summary>
@@ -135,6 +135,14 @@ namespace Arango.Client
             _parameters.Clear();
             
             return result;
+        }
+
+        /// <summary>
+        /// Creates new document within specified collection in current database context.
+        /// </summary>
+        public ArangoResult<Dictionary<string, object>> Create<T>(string collection, T obj)
+        {
+            return Create(collection, Dictator.ToDocument(obj));
         }
         
         #endregion
@@ -229,6 +237,27 @@ namespace Arango.Client
             return result;
         }
         
+        /// <summary>
+        /// Retrieves specified document.
+        /// </summary>
+        public ArangoResult<T> Get<T>(string handle)
+        {
+            var getResult = Get(handle);
+            var result = new ArangoResult<T>();
+            
+            result.StatusCode = getResult.StatusCode;
+            result.Success = getResult.Success;
+            result.Extra = getResult.Extra;
+            result.Error = getResult.Error;
+            
+            if (getResult.Success)
+            {
+                result.Value = getResult.Value.ToObject<T>();
+            }
+            
+            return result;
+        }
+        
         #endregion
         
         #region Update (PATCH)
@@ -286,6 +315,14 @@ namespace Arango.Client
             
             return result;
         }
+
+        /// <summary>
+        /// Updates existing document identified by its handle with new document data.
+        /// </summary>
+        public ArangoResult<Dictionary<string, object>> Update<T>(string handle, T obj)
+        {
+            return Update(handle, Dictator.ToDocument(obj));
+        }
         
         #endregion
         
@@ -339,6 +376,14 @@ namespace Arango.Client
             _parameters.Clear();
             
             return result;
+        }
+        
+        /// <summary>
+        /// Completely replaces existing document identified by its handle with new document data.
+        /// </summary>
+        public ArangoResult<Dictionary<string, object>> Replace<T>(string handle, T obj)
+        {
+            return Replace(handle, Dictator.ToDocument(obj));
         }
         
         #endregion

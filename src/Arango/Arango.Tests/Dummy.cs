@@ -1,10 +1,16 @@
-﻿
+﻿using Arango.Client;
 
 namespace Arango.Tests
 {
     public class Dummy
     {
-        public string foo { get; set; }
-        public int bar { get; set; }
+        [AliasField("foo")]
+        public string Foo { get; set; }
+        
+        [AliasField("bar")]
+        public int Bar { get; set; }
+        
+        [AliasField("baz")]
+        public int Baz { get; set; }
     }
 }

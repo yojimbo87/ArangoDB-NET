@@ -96,7 +96,7 @@ namespace Arango.Client
             result.Extra = listResult.Extra;
             result.Error = listResult.Error;
             
-            if (listResult.Success && (listResult.Value != null))
+            if (listResult.Success)
             {
                 result.Value = listResult.Value.Select(o => Convert.ChangeType(o, type)).Cast<Dictionary<string, object>>().ToList();
             }
@@ -118,7 +118,7 @@ namespace Arango.Client
             result.Extra = listResult.Extra;
             result.Error = listResult.Error;
             
-            if (listResult.Success && (listResult.Value != null))
+            if (listResult.Success)
             {
                 if (type.IsPrimitive ||
         		    (type == typeof(string)) ||
@@ -237,7 +237,7 @@ namespace Arango.Client
             result.Extra = listResult.Extra;
             result.Error = listResult.Error;
             
-            if (listResult.Success && (listResult.Value != null))
+            if (listResult.Success)
             {
                 result.Value = (Dictionary<string, object>)Convert.ChangeType(listResult.Value[0], type);
             }
@@ -258,7 +258,7 @@ namespace Arango.Client
             result.Extra = listResult.Extra;
             result.Error = listResult.Error;
             
-            if (listResult.Success && (listResult.Value != null))
+            if (listResult.Success)
             {
                 result.Value = (T)listResult.Value[0];
             }
@@ -279,7 +279,7 @@ namespace Arango.Client
             result.Extra = listResult.Extra;
             result.Error = listResult.Error;
             
-            if (listResult.Success && (listResult.Value != null))
+            if (listResult.Success)
             {
                 result.Value = listResult.Value[0];
             }

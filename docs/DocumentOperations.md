@@ -22,15 +22,34 @@ Applicable optional parameters available through fluent API:
 ```csharp
 var db = new ArangoDatabase("myDatabaseAlias");
 
-// sets up document with data
 var document = new Dictionary<string, object>()
     .String("foo", "foo string value")
     .Int("bar", 12345);
 
-// creates new document
 var createDocumentResult = db.Document
     .WaitForSync(true)
     .Create("MyDocumentCollection", document);
+    
+if (createDocumentResult.Success)
+{
+    var id = createDocumentResult.Value.String("_id");
+    var key = createDocumentResult.Value.String("_key");
+    var revision = createDocumentResult.Value.String("_rev");
+}
+```
+
+Generic version:
+
+```csharp
+var db = new ArangoDatabase("myDatabaseAlias");
+
+var dummy = new Dummy();
+dummy.Foo = "foo string value";
+dummy.Bar = 12345;
+
+var createDocumentResult = db.Document
+    .WaitForSync(true)
+    .Create("MyDocumentCollection", dummy);
     
 if (createDocumentResult.Success)
 {
@@ -89,6 +108,21 @@ if (getDocumentResult.Success)
 }
 ```
 
+Generic version:
+
+```csharp
+var db = new ArangoDatabase("myDatabaseAlias");
+
+var getDocumentResult = db.Document
+    .Get<Dummy>("MyDocumentCollection/123");
+    
+if (getDocumentResult.Success)
+{
+    var foo = getDocumentResult.Value.Foo;
+    var bar = getDocumentResult.Value.Bar;
+}
+```
+
 ## Update document
 
 Updates existing document identified by its handle with new document data.
@@ -118,6 +152,26 @@ if (updateDocumentResult.Success)
 }
 ```
 
+Generic version:
+
+```csharp
+var db = new ArangoDatabase("myDatabaseAlias");
+
+var dummy = new Dummy();
+dummy.Foo = "some other new string";
+dummy.Baz = 123;
+
+var updateDocumentResult = db.Document
+    .Update("MyDocumentCollection/123", dummy);
+    
+if (updateDocumentResult.Success)
+{
+    var id = updateDocumentResult.Value.String("_id");
+    var key = updateDocumentResult.Value.String("_key");
+    var revision = updateDocumentResult.Value.String("_rev");
+}
+```
+
 ## Replace document
 
 Completely replaces existing document identified by its handle with new document data.
@@ -137,6 +191,26 @@ var document = new Dictionary<string, object>()
 
 var replaceDocumentResult = db.Document
     .Replace("MyDocumentCollection/123", document);
+    
+if (replaceDocumentResult.Success)
+{
+    var id = replaceDocumentResult.Value.String("_id");
+    var key = replaceDocumentResult.Value.String("_key");
+    var revision = replaceDocumentResult.Value.String("_rev");
+}
+```
+
+Generic version:
+
+```csharp
+var db = new ArangoDatabase("myDatabaseAlias");
+
+var dummy = new Dummy();
+dummy.Foo = "some other new string";
+dummy.Baz = 123;
+
+var replaceDocumentResult = db.Document
+    .Replace("MyDocumentCollection/123", dummy);
     
 if (replaceDocumentResult.Success)
 {

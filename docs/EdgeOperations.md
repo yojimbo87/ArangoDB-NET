@@ -23,15 +23,35 @@ Applicable optional parameters available through fluent API:
 ```csharp
 var db = new ArangoDatabase("myDatabaseAlias");
 
-// sets up edge document with data
 var edgeData = new Dictionary<string, object>()
     .String("foo", "foo string value")
     .Int("bar", 12345);
 
-// creates new edge
 var createEdgeResult = db.Edge
     .WaitForSync(true)
     .Create("MyEdgeCollection", "MyDocumentCollection/123", "MyDocumentCollection/456", edgeData);
+    
+if (createEdgeResult.Success)
+{
+    var id = createEdgeResult.Value.String("_id");
+    var key = createEdgeResult.Value.String("_key");
+    var revision = createEdgeResult.Value.String("_rev");
+}
+```
+
+Generic version:
+
+```csharp
+var db = new ArangoDatabase("myDatabaseAlias");
+
+var dummy = new Dummy();
+dummy.Foo = "foo string value";
+dummy.Bar = 12345;
+
+// creates new edge
+var createEdgeResult = db.Edge
+    .WaitForSync(true)
+    .Create("MyEdgeCollection", "MyDocumentCollection/123", "MyDocumentCollection/456", dummy);
     
 if (createEdgeResult.Success)
 {
@@ -92,6 +112,21 @@ if (getEdgeResult.Success)
 }
 ```
 
+Generic version:
+
+```csharp
+var db = new ArangoDatabase("myDatabaseAlias");
+
+var getEdgeResult = db.Edge
+    .Get<Dummy>("MyEdgeCollection/123");
+    
+if (getEdgeResult.Success)
+{
+    var foo = getEdgeResult.Value.Foo;
+    var bar = getEdgeResult.Value.Bar;
+}
+```
+
 ## Retrieve vertex edges
 
 Retrieves list of edges from specified edge type collection to specified document vertex with given direction.
@@ -144,6 +179,26 @@ if (updateEdgeResult.Success)
 }
 ```
 
+Generic version:
+
+```csharp
+var db = new ArangoDatabase("myDatabaseAlias");
+
+var dummy = new Dummy();
+dummy.Foo = "some other new string";
+dummy.Baz = 123;
+
+var updateEdgeResult = db.Edge
+    .Update("MyEdgeCollection/123", dummy);
+    
+if (updateEdgeResult.Success)
+{
+    var id = updateEdgeResult.Value.String("_id");
+    var key = updateEdgeResult.Value.String("_key");
+    var revision = updateEdgeResult.Value.String("_rev");
+}
+```
+
 ## Replace edge
 
 Completely replaces existing edge identified by its handle with new edge data.
@@ -163,6 +218,26 @@ var edgeData = new Dictionary<string, object>()
 
 var replaceEdgeResult = db.Edge
     .Replace("MyEdgeCollection/123", edgeData);
+    
+if (replaceEdgeResult.Success)
+{
+    var id = replaceEdgeResult.Value.String("_id");
+    var key = replaceEdgeResult.Value.String("_key");
+    var revision = replaceEdgeResult.Value.String("_rev");
+}
+```
+
+Generic version:
+
+```csharp
+var db = new ArangoDatabase("myDatabaseAlias");
+
+var dummy = new Dummy();
+dummy.Foo = "some other new string";
+dummy.Baz = 123;
+
+var replaceEdgeResult = db.Edge
+    .Replace("MyEdgeCollection/123", dummy);
     
 if (replaceEdgeResult.Success)
 {
