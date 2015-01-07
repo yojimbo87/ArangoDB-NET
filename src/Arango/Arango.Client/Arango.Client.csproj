@@ -89,6 +89,7 @@
     <Compile Include="Public\ArangoSettings.cs" />
     <Compile Include="Public\ArangoUpdatePolicy.cs" />
     <Compile Include="Public\ArangoUser.cs" />
+    <Compile Include="Public\DictionaryExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ExternalLibraries" />

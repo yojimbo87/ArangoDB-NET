@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CollectionOperations\CollectionOperationsTests.cs" />
+    <Compile Include="ConnectionlessOperations\ConnectionlessOperationsTests.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="DatabaseOperations\DatabaseOperationsTests.cs" />
     <Compile Include="DocumentOperations\DocumentOperationsTests.cs" />
@@ -72,6 +73,7 @@
     <Folder Include="DocumentOperations" />
     <Folder Include="EdgeOperations" />
     <Folder Include="FunctionOperations" />
+    <Folder Include="ConnectionlessOperations" />
     <Folder Include="QueryOperations" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

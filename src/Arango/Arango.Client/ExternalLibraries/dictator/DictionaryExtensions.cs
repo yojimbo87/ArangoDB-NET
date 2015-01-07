@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Arango.Client
 {
-    public static class DictionaryExtensions
+    public static partial class DictionaryExtensions
     {
         #region Field getters
         
