@@ -52,17 +52,17 @@ namespace Arango.Tests
             Assert.IsTrue(doc.HasRev());
             Assert.AreEqual("123456789", doc.Rev());
             
-            Assert.Throws<InvalidFieldTypeException>(() => {
+            Assert.Throws<ArgumentException>(() => {
                  var doc1 = new Dictionary<string, object>()
                      .ID("col/123a");
             });
             
-            Assert.Throws<InvalidFieldTypeException>(() => {
+            Assert.Throws<ArgumentException>(() => {
                  var doc1 = new Dictionary<string, object>()
                      .Key("123a");
             });
             
-            Assert.Throws<InvalidFieldTypeException>(() => {
+            Assert.Throws<ArgumentException>(() => {
                  var doc1 = new Dictionary<string, object>()
                      .Rev("123a");
             });
