@@ -43,12 +43,12 @@ namespace Arango.Client
         /// <summary>
         /// Stores `_id` field value.
         /// </summary>
-        /// <exception cref="InvalidFieldTypeException">Specified value has invalid _id field format.</exception>
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
         public static Dictionary<string, object> ID(this Dictionary<string, object> dictionary, string id)
         {
             if (!ArangoDocument.IsID(id))
             {
-                throw new InvalidFieldTypeException("Specified value (" + id + ") has invalid _id field format.");
+                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
             }
             
             SetFieldValue(dictionary, "_id", id);
@@ -95,12 +95,12 @@ namespace Arango.Client
         /// <summary>
         /// Stores `_key` field value.
         /// </summary>
-        /// <exception cref="InvalidFieldTypeException">Specified value has invalid _key field format.</exception>
+        /// <exception cref="ArgumentException">Specified key value has invalid format.</exception>
         public static Dictionary<string, object> Key(this Dictionary<string, object> dictionary, string key)
         {
             if (!ArangoDocument.IsKey(key))
             {
-                throw new InvalidFieldTypeException("Specified value (" + key + ") has invalid _key field format.");
+                throw new ArgumentException("Specified key value (" + key + ") has invalid format.");
             }
             
             SetFieldValue(dictionary, "_key", key);
@@ -147,12 +147,12 @@ namespace Arango.Client
         /// <summary>
         /// Stores `_rev` field value.
         /// </summary>
-        /// <exception cref="InvalidFieldTypeException">Specified value has invalid _rev field format.</exception>
+        /// <exception cref="ArgumentException">Specified rev value has invalid format.</exception>
         public static Dictionary<string, object> Rev(this Dictionary<string, object> dictionary, string rev)
         {
             if (!ArangoDocument.IsRev(rev))
             {
-                throw new InvalidFieldTypeException("Specified value (" + rev + ") has invalid _rev field format.");
+                throw new ArgumentException("Specified rev value (" + rev + ") has invalid format.");
             }   
             
             SetFieldValue(dictionary, "_rev", rev);
