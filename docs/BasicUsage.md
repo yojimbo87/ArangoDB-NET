@@ -74,15 +74,15 @@ Internal serialization and deserialization of JSON documents is done by embedded
 
 Apart from standard dictionary extensions provided by [dictator](https://github.com/yojimbo87/dictator), there are also following ArangoDB specific extension methods which can be used by `Dictionary<string, object>` instances:
 
-- `HasID()` - Checks if '_id' field is present and has valid format.
-- `ID()` - Retrieves value of '_id' field. If the field is missing or has invalid format null value is returned.
-- `ID(string id)` - Stores '_id' field value.
-- `HasKey()` - Checks if '_key' field is present and has valid format.
-- `Key()` - Retrieves value of '_key' field. If the field is missing or has invalid format null value is returned.
-- `Key(string key)` - Stores '_key' field value.
-- `HasRev()` - Checks if '_rev' field is present and has valid format.
-- `Rev()` - Retrieves value of '_rev' field. If the field is missing or has invalid format null value is returned.
-- `Rev(string rev)` - Stores '_rev' field value.
+- `HasID()` - Checks if `_id` field is present and has valid format.
+- `ID()` - Retrieves value of `_id` field. If the field is missing or has invalid format null value is returned.
+- `ID(string id)` - Stores `_id` field value.
+- `HasKey()` - Checks if `_key` field is present and has valid format.
+- `Key()` - Retrieves value of `_key` field. If the field is missing or has invalid format null value is returned.
+- `Key(string key)` - Stores `_key` field value.
+- `HasRev()` - Checks if `_rev` field is present and has valid format.
+- `Rev()` - Retrieves value of `_rev` field. If the field is missing or has invalid format null value is returned.
+- `Rev(string rev)` - Stores `_rev` field value.
 
 ## Fluent API
 
