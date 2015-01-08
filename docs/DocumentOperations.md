@@ -42,7 +42,7 @@ if (createDocumentResult.Success)
 Generic version:
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var dummy = new Dummy();
 dummy.Foo = "foo string value";
@@ -67,11 +67,11 @@ Checks for existence of specified document.
 Applicable optional parameters available through fluent API:
 
 - `IfMatch(string revision)` - Conditionally operate on document with specified revision.
-- `IfMatch(string revision, ArangoUpdatePolicy updatePolicy)` - Conditionally operate on document with specified revision and update policy.
+- `IfMatch(string revision, AUpdatePolicy updatePolicy)` - Conditionally operate on document with specified revision and update policy.
 - `IfNoneMatch(string revision)` - Conditionally operate on document which current revision does not match specified revision.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var checkDocumentResult = db.Document
     .Check("MyDocumentCollection/123");
@@ -92,7 +92,7 @@ Applicable optional parameters available through fluent API:
 - `IfNoneMatch(string revision)` - Conditionally operate on document which current revision does not match specified revision.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var getDocumentResult = db.Document
     .Get("MyDocumentCollection/123");
@@ -112,7 +112,7 @@ if (getDocumentResult.Success)
 Generic version:
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var getDocumentResult = db.Document
     .Get<Dummy>("MyDocumentCollection/123");
@@ -131,12 +131,12 @@ Updates existing document identified by its handle with new document data.
 Applicable optional parameters available through fluent API:
 
 - `IfMatch(string revision)` - Conditionally operate on document with specified revision.
-- `IfMatch(string revision, ArangoUpdatePolicy updatePolicy)` - Conditionally operate on document with specified revision and update policy.
+- `IfMatch(string revision, AUpdatePolicy updatePolicy)` - Conditionally operate on document with specified revision and update policy.
 - `KeepNull(bool value)` - Determines whether to keep any attributes from existing document that are contained in the patch document which contains null value. Default value: true.
 - `MergeArrays(bool value)` - Determines whether the value in the patch document will overwrite the existing document's value. Default value: true.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var document = new Dictionary<string, object>()
     .String("foo", "new foo string value")
@@ -156,7 +156,7 @@ if (updateDocumentResult.Success)
 Generic version:
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var dummy = new Dummy();
 dummy.Foo = "some other new string";
@@ -181,10 +181,10 @@ Applicable optional parameters available through fluent API:
 
 - `WaitForSync(bool value)` - Determines whether to wait until data are synchronised to disk. Default value: false.
 - `IfMatch(string revision)` - Conditionally operate on document with specified revision.
-- `IfMatch(string revision, ArangoUpdatePolicy updatePolicy)` - Conditionally operate on document with specified revision and update policy.
+- `IfMatch(string revision, AUpdatePolicy updatePolicy)` - Conditionally operate on document with specified revision and update policy.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var document = new Dictionary<string, object>()
     .String("foo", "other foo string value")
@@ -204,7 +204,7 @@ if (replaceDocumentResult.Success)
 Generic version:
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var dummy = new Dummy();
 dummy.Foo = "some other new string";
@@ -227,10 +227,10 @@ Deletes specified document.
 
 - `WaitForSync(bool value)` - Determines whether to wait until data are synchronised to disk. Default value: false.
 - `IfMatch(string revision)` - Conditionally operate on document with specified revision.
-- `IfMatch(string revision, ArangoUpdatePolicy updatePolicy)` - Conditionally operate on document with specified revision and update policy.
+- `IfMatch(string revision, AUpdatePolicy updatePolicy)` - Conditionally operate on document with specified revision and update policy.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var deleteDocumentResult = db.Document
     .Delete("MyDocumentCollection/123");
@@ -245,13 +245,13 @@ if (deleteDocumentResult.Success)
 
 ## Static methods
 
-`ArangoDocument` class provides following static methods:
+`ADocument` class provides following static methods:
 
-- `ArangoDocument.IsID(string id)` - Determines if specified value has valid document `_id` format. 
-- `ArangoDocument.IsKey(string key)` - Determines if specified value has valid document `_key` format.
-- `ArangoDocument.IsRev(string id)` - Determines if specified value has valid document `_rev` format.
-- `ArangoDocument.Identify(string collection, long key)` - Constructs document ID from specified collection and key values.
-- `ArangoDocument.Identify(string collection, string key)` - Constructs document ID from specified collection and key values. If key format is invalid null value is returned.
+- `ADocument.IsID(string id)` - Determines if specified value has valid document `_id` format. 
+- `ADocument.IsKey(string key)` - Determines if specified value has valid document `_key` format.
+- `ADocument.IsRev(string id)` - Determines if specified value has valid document `_rev` format.
+- `ADocument.Identify(string collection, long key)` - Constructs document ID from specified collection and key values.
+- `ADocument.Identify(string collection, string key)` - Constructs document ID from specified collection and key values. If key format is invalid null value is returned.
 
 ## More examples
 

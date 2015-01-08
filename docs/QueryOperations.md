@@ -17,14 +17,14 @@ Applicable parameters available through fluent API:
 
 - `Aql(string query)` - Sets AQL query code.
 - `BindVar(string key, object value)` - Maps key/value bind parameter.
-- `Count(bool value)` - Determines whether the number of retrieved documents should be returned in `Extra` property of `ArangoResult` instance. Default value: false.
+- `Count(bool value)` - Determines whether the number of retrieved documents should be returned in `Extra` property of `AResult` instance. Default value: false.
 - `Ttl(int value)` - Determines whether the number of documents in the result set should be returned. Default value: false.
 - `BatchSize(int value)` - Determines maximum number of result documents to be transferred from the server to the client in one roundtrip. If not set this value is server-controlled.
 
 ## Executing simple query
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var queryResult = db.Query
     .Aql(@"
@@ -46,7 +46,7 @@ if (queryResult.Success)
 ## Executing query with bind variables
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var queryResult = db.Query
     .BindVar("bar", 123)
@@ -83,7 +83,7 @@ Query result can be retrieved through following methods with different value typ
 Analyzes specified AQL query.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var parseQueryResult = db.Query.Parse("FOR item IN MyDocumentCollection RETURN item");
     
@@ -98,7 +98,7 @@ if (parseQueryResult.Success)
 Transforms specified query into minified version with removed leading and trailing whitespaces except new line characters.
 
 ```csharp
-var singleLineQuery = ArangoQuery.Minify(@"
+var singleLineQuery = AQuery.Minify(@"
 FOR item IN MyDocumentCollection
     RETURN item
 ");
@@ -109,7 +109,7 @@ FOR item IN MyDocumentCollection
 Deletes specified AQL query cursor.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var deleteCursorResult = db.Query
     .DeleteCursor("someCursorID");

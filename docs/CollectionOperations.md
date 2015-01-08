@@ -26,13 +26,13 @@ Creates new collection in current database context.
 
 Applicable optional parameters available through fluent API:
 
-- `Type(ArangoCollectionType value)` - Determines type of the collection. Default value: Document.
+- `Type(ACollectionType value)` - Determines type of the collection. Default value: Document.
 - `WaitForSync(bool value)` - Determines whether to wait until data are synchronised to disk. Default value: false.
 - `JournalSize(long value)` - Determines maximum size of a journal or datafile in bytes. Default value: server configured.
 - `DoCompact(bool value)` - Determines whether the collection will be compacted. Default value: true.
 - `IsSystem(bool value)` - Determines whether the collection is a system collection. Default value: false.
 - `IsVolatile(bool value)` - Determines whether the collection data is kept in-memory only and not made persistent. Default value: false.
-- `KeyGeneratorType(ArangoKeyGeneratorType value)` - Determines the type of the key generator. Default value: Traditional.
+- `KeyGeneratorType(AKeyGeneratorType value)` - Determines the type of the key generator. Default value: Traditional.
 - `AllowUserKeys(bool value)` - Determines whether it is allowed to supply custom key values in the _key attribute of a document.
 - `KeyIncrement(long value)` - Determines increment value for autoincrement key generator.
 - `KeyOffset(long value)` - Determines initial offset value for autoincrement key generator.
@@ -40,11 +40,11 @@ Applicable optional parameters available through fluent API:
 - `ShardKeys(List<string> value)` - Determines which document attributes are used to specify the target shard for documents in cluster environment. Default value: ["_key"].
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 // creates new document type collection
 var createCollectionResult = db.Collection
-    .KeyGeneratorType(ArangoKeyGeneratorType.Autoincrement)
+    .KeyGeneratorType(AKeyGeneratorType.Autoincrement)
     .WaitForSync(true)
     .Create("MyDocumentCollection");
     
@@ -55,8 +55,8 @@ if (createCollectionResult.Success)
     var waitForSync = createResult.Value.Bool("waitForSync");
     var isVolatile = createResult.Value.Bool("isVolatile");
     var isSystem = createResult.Value.Bool("isSystem");
-    var status = createResult.Value.Enum<ArangoCollectionStatus>("status");
-    var type = createResult.Value.Enum<ArangoCollectionType>("type");
+    var status = createResult.Value.Enum<ACollectionStatus>("status");
+    var type = createResult.Value.Enum<ACollectionType>("type");
 }
 ```
 
@@ -65,7 +65,7 @@ if (createCollectionResult.Success)
 Retrieves basic information about specified collection.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var getCollectionResult = db.Collection
     .Get("MyDocumentCollection");
@@ -75,8 +75,8 @@ if (getCollectionResult.Success)
     var id = getCollectionResult.Value.String("id");
     var name = getCollectionResult.Value.String("name");
     var isSystem = getCollectionResult.Value.Bool("isSystem");
-    var status = getCollectionResult.Value.Enum<ArangoCollectionStatus>("status");
-    var type = getCollectionResult.Value.Enum<ArangoCollectionType>("type");
+    var status = getCollectionResult.Value.Enum<ACollectionStatus>("status");
+    var type = getCollectionResult.Value.Enum<ACollectionType>("type");
 }
 ```
 
@@ -85,7 +85,7 @@ if (getCollectionResult.Success)
 Retrieves basic information with additional properties about specified collection.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var getCollectionResult = db.Collection
     .GetProperties("MyDocumentCollection");
@@ -97,11 +97,11 @@ if (getCollectionResult.Success)
     var waitForSync = getCollectionResult.Value.Bool("waitForSync");
     var isVolatile = getCollectionResult.Value.Bool("isVolatile");
     var isSystem = getCollectionResult.Value.Bool("isSystem");
-    var status = getCollectionResult.Value.Enum<ArangoCollectionStatus>("status");
-    var type = getCollectionResult.Value.Enum<ArangoCollectionType>("type");
+    var status = getCollectionResult.Value.Enum<ACollectionStatus>("status");
+    var type = getCollectionResult.Value.Enum<ACollectionType>("type");
     var doCompact = getCollectionResult.Value.Bool("doCompact");
     var journalSize = getCollectionResult.Value.Long("journalSize");
-    var keyGeneratorType = getCollectionResult.Value.Enum<ArangoKeyGeneratorType>("keyOptions.type");
+    var keyGeneratorType = getCollectionResult.Value.Enum<AKeyGeneratorType>("keyOptions.type");
     var allowUserKeys = getCollectionResult.Value.Bool("keyOptions.allowUserKeys");
 }
 ```
@@ -111,7 +111,7 @@ if (getCollectionResult.Success)
 Retrieves basic information with additional properties and document count in specified collection.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var getCollectionResult = db.Collection
     .GetCount("MyDocumentCollection");
@@ -123,11 +123,11 @@ if (getCollectionResult.Success)
     var waitForSync = getCollectionResult.Value.Bool("waitForSync");
     var isVolatile = getCollectionResult.Value.Bool("isVolatile");
     var isSystem = getCollectionResult.Value.Bool("isSystem");
-    var status = getCollectionResult.Value.Enum<ArangoCollectionStatus>("status");
-    var type = getCollectionResult.Value.Enum<ArangoCollectionType>("type");
+    var status = getCollectionResult.Value.Enum<ACollectionStatus>("status");
+    var type = getCollectionResult.Value.Enum<ACollectionType>("type");
     var doCompact = getCollectionResult.Value.Bool("doCompact");
     var journalSize = getCollectionResult.Value.Long("journalSize");
-    var keyGeneratorType = getCollectionResult.Value.Enum<ArangoKeyGeneratorType>("keyOptions.type");
+    var keyGeneratorType = getCollectionResult.Value.Enum<AKeyGeneratorType>("keyOptions.type");
     var allowUserKeys = getCollectionResult.Value.Bool("keyOptions.allowUserKeys");
     var count = getCollectionResult.Value.Long("count");
 }
@@ -138,7 +138,7 @@ if (getCollectionResult.Success)
 Retrieves basic information with additional properties, document count and figures in specified collection.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var getCollectionResult = db.Collection
     .GetFigures("MyDocumentCollection");
@@ -150,11 +150,11 @@ if (getCollectionResult.Success)
     var waitForSync = getCollectionResult.Value.Bool("waitForSync");
     var isVolatile = getCollectionResult.Value.Bool("isVolatile");
     var isSystem = getCollectionResult.Value.Bool("isSystem");
-    var status = getCollectionResult.Value.Enum<ArangoCollectionStatus>("status");
-    var type = getCollectionResult.Value.Enum<ArangoCollectionType>("type");
+    var status = getCollectionResult.Value.Enum<ACollectionStatus>("status");
+    var type = getCollectionResult.Value.Enum<ACollectionType>("type");
     var doCompact = getCollectionResult.Value.Bool("doCompact");
     var journalSize = getCollectionResult.Value.Long("journalSize");
-    var keyGeneratorType = getCollectionResult.Value.Enum<ArangoKeyGeneratorType>("keyOptions.type");
+    var keyGeneratorType = getCollectionResult.Value.Enum<AKeyGeneratorType>("keyOptions.type");
     var allowUserKeys = getCollectionResult.Value.Bool("keyOptions.allowUserKeys");
     var count = getCollectionResult.Value.Long("count");
     var figures = getCollectionResult.Value.Document("figures");
@@ -166,7 +166,7 @@ if (getCollectionResult.Success)
 Retrieves basic information and revision ID of specified collection.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var getCollectionResult = db.Collection
     .GetRevision("MyDocumentCollection");
@@ -176,8 +176,8 @@ if (getCollectionResult.Success)
     var id = getCollectionResult.Value.String("id");
     var name = getCollectionResult.Value.String("name");
     var isSystem = getCollectionResult.Value.Bool("isSystem");
-    var status = getCollectionResult.Value.Enum<ArangoCollectionStatus>("status");
-    var type = getCollectionResult.Value.Enum<ArangoCollectionType>("type");
+    var status = getCollectionResult.Value.Enum<ACollectionStatus>("status");
+    var type = getCollectionResult.Value.Enum<ACollectionType>("type");
     var revision = getCollectionResult.Value.String("revision");
 }
 ```
@@ -192,7 +192,7 @@ Applicable optional parameters available through fluent API:
 - `WithData(bool value)` - Determines whether to include document body data in the checksum calculation. Default value: false.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var getCollectionResult = db.Collection
     .GetChecksum("MyDocumentCollection");
@@ -202,8 +202,8 @@ if (getCollectionResult.Success)
     var id = getCollectionResult.Value.String("id");
     var name = getCollectionResult.Value.String("name");
     var isSystem = getCollectionResult.Value.Bool("isSystem");
-    var status = getCollectionResult.Value.Enum<ArangoCollectionStatus>("status");
-    var type = getCollectionResult.Value.Enum<ArangoCollectionType>("type");
+    var status = getCollectionResult.Value.Enum<ACollectionStatus>("status");
+    var type = getCollectionResult.Value.Enum<ACollectionType>("type");
     var revision = getCollectionResult.Value.String("revision");
     var checksum = getCollectionResult.Value.Long("checksum");
 }
@@ -215,13 +215,13 @@ Retrieves list of documents in specified collection.
 
 Applicable optional parameters available through fluent API:
 
-- `ReturnListType(ArangoReturnListType value)` - Determines which attribute will be retuned in the list. Default value: Path.
+- `ReturnListType(AReturnListType value)` - Determines which attribute will be retuned in the list. Default value: Path.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var getDocumentsResult = db.Collection
-    .ReturnListType(ArangoReturnListType.Key)
+    .ReturnListType(AReturnListType.Key)
     .GetAllDocuments("MyDocumentCollection");
 
 if (getDocumentsResult.Success)
@@ -239,13 +239,13 @@ Retrieves list of edges in specified collection.
 
 Applicable optional parameters available through fluent API:
 
-- `ReturnListType(ArangoReturnListType value)` - Determines which attribute will be retuned in the list. Default value: Path.
+- `ReturnListType(AReturnListType value)` - Determines which attribute will be retuned in the list. Default value: Path.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var getEdgesResult = db.Collection
-    .ReturnListType(ArangoReturnListType.Key)
+    .ReturnListType(AReturnListType.Key)
     .GetAllEdges("MyEdgeCollection");
 
 if (getEdgesResult.Success)
@@ -262,7 +262,7 @@ if (getEdgesResult.Success)
 Removes all documents from specified collection.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var truncateCollectionResult = db.Collection
     .Truncate("MyDocumentCollection");
@@ -272,8 +272,8 @@ if (truncateCollectionResult.Success)
     var id = truncateCollectionResult.Value.String("id");
     var name = truncateCollectionResult.Value.String("name");
     var isSystem = truncateCollectionResult.Value.Bool("isSystem");
-    var status = truncateCollectionResult.Value.Enum<ArangoCollectionStatus>("status");
-    var type = truncateCollectionResult.Value.Enum<ArangoCollectionType>("type");
+    var status = truncateCollectionResult.Value.Enum<ACollectionStatus>("status");
+    var type = truncateCollectionResult.Value.Enum<ACollectionType>("type");
 }
 ```
 
@@ -286,7 +286,7 @@ Applicable optional parameters available through fluent API:
 - `Count(bool value)` - Determines whether the return value should include the number of documents in collection. Default value: true.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var loadCollectionResult = db.Collection
     .Count(false)
@@ -297,8 +297,8 @@ if (loadCollectionResult.Success)
     var id = loadCollectionResult.Value.String("id");
     var name = loadCollectionResult.Value.String("name");
     var isSystem = loadCollectionResult.Value.Bool("isSystem");
-    var status = loadCollectionResult.Value.Enum<ArangoCollectionStatus>("status");
-    var type = loadCollectionResult.Value.Enum<ArangoCollectionType>("type");
+    var status = loadCollectionResult.Value.Enum<ACollectionStatus>("status");
+    var type = loadCollectionResult.Value.Enum<ACollectionType>("type");
 }
 ```
 
@@ -307,7 +307,7 @@ if (loadCollectionResult.Success)
 Unloads specified collection from memory.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var unloadCollectionResult = db.Collection
     .Unload("MyDocumentCollection");
@@ -317,8 +317,8 @@ if (unloadCollectionResult.Success)
     var id = unloadCollectionResult.Value.String("id");
     var name = unloadCollectionResult.Value.String("name");
     var isSystem = unloadCollectionResult.Value.Bool("isSystem");
-    var status = unloadCollectionResult.Value.Enum<ArangoCollectionStatus>("status");
-    var type = unloadCollectionResult.Value.Enum<ArangoCollectionType>("type");
+    var status = unloadCollectionResult.Value.Enum<ACollectionStatus>("status");
+    var type = unloadCollectionResult.Value.Enum<ACollectionType>("type");
 }
 ```
 
@@ -332,7 +332,7 @@ Applicable optional parameters available through fluent API:
 - `JournalSize(long value)` - Determines maximum size of a journal or datafile in bytes. Default value: server configured.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var changeCollectionResult = db.Collection
     .WaitForSync(true)
@@ -346,11 +346,11 @@ if (changeCollectionResult.Success)
     var waitForSync = changeCollectionResult.Value.Bool("waitForSync");
     var isVolatile = changeCollectionResult.Value.Bool("isVolatile");
     var isSystem = changeCollectionResult.Value.Bool("isSystem");
-    var status = changeCollectionResult.Value.Enum<ArangoCollectionStatus>("status");
-    var type = changeCollectionResult.Value.Enum<ArangoCollectionType>("type");
+    var status = changeCollectionResult.Value.Enum<ACollectionStatus>("status");
+    var type = changeCollectionResult.Value.Enum<ACollectionType>("type");
     var doCompact = changeCollectionResult.Value.Bool("doCompact");
     var journalSize = changeCollectionResult.Value.Long("journalSize");
-    var keyGeneratorType = changeCollectionResult.Value.Enum<ArangoKeyGeneratorType>("keyOptions.type");
+    var keyGeneratorType = changeCollectionResult.Value.Enum<AKeyGeneratorType>("keyOptions.type");
     var allowUserKeys = changeCollectionResult.Value.Bool("keyOptions.allowUserKeys");
 }
 ```
@@ -360,7 +360,7 @@ if (changeCollectionResult.Success)
 Renames specified collection.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var renameCollectionResult = db.Collection
     .Rename("MyDocumentCollection", "MyFooCollection");
@@ -370,8 +370,8 @@ if (renameCollectionResult.Success)
     var id = renameCollectionResult.Value.String("id");
     var name = renameCollectionResult.Value.String("name");
     var isSystem = renameCollectionResult.Value.Bool("isSystem");
-    var status = renameCollectionResult.Value.Enum<ArangoCollectionStatus>("status");
-    var type = renameCollectionResult.Value.Enum<ArangoCollectionType>("type");
+    var status = renameCollectionResult.Value.Enum<ACollectionStatus>("status");
+    var type = renameCollectionResult.Value.Enum<ACollectionType>("type");
 }
 ```
 
@@ -380,7 +380,7 @@ if (renameCollectionResult.Success)
 Rotates the journal of specified collection to make the data in the file available for compaction. Current journal of the collection will be closed and turned into read-only datafile. This operation is not available in cluster environment.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var rotateJournalResult = db.Collection
     .RotateJournal("MyDocumentCollection");
@@ -391,7 +391,7 @@ var rotateJournalResult = db.Collection
 Deletes specified collection.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var deleteCollectionResult = db.Collection
     .Delete("MyDocumentCollection");

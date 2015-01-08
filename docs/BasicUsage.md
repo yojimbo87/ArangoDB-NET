@@ -2,19 +2,21 @@
 
 - [Connection management](#connection-management)
 - [Database context](#database-context)
-- [ArangoResult object](#arangoresult-object)
-- [ArangoError object](#arangoerror-object)
+- [AResult object](#aresult-object)
+- [AError object](#aerror-object)
 - [JSON representation](#json-representation)
 - [Dictionary extensions](#dictionary-extensions)
 - [Fluent API](#fluent-api)
 
+Driver's public API with its core functionality is exposed through `Arango.Client` namespace. Most of the classes which perform operations on ArangoDB database starts with `A` prefix (e.g. `ADatabase`, `ACollection`, `AQuery`, ...) to reduce the visual noise of superfluous naming.
+
 ## Connection management
 
-Driver's public API with its core functionality is exposed through `Arango.Client` namespace. Before the connection is initiated, driver needs to know database address, name and credentials (if needed) which will be stored under specified alias. `ArangoSettings` static class provides several static methods which are used to manage connection data about remote database backends.
+Before the connection is initiated, driver needs to know database address, name and credentials (if needed) which will be stored under specified alias. `ASettings` static class provides several static methods which are used to manage connection data about remote database backends.
 
 ```csharp
 // adds new connection data to database manager
-ArangoSettings.AddConnection(
+ASettings.AddConnection(
     "myDatabaseAlias",
     "127.0.0.1",
     8529,
@@ -25,39 +27,39 @@ ArangoSettings.AddConnection(
 );
 
 // checks if the specific connection data exists
-if (ArangoSettings.HasConnection("someDatabaseAlias"))
+if (ASettings.HasConnection("someDatabaseAlias"))
 {
     // removes specified connection data
-    ArangoSettings.RemoveConnection("someDatabaseAlias");
+    ASettings.RemoveConnection("someDatabaseAlias");
 }
 ```
 
 ## Database context
 
-Previously set database alias is used for the purpose of retrieving data needed for connecting to specific database and performing desired operations. There is no need to dispose `ArangoDatabase` instance in order to free database connection because operations are performed through HTTP calls.
+Previously set database alias is used for the purpose of retrieving data needed for connecting to specific database and performing desired operations. There is no need to dispose `ADatabase` instance in order to free database connection because operations are performed through HTTP calls.
 
 ```csharp
 // initialize new database context
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 // retrieve specified document
 var getResult = db.Document.Get("myCollection/123");
 ```
 
-## ArangoResult object
+## AResult object
 
-Once the operation is executed, returned data are contained within `ArangoResult` object which consists of following properties:
+Once the operation is executed, returned data are contained within `AResult` object which consists of following properties:
 
 - `Success` - Determines whether the operation ended with success and returned result value is other than null.
 - `StatusCode` - Integer value of the operation response HTTP status code.
 - `HasValue` - Determines if the operation contains value other than null.
 - `Value` - Generic object which type and value depends on performed operation.
-- `Error` - If operation ended with failure, this property would contain instance of `ArangoError` object which contains further information about the error.
+- `Error` - If operation ended with failure, this property would contain instance of `AError` object which contains further information about the error.
 - `Extra` - Document which might contain additional information on performed operation.
 
-## ArangoError object
+## AError object
 
-In case of operation failure driver doesn't throw exceptions explicitely, but `ArangoResult` object `Error` property would contain instance of `ArangoError` object with following properties:
+In case of operation failure driver doesn't throw exceptions explicitely, but `AResult` object `Error` property would contain instance of `AError` object with following properties:
 
 - `StatusCode` - Integer value of the operation response HTTP status code.
 - `Number` - Integer value indicating [ArangoDB internal error code](https://docs.arangodb.com/ErrorCodes/README.html).
@@ -90,7 +92,7 @@ Driver is heavily using [fluent API](http://en.wikipedia.org/wiki/Fluent_interfa
 
 ```csharp
 // initialize new database context
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 // operation core
 var queryOperation = db.Query
     .Aql("FOR item IN myCollection RETURN item");

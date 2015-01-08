@@ -21,7 +21,7 @@ Applicable optional parameters available through fluent API:
 - `WaitForSync(bool value)` - Determines whether to wait until data are synchronised to disk. Default value: false.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var edgeData = new Dictionary<string, object>()
     .String("foo", "foo string value")
@@ -42,7 +42,7 @@ if (createEdgeResult.Success)
 Generic version:
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var dummy = new Dummy();
 dummy.Foo = "foo string value";
@@ -68,11 +68,11 @@ Checks for existence of specified edge.
 Applicable optional parameters available through fluent API:
 
 - `IfMatch(string revision)` - Conditionally operate on edge with specified revision.
-- `IfMatch(string revision, ArangoUpdatePolicy updatePolicy)` - Conditionally operate on edge with specified revision and update policy.
+- `IfMatch(string revision, AUpdatePolicy updatePolicy)` - Conditionally operate on edge with specified revision and update policy.
 - `IfNoneMatch(string revision)` - Conditionally operate on edge which current revision does not match specified revision.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var checkEdgeResult = db.Edge
     .Check("MyEdgeCollection/123");
@@ -93,7 +93,7 @@ Applicable optional parameters available through fluent API:
 - `IfNoneMatch(string revision)` - Conditionally operate on edge which current revision does not match specified revision.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var getEdgeResult = db.Edge
     .Get("MyEdgeCollection/123");
@@ -115,7 +115,7 @@ if (getEdgeResult.Success)
 Generic version:
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var getEdgeResult = db.Edge
     .Get<Dummy>("MyEdgeCollection/123");
@@ -132,10 +132,10 @@ if (getEdgeResult.Success)
 Retrieves list of edges from specified edge type collection to specified document vertex with given direction.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var getEdgesResult = db.Edge
-    .Get("MyEdgeCollection", "MyDocumentCollection/123", ArangoDirection.In);
+    .Get("MyEdgeCollection", "MyDocumentCollection/123", ADirection.In);
     
 if (getEdgesResult.Success)
 {
@@ -157,12 +157,12 @@ Updates existing edge identified by its handle with new edge data.
 Applicable optional parameters available through fluent API:
 
 - `IfMatch(string revision)` - Conditionally operate on edge with specified revision.
-- `IfMatch(string revision, ArangoUpdatePolicy updatePolicy)` - Conditionally operate on edge with specified revision and update policy.
+- `IfMatch(string revision, AUpdatePolicy updatePolicy)` - Conditionally operate on edge with specified revision and update policy.
 - `KeepNull(bool value)` - Determines whether to keep any attributes from existing edge that are contained in the patch edge which contains null value. Default value: true.
 - `MergeArrays(bool value)` - Determines whether the value in the patch edge will overwrite the existing edge's value. Default value: true.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var edgeData = new Dictionary<string, object>()
     .String("foo", "new foo string value")
@@ -182,7 +182,7 @@ if (updateEdgeResult.Success)
 Generic version:
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var dummy = new Dummy();
 dummy.Foo = "some other new string";
@@ -207,10 +207,10 @@ Applicable optional parameters available through fluent API:
 
 - `WaitForSync(bool value)` - Determines whether to wait until data are synchronised to disk. Default value: false.
 - `IfMatch(string revision)` - Conditionally operate on edge with specified revision.
-- `IfMatch(string revision, ArangoUpdatePolicy updatePolicy)` - Conditionally operate on edge with specified revision and update policy.
+- `IfMatch(string revision, AUpdatePolicy updatePolicy)` - Conditionally operate on edge with specified revision and update policy.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var edgeData = new Dictionary<string, object>()
     .String("foo", "other foo string value")
@@ -230,7 +230,7 @@ if (replaceEdgeResult.Success)
 Generic version:
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var dummy = new Dummy();
 dummy.Foo = "some other new string";
@@ -253,10 +253,10 @@ Deletes specified edge.
 
 - `WaitForSync(bool value)` - Determines whether to wait until data are synchronised to disk. Default value: false.
 - `IfMatch(string revision)` - Conditionally operate on edge with specified revision.
-- `IfMatch(string revision, ArangoUpdatePolicy updatePolicy)` - Conditionally operate on edge with specified revision and update policy.
+- `IfMatch(string revision, AUpdatePolicy updatePolicy)` - Conditionally operate on edge with specified revision and update policy.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var deleteEdgeResult = db.Edge
     .Delete("MyEdgeCollection/123");

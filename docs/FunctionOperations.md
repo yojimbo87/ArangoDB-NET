@@ -16,7 +16,7 @@ Applicable optional parameters available through fluent API:
 - `IsDeterministic(bool value)` - Determines whether function return value solely depends on the input value and return value is the same for repeated calls with same input. This parameter is currently not applicable and may be used in the future for optimisation purpose.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var registerFunctionResult = db.Function.Register(
     "myfunctions::temperature::celsiustofahrenheit", 
@@ -38,7 +38,7 @@ Applicable optional parameters available through fluent API:
 - `Namespace(string value)` - Determines optional namespace from which to return all registered AQL user functions.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var functionListResult = db.Function.List();
     
@@ -61,7 +61,7 @@ Applicable optional parameters available through fluent API:
 - `Group(bool value)` - Determines whether the function name is treated as a namespace prefix, and all functions in the specified namespace will be deleted. If set to false, the function name provided in name must be fully qualified, including any namespaces. Default value: false.
 
 ```csharp
-var db = new ArangoDatabase("myDatabaseAlias");
+var db = new ADatabase("myDatabaseAlias");
 
 var unregisterFunctionResult = db.Function.Unregister("myfunctions::temperature::celsiustofahrenheit");
     
