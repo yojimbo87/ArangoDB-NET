@@ -16,7 +16,7 @@ namespace Arango.Tests
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Create(Database.TestDocumentCollectionName);
@@ -29,8 +29,8 @@ namespace Arango.Tests
             Assert.AreEqual(false, createResult.Value.Bool("waitForSync"));
             Assert.AreEqual(false, createResult.Value.Bool("isVolatile"));
             Assert.AreEqual(false, createResult.Value.Bool("isSystem"));
-            Assert.AreEqual(ArangoCollectionStatus.Loaded, createResult.Value.Enum<ArangoCollectionStatus>("status"));
-            Assert.AreEqual(ArangoCollectionType.Document, createResult.Value.Enum<ArangoCollectionType>("type"));
+            Assert.AreEqual(ACollectionStatus.Loaded, createResult.Value.Enum<ACollectionStatus>("status"));
+            Assert.AreEqual(ACollectionType.Document, createResult.Value.Enum<ACollectionType>("type"));
         }
         
         [Test()]
@@ -38,10 +38,10 @@ namespace Arango.Tests
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
-                .Type(ArangoCollectionType.Edge)
+                .Type(ACollectionType.Edge)
                 .Create(Database.TestEdgeCollectionName);
 
             Assert.AreEqual(200, createResult.StatusCode);
@@ -52,8 +52,8 @@ namespace Arango.Tests
             Assert.AreEqual(false, createResult.Value.Bool("waitForSync"));
             Assert.AreEqual(false, createResult.Value.Bool("isVolatile"));
             Assert.AreEqual(false, createResult.Value.Bool("isSystem"));
-            Assert.AreEqual(ArangoCollectionStatus.Loaded, createResult.Value.Enum<ArangoCollectionStatus>("status"));
-            Assert.AreEqual(ArangoCollectionType.Edge, createResult.Value.Enum<ArangoCollectionType>("type"));
+            Assert.AreEqual(ACollectionStatus.Loaded, createResult.Value.Enum<ACollectionStatus>("status"));
+            Assert.AreEqual(ACollectionType.Edge, createResult.Value.Enum<ACollectionType>("type"));
         }
         
         [Test()]
@@ -61,10 +61,10 @@ namespace Arango.Tests
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
             
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
-                .KeyGeneratorType(ArangoKeyGeneratorType.Autoincrement)
+                .KeyGeneratorType(AKeyGeneratorType.Autoincrement)
                 .Create(Database.TestDocumentCollectionName);
             
             Assert.AreEqual(200, createResult.StatusCode);
@@ -75,8 +75,8 @@ namespace Arango.Tests
             Assert.AreEqual(false, createResult.Value.Bool("waitForSync"));
             Assert.AreEqual(false, createResult.Value.Bool("isVolatile"));
             Assert.AreEqual(false, createResult.Value.Bool("isSystem"));
-            Assert.AreEqual(ArangoCollectionStatus.Loaded, createResult.Value.Enum<ArangoCollectionStatus>("status"));
-            Assert.AreEqual(ArangoCollectionType.Document, createResult.Value.Enum<ArangoCollectionType>("type"));
+            Assert.AreEqual(ACollectionStatus.Loaded, createResult.Value.Enum<ACollectionStatus>("status"));
+            Assert.AreEqual(ACollectionType.Document, createResult.Value.Enum<ACollectionType>("type"));
 
 
 			// create documents and test if their key are incremented accordingly
@@ -115,7 +115,7 @@ namespace Arango.Tests
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Create(Database.TestDocumentCollectionName);
@@ -138,7 +138,7 @@ namespace Arango.Tests
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Create(Database.TestDocumentCollectionName);
@@ -158,7 +158,7 @@ namespace Arango.Tests
             Assert.AreEqual(createResult.Value.Bool("waitForSync"), getResult.Value.Bool("waitForSync"));
             Assert.IsTrue(getResult.Value.Bool("doCompact"));
             Assert.IsTrue(getResult.Value.Long("journalSize") > 1);
-            Assert.AreEqual(ArangoKeyGeneratorType.Traditional, getResult.Value.Enum<ArangoKeyGeneratorType>("keyOptions.type"));
+            Assert.AreEqual(AKeyGeneratorType.Traditional, getResult.Value.Enum<AKeyGeneratorType>("keyOptions.type"));
             Assert.AreEqual(true, getResult.Value.Bool("keyOptions.allowUserKeys"));
         }
         
@@ -167,7 +167,7 @@ namespace Arango.Tests
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Create(Database.TestDocumentCollectionName);
@@ -187,7 +187,7 @@ namespace Arango.Tests
             Assert.AreEqual(createResult.Value.Bool("waitForSync"), getResult.Value.Bool("waitForSync"));
             Assert.IsTrue(getResult.Value.Bool("doCompact"));
             Assert.IsTrue(getResult.Value.Long("journalSize") > 1);
-            Assert.AreEqual(ArangoKeyGeneratorType.Traditional, getResult.Value.Enum<ArangoKeyGeneratorType>("keyOptions.type"));
+            Assert.AreEqual(AKeyGeneratorType.Traditional, getResult.Value.Enum<AKeyGeneratorType>("keyOptions.type"));
             Assert.AreEqual(true, getResult.Value.Bool("keyOptions.allowUserKeys"));
             Assert.AreEqual(0, getResult.Value.Long("count"));
         }
@@ -197,7 +197,7 @@ namespace Arango.Tests
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Create(Database.TestDocumentCollectionName);
@@ -217,7 +217,7 @@ namespace Arango.Tests
             Assert.AreEqual(createResult.Value.Bool("waitForSync"), getResult.Value.Bool("waitForSync"));
             Assert.IsTrue(getResult.Value.Bool("doCompact"));
             Assert.IsTrue(getResult.Value.Long("journalSize") > 0);
-            Assert.AreEqual(ArangoKeyGeneratorType.Traditional, getResult.Value.Enum<ArangoKeyGeneratorType>("keyOptions.type"));
+            Assert.AreEqual(AKeyGeneratorType.Traditional, getResult.Value.Enum<AKeyGeneratorType>("keyOptions.type"));
             Assert.AreEqual(true, getResult.Value.Bool("keyOptions.allowUserKeys"));
             Assert.AreEqual(0, getResult.Value.Long("count"));
             Assert.IsTrue(getResult.Value.Document("figures").Count > 0);
@@ -228,7 +228,7 @@ namespace Arango.Tests
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Create(Database.TestDocumentCollectionName);
@@ -252,7 +252,7 @@ namespace Arango.Tests
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Create(Database.TestDocumentCollectionName);
@@ -278,10 +278,10 @@ namespace Arango.Tests
         public void Should_get_all_documents_in_collection()
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-            Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
+            Database.CreateTestCollection(Database.TestDocumentCollectionName, ACollectionType.Document);
             Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             var operationResult = db.Collection
                 .GetAllDocuments(Database.TestDocumentCollectionName);
@@ -298,13 +298,13 @@ namespace Arango.Tests
         public void Should_get_all_document_IDs_in_collection()
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-            Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
+            Database.CreateTestCollection(Database.TestDocumentCollectionName, ACollectionType.Document);
             Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             var operationResult = db.Collection
-                .ReturnListType(ArangoReturnListType.ID)
+                .ReturnListType(AReturnListType.ID)
                 .GetAllDocuments(Database.TestDocumentCollectionName);
             
             Assert.AreEqual(200, operationResult.StatusCode);
@@ -319,13 +319,13 @@ namespace Arango.Tests
         public void Should_get_all_document_keys_in_collection()
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-            Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
+            Database.CreateTestCollection(Database.TestDocumentCollectionName, ACollectionType.Document);
             Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             var operationResult = db.Collection
-                .ReturnListType(ArangoReturnListType.Key)
+                .ReturnListType(AReturnListType.Key)
                 .GetAllDocuments(Database.TestDocumentCollectionName);
             
             Assert.AreEqual(200, operationResult.StatusCode);
@@ -340,11 +340,11 @@ namespace Arango.Tests
         public void Should_get_all_edges_in_collection()
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-            Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
-            Database.CreateTestCollection(Database.TestEdgeCollectionName, ArangoCollectionType.Edge);
+            Database.CreateTestCollection(Database.TestDocumentCollectionName, ACollectionType.Document);
+            Database.CreateTestCollection(Database.TestEdgeCollectionName, ACollectionType.Edge);
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             db.Edge.Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"));
             db.Edge.Create(Database.TestEdgeCollectionName, documents[1].String("_id"), documents[0].String("_id"));
@@ -369,7 +369,7 @@ namespace Arango.Tests
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Create(Database.TestDocumentCollectionName);
@@ -392,7 +392,7 @@ namespace Arango.Tests
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Create(Database.TestDocumentCollectionName);
@@ -416,7 +416,7 @@ namespace Arango.Tests
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Create(Database.TestDocumentCollectionName);
@@ -431,7 +431,7 @@ namespace Arango.Tests
             Assert.AreEqual(createResult.Value.String("id"), operationResult.Value.String("id"));
             Assert.AreEqual(createResult.Value.String("name"), operationResult.Value.String("name"));
             Assert.AreEqual(createResult.Value.Bool("isSystem"), operationResult.Value.Bool("isSystem"));
-            Assert.AreEqual(ArangoCollectionStatus.Loaded, operationResult.Value.Enum<ArangoCollectionStatus>("status"));
+            Assert.AreEqual(ACollectionStatus.Loaded, operationResult.Value.Enum<ACollectionStatus>("status"));
             Assert.AreEqual(createResult.Value.Int("type"), operationResult.Value.Int("type"));
             Assert.IsFalse(operationResult.Value.Has("count"));
         }
@@ -441,7 +441,7 @@ namespace Arango.Tests
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Create(Database.TestDocumentCollectionName);
@@ -455,7 +455,7 @@ namespace Arango.Tests
             Assert.AreEqual(createResult.Value.String("id"), operationResult.Value.String("id"));
             Assert.AreEqual(createResult.Value.String("name"), operationResult.Value.String("name"));
             Assert.AreEqual(createResult.Value.Bool("isSystem"), operationResult.Value.Bool("isSystem"));
-            Assert.IsTrue(operationResult.Value.Enum<ArangoCollectionStatus>("status") == ArangoCollectionStatus.Unloaded || operationResult.Value.Enum<ArangoCollectionStatus>("status") == ArangoCollectionStatus.Unloading);
+            Assert.IsTrue(operationResult.Value.Enum<ACollectionStatus>("status") == ACollectionStatus.Unloaded || operationResult.Value.Enum<ACollectionStatus>("status") == ACollectionStatus.Unloading);
             Assert.AreEqual(createResult.Value.Int("type"), operationResult.Value.Int("type"));
         }
         
@@ -464,7 +464,7 @@ namespace Arango.Tests
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Create(Database.TestDocumentCollectionName);
@@ -486,7 +486,7 @@ namespace Arango.Tests
             Assert.AreEqual(createResult.Value.Int("type"), operationResult.Value.Int("type"));
             Assert.IsFalse(operationResult.Value.Bool("isVolatile"));
             Assert.IsTrue(operationResult.Value.Bool("doCompact"));
-            Assert.AreEqual(ArangoKeyGeneratorType.Traditional, operationResult.Value.Enum<ArangoKeyGeneratorType>("keyOptions.type"));
+            Assert.AreEqual(AKeyGeneratorType.Traditional, operationResult.Value.Enum<AKeyGeneratorType>("keyOptions.type"));
             Assert.IsTrue(operationResult.Value.Bool("keyOptions.allowUserKeys"));
             Assert.IsTrue(operationResult.Value.Bool("waitForSync"));
             Assert.IsTrue(operationResult.Value.Long("journalSize") == journalSize);
@@ -497,7 +497,7 @@ namespace Arango.Tests
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Create(Database.TestDocumentCollectionName);
@@ -520,7 +520,7 @@ namespace Arango.Tests
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Create(Database.TestDocumentCollectionName);
@@ -543,7 +543,7 @@ namespace Arango.Tests
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Create(Database.TestDocumentCollectionName);

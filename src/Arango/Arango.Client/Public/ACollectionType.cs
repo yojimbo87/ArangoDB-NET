@@ -2,7 +2,7 @@
 
 namespace Arango.Client
 {
-    public enum ArangoCollectionType
+    public enum ACollectionType
     {
         Document = 2,
         Edge = 3

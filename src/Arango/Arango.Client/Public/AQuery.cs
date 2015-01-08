@@ -7,14 +7,14 @@ using Arango.fastJSON;
 
 namespace Arango.Client
 {
-    public class ArangoQuery
+    public class AQuery
     {
         readonly Dictionary<string, object> _parameters = new Dictionary<string, object>();
         readonly Connection _connection;
         StringBuilder _query = new StringBuilder();
         Dictionary<string, object> _bindVars = new Dictionary<string, object>();
         
-        internal ArangoQuery(Connection connection)
+        internal AQuery(Connection connection)
         {
             _connection = connection;
         }
@@ -24,7 +24,7 @@ namespace Arango.Client
         /// <summary>
         /// Sets AQL query code.
         /// </summary>
-        public ArangoQuery Aql(string query)
+        public AQuery Aql(string query)
         {
         	var cleanQuery = Minify(query);
         	
@@ -41,7 +41,7 @@ namespace Arango.Client
         /// <summary>
         /// Maps key/value bind parameter to the AQL query.
         /// </summary>
-        public ArangoQuery BindVar(string key, object value)
+        public AQuery BindVar(string key, object value)
         {
             _bindVars.Object(key, value);
             
@@ -49,9 +49,9 @@ namespace Arango.Client
         }
         
         /// <summary>
-        /// Determines whether the number of retrieved documents should be returned in `Extra` property of `ArangoResult` instance. Default value: false.
+        /// Determines whether the number of retrieved documents should be returned in `Extra` property of `AResult` instance. Default value: false.
         /// </summary>
-        public ArangoQuery Count(bool value)
+        public AQuery Count(bool value)
         {
         	_parameters.Bool(ParameterName.Count, value);
         	
@@ -61,7 +61,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines whether the number of documents in the result set should be returned. Default value: false.
         /// </summary>
-        public ArangoQuery Ttl(int value)
+        public AQuery Ttl(int value)
         {
         	_parameters.Int(ParameterName.TTL, value);
         	
@@ -71,7 +71,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines maximum number of result documents to be transferred from the server to the client in one roundtrip. If not set this value is server-controlled.
         /// </summary>
-        public ArangoQuery BatchSize(int value)
+        public AQuery BatchSize(int value)
         {
         	_parameters.Int(ParameterName.BatchSize, value);
         	
@@ -85,11 +85,11 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves result value as list of documents.
         /// </summary>
-        public ArangoResult<List<Dictionary<string, object>>> ToDocuments()
+        public AResult<List<Dictionary<string, object>>> ToDocuments()
         {
             var type = typeof(Dictionary<string, object>);
             var listResult = ToList();
-            var result = new ArangoResult<List<Dictionary<string, object>>>();
+            var result = new AResult<List<Dictionary<string, object>>>();
             
             result.StatusCode = listResult.StatusCode;
             result.Success = listResult.Success;
@@ -107,11 +107,11 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves result value as list of generic objects.
         /// </summary>
-        public ArangoResult<List<T>> ToList<T>()
+        public AResult<List<T>> ToList<T>()
         {
             var type = typeof(T);
             var listResult = ToList();
-            var result = new ArangoResult<List<T>>();
+            var result = new AResult<List<T>>();
             
             result.StatusCode = listResult.StatusCode;
             result.Success = listResult.Success;
@@ -143,7 +143,7 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves result value as list of objects.
         /// </summary>
-        public ArangoResult<List<object>> ToList()
+        public AResult<List<object>> ToList()
         {
             var request = new Request(HttpMethod.POST, ApiBaseUri.Cursor, "");
             var bodyDocument = new Dictionary<string, object>();
@@ -167,7 +167,7 @@ namespace Arango.Client
             request.Body = JSON.ToJSON(bodyDocument);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<List<object>>(response);
+            var result = new AResult<List<object>>(response);
             
             switch (response.StatusCode)
             {
@@ -226,11 +226,11 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves result value as single document.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> ToDocument()
+        public AResult<Dictionary<string, object>> ToDocument()
         {
             var type = typeof(Dictionary<string, object>);
             var listResult = ToList();
-            var result = new ArangoResult<Dictionary<string, object>>();
+            var result = new AResult<Dictionary<string, object>>();
             
             result.StatusCode = listResult.StatusCode;
             result.Success = listResult.Success;
@@ -248,10 +248,10 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves result value as single generic object.
         /// </summary>
-        public ArangoResult<T> ToObject<T>()
+        public AResult<T> ToObject<T>()
         {
             var listResult = ToList<T>();
-            var result = new ArangoResult<T>();
+            var result = new AResult<T>();
             
             result.StatusCode = listResult.StatusCode;
             result.Success = listResult.Success;
@@ -269,10 +269,10 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves result value as single object.
         /// </summary>
-        public ArangoResult<object> ToObject()
+        public AResult<object> ToObject()
         {
             var listResult = ToList();
-            var result = new ArangoResult<object>();
+            var result = new AResult<object>();
             
             result.StatusCode = listResult.StatusCode;
             result.Success = listResult.Success;
@@ -291,12 +291,12 @@ namespace Arango.Client
         
         #region More results in cursor (PUT)
         
-        internal ArangoResult<List<object>> Put(string cursorID)
+        internal AResult<List<object>> Put(string cursorID)
         {
             var request = new Request(HttpMethod.PUT, ApiBaseUri.Cursor, "/" + cursorID);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<List<object>>(response);
+            var result = new AResult<List<object>>(response);
             
             switch (response.StatusCode)
             {
@@ -348,7 +348,7 @@ namespace Arango.Client
         /// <summary>
         /// Analyzes specified AQL query.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Parse(string query)
+        public AResult<Dictionary<string, object>> Parse(string query)
         {
             var request = new Request(HttpMethod.POST, ApiBaseUri.Query, "");
             var bodyDocument = new Dictionary<string, object>();
@@ -359,7 +359,7 @@ namespace Arango.Client
             request.Body = JSON.ToJSON(bodyDocument);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -439,12 +439,12 @@ namespace Arango.Client
         /// <summary>
         /// Deletes specified AQL query cursor.
         /// </summary>
-        public ArangoResult<bool> DeleteCursor(string cursorID)
+        public AResult<bool> DeleteCursor(string cursorID)
         {
             var request = new Request(HttpMethod.DELETE, ApiBaseUri.Cursor, "/" + cursorID);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<bool>(response);
+            var result = new AResult<bool>(response);
             
             switch (response.StatusCode)
             {

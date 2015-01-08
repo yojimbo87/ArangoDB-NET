@@ -12,7 +12,7 @@ namespace Arango.Client.Protocol
         internal DataType DataType { get; set; }
         internal object Data { get; set; }
         internal Exception Exception { get; set; }
-        internal ArangoError Error { get; set; }
+        internal AEerror Error { get; set; }
         
         internal void DeserializeBody()
         {            

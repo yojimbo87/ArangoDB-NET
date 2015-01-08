@@ -69,7 +69,7 @@ namespace Arango.Client.Protocol
             httpRequest.KeepAlive = true;
             httpRequest.SendChunked = false;
             httpRequest.Method = request.HttpMethod.ToString();
-            httpRequest.UserAgent = ArangoSettings.DriverName + "/" + ArangoSettings.DriverVersion;
+            httpRequest.UserAgent = ASettings.DriverName + "/" + ASettings.DriverVersion;
 
             if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
             {
@@ -144,7 +144,7 @@ namespace Arango.Client.Protocol
                         }
                     }
 
-                    response.Error = new ArangoError();
+                    response.Error = new AEerror();
                     response.Error.StatusCode = response.StatusCode;
                     response.Error.Number = 0;
                     response.Error.Message = "Protocol error: " + webException.Message;

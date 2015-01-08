@@ -2,7 +2,7 @@
 
 namespace Arango.Client
 {
-    public enum ArangoCollectionStatus
+    public enum ACollectionStatus
     {
         Newborn = 1,
         Unloaded = 2,

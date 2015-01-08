@@ -2,7 +2,7 @@
 
 namespace Arango.Client
 {
-    public class ArangoError
+    public class AEerror
     {
         /// <summary>
         /// Integer value of the operation response HTTP status code.

@@ -4,7 +4,7 @@ using Arango.fastJSON;
 
 namespace Arango.Client
 {
-    public class ArangoDatabase
+    public class ADatabase
     {
         readonly Dictionary<string, object> _parameters = new Dictionary<string, object>();
         readonly Connection _connection;
@@ -14,7 +14,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines whether system collections should be excluded from the result.
         /// </summary>
-        public ArangoDatabase ExcludeSystem(bool value)
+        public ADatabase ExcludeSystem(bool value)
         {
             // string because value will be stored in query string
             _parameters.String(ParameterName.ExcludeSystem, value.ToString().ToLower());
@@ -27,64 +27,64 @@ namespace Arango.Client
         /// <summary>
         /// Provides access to collection operations in current database context.
         /// </summary>
-        public ArangoCollection Collection
+        public ACollection Collection
         {
             get
             {
-                return new ArangoCollection(_connection);
+                return new ACollection(_connection);
             }
         }
         
         /// <summary>
         /// Provides access to document operations in current database context.
         /// </summary>
-        public ArangoDocument Document
+        public ADocument Document
         {
             get
             {
-                return new ArangoDocument(_connection);
+                return new ADocument(_connection);
             }
         }
         
         /// <summary>
         /// Provides access to edge operations in current database context.
         /// </summary>
-        public ArangoEdge Edge
+        public AEdge Edge
         {
             get
             {
-                return new ArangoEdge(_connection);
+                return new AEdge(_connection);
             }
         }
         
         /// <summary>
         /// Provides access to query operations in current database context.
         /// </summary>
-        public ArangoQuery Query
+        public AQuery Query
         {
             get
             {
-                return new ArangoQuery(_connection);
+                return new AQuery(_connection);
             }
         }
 
         /// <summary>
         /// Provides access to AQL user function management operations in current database context.
         /// </summary>
-        public ArangoFunction Function
+        public AFunction Function
         {
             get
             {
-                return new ArangoFunction(_connection);
+                return new AFunction(_connection);
             }
         }
         
         /// <summary>
         /// Initializes new database context to perform operations on remote database identified by specified alias.
         /// </summary>
-        public ArangoDatabase(string alias)
+        public ADatabase(string alias)
         {
-            _connection = ArangoSettings.GetConnection(alias);
+            _connection = ASettings.GetConnection(alias);
         }
         
         #region Create database (POST)
@@ -92,7 +92,7 @@ namespace Arango.Client
         /// <summary>
         /// Creates new database with given name.
         /// </summary>
-        public ArangoResult<bool> Create(string databaseName)
+        public AResult<bool> Create(string databaseName)
         {
             return Create(databaseName, null);
         }
@@ -100,7 +100,7 @@ namespace Arango.Client
         /// <summary>
         /// Creates new database with given name and user list.
         /// </summary>
-        public ArangoResult<bool> Create(string databaseName, List<ArangoUser> users)
+        public AResult<bool> Create(string databaseName, List<AUser> users)
         {
             var request = new Request(HttpMethod.POST, ApiBaseUri.Database, "");
             var bodyDocument = new Dictionary<string, object>();
@@ -143,7 +143,7 @@ namespace Arango.Client
             request.Body = JSON.ToJSON(bodyDocument);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<bool>(response);
+            var result = new AResult<bool>(response);
             
             switch (response.StatusCode)
             {
@@ -174,12 +174,12 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves information about currently connected database.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> GetCurrent()
+        public AResult<Dictionary<string, object>> GetCurrent()
         {
             var request = new Request(HttpMethod.GET, ApiBaseUri.Database, "/current");
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -209,12 +209,12 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves list of accessible databases which current user can access without specifying a different username or password.
         /// </summary>
-        public ArangoResult<List<string>> GetAccessibleDatabases()
+        public AResult<List<string>> GetAccessibleDatabases()
         {
             var request = new Request(HttpMethod.GET, ApiBaseUri.Database, "/user");
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<List<string>>(response);
+            var result = new AResult<List<string>>(response);
             
             switch (response.StatusCode)
             {
@@ -243,12 +243,12 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves the list of all existing databases.
         /// </summary>
-        public ArangoResult<List<string>> GetAllDatabases()
+        public AResult<List<string>> GetAllDatabases()
         {
             var request = new Request(HttpMethod.GET, ApiBaseUri.Database, "");
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<List<string>>(response);
+            var result = new AResult<List<string>>(response);
             
             switch (response.StatusCode)
             {
@@ -278,7 +278,7 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves information about collections in current database connection.
         /// </summary>
-        public ArangoResult<List<Dictionary<string, object>>> GetAllCollections()
+        public AResult<List<Dictionary<string, object>>> GetAllCollections()
         {
             var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "");
             
@@ -286,7 +286,7 @@ namespace Arango.Client
             request.TrySetQueryStringParameter(ParameterName.ExcludeSystem, _parameters);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<List<Dictionary<string, object>>>(response);
+            var result = new AResult<List<Dictionary<string, object>>>(response);
             
             switch (response.StatusCode)
             {
@@ -316,12 +316,12 @@ namespace Arango.Client
         /// <summary>
         /// Deletes specified database.
         /// </summary>
-        public ArangoResult<bool> Drop(string databaseName)
+        public AResult<bool> Drop(string databaseName)
         {
             var request = new Request(HttpMethod.DELETE, ApiBaseUri.Database, "/" + databaseName);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<bool>(response);
+            var result = new AResult<bool>(response);
             
             switch (response.StatusCode)
             {

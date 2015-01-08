@@ -14,7 +14,7 @@ namespace Arango.Tests
         {
             Database.CleanupTestDatabases();
         	
-            var db = new ArangoDatabase(Database.SystemAlias);
+            var db = new ADatabase(Database.SystemAlias);
 
             var resultCreate = db.Create(Database.TestDatabaseOneTime);
 
@@ -31,7 +31,7 @@ namespace Arango.Tests
         {
             Database.CleanupTestDatabases();
         	
-            var db = new ArangoDatabase(Database.SystemAlias);
+            var db = new ADatabase(Database.SystemAlias);
 
             var resultCreate = db.Create(Database.TestDatabaseOneTime);
 
@@ -49,7 +49,7 @@ namespace Arango.Tests
         {
             Database.CleanupTestDatabases();
 
-            var db = new ArangoDatabase(Database.SystemAlias);
+            var db = new ADatabase(Database.SystemAlias);
 
             var resultCurrent = db.GetCurrent();
 
@@ -68,7 +68,7 @@ namespace Arango.Tests
             Database.CleanupTestDatabases();
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
 
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Create(Database.TestDocumentCollectionName);
@@ -95,7 +95,7 @@ namespace Arango.Tests
         {
             Database.CleanupTestDatabases();
         	
-            var db = new ArangoDatabase(Database.SystemAlias);
+            var db = new ADatabase(Database.SystemAlias);
 
             var createResult = db.Create(Database.TestDatabaseOneTime);
 
@@ -110,12 +110,12 @@ namespace Arango.Tests
         {
             Database.CleanupTestDatabases();
         	
-            var db = new ArangoDatabase(Database.SystemAlias);
+            var db = new ADatabase(Database.SystemAlias);
 
-            var users = new List<ArangoUser>()
+            var users = new List<AUser>()
             {
-                new ArangoUser { Username = "admin", Password = "secret", Active = true },
-                new ArangoUser { Username = "tester001", Password = "test001", Active = false } 
+                new AUser { Username = "admin", Password = "secret", Active = true },
+                new AUser { Username = "tester001", Password = "test001", Active = false } 
             };
             
             var createResult = db.Create(Database.TestDatabaseOneTime, users);
@@ -131,7 +131,7 @@ namespace Arango.Tests
         {
             Database.CleanupTestDatabases();
         	
-            var db = new ArangoDatabase(Database.SystemAlias);
+            var db = new ADatabase(Database.SystemAlias);
 
             var createResult = db.Create(Database.TestDatabaseGeneral);
             
@@ -149,11 +149,11 @@ namespace Arango.Tests
         {
             Database.CleanupTestDatabases();
         	
-            var db = new ArangoDatabase(Database.SystemAlias);
+            var db = new ADatabase(Database.SystemAlias);
 
             var createResult = db.Create(Database.TestDatabaseGeneral);
 
-            var nonSystemDatabase = new ArangoDatabase(Database.Alias);
+            var nonSystemDatabase = new ADatabase(Database.Alias);
             
             var createResult2 = nonSystemDatabase.Create(Database.TestDatabaseOneTime);
 
@@ -169,7 +169,7 @@ namespace Arango.Tests
         {
             Database.CleanupTestDatabases();
         	
-            var db = new ArangoDatabase(Database.SystemAlias);
+            var db = new ADatabase(Database.SystemAlias);
 
             var createResult = db.Create(Database.TestDatabaseGeneral);
             

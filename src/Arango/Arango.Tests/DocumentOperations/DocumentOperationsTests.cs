@@ -12,7 +12,7 @@ namespace Arango.Tests
         public DocumentOperationsTests()
 		{
 			Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-			Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
+			Database.CreateTestCollection(Database.TestDocumentCollectionName, ACollectionType.Document);
 		}
         
         #region Create operations
@@ -21,7 +21,7 @@ namespace Arango.Tests
         public void Should_create_document()
         {
         	Database.ClearTestCollection(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
         		.String("foo", "foo string value")
@@ -42,7 +42,7 @@ namespace Arango.Tests
         public void Should_create_document_with_waitForSync()
         {
         	Database.ClearTestCollection(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
         		.String("foo", "foo string value")
@@ -64,7 +64,7 @@ namespace Arango.Tests
         public void Should_create_document_from_generic_object()
         {
         	Database.ClearTestCollection(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             var dummy = new Dummy();
             dummy.Foo = "foo string value";
@@ -99,7 +99,7 @@ namespace Arango.Tests
         public void Should_check_document()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             var checkResult = db.Document
                 .Check(documents[0].String("_id"));
@@ -114,7 +114,7 @@ namespace Arango.Tests
         public void Should_check_document_with_ifMatch()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             var checkResult = db.Document
                 .IfMatch(documents[0].String("_rev"))
@@ -130,7 +130,7 @@ namespace Arango.Tests
         public void Should_check_document_with_ifMatch_and_return_412()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             var checkResult = db.Document
                 .IfMatch("123456789")
@@ -146,7 +146,7 @@ namespace Arango.Tests
         public void Should_check_document_with_ifNoneMatch()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             var checkResult = db.Document
                 .IfNoneMatch("123456789")
@@ -162,7 +162,7 @@ namespace Arango.Tests
         public void Should_check_document_with_ifNoneMatch_and_return_304()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             var checkResult = db.Document
                 .IfNoneMatch(documents[0].String("_rev"))
@@ -182,7 +182,7 @@ namespace Arango.Tests
         public void Should_get_document()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-        	var db = new ArangoDatabase(Database.Alias);
+        	var db = new ADatabase(Database.Alias);
         	
             var getResult = db.Document
                 .Get(documents[0].String("_id"));
@@ -201,7 +201,7 @@ namespace Arango.Tests
         public void Should_get_document_with_ifMatch()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-        	var db = new ArangoDatabase(Database.Alias);
+        	var db = new ADatabase(Database.Alias);
         	
             var getResult = db.Document
                 .IfMatch(documents[0].String("_rev"))
@@ -221,7 +221,7 @@ namespace Arango.Tests
         public void Should_get_document_with_ifMatch_and_return_412()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-        	var db = new ArangoDatabase(Database.Alias);
+        	var db = new ADatabase(Database.Alias);
         	
             var getResult = db.Document
                 .IfMatch("123456789")
@@ -239,7 +239,7 @@ namespace Arango.Tests
         public void Should_get_document_with_ifNoneMatch()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-        	var db = new ArangoDatabase(Database.Alias);
+        	var db = new ADatabase(Database.Alias);
         	
             var getResult = db.Document
                 .IfNoneMatch("123456789")
@@ -259,7 +259,7 @@ namespace Arango.Tests
         public void Should_get_document_with_ifNoneMatch_and_return_304()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-        	var db = new ArangoDatabase(Database.Alias);
+        	var db = new ADatabase(Database.Alias);
         	
             var getResult = db.Document
                 .IfNoneMatch(documents[0].String("_rev"))
@@ -274,7 +274,7 @@ namespace Arango.Tests
         public void Should_get_document_as_generic_object()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-        	var db = new ArangoDatabase(Database.Alias);
+        	var db = new ADatabase(Database.Alias);
         	
             var getResult = db.Document
                 .Get<Dummy>(documents[0].String("_id"));
@@ -295,7 +295,7 @@ namespace Arango.Tests
         public void Should_update_document()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -331,7 +331,7 @@ namespace Arango.Tests
         public void Should_update_document_with_waitForSync()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -368,7 +368,7 @@ namespace Arango.Tests
         public void Should_update_document_with_ifMatch()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -405,7 +405,7 @@ namespace Arango.Tests
         public void Should_update_document_with_ifMatch_and_return_412()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -428,7 +428,7 @@ namespace Arango.Tests
         public void Should_update_document_with_ifMatch_and_lastUpdatePolicy()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -436,7 +436,7 @@ namespace Arango.Tests
                 .Int("baz", 12345);
             
             var updateResult = db.Document
-                .IfMatch("123456789", ArangoUpdatePolicy.Last)
+                .IfMatch("123456789", AUpdatePolicy.Last)
                 .Update(documents[0].String("_id"), document);
             
             Assert.AreEqual(202, updateResult.StatusCode);
@@ -464,7 +464,7 @@ namespace Arango.Tests
         [Test()]
         public void Should_update_document_with_keepNull()
         {
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var newDocument = new Dictionary<string, object>()
                 .String("foo", "some string")
@@ -508,7 +508,7 @@ namespace Arango.Tests
         [Test()]
         public void Should_update_document_with_mergeArrays_set_to_true()
         {
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var newDocument = new Dictionary<string, object>()
                 .String("foo", "some string")
@@ -552,7 +552,7 @@ namespace Arango.Tests
         [Test()]
         public void Should_update_document_with_mergeArrays_set_to_false()
         {
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var newDocument = new Dictionary<string, object>()
                 .String("foo", "some string")
@@ -597,7 +597,7 @@ namespace Arango.Tests
         public void Should_update_document_with_generic_object()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var dummy = new Dummy();
             dummy.Foo = "some other new string";
@@ -637,7 +637,7 @@ namespace Arango.Tests
         public void Should_replace_document()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -672,7 +672,7 @@ namespace Arango.Tests
         public void Should_replace_document_with_waitForSync()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -708,7 +708,7 @@ namespace Arango.Tests
         public void Should_replace_document_with_ifMatch()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -744,7 +744,7 @@ namespace Arango.Tests
         public void Should_replace_document_with_ifMatch_and_return_412()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -766,14 +766,14 @@ namespace Arango.Tests
         public void Should_replace_document_with_ifMatch_and_lastUpdatePolicy()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
                 .String("foo", "some other new string")
                 .Int("baz", 54321);
             
             var replaceResult = db.Document
-                .IfMatch("123456789", ArangoUpdatePolicy.Last)
+                .IfMatch("123456789", AUpdatePolicy.Last)
                 .Replace(documents[0].String("_id"), document);
             
             Assert.AreEqual(202, replaceResult.StatusCode);
@@ -802,7 +802,7 @@ namespace Arango.Tests
         public void Should_replace_document_with_generic_object()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var dummy = new Dummy();
             dummy.Foo = "some other new string";
@@ -841,7 +841,7 @@ namespace Arango.Tests
         public void Should_delete_document()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             var deleteResult = db.Document
                 .Delete(documents[0].String("_id"));
@@ -858,7 +858,7 @@ namespace Arango.Tests
         public void Should_delete_document_with_waitForSync()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             var deleteResult = db.Document
                 .WaitForSync(true)
@@ -876,7 +876,7 @@ namespace Arango.Tests
         public void Should_delete_document_with_ifMatch()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             var deleteResult = db.Document
                 .IfMatch(documents[0].String("_rev"))
@@ -894,7 +894,7 @@ namespace Arango.Tests
         public void Should_delete_document_with_ifMatch_and_return_412()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var deleteResult = db.Document
                 .IfMatch("123456789")
@@ -911,10 +911,10 @@ namespace Arango.Tests
         public void Should_delete_document_with_ifMatch_and_lastUpdatePolicy()
         {
         	var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             var deleteResult = db.Document
-                .IfMatch("123456789", ArangoUpdatePolicy.Last)
+                .IfMatch("123456789", AUpdatePolicy.Last)
                 .Delete(documents[0].String("_id"));
             
             Assert.AreEqual(202, deleteResult.StatusCode);

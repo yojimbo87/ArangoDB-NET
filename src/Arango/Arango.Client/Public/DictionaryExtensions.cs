@@ -27,7 +27,7 @@ namespace Arango.Client
             {
                 id = String(dictionary, "_id");
                 
-                if (!ArangoDocument.IsID(id))
+                if (!ADocument.IsID(id))
                 {
                     id = null;
                 }
@@ -46,7 +46,7 @@ namespace Arango.Client
         /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
         public static Dictionary<string, object> ID(this Dictionary<string, object> dictionary, string id)
         {
-            if (!ArangoDocument.IsID(id))
+            if (!ADocument.IsID(id))
             {
                 throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
             }
@@ -79,7 +79,7 @@ namespace Arango.Client
             {
                 key = String(dictionary, "_key");
                 
-                if (!ArangoDocument.IsKey(key))
+                if (!ADocument.IsKey(key))
                 {
                     key = null;
                 }
@@ -98,7 +98,7 @@ namespace Arango.Client
         /// <exception cref="ArgumentException">Specified key value has invalid format.</exception>
         public static Dictionary<string, object> Key(this Dictionary<string, object> dictionary, string key)
         {
-            if (!ArangoDocument.IsKey(key))
+            if (!ADocument.IsKey(key))
             {
                 throw new ArgumentException("Specified key value (" + key + ") has invalid format.");
             }
@@ -131,7 +131,7 @@ namespace Arango.Client
             {
                 rev = String(dictionary, "_rev");
                 
-                if (!ArangoDocument.IsRev(rev))
+                if (!ADocument.IsRev(rev))
                 {
                     rev = null;
                 }
@@ -150,7 +150,7 @@ namespace Arango.Client
         /// <exception cref="ArgumentException">Specified rev value has invalid format.</exception>
         public static Dictionary<string, object> Rev(this Dictionary<string, object> dictionary, string rev)
         {
-            if (!ArangoDocument.IsRev(rev))
+            if (!ADocument.IsRev(rev))
             {
                 throw new ArgumentException("Specified rev value (" + rev + ") has invalid format.");
             }   

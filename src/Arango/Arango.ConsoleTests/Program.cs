@@ -11,7 +11,7 @@ namespace Arango.ConsoleTests
         
         public static void Main(string[] args)
         {
-            ArangoSettings.AddConnection(
+            ASettings.AddConnection(
                 _alias,
                 "localhost",
                 8529,
@@ -34,7 +34,7 @@ namespace Arango.ConsoleTests
         
         static void ValueTypeNullCheck()
         {
-            var result = new ArangoResult<bool>();
+            var result = new AResult<bool>();
             result.Success = true;
             result.Value = true;
 
@@ -43,7 +43,7 @@ namespace Arango.ConsoleTests
         
         static void GetCurrentDatabase()
         {
-            var db = new ArangoDatabase(_alias);
+            var db = new ADatabase(_alias);
             
             var result = db.GetCurrent();
 
@@ -59,7 +59,7 @@ namespace Arango.ConsoleTests
         
         static void GetAccessibleDatabases()
         {
-            var db = new ArangoDatabase(_alias);
+            var db = new ADatabase(_alias);
             
             var result = db.GetAccessibleDatabases();
 
@@ -75,7 +75,7 @@ namespace Arango.ConsoleTests
         
         static void GetAllDatabases()
         {
-            var db = new ArangoDatabase(_alias);
+            var db = new ADatabase(_alias);
             
             var result = db.GetAllDatabases();
 
@@ -91,7 +91,7 @@ namespace Arango.ConsoleTests
         
         static void CreateDatabase()
         {
-            var db = new ArangoDatabase(_alias);
+            var db = new ADatabase(_alias);
             
             var result = db.Create("whoa");
 
@@ -107,7 +107,7 @@ namespace Arango.ConsoleTests
         
         static void DropDatabase()
         {
-            var db = new ArangoDatabase(_alias);
+            var db = new ADatabase(_alias);
             
             var result = db.Drop("whoa");
 
@@ -123,7 +123,7 @@ namespace Arango.ConsoleTests
         
         static void CreateDocument()
         {
-            var db = new ArangoDatabase(_alias);
+            var db = new ADatabase(_alias);
             
             var doc = new Dictionary<string, object>()
                 .String("foo", "bar");

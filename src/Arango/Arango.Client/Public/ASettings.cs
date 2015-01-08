@@ -3,7 +3,7 @@ using Arango.Client.Protocol;
 
 namespace Arango.Client
 {
-    public static class ArangoSettings
+    public static class ASettings
     {
         static readonly Dictionary<string, Connection> _connections = new Dictionary<string, Connection>();
         
@@ -19,7 +19,7 @@ namespace Arango.Client
         
         //public static ArangoGlobals Globals { get; private set; }
         
-        static ArangoSettings()
+        static ASettings()
         {
         	//Globals = new ArangoGlobals();
         }

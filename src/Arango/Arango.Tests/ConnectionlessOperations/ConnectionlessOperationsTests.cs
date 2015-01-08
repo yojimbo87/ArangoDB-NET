@@ -13,28 +13,28 @@ namespace Arango.Tests
         public void Should_validate_standard_field_format()
         {
             // _id validation
-            Assert.IsTrue(ArangoDocument.IsID("col/123"));
-            Assert.IsFalse(ArangoDocument.IsID("/123"));
-            Assert.IsFalse(ArangoDocument.IsID("col/"));
-            Assert.IsFalse(ArangoDocument.IsID("col/123/111"));
-            Assert.IsFalse(ArangoDocument.IsID("col/123a"));
+            Assert.IsTrue(ADocument.IsID("col/123"));
+            Assert.IsFalse(ADocument.IsID("/123"));
+            Assert.IsFalse(ADocument.IsID("col/"));
+            Assert.IsFalse(ADocument.IsID("col/123/111"));
+            Assert.IsFalse(ADocument.IsID("col/123a"));
             
             // _key validation
-            Assert.IsTrue(ArangoDocument.IsKey("123"));
-            Assert.IsFalse(ArangoDocument.IsKey("123a"));
+            Assert.IsTrue(ADocument.IsKey("123"));
+            Assert.IsFalse(ADocument.IsKey("123a"));
             
             // _rev validation
-            Assert.IsTrue(ArangoDocument.IsRev("123"));
-            Assert.IsFalse(ArangoDocument.IsRev("123a"));
+            Assert.IsTrue(ADocument.IsRev("123"));
+            Assert.IsFalse(ADocument.IsRev("123a"));
         }
         
         [Test()]
         public void Should_construct_document_IDs()
         {
-            Assert.AreEqual("col/123", ArangoDocument.Identify("col", 123));
-            Assert.AreEqual("col/123", ArangoDocument.Identify("col", "123"));
+            Assert.AreEqual("col/123", ADocument.Identify("col", 123));
+            Assert.AreEqual("col/123", ADocument.Identify("col", "123"));
             
-            Assert.AreEqual(null, ArangoDocument.Identify("col", "123a"));
+            Assert.AreEqual(null, ADocument.Identify("col", "123a"));
         }
         
         [Test()]

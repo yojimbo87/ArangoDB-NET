@@ -4,12 +4,12 @@ using Arango.fastJSON;
 
 namespace Arango.Client
 {
-    public class ArangoCollection
+    public class ACollection
     {
         readonly Dictionary<string, object> _parameters = new Dictionary<string, object>();
         readonly Connection _connection;
         
-        internal ArangoCollection(Connection connection)
+        internal ACollection(Connection connection)
         {
             _connection = connection;
         }
@@ -19,7 +19,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines type of the collection. Default value: Document.
         /// </summary>
-        public ArangoCollection Type(ArangoCollectionType value)
+        public ACollection Type(ACollectionType value)
         {
             _parameters.Enum(ParameterName.Type, value);
         	
@@ -29,7 +29,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines whether or not to wait until data are synchronised to disk. Default value: false.
         /// </summary>
-        public ArangoCollection WaitForSync(bool value)
+        public ACollection WaitForSync(bool value)
         {
             _parameters.Bool(ParameterName.WaitForSync, value);
         	
@@ -39,7 +39,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines maximum size of a journal or datafile in bytes. Default value: server configured.
         /// </summary>
-        public ArangoCollection JournalSize(long value)
+        public ACollection JournalSize(long value)
         {
             _parameters.Long(ParameterName.JournalSize, value);
         	
@@ -49,7 +49,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines whether the collection will be compacted. Default value: true.
         /// </summary>
-        public ArangoCollection DoCompact(bool value)
+        public ACollection DoCompact(bool value)
         {
             _parameters.Bool(ParameterName.DoCompact, value);
         	
@@ -59,7 +59,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines whether the collection is a system collection. Default value: false.
         /// </summary>
-        public ArangoCollection IsSystem(bool value)
+        public ACollection IsSystem(bool value)
         {
             _parameters.Bool(ParameterName.IsSystem, value);
         	
@@ -69,7 +69,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines whether the collection data is kept in-memory only and not made persistent. Default value: false.
         /// </summary>
-        public ArangoCollection IsVolatile(bool value)
+        public ACollection IsVolatile(bool value)
         {
             _parameters.Bool(ParameterName.IsVolatile, value);
         	
@@ -81,7 +81,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines whether it is allowed to supply custom key values in the _key attribute of a document. Default value: Traditional.
         /// </summary>
-        public ArangoCollection KeyGeneratorType(ArangoKeyGeneratorType value)
+        public ACollection KeyGeneratorType(AKeyGeneratorType value)
         {
             // needs to be in string format
             _parameters.Enum(ParameterName.KeyOptionsType, value.ToString().ToLower());
@@ -92,7 +92,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines the type of the key generator.
         /// </summary>
-        public ArangoCollection AllowUserKeys(bool value)
+        public ACollection AllowUserKeys(bool value)
         {
             _parameters.Bool(ParameterName.KeyOptionsAllowUserKeys, value);
         	
@@ -102,7 +102,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines increment value for autoincrement key generator.
         /// </summary>
-        public ArangoCollection KeyIncrement(long value)
+        public ACollection KeyIncrement(long value)
         {
             _parameters.Long(ParameterName.KeyOptionsIncrement, value);
         	
@@ -112,7 +112,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines initial offset value for autoincrement key generator.
         /// </summary>
-        public ArangoCollection KeyOffset(long value)
+        public ACollection KeyOffset(long value)
         {
             _parameters.Long(ParameterName.KeyOptionsOffset, value);
         	
@@ -124,7 +124,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines the number of shards to create for the collection in cluster environment. Default value: 1.
         /// </summary>
-        public ArangoCollection NumberOfShards(int value)
+        public ACollection NumberOfShards(int value)
         {
             _parameters.Int(ParameterName.NumberOfShards, value);
         	
@@ -134,7 +134,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines which document attributes are used to specify the target shard for documents in cluster environment. Default value: ["_key"].
         /// </summary>
-        public ArangoCollection ShardKeys(List<string> value)
+        public ACollection ShardKeys(List<string> value)
         {
             _parameters.List(ParameterName.ShardKeys, value);
         	
@@ -144,7 +144,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines whether the return value should include the number of documents in collection. Default value: true.
         /// </summary>
-        public ArangoCollection Count(bool value)
+        public ACollection Count(bool value)
         {
             _parameters.Bool(ParameterName.Count, value);
         	
@@ -156,7 +156,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines whether to include document revision ids in the checksum calculation. Default value: false.
         /// </summary>
-        public ArangoCollection WithRevisions(bool value)
+        public ACollection WithRevisions(bool value)
         {
             // needs to be in string format
             _parameters.String(ParameterName.WithRevisions, value.ToString().ToLower());
@@ -167,7 +167,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines whether to include document body data in the checksum calculation. Default value: false.
         /// </summary>
-        public ArangoCollection WithData(bool value)
+        public ACollection WithData(bool value)
         {
             // needs to be in string format
             _parameters.String(ParameterName.WithData, value.ToString().ToLower());
@@ -180,7 +180,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines which attribute will be retuned in the list. Default value: Path.
         /// </summary>
-        public ArangoCollection ReturnListType(ArangoReturnListType value)
+        public ACollection ReturnListType(AReturnListType value)
         {
             // needs to be string value
             _parameters.String(ParameterName.Type, value.ToString().ToLower());
@@ -195,7 +195,7 @@ namespace Arango.Client
         /// <summary>
         /// Creates new collection in current database context.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Create(string collectionName)
+        public AResult<Dictionary<string, object>> Create(string collectionName)
         {
             var request = new Request(HttpMethod.POST, ApiBaseUri.Collection, "");
             var bodyDocument = new Dictionary<string, object>();
@@ -230,7 +230,7 @@ namespace Arango.Client
             request.Body = JSON.ToJSON(bodyDocument);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -258,12 +258,12 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves basic information about specified collection.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Get(string collectionName)
+        public AResult<Dictionary<string, object>> Get(string collectionName)
         {
             var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "/" + collectionName);
 
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -292,12 +292,12 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves basic information with additional properties about specified collection.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> GetProperties(string collectionName)
+        public AResult<Dictionary<string, object>> GetProperties(string collectionName)
         {
             var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "/" + collectionName + "/properties");
 
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -327,12 +327,12 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves basic information with additional properties and document count in specified collection.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> GetCount(string collectionName)
+        public AResult<Dictionary<string, object>> GetCount(string collectionName)
         {
             var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "/" + collectionName + "/count");
 
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -362,12 +362,12 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves basic information with additional properties, document count and figures in specified collection.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> GetFigures(string collectionName)
+        public AResult<Dictionary<string, object>> GetFigures(string collectionName)
         {
             var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "/" + collectionName + "/figures");
 
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -397,12 +397,12 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves basic information and revision ID of specified collection.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> GetRevision(string collectionName)
+        public AResult<Dictionary<string, object>> GetRevision(string collectionName)
         {
             var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "/" + collectionName + "/revision");
 
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -432,7 +432,7 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves basic information, revision ID and checksum of specified collection.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> GetChecksum(string collectionName)
+        public AResult<Dictionary<string, object>> GetChecksum(string collectionName)
         {
             var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "/" + collectionName + "/checksum");
 
@@ -442,7 +442,7 @@ namespace Arango.Client
             request.TrySetQueryStringParameter(ParameterName.WithData, _parameters);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -472,7 +472,7 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves list of documents in specified collection.
         /// </summary>
-        public ArangoResult<List<string>> GetAllDocuments(string collectionName)
+        public AResult<List<string>> GetAllDocuments(string collectionName)
         {
             var request = new Request(HttpMethod.GET, ApiBaseUri.Document, "");
 
@@ -482,7 +482,7 @@ namespace Arango.Client
             request.TrySetQueryStringParameter(ParameterName.Type, _parameters);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<List<string>>(response);
+            var result = new AResult<List<string>>(response);
             
             switch (response.StatusCode)
             {
@@ -511,7 +511,7 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves list of edges in specified collection.
         /// </summary>
-        public ArangoResult<List<string>> GetAllEdges(string collectionName)
+        public AResult<List<string>> GetAllEdges(string collectionName)
         {
             var request = new Request(HttpMethod.GET, ApiBaseUri.Edge, "");
 
@@ -521,7 +521,7 @@ namespace Arango.Client
             request.TrySetQueryStringParameter(ParameterName.Type, _parameters);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<List<string>>(response);
+            var result = new AResult<List<string>>(response);
             
             switch (response.StatusCode)
             {
@@ -550,12 +550,12 @@ namespace Arango.Client
         /// <summary>
         /// Removes all documents from specified collection.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Truncate(string collectionName)
+        public AResult<Dictionary<string, object>> Truncate(string collectionName)
         {
             var request = new Request(HttpMethod.PUT, ApiBaseUri.Collection, "/" + collectionName + "/truncate");
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -583,7 +583,7 @@ namespace Arango.Client
         /// <summary>
         /// Loads specified collection into memory.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Load(string collectionName)
+        public AResult<Dictionary<string, object>> Load(string collectionName)
         {
             var request = new Request(HttpMethod.PUT, ApiBaseUri.Collection, "/" + collectionName + "/load");
             
@@ -598,7 +598,7 @@ namespace Arango.Client
             }
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -628,12 +628,12 @@ namespace Arango.Client
         /// <summary>
         /// Unloads specified collection from memory.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Unload(string collectionName)
+        public AResult<Dictionary<string, object>> Unload(string collectionName)
         {
             var request = new Request(HttpMethod.PUT, ApiBaseUri.Collection, "/" + collectionName + "/unload");
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -663,7 +663,7 @@ namespace Arango.Client
         /// <summary>
         /// Changes properties of specified collection.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> ChangeProperties(string collectionName)
+        public AResult<Dictionary<string, object>> ChangeProperties(string collectionName)
         {
             var request = new Request(HttpMethod.PUT, ApiBaseUri.Collection, "/" + collectionName + "/properties");
             var bodyDocument = new Dictionary<string, object>();
@@ -676,7 +676,7 @@ namespace Arango.Client
             request.Body = JSON.ToJSON(bodyDocument);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -704,7 +704,7 @@ namespace Arango.Client
         /// <summary>
         /// Renames specified collection.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Rename(string collectionName, string newCollectionName)
+        public AResult<Dictionary<string, object>> Rename(string collectionName, string newCollectionName)
         {
             var request = new Request(HttpMethod.PUT, ApiBaseUri.Collection, "/" + collectionName + "/rename");
             var bodyDocument = new Dictionary<string, object>()
@@ -713,7 +713,7 @@ namespace Arango.Client
             request.Body = JSON.ToJSON(bodyDocument);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -741,12 +741,12 @@ namespace Arango.Client
         /// <summary>
         /// Rotates the journal of specified collection to make the data in the file available for compaction. Current journal of the collection will be closed and turned into read-only datafile. This operation is not available in cluster environment.
         /// </summary>
-        public ArangoResult<bool> RotateJournal(string collectionName)
+        public AResult<bool> RotateJournal(string collectionName)
         {
             var request = new Request(HttpMethod.PUT, ApiBaseUri.Collection, "/" + collectionName + "/rotate");
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<bool>(response);
+            var result = new AResult<bool>(response);
             
             switch (response.StatusCode)
             {
@@ -776,12 +776,12 @@ namespace Arango.Client
         /// <summary>
         /// Deletes specified collection.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Delete(string collectionName)
+        public AResult<Dictionary<string, object>> Delete(string collectionName)
         {
             var request = new Request(HttpMethod.DELETE, ApiBaseUri.Collection, "/" + collectionName);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {

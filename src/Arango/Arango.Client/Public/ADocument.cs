@@ -5,12 +5,12 @@ using Arango.fastJSON;
 
 namespace Arango.Client
 {
-    public class ArangoDocument
+    public class ADocument
     {
         readonly Dictionary<string, object> _parameters = new Dictionary<string, object>();
         readonly Connection _connection;
         
-        internal ArangoDocument(Connection connection)
+        internal ADocument(Connection connection)
         {
             _connection = connection;
         }
@@ -20,7 +20,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines whether collection should be created if it does not exist. Default value: false.
         /// </summary>
-        public ArangoDocument CreateCollection(bool value)
+        public ADocument CreateCollection(bool value)
         {
             // needs to be string value
             _parameters.String(ParameterName.CreateCollection, value.ToString().ToLower());
@@ -31,7 +31,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines whether or not to wait until data are synchronised to disk. Default value: false.
         /// </summary>
-        public ArangoDocument WaitForSync(bool value)
+        public ADocument WaitForSync(bool value)
         {
             // needs to be string value
             _parameters.String(ParameterName.WaitForSync, value.ToString().ToLower());
@@ -42,7 +42,7 @@ namespace Arango.Client
         /// <summary>
         /// Conditionally operate on document with specified revision.
         /// </summary>
-        public ArangoDocument IfMatch(string revision)
+        public ADocument IfMatch(string revision)
         {
             _parameters.String(ParameterName.IfMatch, revision);
         	
@@ -52,7 +52,7 @@ namespace Arango.Client
         /// <summary>
         /// Conditionally operate on document with specified revision and update policy.
         /// </summary>
-        public ArangoDocument IfMatch(string revision, ArangoUpdatePolicy updatePolicy)
+        public ADocument IfMatch(string revision, AUpdatePolicy updatePolicy)
         {
             _parameters.String(ParameterName.IfMatch, revision);
             // needs to be string value
@@ -64,7 +64,7 @@ namespace Arango.Client
         /// <summary>
         /// Conditionally operate on document which current revision does not match specified revision.
         /// </summary>
-        public ArangoDocument IfNoneMatch(string revision)
+        public ADocument IfNoneMatch(string revision)
         {
             _parameters.String(ParameterName.IfNoneMatch, revision);
         	
@@ -74,7 +74,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines whether to keep any attributes from existing document that are contained in the patch document which contains null value. Default value: true.
         /// </summary>
-        public ArangoDocument KeepNull(bool value)
+        public ADocument KeepNull(bool value)
         {
             // needs to be string value
             _parameters.String(ParameterName.KeepNull, value.ToString().ToLower());
@@ -85,7 +85,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines whether the value in the patch document will overwrite the existing document's value. Default value: true.
         /// </summary>
-        public ArangoDocument MergeArrays(bool value)
+        public ADocument MergeArrays(bool value)
         {
             // needs to be string value
             _parameters.String(ParameterName.MergeArrays, value.ToString().ToLower());
@@ -100,7 +100,7 @@ namespace Arango.Client
         /// <summary>
         /// Creates new document within specified collection in current database context.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Create(string collectionName, Dictionary<string, object> document)
+        public AResult<Dictionary<string, object>> Create(string collectionName, Dictionary<string, object> document)
         {
             var request = new Request(HttpMethod.POST, ApiBaseUri.Document, "");
             
@@ -114,7 +114,7 @@ namespace Arango.Client
             request.Body = JSON.ToJSON(document);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -141,7 +141,7 @@ namespace Arango.Client
         /// <summary>
         /// Creates new document within specified collection in current database context.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Create<T>(string collectionName, T obj)
+        public AResult<Dictionary<string, object>> Create<T>(string collectionName, T obj)
         {
             return Create(collectionName, Dictator.ToDocument(obj));
         }
@@ -154,9 +154,9 @@ namespace Arango.Client
         /// Checks for existence of specified document.
         /// </summary>
         /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
-        public ArangoResult<string> Check(string id)
+        public AResult<string> Check(string id)
         {
-            if (!ArangoDocument.IsID(id))
+            if (!ADocument.IsID(id))
             {
                 throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
             }
@@ -169,7 +169,7 @@ namespace Arango.Client
             request.TrySetHeaderParameter(ParameterName.IfNoneMatch, _parameters);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<string>(response);
+            var result = new AResult<string>(response);
             
             switch (response.StatusCode)
             {
@@ -206,9 +206,9 @@ namespace Arango.Client
         /// Retrieves specified document.
         /// </summary>
         /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
-        public ArangoResult<Dictionary<string, object>> Get(string id)
+        public AResult<Dictionary<string, object>> Get(string id)
         {
-            if (!ArangoDocument.IsID(id))
+            if (!ADocument.IsID(id))
             {
                 throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
             }
@@ -221,7 +221,7 @@ namespace Arango.Client
             request.TrySetHeaderParameter(ParameterName.IfNoneMatch, _parameters);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -254,10 +254,10 @@ namespace Arango.Client
         /// Retrieves specified document.
         /// </summary>
         /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
-        public ArangoResult<T> Get<T>(string id)
+        public AResult<T> Get<T>(string id)
         {
             var getResult = Get(id);
-            var result = new ArangoResult<T>();
+            var result = new AResult<T>();
             
             result.StatusCode = getResult.StatusCode;
             result.Success = getResult.Success;
@@ -280,9 +280,9 @@ namespace Arango.Client
         /// Updates existing document identified by its handle with new document data.
         /// </summary>
         /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
-        public ArangoResult<Dictionary<string, object>> Update(string id, Dictionary<string, object> document)
+        public AResult<Dictionary<string, object>> Update(string id, Dictionary<string, object> document)
         {
-            if (!ArangoDocument.IsID(id))
+            if (!ADocument.IsID(id))
             {
                 throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
             }
@@ -306,7 +306,7 @@ namespace Arango.Client
             request.Body = JSON.ToJSON(document);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -340,7 +340,7 @@ namespace Arango.Client
         /// Updates existing document identified by its handle with new document data.
         /// </summary>
         /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
-        public ArangoResult<Dictionary<string, object>> Update<T>(string id, T obj)
+        public AResult<Dictionary<string, object>> Update<T>(string id, T obj)
         {
             return Update(id, Dictator.ToDocument(obj));
         }
@@ -353,9 +353,9 @@ namespace Arango.Client
         /// Completely replaces existing document identified by its handle with new document data.
         /// </summary>
         /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
-        public ArangoResult<Dictionary<string, object>> Replace(string id, Dictionary<string, object> document)
+        public AResult<Dictionary<string, object>> Replace(string id, Dictionary<string, object> document)
         {
-            if (!ArangoDocument.IsID(id))
+            if (!ADocument.IsID(id))
             {
                 throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
             }
@@ -375,7 +375,7 @@ namespace Arango.Client
             request.Body = JSON.ToJSON(document);
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
@@ -409,7 +409,7 @@ namespace Arango.Client
         /// Completely replaces existing document identified by its handle with new document data.
         /// </summary>
         /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
-        public ArangoResult<Dictionary<string, object>> Replace<T>(string id, T obj)
+        public AResult<Dictionary<string, object>> Replace<T>(string id, T obj)
         {
             return Replace(id, Dictator.ToDocument(obj));
         }
@@ -422,9 +422,9 @@ namespace Arango.Client
         /// Deletes specified document.
         /// </summary>
         /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
-        public ArangoResult<Dictionary<string, object>> Delete(string id)
+        public AResult<Dictionary<string, object>> Delete(string id)
         {
-            if (!ArangoDocument.IsID(id))
+            if (!ADocument.IsID(id))
             {
                 throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
             }
@@ -442,7 +442,7 @@ namespace Arango.Client
             }
             
             var response = _connection.Send(request);
-            var result = new ArangoResult<Dictionary<string, object>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {

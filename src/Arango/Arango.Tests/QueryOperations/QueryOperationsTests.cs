@@ -12,7 +12,7 @@ namespace Arango.Tests
         public QueryOperationsTests()
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-			Database.CreateTestCollection(Database.TestDocumentCollectionName, ArangoCollectionType.Document);
+			Database.CreateTestCollection(Database.TestDocumentCollectionName, ACollectionType.Document);
         }
         
         #region ToDocument(s)
@@ -21,7 +21,7 @@ namespace Arango.Tests
         public void Should_execute_AQL_query_with_document_result()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var queryResult = db.Query
                 .Aql(string.Format(@"
@@ -42,7 +42,7 @@ namespace Arango.Tests
         public void Should_execute_AQL_query_with_document_list_result()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var queryResult = db.Query
                 .Aql(string.Format(@"
@@ -69,7 +69,7 @@ namespace Arango.Tests
         public void Should_execute_AQL_query_with_single_object_result()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var queryResult = db.Query
                 .Aql(string.Format(@"
@@ -89,7 +89,7 @@ namespace Arango.Tests
         public void Should_execute_AQL_query_with_single_primitive_object_result()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var queryResult = db.Query
                 .Aql(string.Format(@"
@@ -110,7 +110,7 @@ namespace Arango.Tests
         public void Should_execute_AQL_query_with_single_dictionary_object_result()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var queryResult = db.Query
                 .Aql(string.Format(@"
@@ -132,7 +132,7 @@ namespace Arango.Tests
         public void Should_execute_AQL_query_with_single_strongly_typed_object_result()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var queryResult = db.Query
                 .Aql(string.Format(@"
@@ -158,7 +158,7 @@ namespace Arango.Tests
         public void Should_execute_AQL_query_with_list_result()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var queryResult = db.Query
                 .Aql(string.Format(@"
@@ -177,7 +177,7 @@ namespace Arango.Tests
         public void Should_execute_AQL_query_with_primitive_list_result()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var queryResult = db.Query
                 .Aql(string.Format(@"
@@ -199,7 +199,7 @@ namespace Arango.Tests
         public void Should_execute_AQL_query_with_dictionary_list_result()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var queryResult = db.Query
                 .Aql(string.Format(@"
@@ -222,7 +222,7 @@ namespace Arango.Tests
         public void Should_execute_AQL_query_with_strongly_typed_list_result()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var queryResult = db.Query
                 .Aql(string.Format(@"
@@ -248,7 +248,7 @@ namespace Arango.Tests
         public void Should_execute_AQL_query_with_count()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var queryResult = db.Query
                 .Count(true)
@@ -269,7 +269,7 @@ namespace Arango.Tests
         public void Should_execute_AQL_query_with_batchSize()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var doc3 = new Dictionary<string, object>()
                 .String("foo", "foo string 3");
@@ -301,7 +301,7 @@ namespace Arango.Tests
         public void Should_execute_AQL_query_with_bindVar()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var queryResult = db.Query
                 .BindVar("barNumber", 1)
@@ -322,7 +322,7 @@ namespace Arango.Tests
         public void Should_execute_AQL_query_fluent()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             var useCount = true;
             var useBatchSize = true;
             
@@ -355,7 +355,7 @@ namespace Arango.Tests
         public void Should_parse_query()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var parseResult = db.Query
                 .Parse(string.Format(@"
@@ -374,7 +374,7 @@ namespace Arango.Tests
         [Test()]
         public void Should_minify_query()
         {
-            var singleLineQuery = ArangoQuery.Minify(@"
+            var singleLineQuery = AQuery.Minify(@"
             FOR item IN MyDocumentCollection
                 RETURN item
             ");
@@ -386,7 +386,7 @@ namespace Arango.Tests
         public void Should_return_404_with_deleteCursor_operation()
         {
             var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var queryResult = db.Query
                 .BatchSize(1)

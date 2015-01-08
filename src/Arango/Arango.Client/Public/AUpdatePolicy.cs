@@ -2,7 +2,7 @@
 
 namespace Arango.Client
 {
-    public enum ArangoUpdatePolicy
+    public enum AUpdatePolicy
     {
         Error,
         Last

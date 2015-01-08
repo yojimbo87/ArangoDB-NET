@@ -36,7 +36,7 @@ namespace Arango.Tests
             UserName = "";
             Password = "";
 
-            ArangoSettings.AddConnection(
+            ASettings.AddConnection(
                 SystemAlias,
                 Hostname,
                 Port,
@@ -46,7 +46,7 @@ namespace Arango.Tests
                 Password
             );
 
-            ArangoSettings.AddConnection(
+            ASettings.AddConnection(
                 Alias,
                 Hostname,
                 Port,
@@ -61,7 +61,7 @@ namespace Arango.Tests
         {	
             DeleteTestDatabase(databaseName);
 
-            var db = new ArangoDatabase(Database.SystemAlias);
+            var db = new ADatabase(Database.SystemAlias);
             
             var resultList = db.GetAccessibleDatabases();
 
@@ -75,7 +75,7 @@ namespace Arango.Tests
 
         public static void DeleteTestDatabase(string databaseName)
         {
-            var db = new ArangoDatabase(Database.SystemAlias);
+            var db = new ADatabase(Database.SystemAlias);
             
             var resultList = db.GetAccessibleDatabases();
 
@@ -91,11 +91,11 @@ namespace Arango.Tests
             Database.DeleteTestDatabase(Database.TestDatabaseOneTime);
         }
         
-        public static void CreateTestCollection(string collectionName, ArangoCollectionType collectionType)
+        public static void CreateTestCollection(string collectionName, ACollectionType collectionType)
         {
         	DeleteTestCollection(collectionName);
         	
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Type(collectionType)
@@ -104,7 +104,7 @@ namespace Arango.Tests
         
         public static void ClearTestCollection(string collectionName)
         {
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var createResult = db.Collection
                 .Truncate(collectionName);
@@ -115,7 +115,7 @@ namespace Arango.Tests
             ClearTestCollection(collectionName);
             
             var documents = new List<Dictionary<string, object>>();
-        	var db = new ArangoDatabase(Alias);
+        	var db = new ADatabase(Alias);
         	
         	var document1 = new Dictionary<string, object>()
         		.String("foo", "string value one")
@@ -141,7 +141,7 @@ namespace Arango.Tests
 
         public static void DeleteTestCollection(string collectionName)
         {
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
 
             var resultGet = db.Collection.Get(collectionName);
             

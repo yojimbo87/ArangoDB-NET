@@ -3,7 +3,7 @@ using Arango.Client.Protocol;
 
 namespace Arango.Client
 {
-    public class ArangoResult<T>
+    public class AResult<T>
     {
         /// <summary>
         /// Determines whether the operation ended with success and returned result value is other than null.
@@ -32,18 +32,18 @@ namespace Arango.Client
         public T Value { get; set; }
         
         /// <summary>
-        /// If operation ended with failure, this property would contain instance of ArangoError object which contains further information about the error.
+        /// If operation ended with failure, this property would contain instance of AEerror object which contains further information about the error.
         /// </summary>
-        public ArangoError Error { get; set; }
+        public AEerror Error { get; set; }
         
         /// <summary>
         /// Document which might contain additional information on performed operation.
         /// </summary>
         public Dictionary<string, object> Extra { get; set; }
         
-        public ArangoResult() { }
+        public AResult() { }
         
-        internal ArangoResult(Response response)
+        internal AResult(Response response)
         {
             StatusCode = response.StatusCode;
             Error = response.Error;

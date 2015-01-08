@@ -2,7 +2,7 @@
 
 namespace Arango.Client
 {
-    public enum ArangoDirection
+    public enum ADirection
     {
         In,
         Out,

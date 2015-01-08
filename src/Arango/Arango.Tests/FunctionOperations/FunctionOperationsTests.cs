@@ -13,7 +13,7 @@ namespace Arango.Tests
         public void Should_register_function()
         {
         	Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             var registerResult = db.Function.Register(
                 "myfunctions::temperature::celsiustofahrenheit", 
@@ -40,7 +40,7 @@ namespace Arango.Tests
         public void Should_list_functions()
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             const string name1 = "myfunctions::temperature::celsiustofahrenheit1";
             const string code1 = "function (celsius) { return celsius * 1.8 + 40; }";
@@ -70,7 +70,7 @@ namespace Arango.Tests
         public void Should_replace_function()
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             var registerResult = db.Function.Register(
                 "myfunctions::temperature::celsiustofahrenheit", 
@@ -107,7 +107,7 @@ namespace Arango.Tests
         public void Should_unregister_function()
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-            var db = new ArangoDatabase(Database.Alias);
+            var db = new ADatabase(Database.Alias);
             
             var registerResult = db.Function.Register(
                 "myfunctions::temperature::celsiustofahrenheit", 

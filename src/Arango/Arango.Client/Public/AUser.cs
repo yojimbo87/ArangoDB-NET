@@ -2,14 +2,14 @@
 
 namespace Arango.Client
 {
-    public class ArangoUser
+    public class AUser
     {
         public string Username { get; set; }
         public string Password { get; set; }
         public bool Active { get; set; }
         public Dictionary<string, object> Extra { get; set; }
         
-        public ArangoUser()
+        public AUser()
         {
             Active = true;
         }

@@ -2,7 +2,7 @@
 
 namespace Arango.Client
 {
-    public enum ArangoReturnListType
+    public enum AReturnListType
     {
         ID,
         Key,
