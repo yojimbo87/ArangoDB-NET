@@ -1,4 +1,5 @@
-﻿﻿using System.Collections.Generic;
+﻿using System;﻿
+using System.Collections.Generic;
 using Arango.Client.Protocol;
 using Arango.fastJSON;
 
@@ -99,12 +100,12 @@ namespace Arango.Client
         /// <summary>
         /// Creates new document within specified collection in current database context.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Create(string collection, Dictionary<string, object> document)
+        public ArangoResult<Dictionary<string, object>> Create(string collectionName, Dictionary<string, object> document)
         {
             var request = new Request(HttpMethod.POST, ApiBaseUri.Document, "");
             
             // required
-            request.QueryString.Add(ParameterName.Collection, collection);
+            request.QueryString.Add(ParameterName.Collection, collectionName);
             // optional
             request.TrySetQueryStringParameter(ParameterName.CreateCollection, _parameters);
             // optional
@@ -140,9 +141,9 @@ namespace Arango.Client
         /// <summary>
         /// Creates new document within specified collection in current database context.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Create<T>(string collection, T obj)
+        public ArangoResult<Dictionary<string, object>> Create<T>(string collectionName, T obj)
         {
-            return Create(collection, Dictator.ToDocument(obj));
+            return Create(collectionName, Dictator.ToDocument(obj));
         }
         
         #endregion
@@ -152,9 +153,15 @@ namespace Arango.Client
         /// <summary>
         /// Checks for existence of specified document.
         /// </summary>
-        public ArangoResult<string> Check(string handle)
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public ArangoResult<string> Check(string id)
         {
-            var request = new Request(HttpMethod.HEAD, ApiBaseUri.Document, "/" + handle);
+            if (!ArangoDocument.IsID(id))
+            {
+                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
+            }
+            
+            var request = new Request(HttpMethod.HEAD, ApiBaseUri.Document, "/" + id);
             
             // optional
             request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
@@ -198,9 +205,15 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves specified document.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Get(string handle)
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public ArangoResult<Dictionary<string, object>> Get(string id)
         {
-            var request = new Request(HttpMethod.GET, ApiBaseUri.Document, "/" + handle);
+            if (!ArangoDocument.IsID(id))
+            {
+                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
+            }
+            
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Document, "/" + id);
             
             // optional
             request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
@@ -240,9 +253,10 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves specified document.
         /// </summary>
-        public ArangoResult<T> Get<T>(string handle)
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public ArangoResult<T> Get<T>(string id)
         {
-            var getResult = Get(handle);
+            var getResult = Get(id);
             var result = new ArangoResult<T>();
             
             result.StatusCode = getResult.StatusCode;
@@ -265,9 +279,15 @@ namespace Arango.Client
         /// <summary>
         /// Updates existing document identified by its handle with new document data.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Update(string handle, Dictionary<string, object> document)
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public ArangoResult<Dictionary<string, object>> Update(string id, Dictionary<string, object> document)
         {
-            var request = new Request(HttpMethod.PATCH, ApiBaseUri.Document, "/" + handle);
+            if (!ArangoDocument.IsID(id))
+            {
+                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
+            }
+            
+            var request = new Request(HttpMethod.PATCH, ApiBaseUri.Document, "/" + id);
             
             // optional
             request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
@@ -319,9 +339,10 @@ namespace Arango.Client
         /// <summary>
         /// Updates existing document identified by its handle with new document data.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Update<T>(string handle, T obj)
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public ArangoResult<Dictionary<string, object>> Update<T>(string id, T obj)
         {
-            return Update(handle, Dictator.ToDocument(obj));
+            return Update(id, Dictator.ToDocument(obj));
         }
         
         #endregion
@@ -331,9 +352,15 @@ namespace Arango.Client
         /// <summary>
         /// Completely replaces existing document identified by its handle with new document data.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Replace(string handle, Dictionary<string, object> document)
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public ArangoResult<Dictionary<string, object>> Replace(string id, Dictionary<string, object> document)
         {
-            var request = new Request(HttpMethod.PUT, ApiBaseUri.Document, "/" + handle);
+            if (!ArangoDocument.IsID(id))
+            {
+                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
+            }
+            
+            var request = new Request(HttpMethod.PUT, ApiBaseUri.Document, "/" + id);
             
             // optional
             request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
@@ -381,9 +408,10 @@ namespace Arango.Client
         /// <summary>
         /// Completely replaces existing document identified by its handle with new document data.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Replace<T>(string handle, T obj)
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public ArangoResult<Dictionary<string, object>> Replace<T>(string id, T obj)
         {
-            return Replace(handle, Dictator.ToDocument(obj));
+            return Replace(id, Dictator.ToDocument(obj));
         }
         
         #endregion
@@ -393,9 +421,15 @@ namespace Arango.Client
         /// <summary>
         /// Deletes specified document.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Delete(string handle)
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public ArangoResult<Dictionary<string, object>> Delete(string id)
         {
-            var request = new Request(HttpMethod.DELETE, ApiBaseUri.Document, "/" + handle);
+            if (!ArangoDocument.IsID(id))
+            {
+                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
+            }
+            
+            var request = new Request(HttpMethod.DELETE, ApiBaseUri.Document, "/" + id);
             
             // optional
             request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
@@ -435,6 +469,71 @@ namespace Arango.Client
             _parameters.Clear();
             
             return result;
+        }
+        
+        #endregion
+        
+        #region Static methods
+        
+        /// <summary>
+        /// Determines if specified value has valid document `_id` format. 
+        /// </summary>
+        public static bool IsID(string id)
+        {
+            if (id.Contains("/"))
+            {
+                var split = id.Split('/');
+                
+                if ((split.Length == 2) && (split[0].Length > 0) && (split[1].Length > 0))
+                {
+                    long key;
+
+                    return long.TryParse(split[1], out key);
+                }
+            }
+            
+            return false;
+        }
+        
+        /// <summary>
+        /// Determines if specified value has valid document `_key` format. 
+        /// </summary>
+        public static bool IsKey(string key)
+        {
+            long outKey;
+
+            return long.TryParse(key, out outKey);
+        }
+        
+        /// <summary>
+        /// Determines if specified value has valid document `_rev` format. 
+        /// </summary>
+        public static bool IsRev(string revision)
+        {
+            long outRev;
+
+            return long.TryParse(revision, out outRev);
+        }
+        
+        /// <summary>
+        /// Constructs document ID from specified collection and key values.
+        /// </summary>
+        public static string Identify(string collection, long key)
+        {
+            return collection + "/" + key;
+        }
+        
+        /// <summary>
+        /// Constructs document ID from specified collection and key values. If key format is invalid null value is returned.
+        /// </summary>
+        public static string Identify(string collection, string key)
+        {
+            if (IsKey(key))
+            {
+                return collection + "/" + key;
+            }
+            
+            return null;
         }
         
         #endregion

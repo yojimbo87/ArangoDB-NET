@@ -6,6 +6,7 @@
 - [Update document](#update-document)
 - [Replace document](#replace-document)
 - [Delete document](#delete-document)
+- [Static methods](#static-methods)
 - [More examples](#more-examples)
 
 Document operations are focused on management of documents in document type collections. These operations are accessible through `Document` property in database context object.
@@ -241,6 +242,16 @@ if (deleteDocumentResult.Success)
     var revision = deleteDocumentResult.Value.String("_rev");
 }
 ```
+
+## Static methods
+
+`ArangoDocument` class provides following static methods:
+
+- `ArangoDocument.IsID(string id)` - Determines if specified value has valid document `_id` format. 
+- `ArangoDocument.IsKey(string key)` - Determines if specified value has valid document `_key` format.
+- `ArangoDocument.IsRev(string id)` - Determines if specified value has valid document `_rev` format.
+- `ArangoDocument.Identify(string collection, long key)` - Constructs document ID from specified collection and key values.
+- `ArangoDocument.Identify(string collection, string key)` - Constructs document ID from specified collection and key values. If key format is invalid null value is returned.
 
 ## More examples
 

@@ -9,15 +9,15 @@ namespace Arango.Client
         #region _id
         
         /// <summary>
-        /// Checks if '_id' field is present within document.
+        /// Checks if '_id' field is present and has valid format.
         /// </summary>
         public static bool HasID(this Dictionary<string, object> dictionary)
         {
-            return Has(dictionary, "_id");
+            return !string.IsNullOrEmpty(ID(dictionary));
         }
         
         /// <summary>
-        /// Retrieves value of '_id' field from document. If the field is missing null value is returned.
+        /// Retrieves value of '_id' field. If the field is missing or has invalid format null value is returned.
         /// </summary>
         public static string ID(this Dictionary<string, object> dictionary)
         {
@@ -26,6 +26,11 @@ namespace Arango.Client
             try
             {
                 id = String(dictionary, "_id");
+                
+                if (!ArangoDocument.IsID(id))
+                {
+                    id = null;
+                }
             }
             catch (Exception)
             {
@@ -36,10 +41,16 @@ namespace Arango.Client
         }
         
         /// <summary>
-        /// Stores _id field value.
+        /// Stores '_id' field value.
         /// </summary>
+        /// <exception cref="InvalidFieldTypeException">Specified value has invalid _id field format.</exception>
         public static Dictionary<string, object> ID(this Dictionary<string, object> dictionary, string id)
         {
+            if (!ArangoDocument.IsID(id))
+            {
+                throw new InvalidFieldTypeException("Specified value (" + id + ") has invalid _id field format.");
+            }
+            
             SetFieldValue(dictionary, "_id", id);
             
             return dictionary;
@@ -50,15 +61,15 @@ namespace Arango.Client
         #region _key
         
         /// <summary>
-        /// Checks if '_key' field is present within document.
+        /// Checks if '_key' field is present and has valid format.
         /// </summary>
         public static bool HasKey(this Dictionary<string, object> dictionary)
         {
-            return Has(dictionary, "_key");
+            return !string.IsNullOrEmpty(Key(dictionary));
         }
         
         /// <summary>
-        /// Retrieves value of '_key' field from document. If the field is missing null value is returned.
+        /// Retrieves value of '_key' field. If the field is missing or has invalid format null value is returned.
         /// </summary>
         public static string Key(this Dictionary<string, object> dictionary)
         {
@@ -67,6 +78,11 @@ namespace Arango.Client
             try
             {
                 key = String(dictionary, "_key");
+                
+                if (!ArangoDocument.IsKey(key))
+                {
+                    key = null;
+                }
             }
             catch (Exception)
             {
@@ -77,10 +93,16 @@ namespace Arango.Client
         }
         
         /// <summary>
-        /// Stores _key field value.
+        /// Stores '_key' field value.
         /// </summary>
+        /// <exception cref="InvalidFieldTypeException">Specified value has invalid _key field format.</exception>
         public static Dictionary<string, object> Key(this Dictionary<string, object> dictionary, string key)
         {
+            if (!ArangoDocument.IsKey(key))
+            {
+                throw new InvalidFieldTypeException("Specified value (" + key + ") has invalid _key field format.");
+            }
+            
             SetFieldValue(dictionary, "_key", key);
             
             return dictionary;
@@ -91,15 +113,15 @@ namespace Arango.Client
         #region _rev
         
         /// <summary>
-        /// Checks if '_rev' field is present within document.
+        /// Checks if '_rev' field is present and has valid format.
         /// </summary>
         public static bool HasRev(this Dictionary<string, object> dictionary)
         {
-            return Has(dictionary, "_rev");
+            return !string.IsNullOrEmpty(Rev(dictionary));
         }
         
         /// <summary>
-        /// Retrieves value of '_rev' field from document. If the field is missing null value is returned.
+        /// Retrieves value of '_rev' field. If the field is missing or has invalid format null value is returned.
         /// </summary>
         public static string Rev(this Dictionary<string, object> dictionary)
         {
@@ -108,6 +130,11 @@ namespace Arango.Client
             try
             {
                 rev = String(dictionary, "_rev");
+                
+                if (!ArangoDocument.IsRev(rev))
+                {
+                    rev = null;
+                }
             }
             catch (Exception)
             {
@@ -118,10 +145,16 @@ namespace Arango.Client
         }
         
         /// <summary>
-        /// Stores _rev field value.
+        /// Stores '_rev' field value.
         /// </summary>
+        /// <exception cref="InvalidFieldTypeException">Specified value has invalid _rev field format.</exception>
         public static Dictionary<string, object> Rev(this Dictionary<string, object> dictionary, string rev)
         {
+            if (!ArangoDocument.IsRev(rev))
+            {
+                throw new InvalidFieldTypeException("Specified value (" + rev + ") has invalid _rev field format.");
+            }   
+            
             SetFieldValue(dictionary, "_rev", rev);
             
             return dictionary;

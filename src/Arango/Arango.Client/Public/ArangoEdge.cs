@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Arango.Client.Protocol;
 using Arango.fastJSON;
 
@@ -99,20 +100,20 @@ namespace Arango.Client
         /// <summary>
         /// Creates new edge within specified collection between two document vertices in current database context.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Create(string collection, string fromHandle, string toHandle)
+        public ArangoResult<Dictionary<string, object>> Create(string collectionName, string fromHandle, string toHandle)
         {
-            return Create(collection, fromHandle, toHandle, null);
+            return Create(collectionName, fromHandle, toHandle, null);
         }
         
         /// <summary>
         /// Creates new edge with document data within specified collection between two document vertices in current database context.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Create(string collection, string fromHandle, string toHandle, Dictionary<string, object> document)
+        public ArangoResult<Dictionary<string, object>> Create(string collectionName, string fromHandle, string toHandle, Dictionary<string, object> document)
         {
             var request = new Request(HttpMethod.POST, ApiBaseUri.Edge, "");
             
             // required
-            request.QueryString.Add(ParameterName.Collection, collection);
+            request.QueryString.Add(ParameterName.Collection, collectionName);
             // required
             request.QueryString.Add(ParameterName.From, fromHandle);
             // required
@@ -157,9 +158,9 @@ namespace Arango.Client
         /// <summary>
         /// Creates new edge with document data within specified collection between two document vertices in current database context.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Create<T>(string collection, string fromHandle, string toHandle, T obj)
+        public ArangoResult<Dictionary<string, object>> Create<T>(string collectionName, string fromHandle, string toHandle, T obj)
         {
-            return Create(collection, fromHandle, toHandle, Dictator.ToDocument(obj));
+            return Create(collectionName, fromHandle, toHandle, Dictator.ToDocument(obj));
         }
         
         #endregion
@@ -169,9 +170,15 @@ namespace Arango.Client
         /// <summary>
         /// Checks for existence of specified edge.
         /// </summary>
-        public ArangoResult<string> Check(string handle)
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public ArangoResult<string> Check(string id)
         {
-            var request = new Request(HttpMethod.HEAD, ApiBaseUri.Edge, "/" + handle);
+            if (!ArangoDocument.IsID(id))
+            {
+                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
+            }
+            
+            var request = new Request(HttpMethod.HEAD, ApiBaseUri.Edge, "/" + id);
             
             // optional
             request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
@@ -215,9 +222,15 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves specified edge.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Get(string handle)
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public ArangoResult<Dictionary<string, object>> Get(string id)
         {
-            var request = new Request(HttpMethod.GET, ApiBaseUri.Edge, "/" + handle);
+            if (!ArangoDocument.IsID(id))
+            {
+                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
+            }
+            
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Edge, "/" + id);
             
             // optional
             request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
@@ -257,9 +270,10 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves specified edge.
         /// </summary>
-        public ArangoResult<T> Get<T>(string handle)
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public ArangoResult<T> Get<T>(string id)
         {
-            var getResult = Get(handle);
+            var getResult = Get(id);
             var result = new ArangoResult<T>();
             
             result.StatusCode = getResult.StatusCode;
@@ -322,9 +336,15 @@ namespace Arango.Client
         /// <summary>
         /// Updates existing edge identified by its handle with new edge data.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Update(string handle, Dictionary<string, object> document)
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public ArangoResult<Dictionary<string, object>> Update(string id, Dictionary<string, object> document)
         {
-            var request = new Request(HttpMethod.PATCH, ApiBaseUri.Edge, "/" + handle);
+            if (!ArangoDocument.IsID(id))
+            {
+                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
+            }
+            
+            var request = new Request(HttpMethod.PATCH, ApiBaseUri.Edge, "/" + id);
             
             // optional
             request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
@@ -376,9 +396,10 @@ namespace Arango.Client
         /// <summary>
         /// Updates existing edge identified by its handle with new edge data.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Update<T>(string handle, T obj)
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public ArangoResult<Dictionary<string, object>> Update<T>(string id, T obj)
         {
-            return Update(handle, Dictator.ToDocument(obj));
+            return Update(id, Dictator.ToDocument(obj));
         }
         
         #endregion
@@ -388,9 +409,15 @@ namespace Arango.Client
         /// <summary>
         /// Completely replaces existing edge identified by its handle with new edge data.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Replace(string handle, Dictionary<string, object> document)
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public ArangoResult<Dictionary<string, object>> Replace(string id, Dictionary<string, object> document)
         {
-            var request = new Request(HttpMethod.PUT, ApiBaseUri.Edge, "/" + handle);
+            if (!ArangoDocument.IsID(id))
+            {
+                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
+            }
+            
+            var request = new Request(HttpMethod.PUT, ApiBaseUri.Edge, "/" + id);
             
             // optional
             request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
@@ -438,9 +465,10 @@ namespace Arango.Client
         /// <summary>
         /// Completely replaces existing edge identified by its handle with new edge data.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Replace<T>(string handle, T obj)
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public ArangoResult<Dictionary<string, object>> Replace<T>(string id, T obj)
         {
-            return Replace(handle, Dictator.ToDocument(obj));
+            return Replace(id, Dictator.ToDocument(obj));
         }
         
         #endregion
@@ -450,9 +478,15 @@ namespace Arango.Client
         /// <summary>
         /// Deletes specified edge.
         /// </summary>
-        public ArangoResult<Dictionary<string, object>> Delete(string handle)
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public ArangoResult<Dictionary<string, object>> Delete(string id)
         {
-            var request = new Request(HttpMethod.DELETE, ApiBaseUri.Edge, "/" + handle);
+            if (!ArangoDocument.IsID(id))
+            {
+                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
+            }
+            
+            var request = new Request(HttpMethod.DELETE, ApiBaseUri.Edge, "/" + id);
             
             // optional
             request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);

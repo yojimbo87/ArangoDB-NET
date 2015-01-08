@@ -5,6 +5,7 @@
 - [ArangoResult object](#arangoresult-object)
 - [ArangoError object](#arangoerror-object)
 - [JSON representation](#json-representation)
+- [Dictionary extensions](#dictionary-extensions)
 - [Fluent API](#fluent-api)
 
 ## Connection management
@@ -68,6 +69,20 @@ In case of operation failure driver doesn't throw exceptions explicitely, but `A
 JSON objects are by default represented as `Dictionary<string, object>`. In order to simplify the usage of dictionaries (aka documents), driver comes equipped with embedded [dictator library](https://github.com/yojimbo87/dictator) which provide helpful set of methods to provide easier way to handle data stored in these objects. Dictator also provides methods for [conversion](https://github.com/yojimbo87/dictator#convert-document-to-strongly-typed-object) of documents to generic objects and [vice versa](https://github.com/yojimbo87/dictator#convert-strongly-typed-object-to-document). Custom classes can also take advantage of several [property attributes](https://github.com/yojimbo87/dictator#property-attributes).
 
 Internal serialization and deserialization of JSON documents is done by embedded [fastJSON library](http://www.codeproject.com/Articles/159450/fastJSON) which functionality is accessible through `Arango.fastJSON` namespace.
+
+## Dictionary extensions
+
+Apart from standard dictionary extensions provided by [dictator](https://github.com/yojimbo87/dictator), there are also following ArangoDB specific extension methods which can be used by `Dictionary<string, object>` instances:
+
+- `HasID()` - Checks if '_id' field is present and has valid format.
+- `ID()` - Retrieves value of '_id' field. If the field is missing or has invalid format null value is returned.
+- `ID(string id)` - Stores '_id' field value.
+- `HasKey()` - Checks if '_key' field is present and has valid format.
+- `Key()` - Retrieves value of '_key' field. If the field is missing or has invalid format null value is returned.
+- `Key(string key)` - Stores '_key' field value.
+- `HasRev()` - Checks if '_rev' field is present and has valid format.
+- `Rev()` - Retrieves value of '_rev' field. If the field is missing or has invalid format null value is returned.
+- `Rev(string rev)` - Stores '_rev' field value.
 
 ## Fluent API
 
