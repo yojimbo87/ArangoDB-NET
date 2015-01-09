@@ -100,24 +100,34 @@ namespace Arango.Client
         /// <summary>
         /// Creates new edge within specified collection between two document vertices in current database context.
         /// </summary>
-        public AResult<Dictionary<string, object>> Create(string collectionName, string fromHandle, string toHandle)
+        public AResult<Dictionary<string, object>> Create(string collectionName, string fromID, string toID)
         {
-            return Create(collectionName, fromHandle, toHandle, null);
+            return Create(collectionName, fromID, toID, null);
         }
         
         /// <summary>
         /// Creates new edge with document data within specified collection between two document vertices in current database context.
         /// </summary>
-        public AResult<Dictionary<string, object>> Create(string collectionName, string fromHandle, string toHandle, Dictionary<string, object> document)
+        public AResult<Dictionary<string, object>> Create(string collectionName, string fromID, string toID, Dictionary<string, object> document)
         {
+            if (!ADocument.IsID(fromID))
+            {
+                throw new ArgumentException("Specified fromID value (" + fromID + ") has invalid format.");
+            }
+            
+            if (!ADocument.IsID(toID))
+            {
+                throw new ArgumentException("Specified toID value (" + toID + ") has invalid format.");
+            }
+            
             var request = new Request(HttpMethod.POST, ApiBaseUri.Edge, "");
             
             // required
             request.QueryString.Add(ParameterName.Collection, collectionName);
             // required
-            request.QueryString.Add(ParameterName.From, fromHandle);
+            request.QueryString.Add(ParameterName.From, fromID);
             // required
-            request.QueryString.Add(ParameterName.To, toHandle);
+            request.QueryString.Add(ParameterName.To, toID);
             // optional
             request.TrySetQueryStringParameter(ParameterName.CreateCollection, _parameters);
             // optional
@@ -158,9 +168,9 @@ namespace Arango.Client
         /// <summary>
         /// Creates new edge with document data within specified collection between two document vertices in current database context.
         /// </summary>
-        public AResult<Dictionary<string, object>> Create<T>(string collectionName, string fromHandle, string toHandle, T obj)
+        public AResult<Dictionary<string, object>> Create<T>(string collectionName, string fromID, string toID, T obj)
         {
-            return Create(collectionName, fromHandle, toHandle, Dictator.ToDocument(obj));
+            return Create(collectionName, fromID, toID, Dictator.ToDocument(obj));
         }
         
         #endregion
@@ -298,6 +308,11 @@ namespace Arango.Client
         /// </summary>
         public AResult<List<Dictionary<string, object>>> Get(string collectionName, string startVertexID, ADirection direction)
         {
+            if (!ADocument.IsID(startVertexID))
+            {
+                throw new ArgumentException("Specified startVertexID value (" + startVertexID + ") has invalid format.");
+            }
+            
             var request = new Request(HttpMethod.GET, ApiBaseUri.Edges, "/" + collectionName);
             
             // required
