@@ -207,18 +207,35 @@ namespace Arango.Client
             return ((IEnumerable)fieldValue).Cast<T>().ToList();
         }
         /// <summary>
-        /// Retrieves number of list items from specified field path.
+        /// Retrieves generic array type from specified field path.
         /// </summary>
         /// <exception cref="NonExistingFieldException">Field does not exist in specified path.</exception>
         /// <exception cref="InvalidFieldException">Field path contains field which is not traversable.</exception>
-        /// <exception cref="InvalidFieldTypeException">Field value is not List type.</exception>
-        public static int ListSize(this Dictionary<string, object> dictionary, string fieldPath)
+        /// <exception cref="InvalidFieldTypeException">Field value is not T[] type.</exception>
+        public static T[] Array<T>(this Dictionary<string, object> dictionary, string fieldPath)
         {
             var fieldValue = GetFieldValue(dictionary, fieldPath);
             
-            if (!(fieldValue.GetType().IsGenericType && (fieldValue is IList)))
+            if (!(fieldValue is IEnumerable))
             {
-                throw new InvalidFieldTypeException(string.Format("Field path '{0}' value does not contain list type.", fieldPath));
+                throw new InvalidFieldTypeException(string.Format("Field path '{0}' value does not contain array type.", fieldPath));
+            }
+            
+            return ((IEnumerable)fieldValue).Cast<T>().ToArray();
+        }
+        /// <summary>
+        /// Retrieves number of items contained in specified field path.
+        /// </summary>
+        /// <exception cref="NonExistingFieldException">Field does not exist in specified path.</exception>
+        /// <exception cref="InvalidFieldException">Field path contains field which is not traversable.</exception>
+        /// <exception cref="InvalidFieldTypeException">Field value does not contain type which can retrieve items count.</exception>
+        public static int Size(this Dictionary<string, object> dictionary, string fieldPath)
+        {
+            var fieldValue = GetFieldValue(dictionary, fieldPath);
+            
+            if (!(fieldValue is IList))
+            {
+                throw new InvalidFieldTypeException(string.Format("Field path '{0}' value does not contain type which can retrieve items count.", fieldPath));
             }
             
             return ((IList)fieldValue).Count;
@@ -410,6 +427,15 @@ namespace Arango.Client
         /// Stores generic List type value to specified field path.
         /// </summary>
         public static Dictionary<string, object> List<T>(this Dictionary<string, object> dictionary, string fieldPath, List<T> fieldValue)
+        {
+            SetFieldValue(dictionary, fieldPath, fieldValue);
+            
+            return dictionary;
+        }
+        /// <summary>
+        /// Stores generic array type value to specified field path.
+        /// </summary>
+        public static Dictionary<string, object> Array<T>(this Dictionary<string, object> dictionary, string fieldPath, T[] fieldValue)
         {
             SetFieldValue(dictionary, fieldPath, fieldValue);
             
@@ -1261,12 +1287,10 @@ namespace Arango.Client
                     }
                     // property is a collection
                     else if ((propertyInfo.PropertyType.IsArray || propertyInfo.PropertyType.IsGenericType) && (fieldValue is IList))
-                    {
-                        var instance = Activator.CreateInstance(propertyInfo.PropertyType);
-                            
+                    {  
                         propertyInfo.SetValue(
                             stronglyTypedObject,
-                            ConvertToCollection(instance, (IList)fieldValue, propertyInfo.PropertyType),
+                            ConvertToCollection((IList)fieldValue, propertyInfo.PropertyType),
                             null
                         );
                     }
@@ -1304,18 +1328,18 @@ namespace Arango.Client
         /// <summary>
         /// Converts specified object into collection of items of specified type.
         /// </summary>
-        static object ConvertToCollection(object collectionObject, IList collection, Type collectionType)
+        static object ConvertToCollection(IList collection, Type collectionType)
         {
             if (collection == null)
             {
                 return null;
             }
+
+            // create instance of property type
+            var collectionInstance = Activator.CreateInstance(collectionType, collection.Count);
             
             if (collection.Count > 0)
             {
-                // create instance of property type
-                var collectionInstance = Activator.CreateInstance(collectionType, collection.Count);
-
                 for (int i = 0; i < collection.Count; i++)
                 {
                     var elementType = collection[i].GetType();
@@ -1323,7 +1347,7 @@ namespace Arango.Client
                     // collection is simple array
                     if (collectionType.IsArray)
                     {
-                        ((IList)collectionObject).Add(collection[i]);
+                        ((IList)collectionInstance)[i] = collection[i];
                     }
                     // collection is generic
                     else if (collectionType.IsGenericType && (collection is IEnumerable))
@@ -1334,7 +1358,7 @@ namespace Arango.Client
                             (elementType == typeof(DateTime)) ||
                             (elementType == typeof(decimal)))
                         {
-                            ((IList)collectionObject).Add(collection[i]);
+                            ((IList)collectionInstance).Add(collection[i]);
                         }
                         // generic collection consists of generic type which should be parsed
                         else
@@ -1345,17 +1369,17 @@ namespace Arango.Client
                             
                             if (elementType == typeof(Dictionary<string, object>))
                             {
-                                ((IList)collectionObject).Add(ConvertToObject((Dictionary<string, object>)collection[i], instanceType));
+                                ((IList)collectionInstance).Add(ConvertToObject((Dictionary<string, object>)collection[i], instanceType));
                             }
                             else
                             {
                                 if (elementType == instanceType)
                                 {
-                                    ((IList)collectionObject).Add(collection[i]);
+                                    ((IList)collectionInstance).Add(collection[i]);
                                 } 
                                 else
                                 {
-                                    ((IList)collectionObject).Add(Convert.ChangeType(collection[i], collectionType));
+                                    ((IList)collectionInstance).Add(Convert.ChangeType(collection[i], collectionType));
                                 }
                             }
                         }
@@ -1364,12 +1388,12 @@ namespace Arango.Client
                     {
                         var obj = Activator.CreateInstance(elementType, collection[i]);
 
-                        ((IList)collectionObject).Add(obj);
+                        ((IList)collectionInstance).Add(obj);
                     }
                 }
             }
             
-            return collectionObject;
+            return collectionInstance;
         }
         
         #endregion
