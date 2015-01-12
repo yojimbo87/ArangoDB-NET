@@ -1,5 +1,6 @@
 ﻿using System;﻿
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Arango.Client.Protocol;
 using Arango.fastJSON;
 
@@ -7,6 +8,7 @@ namespace Arango.Client
 {
     public class ADocument
     {
+        readonly static Regex _keyRegex = new Regex(@"^[a-zA-Z0-9_:-]*$");
         readonly Dictionary<string, object> _parameters = new Dictionary<string, object>();
         readonly Connection _connection;
         
@@ -486,9 +488,7 @@ namespace Arango.Client
                 
                 if ((split.Length == 2) && (split[0].Length > 0) && (split[1].Length > 0))
                 {
-                    long key;
-
-                    return long.TryParse(split[1], out key);
+                    return IsKey(split[1]);
                 }
             }
             
@@ -500,9 +500,7 @@ namespace Arango.Client
         /// </summary>
         public static bool IsKey(string key)
         {
-            long outKey;
-
-            return long.TryParse(key, out outKey);
+            return _keyRegex.IsMatch(key);
         }
         
         /// <summary>
