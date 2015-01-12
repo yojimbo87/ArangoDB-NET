@@ -47,6 +47,7 @@ There are following ways to install the driver:
   - [More examples](docs/CollectionOperations.md#more-examples)
 - [Document operations](docs/DocumentOperations.md)
   - [Create document](docs/DocumentOperations.md#create-document)
+  - [Create document with user defined key](docs/DocumentOperations.md#create-document-with-user-defined-key)
   - [Check document existence](docs/DocumentOperations.md#check-document-existence)
   - [Retrieve document](docs/DocumentOperations.md#retrieve-document)
   - [Update document](docs/DocumentOperations.md#update-document)

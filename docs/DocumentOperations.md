@@ -1,6 +1,7 @@
 # Document operations
 
 - [Create document](#create-document)
+- [Create document with user defined key](#create-document-with-user-defined-key)
 - [Check document existence](#check-document-existence)
 - [Retrieve document](#retrieve-document)
 - [Update document](#update-document)
@@ -54,6 +55,32 @@ var createDocumentResult = db.Document
 if (createDocumentResult.Success)
 {
     var id = createDocumentResult.Value.String("_id");
+    var key = createDocumentResult.Value.String("_key");
+    var revision = createDocumentResult.Value.String("_rev");
+}
+```
+
+## Create document with user defined key
+
+Documents can be created with custom `_key` field value within the collection which is set to allow user defined keys. Key value must have [valid format](https://docs.arangodb.com/NamingConventions/DocumentKeys.html).
+
+```csharp
+var db = new ArangoDatabase("myDatabaseAlias");
+
+var document = new Dictionary<string, object>()
+    .String("_key", "1234-5678")
+    .String("foo", "foo string value")
+    .Int("bar", 12345);
+
+var createDocumentResult = db.Document
+    .WaitForSync(true)
+    .Create("MyDocumentCollection", document);
+    
+if (createDocumentResult.Success)
+{
+    // string value "MyDocumentCollection/1234-5678"
+    var id = createDocumentResult.Value.String("_id");
+    // string value "1234-5678"
     var key = createDocumentResult.Value.String("_key");
     var revision = createDocumentResult.Value.String("_rev");
 }
