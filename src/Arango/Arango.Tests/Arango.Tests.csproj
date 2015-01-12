@@ -55,6 +55,7 @@
     <Compile Include="EdgeOperations\EdgeOperationsTests.cs" />
     <Compile Include="Entities\Dummy.cs" />
     <Compile Include="FunctionOperations\FunctionOperationsTests.cs" />
+    <Compile Include="Issues\IssueTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryOperations\QueryOperationsTests.cs" />
   </ItemGroup>
@@ -75,6 +76,7 @@
     <Folder Include="FunctionOperations" />
     <Folder Include="ConnectionlessOperations" />
     <Folder Include="Entities" />
+    <Folder Include="Issues" />
     <Folder Include="QueryOperations" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
