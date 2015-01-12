@@ -5,7 +5,7 @@
 - [AResult object](#aresult-object)
 - [AError object](#aerror-object)
 - [JSON representation](#json-representation)
-- [Dictionary extensions](#dictionary-extensions)
+- [Document ID, key and revision](#document-ID,-key-and-revision)
 - [Fluent API](#fluent-api)
 
 Driver's public API with its core functionality is exposed through `Arango.Client` namespace. Most of the classes which perform operations on ArangoDB database starts with `A` prefix (e.g. `ADatabase`, `ACollection`, `AQuery`, ...) to reduce the visual noise of superfluous naming.
@@ -72,9 +72,9 @@ JSON objects are by default represented as `Dictionary<string, object>`. In orde
 
 Internal serialization and deserialization of JSON documents is done by embedded [fastJSON library](http://www.codeproject.com/Articles/159450/fastJSON) which functionality is accessible through `Arango.fastJSON` namespace.
 
-## Dictionary extensions
+## Document ID, key and revision
 
-Apart from standard dictionary extensions provided by [dictator](https://github.com/yojimbo87/dictator), there are also following ArangoDB specific extension methods which can be used by `Dictionary<string, object>` instances:
+Apart from standard dictionary extensions provided by [dictator](https://github.com/yojimbo87/dictator), there are also following ArangoDB specific extension methods which can be used by `Dictionary<string, object>` instances to work with ArangoDB standard ID, key and revision document fields:
 
 - `HasID()` - Checks if `_id` field is present and has valid format.
 - `ID()` - Retrieves value of `_id` field. If the field is missing or has invalid format null value is returned.
@@ -85,6 +85,14 @@ Apart from standard dictionary extensions provided by [dictator](https://github.
 - `HasRev()` - Checks if `_rev` field is present and has valid format.
 - `Rev()` - Retrieves value of `_rev` field. If the field is missing or has invalid format null value is returned.
 - `Rev(string rev)` - Stores `_rev` field value.
+
+`ADocument` class provides several static methods for format validation of [ID](https://docs.arangodb.com/Glossary/README.html#document_handle), [key](https://docs.arangodb.com/NamingConventions/DocumentKeys.html) and [revision](https://docs.arangodb.com/Glossary/README.html#document_revision) values: 
+
+- `ADocument.IsID(string id)` - Determines if specified value has valid document `_id` format. 
+- `ADocument.IsKey(string key)` - Determines if specified value has valid document `_key` format.
+- `ADocument.IsRev(string id)` - Determines if specified value has valid document `_rev` format.
+- `ADocument.Identify(string collection, long key)` - Constructs document ID from specified collection and key values.
+- `ADocument.Identify(string collection, string key)` - Constructs document ID from specified collection and key values. If key format is invalid null value is returned.
 
 ## Fluent API
 

@@ -6,7 +6,6 @@
 - [Update document](#update-document)
 - [Replace document](#replace-document)
 - [Delete document](#delete-document)
-- [Static methods](#static-methods)
 - [More examples](#more-examples)
 
 Document operations are focused on management of documents in document type collections. These operations are accessible through `Document` property in database context object.
@@ -242,16 +241,6 @@ if (deleteDocumentResult.Success)
     var revision = deleteDocumentResult.Value.String("_rev");
 }
 ```
-
-## Static methods
-
-`ADocument` class provides following static methods:
-
-- `ADocument.IsID(string id)` - Determines if specified value has valid document `_id` format. 
-- `ADocument.IsKey(string key)` - Determines if specified value has valid document `_key` format.
-- `ADocument.IsRev(string id)` - Determines if specified value has valid document `_rev` format.
-- `ADocument.Identify(string collection, long key)` - Constructs document ID from specified collection and key values.
-- `ADocument.Identify(string collection, string key)` - Constructs document ID from specified collection and key values. If key format is invalid null value is returned.
 
 ## More examples
 
