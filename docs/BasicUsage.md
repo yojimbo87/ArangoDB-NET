@@ -5,7 +5,7 @@
 - [AResult object](#aresult-object)
 - [AError object](#aerror-object)
 - [JSON representation](#json-representation)
-- [Document ID, key and revision](#document-ID,-key-and-revision)
+- [Document ID, key and revision](#document-id-key-and-revision)
 - [Fluent API](#fluent-api)
 
 Driver's public API with its core functionality is exposed through `Arango.Client` namespace. Most of the classes which perform operations on ArangoDB database starts with `A` prefix (e.g. `ADatabase`, `ACollection`, `AQuery`, ...) to reduce the visual noise of superfluous naming.
