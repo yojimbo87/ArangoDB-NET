@@ -79,7 +79,7 @@ namespace Arango.Client
         #region Key options
         
         /// <summary>
-        /// Determines whether it is allowed to supply custom key values in the _key attribute of a document. Default value: Traditional.
+        /// Determines the type of the key generator. Default value: Traditional.
         /// </summary>
         public ACollection KeyGeneratorType(AKeyGeneratorType value)
         {
@@ -90,7 +90,7 @@ namespace Arango.Client
         }
         
         /// <summary>
-        /// Determines the type of the key generator.
+        /// Determines whether it is allowed to supply custom key values in the _key attribute of a document. Default value: true.
         /// </summary>
         public ACollection AllowUserKeys(bool value)
         {

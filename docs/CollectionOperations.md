@@ -33,7 +33,7 @@ Applicable optional parameters available through fluent API:
 - `IsSystem(bool value)` - Determines whether the collection is a system collection. Default value: false.
 - `IsVolatile(bool value)` - Determines whether the collection data is kept in-memory only and not made persistent. Default value: false.
 - `KeyGeneratorType(AKeyGeneratorType value)` - Determines the type of the key generator. Default value: Traditional.
-- `AllowUserKeys(bool value)` - Determines whether it is allowed to supply custom key values in the _key attribute of a document.
+- `AllowUserKeys(bool value)` - Determines whether it is allowed to supply custom key values in the _key attribute of a document. Default value: true.
 - `KeyIncrement(long value)` - Determines increment value for autoincrement key generator.
 - `KeyOffset(long value)` - Determines initial offset value for autoincrement key generator.
 - `NumberOfShards(int value)` - Determines the number of shards to create for the collection in cluster environment. Default value: 1.
