@@ -91,6 +91,28 @@ namespace Arango.Tests
             Assert.AreEqual(0, dummy.Baz);
         }
         
+        [Test()]
+        public void Should_create_document_with_custom_ID()
+        {
+            Database.ClearTestCollection(Database.TestDocumentCollectionName);
+        	var db = new ADatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("_key", "1234-5678")
+        		.String("foo", "foo string value")
+        		.Int("bar", 12345);
+
+            var createResult = db.Document
+                .Create(Database.TestDocumentCollectionName, document);
+            
+            Assert.AreEqual(202, createResult.StatusCode);
+            Assert.IsTrue(createResult.Success);
+            Assert.IsTrue(createResult.HasValue);
+            Assert.AreEqual(Database.TestDocumentCollectionName + "/" + document.String("_key"), createResult.Value.String("_id"));
+            Assert.AreEqual(document.String("_key"), createResult.Value.String("_key"));
+            Assert.IsTrue(createResult.Value.IsString("_rev"));
+        }
+        
         #endregion
         
         #region Check operations
