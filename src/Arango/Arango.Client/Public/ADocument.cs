@@ -1,6 +1,5 @@
 ﻿using System;﻿
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Arango.Client.Protocol;
 using Arango.fastJSON;
 
@@ -8,7 +7,6 @@ namespace Arango.Client
 {
     public class ADocument
     {
-        readonly static Regex _keyRegex = new Regex(@"^[a-zA-Z0-9_:-]*$");
         readonly Dictionary<string, object> _parameters = new Dictionary<string, object>();
         readonly Connection _connection;
         
@@ -113,7 +111,7 @@ namespace Arango.Client
             // optional
             request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
 
-            request.Body = JSON.ToJSON(document);
+            request.Body = JSON.ToJSON(document, ASettings.JsonParameters);
             
             var response = _connection.Send(request);
             var result = new AResult<Dictionary<string, object>>(response);
@@ -305,7 +303,7 @@ namespace Arango.Client
             // optional
             request.TrySetQueryStringParameter(ParameterName.MergeArrays, _parameters);
 
-            request.Body = JSON.ToJSON(document);
+            request.Body = JSON.ToJSON(document, ASettings.JsonParameters);
             
             var response = _connection.Send(request);
             var result = new AResult<Dictionary<string, object>>(response);
@@ -374,7 +372,7 @@ namespace Arango.Client
                 request.TrySetQueryStringParameter(ParameterName.Policy, _parameters);
             }
             
-            request.Body = JSON.ToJSON(document);
+            request.Body = JSON.ToJSON(document, ASettings.JsonParameters);
             
             var response = _connection.Send(request);
             var result = new AResult<Dictionary<string, object>>(response);
@@ -500,7 +498,7 @@ namespace Arango.Client
         /// </summary>
         public static bool IsKey(string key)
         {
-            return _keyRegex.IsMatch(key);
+            return ASettings.KeyRegex.IsMatch(key);
         }
         
         /// <summary>

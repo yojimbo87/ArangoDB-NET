@@ -140,7 +140,7 @@ namespace Arango.Client
                 bodyDocument.List("users", userList);
             }
             
-            request.Body = JSON.ToJSON(bodyDocument);
+            request.Body = JSON.ToJSON(bodyDocument, ASettings.JsonParameters);
             
             var response = _connection.Send(request);
             var result = new AResult<bool>(response);

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using Arango.fastJSON;
 using Arango.Client.Protocol;
 
 namespace Arango.Client
@@ -6,6 +8,9 @@ namespace Arango.Client
     public static class ASettings
     {
         static readonly Dictionary<string, Connection> _connections = new Dictionary<string, Connection>();
+        
+        internal readonly static Regex KeyRegex = new Regex(@"^[a-zA-Z0-9_:-]*$");
+        internal readonly static JSONParameters JsonParameters = new JSONParameters { UseFastGuid = false };
         
         /// <summary>
         /// Driver name.
@@ -17,11 +22,8 @@ namespace Arango.Client
         /// </summary>
         public const string DriverVersion = "2.0.0";
         
-        //public static ArangoGlobals Globals { get; private set; }
-        
         static ASettings()
         {
-        	//Globals = new ArangoGlobals();
         }
         
         #region AddConnection

@@ -227,7 +227,7 @@ namespace Arango.Client
             // optional
             Request.TrySetBodyParameter(ParameterName.ShardKeys, _parameters, bodyDocument);
             
-            request.Body = JSON.ToJSON(bodyDocument);
+            request.Body = JSON.ToJSON(bodyDocument, ASettings.JsonParameters);
             
             var response = _connection.Send(request);
             var result = new AResult<Dictionary<string, object>>(response);
@@ -594,7 +594,7 @@ namespace Arango.Client
                 // optional
                 Request.TrySetBodyParameter(ParameterName.Count, _parameters, bodyDocument);
                 
-                request.Body = JSON.ToJSON(bodyDocument);
+                request.Body = JSON.ToJSON(bodyDocument, ASettings.JsonParameters);
             }
             
             var response = _connection.Send(request);
@@ -673,7 +673,7 @@ namespace Arango.Client
             // optional
             Request.TrySetBodyParameter(ParameterName.JournalSize, _parameters, bodyDocument);
             
-            request.Body = JSON.ToJSON(bodyDocument);
+            request.Body = JSON.ToJSON(bodyDocument, ASettings.JsonParameters);
             
             var response = _connection.Send(request);
             var result = new AResult<Dictionary<string, object>>(response);
@@ -710,7 +710,7 @@ namespace Arango.Client
             var bodyDocument = new Dictionary<string, object>()
                 .String(ParameterName.Name, newCollectionName);
             
-            request.Body = JSON.ToJSON(bodyDocument);
+            request.Body = JSON.ToJSON(bodyDocument, ASettings.JsonParameters);
             
             var response = _connection.Send(request);
             var result = new AResult<Dictionary<string, object>>(response);

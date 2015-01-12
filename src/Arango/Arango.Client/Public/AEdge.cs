@@ -138,7 +138,7 @@ namespace Arango.Client
                 document = new Dictionary<string, object>();
             }
             
-            request.Body = JSON.ToJSON(document);
+            request.Body = JSON.ToJSON(document, ASettings.JsonParameters);
             
             var response = _connection.Send(request);
             var result = new AResult<Dictionary<string, object>>(response);
@@ -375,7 +375,7 @@ namespace Arango.Client
             // optional
             request.TrySetQueryStringParameter(ParameterName.MergeArrays, _parameters);
 
-            request.Body = JSON.ToJSON(document);
+            request.Body = JSON.ToJSON(document, ASettings.JsonParameters);
             
             var response = _connection.Send(request);
             var result = new AResult<Dictionary<string, object>>(response);
@@ -444,7 +444,7 @@ namespace Arango.Client
                 request.TrySetQueryStringParameter(ParameterName.Policy, _parameters);
             }
 
-            request.Body = JSON.ToJSON(document);
+            request.Body = JSON.ToJSON(document, ASettings.JsonParameters);
             
             var response = _connection.Send(request);
             var result = new AResult<Dictionary<string, object>>(response);

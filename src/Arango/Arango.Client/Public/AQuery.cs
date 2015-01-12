@@ -164,7 +164,7 @@ namespace Arango.Client
             
             // TODO: options parameter
             
-            request.Body = JSON.ToJSON(bodyDocument);
+            request.Body = JSON.ToJSON(bodyDocument, ASettings.JsonParameters);
             
             var response = _connection.Send(request);
             var result = new AResult<List<object>>(response);
@@ -356,7 +356,7 @@ namespace Arango.Client
             // required
             bodyDocument.String(ParameterName.Query, Minify(query));
             
-            request.Body = JSON.ToJSON(bodyDocument);
+            request.Body = JSON.ToJSON(bodyDocument, ASettings.JsonParameters);
             
             var response = _connection.Send(request);
             var result = new AResult<Dictionary<string, object>>(response);
