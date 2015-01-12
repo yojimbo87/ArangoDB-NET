@@ -10,20 +10,25 @@ namespace Arango.Client
         static readonly Dictionary<string, Connection> _connections = new Dictionary<string, Connection>();
         
         internal readonly static Regex KeyRegex = new Regex(@"^[a-zA-Z0-9_:-]*$");
-        internal readonly static JSONParameters JsonParameters = new JSONParameters { UseFastGuid = false };
         
         /// <summary>
-        /// Driver name.
+        /// Determines driver name.
         /// </summary>
         public const string DriverName = "ArangoDB-NET";
         
         /// <summary>
-        /// Driver version.
+        /// Determines driver version.
         /// </summary>
         public const string DriverVersion = "2.0.0";
         
+        /// <summary>
+        /// Determines JSON serialization options.
+        /// </summary>
+        public static JSONParameters JsonParameters { get; set; }
+        
         static ASettings()
         {
+            JsonParameters = new JSONParameters { UseFastGuid = false };
         }
         
         #region AddConnection

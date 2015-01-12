@@ -17,6 +17,7 @@ There are following ways to install the driver:
   - [AResult object](docs/BasicUsage.md#aresult-object)
   - [AError object](docs/BasicUsage.md#aerror-object)
   - [JSON representation](docs/BasicUsage.md#json-representation)
+  - [Serialization options](docs/BasicUsage.md#serialization-options)
   - [Document ID, key and revision](docs/BasicUsage.md#document-id-key-and-revision)
   - [Fluent API](docs/BasicUsage.md#fluent-api)
 - [Database operations](docs/DatabaseOperations.md)

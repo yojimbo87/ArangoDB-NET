@@ -112,6 +112,23 @@ namespace Arango.Client
             return dateTime;
         }
         /// <summary>
+        /// Retrieves Guid type value from specified field path.
+        /// </summary>
+        /// <exception cref="NonExistingFieldException">Field does not exist in specified path.</exception>
+        /// <exception cref="InvalidFieldException">Field path contains field which is not traversable.</exception>
+        /// /// <exception cref="InvalidFieldTypeException">Field value can not be converted to Guid type.</exception>
+        public static Guid Guid(this Dictionary<string, object> dictionary, string fieldPath)
+        {
+            var fieldValue = GetFieldValue(dictionary, fieldPath);
+            
+            if (!(fieldValue is Guid))
+            {
+                throw new InvalidFieldTypeException(string.Format("Field path '{0}' value does not contain Guid type.", fieldPath));
+            }
+            
+            return (Guid)fieldValue;
+        }
+        /// <summary>
         /// Retrieves string type value from specified field path.
         /// </summary>
         /// <exception cref="NonExistingFieldException">Field does not exist in specified path.</exception>
@@ -360,6 +377,15 @@ namespace Arango.Client
         
         #endregion
         
+        /// <summary>
+        /// Stores Guid type value to specified field path.
+        /// </summary>
+        public static Dictionary<string, object> Guid(this Dictionary<string, object> dictionary, string fieldPath, Guid fieldValue)
+        {
+            SetFieldValue(dictionary, fieldPath, fieldValue);
+            
+            return dictionary;
+        }
         /// <summary>
         /// Stores string type value to specified field path.
         /// </summary>
@@ -738,6 +764,29 @@ namespace Arango.Client
                             isValid = true;
                         }
                         break;
+                }
+            }
+            catch (Exception)
+            {
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        /// <summary>
+        /// Checks if specified field has Guid type value.
+        /// </summary>
+        public static bool IsGuid(this Dictionary<string, object> dictionary, string fieldPath)
+        {
+            var isValid = false;
+            
+            try
+            {
+                var fieldValue = GetFieldValue(dictionary, fieldPath);
+                
+                if (fieldValue is Guid)
+                {
+                    isValid = true;
                 }
             }
             catch (Exception)
@@ -1308,10 +1357,39 @@ namespace Arango.Client
                             propertyInfo.SetValue(stronglyTypedObject, fieldValue, null);
                         }
                     }
+                    // property is Enum type
+                    else if (propertyInfo.PropertyType.IsEnum)
+                    {
+                        // field value in document is stored as enum object
+                        if (fieldValue is Enum)
+                        {
+                            propertyInfo.SetValue(stronglyTypedObject, fieldValue, null);
+                        }
+                        // field value in document is stored as integer
+                        else if ((fieldValue is byte) || (fieldValue is sbyte) ||
+                                (fieldValue is short) || (fieldValue is ushort) ||
+                                (fieldValue is int) || (fieldValue is uint) ||
+                                (fieldValue is long) || (fieldValue is ulong))
+                        {
+                            propertyInfo.SetValue(stronglyTypedObject, System.Enum.ToObject(propertyInfo.PropertyType, fieldValue), null);
+                        }
+                        // field value in document is stored as string
+                        else if (fieldValue is string)
+                        {
+                            propertyInfo.SetValue(stronglyTypedObject, System.Enum.Parse(propertyInfo.PropertyType, (string)fieldValue, true), null);
+                        }
+                    }
                     // property is Guid type
                     else if (propertyInfo.PropertyType == typeof(Guid))
                     {
-                        propertyInfo.SetValue(stronglyTypedObject, new Guid((string)fieldValue), null);
+                        if (fieldValue is string)
+                        {
+                            propertyInfo.SetValue(stronglyTypedObject, new Guid((string)fieldValue), null);
+                        }
+                        else if (fieldValue is Guid)
+                        {
+                            propertyInfo.SetValue(stronglyTypedObject, fieldValue, null);
+                        }
                     }
                     // property is basic type
                     else
