@@ -9,6 +9,14 @@ namespace Arango.ConsoleTests
     {
         public static void Main(string[] args)
         {
+            //PerformanceTests();
+            
+            Console.Write("Press any key to continue . . . ");
+            Console.ReadKey(true);
+        }
+        
+        static void PerformanceTests()
+        {
             var performance = new Performance();
             
             //performance.TestSimpleSequentialHttpPostRequests();
@@ -16,9 +24,6 @@ namespace Arango.ConsoleTests
             //performance.TestSimpleParallelHttpPostRequests();
             
             performance.Dispose();
-            
-            Console.Write("Press any key to continue . . . ");
-            Console.ReadKey(true);
         }
     }
 }
