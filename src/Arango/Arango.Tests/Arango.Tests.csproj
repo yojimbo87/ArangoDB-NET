@@ -54,8 +54,10 @@
     <Compile Include="DocumentOperations\DocumentOperationsTests.cs" />
     <Compile Include="EdgeOperations\EdgeOperationsTests.cs" />
     <Compile Include="Entities\Dummy.cs" />
+    <Compile Include="Entities\PerformanceEntity.cs" />
     <Compile Include="FunctionOperations\FunctionOperationsTests.cs" />
     <Compile Include="Issues\IssueTests.cs" />
+    <Compile Include="Performance\PerformanceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryOperations\QueryOperationsTests.cs" />
   </ItemGroup>
@@ -77,6 +79,7 @@
     <Folder Include="ConnectionlessOperations" />
     <Folder Include="Entities" />
     <Folder Include="Issues" />
+    <Folder Include="Performance" />
     <Folder Include="QueryOperations" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
