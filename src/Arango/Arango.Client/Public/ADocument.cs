@@ -96,11 +96,11 @@ namespace Arango.Client
         #endregion
         
         #region Create (POST)
-                
+        
         /// <summary>
         /// Creates new document within specified collection in current database context.
         /// </summary>
-        public AResult<Dictionary<string, object>> Create(string collectionName, Dictionary<string, object> document)
+        public AResult<Dictionary<string, object>> Create(string collectionName, string json)
         {
             var request = new Request(HttpMethod.POST, ApiBaseUri.Document, "");
             
@@ -111,7 +111,7 @@ namespace Arango.Client
             // optional
             request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
 
-            request.Body = JSON.ToJSON(document, ASettings.JsonParameters);
+            request.Body = json;
             
             var response = _connection.Send(request);
             var result = new AResult<Dictionary<string, object>>(response);
@@ -136,6 +136,14 @@ namespace Arango.Client
             _parameters.Clear();
             
             return result;
+        }
+        
+        /// <summary>
+        /// Creates new document within specified collection in current database context.
+        /// </summary>
+        public AResult<Dictionary<string, object>> Create(string collectionName, Dictionary<string, object> document)
+        {
+            return Create(collectionName, JSON.ToJSON(document, ASettings.JsonParameters));
         }
 
         /// <summary>
@@ -280,7 +288,7 @@ namespace Arango.Client
         /// Updates existing document identified by its handle with new document data.
         /// </summary>
         /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
-        public AResult<Dictionary<string, object>> Update(string id, Dictionary<string, object> document)
+        public AResult<Dictionary<string, object>> Update(string id, string json)
         {
             if (!ADocument.IsID(id))
             {
@@ -303,7 +311,7 @@ namespace Arango.Client
             // optional
             request.TrySetQueryStringParameter(ParameterName.MergeArrays, _parameters);
 
-            request.Body = JSON.ToJSON(document, ASettings.JsonParameters);
+            request.Body = json;
             
             var response = _connection.Send(request);
             var result = new AResult<Dictionary<string, object>>(response);
@@ -340,6 +348,15 @@ namespace Arango.Client
         /// Updates existing document identified by its handle with new document data.
         /// </summary>
         /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public AResult<Dictionary<string, object>> Update(string id, Dictionary<string, object> document)
+        {
+            return Update(id, JSON.ToJSON(document, ASettings.JsonParameters));
+        }
+        
+        /// <summary>
+        /// Updates existing document identified by its handle with new document data.
+        /// </summary>
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
         public AResult<Dictionary<string, object>> Update<T>(string id, T obj)
         {
             return Update(id, Dictator.ToDocument(obj));
@@ -353,7 +370,7 @@ namespace Arango.Client
         /// Completely replaces existing document identified by its handle with new document data.
         /// </summary>
         /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
-        public AResult<Dictionary<string, object>> Replace(string id, Dictionary<string, object> document)
+        public AResult<Dictionary<string, object>> Replace(string id, string json)
         {
             if (!ADocument.IsID(id))
             {
@@ -372,7 +389,7 @@ namespace Arango.Client
                 request.TrySetQueryStringParameter(ParameterName.Policy, _parameters);
             }
             
-            request.Body = JSON.ToJSON(document, ASettings.JsonParameters);
+            request.Body = json;
             
             var response = _connection.Send(request);
             var result = new AResult<Dictionary<string, object>>(response);
@@ -403,6 +420,15 @@ namespace Arango.Client
             _parameters.Clear();
             
             return result;
+        }
+        
+        /// <summary>
+        /// Completely replaces existing document identified by its handle with new document data.
+        /// </summary>
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public AResult<Dictionary<string, object>> Replace(string id, Dictionary<string, object> document)
+        {
+            return Replace(id, JSON.ToJSON(document, ASettings.JsonParameters));
         }
         
         /// <summary>
