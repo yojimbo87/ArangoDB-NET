@@ -1017,6 +1017,45 @@ namespace Arango.Client
         #endregion
 
         /// <summary>
+        /// Iterates over documents from specified field path and performs given action.
+        /// </summary>
+        public static Dictionary<string, object> Each(this Dictionary<string, object> dictionary, string fieldPath, Action<int, Dictionary<string, object>> action)
+        {
+            var fieldValue = GetFieldValue(dictionary, fieldPath);
+            
+            if (fieldValue is IList)
+            {
+                for (int i = 0; i < ((IList)fieldValue).Count; i++)
+                {
+                    if (((IList)fieldValue)[i] is Dictionary<string, object>)
+                    {
+                        action(i, (Dictionary<string, object>)((IList)fieldValue)[i]);
+                    }
+                } 
+            }
+            
+            return dictionary;
+        }
+        
+        /// <summary>
+        /// Iterates over items from specified field path and performs given action.
+        /// </summary>
+        public static Dictionary<string, object> Each<T>(this Dictionary<string, object> dictionary, string fieldPath, Action<int, T> action)
+        {
+            var fieldValue = GetFieldValue(dictionary, fieldPath);
+            
+            if (fieldValue is IList)
+            {
+                for (int i = 0; i < ((IList)fieldValue).Count; i++)
+                {
+                    action(i, (T)((IList)fieldValue)[i]);
+                } 
+            }
+            
+            return dictionary;
+        }
+        
+        /// <summary>
         /// Creates a deep clone of current dictionary.
         /// </summary>
         public static Dictionary<string, object> Clone(this Dictionary<string, object> dictionary)
@@ -1203,7 +1242,17 @@ namespace Arango.Client
             for (int i = 0; i < fieldNames.Length; i++)
             {
                 var fieldName = fieldNames[i];
+                var arrayContent = "";
 
+                if (fieldName.Contains("[") && fieldName.Contains("]"))
+                {
+                    var firstIndex = fieldName.IndexOf('[');
+                    var lastIndex = fieldName.IndexOf(']');
+                    
+                    arrayContent = fieldName.Substring(firstIndex + 1, lastIndex - firstIndex - 1);
+                    fieldName = fieldName.Substring(0, firstIndex);
+                }
+                
                 // throw exception if the field is not present in dictionary
                 if (!parentDictionary.ContainsKey(fieldName))
                 {
@@ -1212,16 +1261,18 @@ namespace Arango.Client
 
                 // current field name is final - retrieve field value and break loop
                 if (i == (fieldNames.Length - 1))
-                {        			
-                    fieldValue = parentDictionary[fieldName];
+                {
+                    fieldValue = GetFieldObject(fieldName, arrayContent, parentDictionary);
                     
                     break;
                 }
                 
-                // descendant field is dictionary - set is as current parent dictionary
-                if (parentDictionary[fieldName] is Dictionary<string, object>)
+                var tempParentObject = GetFieldObject(fieldName, arrayContent, parentDictionary);
+                
+                 // descendant field is dictionary - set is as current parent dictionary
+                if (tempParentObject is Dictionary<string, object>)
                 {
-                    parentDictionary = (Dictionary<string, object>)parentDictionary[fieldName];
+                    parentDictionary = (Dictionary<string, object>)tempParentObject;
                 }
                 // can not continue with processing - throw exception
                 else
@@ -1231,6 +1282,31 @@ namespace Arango.Client
             }
             
             return fieldValue;
+        }
+        /// <summary>
+        /// Retrieves object from specified field depending on array content.
+        /// </summary>
+        /// <exception cref="IndexOutOfRangeException">Index in field specified field is out of range.</exception>
+        static object GetFieldObject(string fieldName, string arrayContent, Dictionary<string, object> fieldDocument)
+        {
+            if (!string.IsNullOrEmpty(arrayContent))
+            {
+                int indexNumber;
+                
+                if (int.TryParse(arrayContent, out indexNumber))
+                {
+                    var collection = ((IList)fieldDocument[fieldName]);
+                    
+                    if ((indexNumber >= 0) && ((indexNumber + 1) <= collection.Count))
+                    {
+                        return collection[indexNumber];
+                    }
+                    
+                    throw new IndexOutOfRangeException("Index in field '" + fieldName + "' is out of range.");
+                }
+            }
+            
+            return fieldDocument[fieldName];
         }
         /// <summary>
         /// Stores given value to specified field path.
@@ -1249,27 +1325,87 @@ namespace Arango.Client
             for (int i = 0; i < fieldNames.Length; i++)
             {
                 var fieldName = fieldNames[i];
+                var arrayContent = "";
+
+                if (fieldName.Contains("[") && fieldName.Contains("]"))
+                {
+                    var firstIndex = fieldName.IndexOf('[');
+                    var lastIndex = fieldName.IndexOf(']');
+                    
+                    arrayContent = fieldName.Substring(firstIndex + 1, lastIndex - firstIndex - 1);
+                    fieldName = fieldName.Substring(0, firstIndex);
+                }
                 
                 // current field name is final - set field value and break loop
                 if (i == (fieldNames.Length - 1))
                 {
-                    parentDictionary[fieldName] = fieldValue;
+                    SetFieldObject(fieldName, arrayContent, parentDictionary, fieldValue);
                     
                     break;
                 }
                 
-                // descendant field is dictionary - set is as current parent dictionary
-                if (parentDictionary.ContainsKey(fieldName) && (parentDictionary[fieldName] is Dictionary<string, object>))
+                if (parentDictionary.ContainsKey(fieldName))
                 {
-                    parentDictionary = (Dictionary<string, object>)parentDictionary[fieldName];
+                    var tempParentObject = GetFieldObject(fieldName, arrayContent, parentDictionary);
+                    
+                    // descendant field is not dictionary - dictionary field needs to be created
+                    if (!(tempParentObject is Dictionary<string, object>))
+                    {
+                        var newDictionary = new Dictionary<string, object>();
+                        parentDictionary[fieldName] = newDictionary;
+                        parentDictionary = newDictionary;
+                    }
+                    else
+                    {
+                        parentDictionary = (Dictionary<string, object>)tempParentObject;
+                    }
                 }
-                // descendant field does not exist or isn't dictioanry - field needs to be set as dictionary
+                // descendant field does not exist - dictionary field needs to be created
                 else
                 {
-                    var newDictionary = Dictator.New();
+                    var newDictionary = new Dictionary<string, object>();
                     parentDictionary[fieldName] = newDictionary;
                     parentDictionary = newDictionary;
                 }
+            }
+        }
+        /// <summary>
+        /// Stores given value to specified field depending on array content.
+        /// </summary>
+        /// <exception cref="IndexOutOfRangeException">Index in field specified field is out of range.</exception>
+        static void SetFieldObject(string fieldName, string arrayContent, Dictionary<string, object> fieldDocument, object fieldValue)
+        {
+            if (!string.IsNullOrEmpty(arrayContent))
+            {
+                var collection = ((IList)fieldDocument[fieldName]);
+                
+                // append value to collection
+                if (arrayContent == "*")
+                {
+                    collection.Add(fieldValue);
+                }
+                // insert value at specified index
+                else
+                {
+                    int indexNumber;
+                    
+                    if (int.TryParse(arrayContent, out indexNumber))
+                    {
+                        if ((indexNumber >= 0) && ((indexNumber + 1) <= collection.Count))
+                        {
+                            collection[indexNumber] = fieldValue;
+                        }
+                        else
+                        {
+                            throw new IndexOutOfRangeException("Index in field '" + fieldName + "' is out of range.");
+                        }
+                    }
+                }
+            }
+            // no array content
+            else
+            {
+                fieldDocument[fieldName] = fieldValue;
             }
         }
         /// <summary>
