@@ -524,6 +524,11 @@ namespace Arango.Client
         /// </summary>
         public static bool IsKey(string key)
         {
+            if (string.IsNullOrEmpty(key))
+            {
+                return false;
+            }
+            
             return ASettings.KeyRegex.IsMatch(key);
         }
         
@@ -532,6 +537,11 @@ namespace Arango.Client
         /// </summary>
         public static bool IsRev(string revision)
         {
+            if (string.IsNullOrEmpty(revision))
+            {
+                return false;
+            }
+            
             long outRev;
 
             return long.TryParse(revision, out outRev);
@@ -542,6 +552,11 @@ namespace Arango.Client
         /// </summary>
         public static string Identify(string collection, long key)
         {
+            if (string.IsNullOrEmpty(collection))
+            {
+                return null;
+            }
+            
             return collection + "/" + key;
         }
         
@@ -550,9 +565,35 @@ namespace Arango.Client
         /// </summary>
         public static string Identify(string collection, string key)
         {
+            if (string.IsNullOrEmpty(collection))
+            {
+                return null;
+            }
+            
             if (IsKey(key))
             {
                 return collection + "/" + key;
+            }
+            
+            return null;
+        }
+        
+        /// <summary>
+        /// Parses key value out of specified document ID. If ID has invalid value null is returned. 
+        /// </summary>
+        public static string ParseKey(string id)
+        {
+            if (id.Contains("/"))
+            {
+                var split = id.Split('/');
+                
+                if ((split.Length == 2) && (split[0].Length > 0) && (split[1].Length > 0))
+                {
+                    if (IsKey(split[1]))
+                    {
+                        return split[1];
+                    }
+                }
             }
             
             return null;
