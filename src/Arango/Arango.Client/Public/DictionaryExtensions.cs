@@ -161,5 +161,53 @@ namespace Arango.Client
         }
         
         #endregion
+        
+        /// <summary>
+        /// Checks if specified field path has valid document ID value in the format of `collection/key`.
+        /// </summary>
+        public static bool IsID(this Dictionary<string, object> dictionary, string fieldPath)
+        {
+            var isValid = false;
+            
+            try
+            {
+                var fieldValue = GetFieldValue(dictionary, fieldPath);
+                
+                if (fieldValue is string)
+                {
+                    return ADocument.IsID((string)fieldValue);
+                }
+            }
+            catch (Exception)
+            {
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        /// <summary>
+        /// Checks if specified field path has valid document key value.
+        /// </summary>
+        public static bool IsKey(this Dictionary<string, object> dictionary, string fieldPath)
+        {
+            var isValid = false;
+            
+            try
+            {
+                var fieldValue = GetFieldValue(dictionary, fieldPath);
+                
+                if (fieldValue is string)
+                {
+                    return ADocument.IsKey((string)fieldValue);
+                }
+            }
+            catch (Exception)
+            {
+                isValid = false;
+            }
+            
+            return isValid;
+        }
     }
 }
