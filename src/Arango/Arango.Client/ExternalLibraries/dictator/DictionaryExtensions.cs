@@ -951,13 +951,6 @@ namespace Arango.Client
         /// <summary>
         /// Checks if specified field has given type value.
         /// </summary>
-        public static bool IsType<T>(this Dictionary<string, object> dictionary, string fieldPath)
-        {
-            return IsType(dictionary, fieldPath, typeof(T));
-        }
-        /// <summary>
-        /// Checks if specified field has given type value.
-        /// </summary>
         public static bool IsType(this Dictionary<string, object> dictionary, string fieldPath, Type type)
         {
             var isValid = false;
@@ -984,6 +977,46 @@ namespace Arango.Client
             return isValid;
         }
         /// <summary>
+        /// Checks if specified field has given type value.
+        /// </summary>
+        public static bool IsType<T>(this Dictionary<string, object> dictionary, string fieldPath)
+        {
+            return IsType(dictionary, fieldPath, typeof(T));
+        }
+        /// <summary>
+        /// Checks if specified field has integer value. Applicable integer types are byte, sbyte, short, ushort, int, uint, long and ulong.
+        /// </summary>
+        public static bool IsInteger(this Dictionary<string, object> dictionary, string fieldPath)
+        {
+            var isValid = false;
+            
+            try
+            {
+                var fieldValue = GetFieldValue(dictionary, fieldPath);
+                
+                if (fieldValue != null)
+                {
+                    if ((fieldValue is byte) ||
+                        (fieldValue is sbyte) ||
+                        (fieldValue is short) ||
+                        (fieldValue is ushort) ||
+                        (fieldValue is int) ||
+                        (fieldValue is uint) ||
+                        (fieldValue is long) ||
+                        (fieldValue is ulong))
+                    {
+                        isValid = true;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        /// <summary>
         /// Checks if specified field equals to given value. Object's Equals method is used for value comparison.
         /// </summary>
         public static bool IsEqual(this Dictionary<string, object> dictionary, string fieldPath, object compareValue)
@@ -994,16 +1027,16 @@ namespace Arango.Client
             {
                 var fieldValue = GetFieldValue(dictionary, fieldPath);
                 
-                if (fieldValue != null)
+                if ((fieldValue == null) && (compareValue == null))
                 {
-                    if (fieldValue.Equals(compareValue))
+                    isValid = true;
+                }
+                else if ((fieldValue != null) && (compareValue != null))
+                {
+                    if ((fieldValue.GetType() == compareValue.GetType()) && fieldValue.Equals(compareValue))
                     {
                         isValid = true;
                     }
-                }
-                else if (fieldValue == null && compareValue == null)
-                {
-                    isValid = true;
                 }
             }
             catch (Exception)
