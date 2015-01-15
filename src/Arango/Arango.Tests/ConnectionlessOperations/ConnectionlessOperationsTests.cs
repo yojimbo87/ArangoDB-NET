@@ -23,6 +23,7 @@ namespace Arango.Tests
             Assert.IsFalse(ADocument.IsID("col/"));
             Assert.IsFalse(ADocument.IsID("col/123/111"));
             Assert.IsFalse(ADocument.IsID("col/123 111"));
+            Assert.IsFalse(ADocument.IsID(""));
             
             // _key validation
             Assert.IsTrue(ADocument.IsKey("123"));
@@ -34,10 +35,54 @@ namespace Arango.Tests
             Assert.IsFalse(ADocument.IsKey("123/111"));
             Assert.IsFalse(ADocument.IsKey("123 111"));
             Assert.IsFalse(ADocument.IsKey("a123_a :b-c"));
+            Assert.IsFalse(ADocument.IsKey(""));
             
             // _rev validation
             Assert.IsTrue(ADocument.IsRev("123"));
             Assert.IsFalse(ADocument.IsRev("123a"));
+            Assert.IsFalse(ADocument.IsRev(""));
+        }
+        
+        [Test()]
+        public void Should_validate_document_ID_fields()
+        {
+            var doc1 = new Dictionary<string, object>()
+                .String("id1", "myCollection/123")
+                .String("id2", "myCollection/a123-4:5_6")
+                .String("id3", "myCollection/1.23")
+                .Long("id4", 123)
+                .Object("id5", null)
+                .String("id6", "");
+            
+            Assert.IsTrue(doc1.IsID("id1"));
+            Assert.IsTrue(doc1.IsID("id2"));
+            
+            Assert.IsFalse(doc1.IsID("id3"));
+            Assert.IsFalse(doc1.IsID("id4"));
+            Assert.IsFalse(doc1.IsID("id5"));
+            Assert.IsFalse(doc1.IsID("id6"));
+            Assert.IsFalse(doc1.IsID("nonExistingField"));
+        }
+        
+        [Test()]
+        public void Should_validate_document_key_fields()
+        {
+            var doc1 = new Dictionary<string, object>()
+                .String("key1", "123")
+                .String("key2", "a123-4:5_6")
+                .String("key3", "1.23")
+                .Long("key4", 123)
+                .Object("key5", null)
+                .String("key6", "");
+            
+            Assert.IsTrue(doc1.IsKey("key1"));
+            Assert.IsTrue(doc1.IsKey("key2"));
+            
+            Assert.IsFalse(doc1.IsKey("key3"));
+            Assert.IsFalse(doc1.IsKey("key4"));
+            Assert.IsFalse(doc1.IsKey("key5"));
+            Assert.IsFalse(doc1.IsKey("key6"));
+            Assert.IsFalse(doc1.IsKey("nonExistingField"));
         }
         
         [Test()]
@@ -48,6 +93,19 @@ namespace Arango.Tests
             Assert.AreEqual("col/123a", ADocument.Identify("col", "123a"));
             
             Assert.AreEqual(null, ADocument.Identify("col", "123 a"));
+            Assert.AreEqual(null, ADocument.Identify("", "123"));
+            Assert.AreEqual(null, ADocument.Identify("col", ""));
+        }
+        
+        [Test()]
+        public void Should_parse_keys_from_document_IDs()
+        {
+            Assert.AreEqual("123", ADocument.ParseKey("col/123"));
+            Assert.AreEqual("a123-4:5_6", ADocument.ParseKey("col/a123-4:5_6"));
+            
+            Assert.AreEqual(null, ADocument.ParseKey("col/123 a"));
+            Assert.AreEqual(null, ADocument.ParseKey("/123"));
+            Assert.AreEqual(null, ADocument.ParseKey("col/"));
         }
         
         [Test()]

@@ -90,6 +90,8 @@ Apart from standard dictionary extensions provided by [dictator](https://github.
 - `HasRev()` - Checks if `_rev` field is present and has valid format.
 - `Rev()` - Retrieves value of `_rev` field. If the field is missing or has invalid format null value is returned.
 - `Rev(string rev)` - Stores `_rev` field value.
+- `IsID(string fieldPath)` - Checks if specified field path has valid document ID value in the format of `collection/key`.
+- `IsKey(string fieldPath)` - Checks if specified field path has valid document key value.
 
 `ADocument` class provides several static methods for format validation of [ID](https://docs.arangodb.com/Glossary/README.html#document_handle), [key](https://docs.arangodb.com/NamingConventions/DocumentKeys.html) and [revision](https://docs.arangodb.com/Glossary/README.html#document_revision) values: 
 
@@ -98,6 +100,7 @@ Apart from standard dictionary extensions provided by [dictator](https://github.
 - `ADocument.IsRev(string id)` - Determines if specified value has valid document `_rev` format.
 - `ADocument.Identify(string collection, long key)` - Constructs document ID from specified collection and key values.
 - `ADocument.Identify(string collection, string key)` - Constructs document ID from specified collection and key values. If key format is invalid null value is returned.
+- `ADocument.ParseKey(string id)` - Parses key value out of specified document ID. If ID has invalid value null is returned. 
 
 ## Fluent API
 
