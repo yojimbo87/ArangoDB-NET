@@ -80,6 +80,17 @@ namespace Arango.Client
         }
         
         /// <summary>
+        /// Provides access to transaction operations in current database context.
+        /// </summary>
+        public ATransaction Transaction
+        {
+            get
+            {
+                return new ATransaction(_connection);
+            }
+        }
+        
+        /// <summary>
         /// Initializes new database context to perform operations on remote database identified by specified alias.
         /// </summary>
         public ADatabase(string alias)

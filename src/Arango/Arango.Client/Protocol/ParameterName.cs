@@ -4,9 +4,11 @@ namespace Arango.Client.Protocol
 {
     internal static class ParameterName
     {
+        internal const string Action = "action";
         internal const string BatchSize = "batchSize";
         internal const string BindVars = "bindVars";
         internal const string Collection = "collection";
+        internal const string Collections = "collections";
         internal const string Code = "code";
         internal const string Count = "count";
         internal const string CreateCollection = "createCollection";
@@ -26,6 +28,7 @@ namespace Arango.Client.Protocol
         internal const string KeyOptionsAllowUserKeys = "keyOptions.allowUserKeys";
         internal const string KeyOptionsIncrement = "keyOptions.increment";
         internal const string KeyOptionsOffset = "keyOptions.offset";
+        internal const string LockTimeout = "lockTimeout";
         internal const string MergeObjects = "mergeObjects";
         internal const string Name = "name";
         internal const string Namespace = "namespace";
@@ -33,6 +36,7 @@ namespace Arango.Client.Protocol
         internal const string OptionsFullCount = "options.fullCount";
         internal const string OptionsMaxPlans = "options.maxPlans";
         internal const string OptionsOptimizerRules = "options.optimizer.rules";
+        internal const string Params = "params";
         internal const string Policy = "policy";
         internal const string Query = "query";
         internal const string ShardKeys = "shardKeys";

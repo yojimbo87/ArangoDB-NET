@@ -73,6 +73,7 @@
     <Compile Include="Protocol\ParameterName.cs" />
     <Compile Include="Protocol\Request.cs" />
     <Compile Include="Protocol\Response.cs" />
+    <Compile Include="Protocol\Transaction.cs" />
     <Compile Include="Public\ACollection.cs" />
     <Compile Include="Public\ACollectionStatus.cs" />
     <Compile Include="Public\ACollectionType.cs" />
@@ -87,6 +88,7 @@
     <Compile Include="Public\AResult.cs" />
     <Compile Include="Public\AReturnListType.cs" />
     <Compile Include="Public\ASettings.cs" />
+    <Compile Include="Public\ATransaction.cs" />
     <Compile Include="Public\AUpdatePolicy.cs" />
     <Compile Include="Public\AUser.cs" />
     <Compile Include="Public\DictionaryExtensions.cs" />

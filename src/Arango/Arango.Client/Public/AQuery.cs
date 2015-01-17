@@ -11,8 +11,8 @@ namespace Arango.Client
     {
         readonly Dictionary<string, object> _parameters = new Dictionary<string, object>();
         readonly Connection _connection;
-        StringBuilder _query = new StringBuilder();
-        Dictionary<string, object> _bindVars = new Dictionary<string, object>();
+        readonly StringBuilder _query = new StringBuilder();
+        readonly Dictionary<string, object> _bindVars = new Dictionary<string, object>();
         
         internal AQuery(Connection connection)
         {

@@ -55,11 +55,13 @@
     <Compile Include="EdgeOperations\EdgeOperationsTests.cs" />
     <Compile Include="Entities\Dummy.cs" />
     <Compile Include="Entities\PerformanceEntity.cs" />
+    <Compile Include="Entities\TransactionEntity.cs" />
     <Compile Include="FunctionOperations\FunctionOperationsTests.cs" />
     <Compile Include="Issues\IssueTests.cs" />
     <Compile Include="Performance\PerformanceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryOperations\QueryOperationsTests.cs" />
+    <Compile Include="TransactionOperations\TransactionOperationsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Arango.Client\Arango.Client.csproj">
@@ -79,6 +81,7 @@
     <Folder Include="ConnectionlessOperations" />
     <Folder Include="Entities" />
     <Folder Include="Issues" />
+    <Folder Include="TransactionOperations" />
     <Folder Include="Performance" />
     <Folder Include="QueryOperations" />
   </ItemGroup>
