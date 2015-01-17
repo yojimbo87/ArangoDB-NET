@@ -546,7 +546,7 @@ namespace Arango.Tests
                 .Document("bar", new Dictionary<string, object>().String("bar", "other string value"));
             
             var updateResult = db.Document
-                .MergeArrays(true) // this is also default behavior
+                .MergeObjects(true) // this is also default behavior
                 .Update(newDocument.String("_id"), document);
             
             Assert.AreEqual(202, updateResult.StatusCode);
@@ -590,7 +590,7 @@ namespace Arango.Tests
                 .Document("bar", new Dictionary<string, object>().String("bar", "other string value"));
             
             var updateResult = db.Document
-                .MergeArrays(false)
+                .MergeObjects(false)
                 .Update(newDocument.String("_id"), document);
             
             Assert.AreEqual(202, updateResult.StatusCode);

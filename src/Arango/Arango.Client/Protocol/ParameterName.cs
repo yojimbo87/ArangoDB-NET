@@ -26,7 +26,7 @@ namespace Arango.Client.Protocol
         internal const string KeyOptionsAllowUserKeys = "keyOptions.allowUserKeys";
         internal const string KeyOptionsIncrement = "keyOptions.increment";
         internal const string KeyOptionsOffset = "keyOptions.offset";
-        internal const string MergeArrays = "mergeArrays";
+        internal const string MergeObjects = "mergeObjects";
         internal const string Name = "name";
         internal const string Namespace = "namespace";
         internal const string NumberOfShards = "numberOfShards";

@@ -159,7 +159,7 @@ Applicable optional parameters available through fluent API:
 - `IfMatch(string revision)` - Conditionally operate on edge with specified revision.
 - `IfMatch(string revision, AUpdatePolicy updatePolicy)` - Conditionally operate on edge with specified revision and update policy.
 - `KeepNull(bool value)` - Determines whether to keep any attributes from existing edge that are contained in the patch edge which contains null value. Default value: true.
-- `MergeArrays(bool value)` - Determines whether the value in the patch edge will overwrite the existing edge's value. Default value: true.
+- `MergeObjects(bool value)` - Determines whether the value in the patch edge will overwrite the existing edge's value. Default value: true.
 
 ```csharp
 var db = new ADatabase("myDatabaseAlias");

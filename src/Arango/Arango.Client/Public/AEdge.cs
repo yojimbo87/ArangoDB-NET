@@ -85,10 +85,10 @@ namespace Arango.Client
         /// <summary>
         /// Determines whether the value in the patch edge will overwrite the existing edge's value. Default value: true.
         /// </summary>
-        public AEdge MergeArrays(bool value)
+        public AEdge MergeObjects(bool value)
         {
             // needs to be string value
-            _parameters.String(ParameterName.MergeArrays, value.ToString().ToLower());
+            _parameters.String(ParameterName.MergeObjects, value.ToString().ToLower());
         	
         	return this;
         }
@@ -376,7 +376,7 @@ namespace Arango.Client
             // optional
             request.TrySetQueryStringParameter(ParameterName.KeepNull, _parameters);
             // optional
-            request.TrySetQueryStringParameter(ParameterName.MergeArrays, _parameters);
+            request.TrySetQueryStringParameter(ParameterName.MergeObjects, _parameters);
 
             request.Body = json;
             
