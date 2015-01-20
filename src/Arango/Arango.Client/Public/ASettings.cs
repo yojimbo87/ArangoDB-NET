@@ -28,7 +28,7 @@ namespace Arango.Client
         
         static ASettings()
         {
-            JsonParameters = new JSONParameters { UseFastGuid = false };
+            JsonParameters = new JSONParameters { UseEscapedUnicode = false, UseFastGuid = false };
         }
         
         #region AddConnection

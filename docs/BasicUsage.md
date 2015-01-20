@@ -75,7 +75,7 @@ Internal serialization and deserialization of JSON documents is done by embedded
 
 ## Serialization options
 
-`ASettings.JsonParameters` static property can be used to set custom serialization options which are provided by [fastJSON](http://www.codeproject.com/Articles/159450/fastJSON) library. By default all options are set to their default values except `UseFastGuid` which is set to false in order to serialize Guid type values in string format. Advantage of this approach is the ability to, for example, explicitely set `UseValuesOfEnums` to true value which will result in Enum type fields being stored as integers instead of strings.
+`ASettings.JsonParameters` static property can be used to set custom serialization options which are provided by [fastJSON](http://www.codeproject.com/Articles/159450/fastJSON) library. By default all options are set to their default values except `UseEscapedUnicode` and `UseFastGuid` which are both set to false value. Advantage of this approach is the ability to, for example, explicitely set `UseValuesOfEnums` to true value which will result in Enum type fields being stored as integers instead of strings.
 
 ## Document ID, key and revision
 
