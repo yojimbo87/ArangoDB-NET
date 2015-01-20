@@ -1,4 +1,4 @@
-The MIT X11 License covers libraries in the ArangoDB-NET project. 
+The MIT License (MIT). 3rd party libraries might be covered by other licenses.
 
 Copyright (c) [2012 - present] Tomas Bosak, [http://yojimbo87.github.com/](http://yojimbo87.github.com/)
  

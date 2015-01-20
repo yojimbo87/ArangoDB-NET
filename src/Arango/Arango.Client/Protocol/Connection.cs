@@ -1,73 +1,76 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Net.Http;
 using System.Text;
-using Newtonsoft.Json;
 
 namespace Arango.Client.Protocol
 {
+    /// <summary>
+    /// Stores data about single endpoint and processes communication between client and server.
+    /// </summary>
     internal class Connection
     {
         #region Properties
 
-        public string Hostname { get; set; }
+        internal string Alias { get; set; }
 
-        public int Port { get; set; }
+        internal string Hostname { get; set; }
 
-        public bool IsSecured { get; set; }
-        
-        public string DatabaseName { get; set; }
+        internal int Port { get; set; }
 
-        public string Alias { get; set; }
-        
-        public string Username { get; set; }
+        internal bool IsSecured { get; set; }
 
-        public string Password { get; set; }
+        internal string DatabaseName { get; set; }
+
+        internal string Username { get; set; }
+
+        internal string Password { get; set; }
 
         internal Uri BaseUri { get; set; }
 
         #endregion
-
-        internal Connection(string hostname, int port, bool isSecured, string userName = "", string password = "")
+        
+        internal Connection(string alias, string hostname, int port, bool isSecured, string username, string password)
         {
+            Alias = alias;
             Hostname = hostname;
             Port = port;
             IsSecured = isSecured;
-            Username = userName;
+            Username = username;
             Password = password;
 
             BaseUri = new Uri((isSecured ? "https" : "http") + "://" + hostname + ":" + port + "/");
         }
-        
-        internal Connection(string hostname, int port, bool isSecured, string databaseName, string alias, string userName = "", string password = "")
+
+        internal Connection(string alias, string hostname, int port, bool isSecured, string databaseName, string userName, string password)
         {
+            Alias = alias;
             Hostname = hostname;
             Port = port;
             IsSecured = isSecured;
             DatabaseName = databaseName;
-            Alias = alias;
             Username = userName;
             Password = password;
 
             BaseUri = new Uri((isSecured ? "https" : "http") + "://" + hostname + ":" + port + "/_db/" + databaseName + "/");
         }
 
-        internal Response Process(Request request)
+        internal Response Send(Request request)
         {
-            var httpRequest = (HttpWebRequest)HttpWebRequest.Create(BaseUri + request.RelativeUri);
-            
-            if ((request.Headers.Count > 0))
+            var uri = BaseUri + request.GetRelativeUri();
+            var httpRequest = HttpWebRequest.CreateHttp(uri);
+
+            if (request.Headers.Count > 0)
             {
                 httpRequest.Headers = request.Headers;
             }
-            
+
             httpRequest.KeepAlive = true;
             httpRequest.SendChunked = false;
-            httpRequest.Method = request.Method;
-            httpRequest.UserAgent = ArangoClient.DriverName + "/" + ArangoClient.DriverVersion;
-            
+            httpRequest.Method = request.HttpMethod.ToString();
+            httpRequest.UserAgent = ASettings.DriverName + "/" + ASettings.DriverVersion;
+
             if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
             {
                 httpRequest.Headers.Add(
@@ -79,13 +82,13 @@ namespace Arango.Client.Protocol
             if (!string.IsNullOrEmpty(request.Body))
             {
                 httpRequest.ContentType = "application/json; charset=utf-8";
-                
+
                 var data = Encoding.UTF8.GetBytes(request.Body);
                 var stream = httpRequest.GetRequestStream();
-                
+
                 stream.Write(data, 0, data.Length);
                 stream.Flush();
-                
+
                 stream.Close();
                 stream.Dispose();
             }
@@ -102,45 +105,27 @@ namespace Arango.Client.Protocol
                 {
                     var responseStream = httpResponse.GetResponseStream();
                     var reader = new StreamReader(responseStream);
-    
-                    response.StatusCode = httpResponse.StatusCode;
+
+                    response.StatusCode = (int)httpResponse.StatusCode;
                     response.Headers = httpResponse.Headers;
-                    response.JsonString = reader.ReadToEnd();
-                    
+                    response.Body = reader.ReadToEnd();
+
                     reader.Close();
                     reader.Dispose();
                     responseStream.Close();
                     responseStream.Dispose();
                 }
-                
-                if (!string.IsNullOrEmpty(response.JsonString))
-                {
-                    // response string is array
-                    if (response.JsonString[0] == '[')
-                    {
-                        response.List = Document.DeserializeArray<Document>(response.JsonString);
-                    }
-                    // response string is object
-                    else
-                    {
-                        response.Document = Document.DeserializeDocument(response.JsonString);
-                    }
-                }
-                else
-                {
-                    response.Document = new Document();
-                }
+
+                response.DeserializeBody();
             }
             catch (WebException webException)
             {
                 if ((webException.Status == WebExceptionStatus.ProtocolError) && 
                     (webException.Response != null))
                 {
-                    var errorMessage = "";
                     using (var exceptionHttpResponse = (HttpWebResponse)webException.Response)
                     {
-                        response.IsException = true;
-                        response.StatusCode = exceptionHttpResponse.StatusCode;
+                        response.StatusCode = (int)exceptionHttpResponse.StatusCode;
 
                         if (exceptionHttpResponse.Headers.Count > 0)
                         {
@@ -152,40 +137,27 @@ namespace Arango.Client.Protocol
                             using (var exceptionResponseStream = exceptionHttpResponse.GetResponseStream())
                             using (var exceptionReader = new StreamReader(exceptionResponseStream))
                             {
-                                response.JsonString = exceptionReader.ReadToEnd();
+                                response.Body = exceptionReader.ReadToEnd();
                             }
+                            
+                            response.DeserializeBody();
                         }
                     }
-                    
-                    if (!string.IsNullOrEmpty(response.JsonString))
+
+                    response.Error = new AEerror();
+                    response.Error.StatusCode = response.StatusCode;
+                    response.Error.Number = 0;
+                    response.Error.Message = "Protocol error: " + webException.Message;
+                    response.Error.Exception = webException;
+
+                    if (response.DataType == DataType.Document)
                     {
-                        // response string is array
-                        if (response.JsonString[0] == '[')
-                        {
-                            response.List = Document.DeserializeArray<Document>(response.JsonString);
-                        }
-                        // response string is object
-                        else
-                        {
-                            response.Document = Document.DeserializeDocument(response.JsonString);
-                        }
+                        var document = (Dictionary<string, object>)response.Data;
                         
-                        errorMessage = string.Format(
-                                "ArangoDB responded with error code {0}:\n{1} [error number {2}]",
-                                response.Document.Enum<HttpStatusCode>("code"),
-                                response.Document.String("errorMessage"),
-                                response.Document.Int("errorNum")
-                            );
+                        response.Error.StatusCode = document.Int("code");
+                        response.Error.Number = document.Int("errorNum");
+                        response.Error.Message = "ArangoDB error: " + document.String("errorMessage");
                     }
-                    else
-                    {
-                        response.Document = new Document();
-                        errorMessage = "ArangoDB response was empty.";
-                    }
-                    
-                    response.Document.String("driverErrorMessage", errorMessage);
-                    response.Document.String("driverExceptionMessage", webException.Message);
-                    response.Document.Object("driverInnerException", webException.InnerException);
                 }
                 else
                 {

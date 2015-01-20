@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Text;
 
@@ -6,55 +6,66 @@ namespace Arango.Client.Protocol
 {
     internal class Request
     {
-        private string _relativeUri;
-
-        internal string RelativeUri 
-        {
-            get
-            {
-                if (QueryString.Count == 0)
-                {
-                    return _relativeUri;
-                }
-                else
-                {
-                    var uri = new StringBuilder(_relativeUri + "?");
-                    var index = 0;
-
-                    foreach (var item in QueryString)
-                    {
-                        uri.Append(item.Key + "=" + item.Value);
-
-                        index++;
-
-                        if (index != QueryString.Count)
-                        {
-                            uri.Append("&");
-                        }
-                    }
-
-                    return uri.ToString();
-                }
-            }
-
-            set 
-            {
-                _relativeUri = value;
-            }
-
-        }
-        
-        internal RequestType Type { get; set; }
-        internal string Method { get; set; }
+        internal HttpMethod HttpMethod { get; set; }
+        internal string OperationUri { get; set; }
         internal WebHeaderCollection Headers = new WebHeaderCollection();
         internal Dictionary<string, string> QueryString = new Dictionary<string, string>();
         internal string Body { get; set; }
-
-        internal Request(RequestType requestType, string method)
+        
+        internal Request(HttpMethod httpMethod, string apiUri, string operationUri)
         {
-            Type = requestType;
-            Method = method;
+            HttpMethod = httpMethod;
+            OperationUri = apiUri + operationUri;
+        }
+        
+        internal string GetRelativeUri()
+        {
+            var uri = new StringBuilder(OperationUri);
+            
+            if (QueryString.Count > 0)
+            {
+                uri.Append("?");
+                
+                var index = 0;
+
+                foreach (var item in QueryString)
+                {
+                    uri.Append(item.Key + "=" + item.Value);
+
+                    index++;
+
+                    if (index != QueryString.Count)
+                    {
+                        uri.Append("&");
+                    }
+                }
+            }
+            
+            return uri.ToString();
+        }
+        
+        internal void TrySetHeaderParameter(string parameterName, Dictionary<string, object> parameters)
+        {
+            if (parameters.ContainsKey(parameterName))
+            {
+                Headers.Add(parameterName, parameters.String(parameterName));
+            }
+        }
+        
+        internal void TrySetQueryStringParameter(string parameterName, Dictionary<string, object> parameters)
+        {
+            if (parameters.ContainsKey(parameterName))
+            {
+                QueryString.Add(parameterName, parameters.String(parameterName));
+            }
+        }
+        
+        internal static void TrySetBodyParameter(string parameterName, Dictionary<string, object> source, Dictionary<string, object> destination)
+        {
+            if (source.Has(parameterName))
+            {
+                destination.Object(parameterName, source.Object(parameterName));
+            }
         }
     }
 }
-

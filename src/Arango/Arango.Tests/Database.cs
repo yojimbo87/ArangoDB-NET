@@ -1,4 +1,5 @@
-﻿using Arango.Client;
+﻿using System.Collections.Generic;
+using Arango.Client;
 
 namespace Arango.Tests
 {
@@ -6,15 +7,16 @@ namespace Arango.Tests
     {
         public static string TestDatabaseOneTime { get; set; }
         public static string TestDatabaseGeneral { get; set; }
-        
+
         public static string TestDocumentCollectionName { get; set; }
         public static string TestEdgeCollectionName { get; set; }
-        
+
+        public static string Alias { get; set; }
+        public static string SystemAlias { get; set; }
+
         public static string Hostname { get; set; }
         public static int Port { get; set; }
         public static bool IsSecured { get; set; }
-        public static string DatabaseName { get; set; }
-        public static string Alias { get; set; }
         public static string UserName { get; set; }
         public static string Password { get; set; }
         
@@ -22,94 +24,128 @@ namespace Arango.Tests
         {
             TestDatabaseOneTime = "testOneTimeDatabase001xyzLatif";
             TestDatabaseGeneral = "testDatabaseGeneral001xyzLatif";
-            
+
             TestDocumentCollectionName = "testDocumentCollection001xyzLatif";
             TestEdgeCollectionName = "testEdgeCollection001xyzLatif";
             
+            Alias = "testAlias";
+            SystemAlias = "systemAlias";
             Hostname = "localhost";
             Port = 8529;
             IsSecured = false;
-            DatabaseName = TestDatabaseGeneral;
-            Alias = "test";
             UserName = "";
             Password = "";
-            
-            ArangoClient.AddConnection(
+
+            ASettings.AddConnection(
+                SystemAlias,
                 Hostname,
                 Port,
                 IsSecured,
-                DatabaseName,
+                "_system",
+                UserName,
+                Password
+            );
+
+            ASettings.AddConnection(
                 Alias,
+                Hostname,
+                Port,
+                IsSecured,
+                TestDatabaseGeneral,
                 UserName,
                 Password
             );
         }
         
-        public static ArangoDatabase GetTestDatabase()
-        {
-            return new ArangoDatabase(Alias);
-        }
-        
         public static void CreateTestDatabase(string databaseName)
-        {
-            DeleteTestDatabase(Database.TestDatabaseGeneral);
+        {	
+            DeleteTestDatabase(databaseName);
+
+            var db = new ADatabase(Database.SystemAlias);
             
-            ArangoClient.CreateDatabase(
-                Database.Hostname,
-                Database.Port,
-                Database.IsSecured,
-                Database.TestDatabaseGeneral,
-                Database.UserName,
-                Database.Password
-            );
+            var resultList = db.GetAccessibleDatabases();
+
+            if (resultList.Success && resultList.Value.Contains(databaseName))
+            {
+            	db.Drop(databaseName);
+            }
+            
+            db.Create(databaseName);
         }
-        
+
         public static void DeleteTestDatabase(string databaseName)
         {
-            var databases = ArangoClient.ListDatabases(
-                Database.Hostname,
-                Database.Port,
-                Database.IsSecured,
-                Database.UserName,
-                Database.Password
-            );
+            var db = new ADatabase(Database.SystemAlias);
             
-            if (databases.Contains(Database.TestDatabaseGeneral))
+            var resultList = db.GetAccessibleDatabases();
+
+            if (resultList.Success && resultList.Value.Contains(databaseName))
             {
-                ArangoClient.DeleteDatabase(
-                    Database.Hostname,
-                    Database.Port,
-                    Database.IsSecured,
-                    Database.TestDatabaseGeneral,
-                    Database.UserName,
-                    Database.Password
-                );
+            	db.Drop(databaseName);
             }
         }
-        
-        public static void CreateTestCollection(string collectionName, ArangoCollectionType collectionType = ArangoCollectionType.Document)
+
+        public static void CleanupTestDatabases()
         {
-            var db = GetTestDatabase();
-            
-            if (db.Collection.Get(collectionName) != null)
-            {
-                // delet collection if it exists
-                db.Collection.Delete(collectionName);
-            }
-            
-            // create new test collection
-            var collection = new ArangoCollection();
-            collection.Name = collectionName;
-            collection.Type = collectionType;
-            
-            db.Collection.Create(collection);
+            Database.DeleteTestDatabase(Database.TestDatabaseGeneral);
+            Database.DeleteTestDatabase(Database.TestDatabaseOneTime);
         }
         
+        public static void CreateTestCollection(string collectionName, ACollectionType collectionType)
+        {
+        	DeleteTestCollection(collectionName);
+        	
+            var db = new ADatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Type(collectionType)
+                .Create(collectionName);
+        }
+        
+        public static void ClearTestCollection(string collectionName)
+        {
+            var db = new ADatabase(Database.Alias);
+
+            var createResult = db.Collection
+                .Truncate(collectionName);
+        }
+        
+        public static List<Dictionary<string, object>> ClearCollectionAndFetchTestDocumentData(string collectionName)
+        {
+            ClearTestCollection(collectionName);
+            
+            var documents = new List<Dictionary<string, object>>();
+        	var db = new ADatabase(Alias);
+        	
+        	var document1 = new Dictionary<string, object>()
+        		.String("foo", "string value one")
+        		.Int("bar", 1);
+        	
+        	var document2 = new Dictionary<string, object>()
+        		.String("foo", "string value two")
+        		.Int("bar", 2);
+        	
+        	var createResult1 = db.Document.Create(TestDocumentCollectionName, document1);
+        	
+        	document1.Merge(createResult1.Value);
+        	
+        	var createResult2 = db.Document.Create(TestDocumentCollectionName, document2);
+        	
+        	document2.Merge(createResult2.Value);
+        	
+        	documents.Add(document1);
+        	documents.Add(document2);
+        	
+        	return documents;
+        }
+
         public static void DeleteTestCollection(string collectionName)
         {
-            var db = GetTestDatabase();
+            var db = new ADatabase(Database.Alias);
+
+            var resultGet = db.Collection.Get(collectionName);
             
-            if (db.Collection.Get(collectionName) != null)
+            if (resultGet.Success && (resultGet.Value.String("name") == collectionName))
             {
                 db.Collection.Delete(collectionName);
             }
