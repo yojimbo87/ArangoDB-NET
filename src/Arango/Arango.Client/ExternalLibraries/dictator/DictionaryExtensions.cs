@@ -1590,6 +1590,18 @@ namespace Arango.Client
             // create instance of property type
             var collectionInstance = Activator.CreateInstance(collectionType, collection.Count);
             
+            // get type of items within collection
+            Type collectionElementType;
+            
+            if (collectionType.IsArray)
+            {
+                collectionElementType = collectionType.GetElementType();
+            }
+            else
+            {
+                collectionElementType = collectionType.GetGenericArguments()[0];
+            }
+            
             if (collection.Count > 0)
             {
                 for (int i = 0; i < collection.Count; i++)
@@ -1599,7 +1611,14 @@ namespace Arango.Client
                     // collection is simple array
                     if (collectionType.IsArray)
                     {
-                        ((IList)collectionInstance)[i] = collection[i];
+                        if (collectionElementType == elementType)
+                        {
+                            ((IList)collectionInstance)[i] = collection[i];
+                        }
+                        else
+                        {
+                            ((IList)collectionInstance)[i] = Convert.ChangeType(collection[i], collectionElementType);
+                        }
                     }
                     // collection is generic
                     else if (collectionType.IsGenericType && (collection is IEnumerable))
@@ -1610,7 +1629,14 @@ namespace Arango.Client
                             (elementType == typeof(DateTime)) ||
                             (elementType == typeof(decimal)))
                         {
-                            ((IList)collectionInstance).Add(collection[i]);
+                            if (collectionElementType == elementType)
+                            {
+                                ((IList)collectionInstance).Add(collection[i]);
+                            }
+                            else
+                            {
+                                ((IList)collectionInstance).Add(Convert.ChangeType(collection[i], collectionElementType));
+                            }
                         }
                         // generic collection consists of generic type which should be parsed
                         else

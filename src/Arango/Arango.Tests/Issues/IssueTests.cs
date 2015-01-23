@@ -74,6 +74,36 @@ namespace Arango.Tests
             Assert.AreEqual((int)demo.MyFavoriteColor, getDocResult2.Value.Int("MyFavoriteColor"));
         }
         
+        [Test()]
+        public void Issue_No15_List_save_and_retrieve()
+        {
+            Database.CreateTestCollection(Database.TestDocumentCollectionName, ACollectionType.Document);
+            var db = new ADatabase(Database.Alias);
+            
+            var entity = new IssueNo15Entity();
+            entity.ListNumbers = new List<int> { 1, 2, 3 };
+            entity.ArrayNumbers = new int[] { 4, 5, 6};
+            
+            var createResult = db.Document.Create<IssueNo15Entity>(Database.TestDocumentCollectionName, entity);
+            
+            Assert.IsTrue(createResult.Success);
+            
+            var getresult = db.Document.Get<IssueNo15Entity>(createResult.Value.ID());
+            
+            Assert.IsTrue(getresult.Success);
+            Assert.IsTrue(getresult.HasValue);
+            
+            for (int i = 0; i < getresult.Value.ListNumbers.Count; i++)
+            {
+                Assert.AreEqual(entity.ListNumbers[i], getresult.Value.ListNumbers[i]);
+            }
+            
+            for (int i = 0; i < getresult.Value.ArrayNumbers.Length; i++)
+            {
+                Assert.AreEqual(entity.ArrayNumbers[i], getresult.Value.ArrayNumbers[i]);
+            }
+        }
+        
         public void Dispose()
         {
             Database.DeleteTestDatabase(Database.TestDatabaseGeneral);
