@@ -61,6 +61,25 @@ namespace Arango.Tests
             Assert.IsTrue(queryResult.Value[1].IsLong("bar"));
         }
         
+        [Test()]
+        public void Should_execute_AQL_query_with_empty_document_result()
+        {
+            var db = new ADatabase(Database.Alias);
+
+            var queryResult = db.Query
+                .Aql(@"
+                LET items = []
+                FOR item IN items
+                    RETURN item
+                ")
+                .ToDocument();
+
+            Assert.AreEqual(201, queryResult.StatusCode);
+            Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.HasValue);
+            Assert.AreEqual(0, queryResult.Value.Count);
+        }
+        
         #endregion
         
         #region ToObject
@@ -148,6 +167,46 @@ namespace Arango.Tests
             Assert.IsTrue(queryResult.HasValue);
             Assert.IsTrue(documents.First(q => q.String("foo") == queryResult.Value.Foo) != null);
             Assert.IsTrue(documents.First(q => q.Int("bar") == queryResult.Value.Bar) != null);
+        }
+        
+        [Test()]
+        public void Should_execute_AQL_query_with_empty_single_object_result()
+        {
+            var db = new ADatabase(Database.Alias);
+
+            var queryResult = db.Query
+                .Aql(@"
+                LET items = []
+                FOR item IN items
+                    RETURN item
+                ")
+                .ToObject();
+
+            Assert.AreEqual(201, queryResult.StatusCode);
+            Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.HasValue);
+            Assert.IsTrue(queryResult.Value != null);
+        }
+        
+        [Test()]
+        public void Should_execute_AQL_query_with_empty_single_strongly_typed_object_result()
+        {
+            var db = new ADatabase(Database.Alias);
+
+            var queryResult = db.Query
+                .Aql(@"
+                LET items = []
+                FOR item IN items
+                    RETURN item
+                ")
+                .ToObject<Dummy>();
+
+            Assert.AreEqual(201, queryResult.StatusCode);
+            Assert.IsTrue(queryResult.Success);
+            Assert.IsTrue(queryResult.HasValue);
+            Assert.IsTrue(queryResult.Value != null);
+            Assert.AreEqual(null, queryResult.Value.Foo);
+            Assert.AreEqual(0, queryResult.Value.Bar);
         }
         
         #endregion

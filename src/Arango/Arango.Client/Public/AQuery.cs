@@ -239,7 +239,14 @@ namespace Arango.Client
             
             if (listResult.Success)
             {
-                result.Value = (Dictionary<string, object>)Convert.ChangeType(listResult.Value[0], type);
+                if (listResult.Value.Count > 0)
+                {
+                    result.Value = (Dictionary<string, object>)Convert.ChangeType(listResult.Value[0], type);
+                }
+                else
+                {
+                    result.Value = new Dictionary<string, object>();
+                }
             }
             
             return result;
@@ -260,7 +267,14 @@ namespace Arango.Client
             
             if (listResult.Success)
             {
-                result.Value = (T)listResult.Value[0];
+                if (listResult.Value.Count > 0)
+                {
+                    result.Value = (T)listResult.Value[0];
+                }
+                else
+                {
+                    result.Value = (T)Activator.CreateInstance(typeof(T));
+                }
             }
             
             return result;
@@ -281,7 +295,14 @@ namespace Arango.Client
             
             if (listResult.Success)
             {
-                result.Value = listResult.Value[0];
+                if (listResult.Value.Count > 0)
+                {
+                    result.Value = listResult.Value[0];
+                }
+                else
+                {
+                    result.Value = new object();
+                }
             }
             
             return result;
