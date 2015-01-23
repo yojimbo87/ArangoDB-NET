@@ -214,6 +214,7 @@ namespace Arango.Client
         /// <exception cref="InvalidFieldTypeException">Field value is not List&lt;T&gt; type.</exception>
         public static List<T> List<T>(this Dictionary<string, object> dictionary, string fieldPath)
         {
+            var type = typeof(T);
             var fieldValue = GetFieldValue(dictionary, fieldPath);
             
             if (!(fieldValue.GetType().IsGenericType && (fieldValue is IEnumerable)))
@@ -221,7 +222,25 @@ namespace Arango.Client
                 throw new InvalidFieldTypeException(string.Format("Field path '{0}' value does not contain list type.", fieldPath));
             }
             
-            return ((IEnumerable)fieldValue).Cast<T>().ToList();
+            var collection = (IList)fieldValue;
+            var collectionElementType = collection.GetType().GetGenericArguments()[0];
+            
+            if (collectionElementType == type)
+            {
+                return collection.Cast<T>().ToList();
+            }
+            // when retrieved type is different from stored one its items needs to be converted to desired type
+            else
+            {
+                var returnCollection = new List<T>();
+                
+                for (int i = 0; i < collection.Count; i++)
+                {
+                    returnCollection.Add((T)Convert.ChangeType(collection[i], type));
+                }
+                
+                return returnCollection;
+            }
         }
         /// <summary>
         /// Retrieves generic array type from specified field path.
@@ -231,6 +250,7 @@ namespace Arango.Client
         /// <exception cref="InvalidFieldTypeException">Field value is not T[] type.</exception>
         public static T[] Array<T>(this Dictionary<string, object> dictionary, string fieldPath)
         {
+            var type = typeof(T);
             var fieldValue = GetFieldValue(dictionary, fieldPath);
             
             if (!(fieldValue is IEnumerable))
@@ -238,7 +258,25 @@ namespace Arango.Client
                 throw new InvalidFieldTypeException(string.Format("Field path '{0}' value does not contain array type.", fieldPath));
             }
             
-            return ((IEnumerable)fieldValue).Cast<T>().ToArray();
+            var collection = (IList)fieldValue;
+            var collectionElementType = collection.GetType().GetElementType();
+            
+            if (collectionElementType == type)
+            {
+                return collection.Cast<T>().ToArray();
+            }
+            // when retrieved type is different from stored one its items needs to be converted to desired type
+            else
+            {
+                var returnCollection = Activator.CreateInstance(typeof(T[]), collection.Count);
+                
+                for (int i = 0; i < collection.Count; i++)
+                {
+                    ((T[])returnCollection)[i] = (T)Convert.ChangeType(collection[i], type);
+                }
+                
+                return (T[])returnCollection;
+            }
         }
         /// <summary>
         /// Retrieves number of items contained in specified field path.
