@@ -79,24 +79,4 @@ namespace Arango.Tests
             Database.DeleteTestDatabase(Database.TestDatabaseGeneral);
         }
     }
-    
-    public class IssueNo8Entity
-    {
-        public Guid SomeOtherId { get; set; }
-        public string Name { get; set; }
-    }
-    
-    public class IssueNo9Entity
-    {
-        public Guid SomeOtherId { get; set; }
-
-        public string Name { get; set; }
-    
-        public Color MyFavoriteColor { get; set; }
-        
-        public enum Color
-        {
-            Blue, Red
-        }
-    }
 }
