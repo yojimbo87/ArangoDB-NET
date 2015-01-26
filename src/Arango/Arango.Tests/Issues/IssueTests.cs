@@ -104,6 +104,35 @@ namespace Arango.Tests
             }
         }
         
+        [Test()]
+        public void Issue_No16_SortedList()
+        {
+            Database.CreateTestCollection(Database.TestDocumentCollectionName, ACollectionType.Document);
+            var db = new ADatabase(Database.Alias);
+            
+            var entity = new IssueNo16Entity();
+            entity.SortedList = new SortedList<int, bool>();
+            entity.SortedList.Add(1, true);
+            entity.SortedList.Add(2, false);
+            entity.SortedList.Add(3, false);
+            entity.SortedList.Add(4, false);
+            
+            var createResult = db.Document.Create<IssueNo16Entity>(Database.TestDocumentCollectionName, entity);
+            
+            Assert.IsTrue(createResult.Success);
+            
+            var getResult = db.Document.Get<IssueNo16Entity>(createResult.Value.ID());
+            
+            Assert.IsTrue(getResult.Success);
+            Assert.IsTrue(getResult.HasValue);
+            
+            for (int i = 0; i < getResult.Value.SortedList.Count; i++)
+            {
+                Assert.AreEqual(entity.SortedList.ElementAt(i).Key, getResult.Value.SortedList.ElementAt(i).Key);
+                Assert.AreEqual(entity.SortedList.ElementAt(i).Value, getResult.Value.SortedList.ElementAt(i).Value);
+            }
+        }
+        
         public void Dispose()
         {
             Database.DeleteTestDatabase(Database.TestDatabaseGeneral);

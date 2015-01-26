@@ -1642,6 +1642,8 @@ namespace Arango.Client
             
             if (collection.Count > 0)
             {
+                // TODO: move type inference and processing out of the loop for performance reasons
+                
                 for (int i = 0; i < collection.Count; i++)
                 {
                     var elementType = collection[i].GetType();
@@ -1679,17 +1681,27 @@ namespace Arango.Client
                         // generic collection consists of generic type which should be parsed
                         else
                         {
-                            // create instance object based on first element of generic collection
-                            var instance = Activator.CreateInstance(collectionType.GetGenericArguments().First(), null);
-                            var instanceType = instance.GetType();
-                            
-                            if (elementType == typeof(Dictionary<string, object>))
+                            if ((collectionType.GetGenericTypeDefinition() == typeof(SortedList<,>)) &&
+                                (elementType == typeof(Dictionary<string, object>)))
                             {
-                                ((IList)collectionInstance).Add(ConvertToObject((Dictionary<string, object>)collection[i], instanceType));
+                                var element = (Dictionary<string, object>)collection[i];
+                                var addMethod = collectionType.GetMethod("Add");
+                                
+                                addMethod.Invoke(
+                                    collectionInstance, 
+                                    new [] { 
+                                        Convert.ChangeType(element["k"], collectionType.GetGenericArguments()[0]),
+                                        Convert.ChangeType(element["v"], collectionType.GetGenericArguments()[1])
+                                    }
+                                );
+                            }
+                            else if (elementType == typeof(Dictionary<string, object>))
+                            {
+                                ((IList)collectionInstance).Add(ConvertToObject((Dictionary<string, object>)collection[i], collectionType.GetGenericArguments()[0]));
                             }
                             else
                             {
-                                if (elementType == instanceType)
+                                if (elementType == collectionType.GetGenericArguments()[0])
                                 {
                                     ((IList)collectionInstance).Add(collection[i]);
                                 } 

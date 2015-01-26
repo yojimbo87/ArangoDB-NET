@@ -55,6 +55,7 @@
     <Compile Include="EdgeOperations\EdgeOperationsTests.cs" />
     <Compile Include="Entities\Dummy.cs" />
     <Compile Include="Entities\IssueNo15Entity.cs" />
+    <Compile Include="Entities\IssueNo16Entity.cs" />
     <Compile Include="Entities\IssueNo8Entity.cs" />
     <Compile Include="Entities\IssueNo9Entity.cs" />
     <Compile Include="Entities\PerformanceEntity.cs" />
