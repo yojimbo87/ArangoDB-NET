@@ -987,6 +987,29 @@ namespace Arango.Client
             return isValid;
         }
         /// <summary>
+        /// Checks if specified field has array type value.
+        /// </summary>
+        public static bool IsArray(this Dictionary<string, object> dictionary, string fieldPath)
+        {
+            var isValid = false;
+            
+            try
+            {
+                var fieldValue = GetFieldValue(dictionary, fieldPath);
+            
+                if (fieldValue.GetType().IsArray)
+                {
+                    isValid = true;
+                }
+            }
+            catch (Exception)
+            {
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        /// <summary>
         /// Checks if specified field has given type value.
         /// </summary>
         public static bool IsType(this Dictionary<string, object> dictionary, string fieldPath, Type type)
@@ -1220,6 +1243,16 @@ namespace Arango.Client
                 for (int i = 0; i < fieldNames.Length; i++)
                 {
                     var fieldName = fieldNames[i];
+                    var arrayContent = "";
+
+                    if (fieldName.Contains("[") && fieldName.Contains("]"))
+                    {
+                        var firstIndex = fieldName.IndexOf('[');
+                        var lastIndex = fieldName.IndexOf(']');
+                        
+                        arrayContent = fieldName.Substring(firstIndex + 1, lastIndex - firstIndex - 1);
+                        fieldName = fieldName.Substring(0, firstIndex);
+                    }
     
                     // field is not present in dictionary - next field path iteration
                     if (!parentDictionary.ContainsKey(fieldName))
@@ -1235,10 +1268,12 @@ namespace Arango.Client
                         break;
                     }
                     
+                    var tempParentObject = GetFieldObject(fieldName, arrayContent, parentDictionary);
+                
                     // descendant field is dictionary - set is as current parent dictionary
-                    if (parentDictionary[fieldName] is Dictionary<string, object>)
+                    if (tempParentObject is Dictionary<string, object>)
                     {
-                        parentDictionary = (Dictionary<string, object>)parentDictionary[fieldName];
+                        parentDictionary = (Dictionary<string, object>)tempParentObject;
                     }
                     // can not continue with processing - next field path iteration
                     else
