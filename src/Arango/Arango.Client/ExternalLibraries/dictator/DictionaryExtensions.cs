@@ -1566,7 +1566,11 @@ namespace Arango.Client
                         if ((fieldValue == null) || (propertyInfo.PropertyType == fieldType))
                         {
                             propertyInfo.SetValue(stronglyTypedObject, fieldValue, null);
-                        } 
+                        }
+                        else if (propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                        {
+                            propertyInfo.SetValue(stronglyTypedObject, Convert.ChangeType(fieldValue, Nullable.GetUnderlyingType(propertyInfo.PropertyType)), null);
+                        }
                         else
                         {
                             propertyInfo.SetValue(stronglyTypedObject, Convert.ChangeType(fieldValue, propertyInfo.PropertyType), null);
