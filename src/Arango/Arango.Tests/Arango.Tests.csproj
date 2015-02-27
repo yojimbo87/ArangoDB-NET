@@ -51,6 +51,7 @@
     <Compile Include="ConnectionlessOperations\ConnectionlessOperationsTests.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="DatabaseOperations\DatabaseOperationsTests.cs" />
+    <Compile Include="DocumentOperations\DictionaryExtensionTests.cs" />
     <Compile Include="DocumentOperations\DocumentOperationsTests.cs" />
     <Compile Include="EdgeOperations\EdgeOperationsTests.cs" />
     <Compile Include="Entities\Dummy.cs" />
@@ -72,18 +73,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DatabaseOperations" />
-    <Folder Include="CollectionOperations" />
-    <Folder Include="DocumentOperations" />
-    <Folder Include="EdgeOperations" />
-    <Folder Include="FunctionOperations" />
-    <Folder Include="ConnectionlessOperations" />
-    <Folder Include="Entities" />
-    <Folder Include="Issues" />
-    <Folder Include="TransactionOperations" />
-    <Folder Include="Performance" />
-    <Folder Include="QueryOperations" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
