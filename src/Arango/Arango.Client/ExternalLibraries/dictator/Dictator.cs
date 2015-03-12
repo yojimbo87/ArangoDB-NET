@@ -13,15 +13,31 @@ namespace Arango.Client
         /// </summary>
         public static DictatorSettings Settings { get; private set; }
         
+        /// <summary>
+        /// Creates new empty document.
+        /// </summary>
         public static Dictionary<string, object> New()
         {
             return new Dictionary<string, object>();
+        }
+        
+        /// <summary>
+        /// Creates new schema validator.
+        /// </summary>
+        public static Schema Schema
+        {
+            get 
+            {
+                return new Schema();
+            }
         }
         
         static Dictator()
         {
             Settings = new DictatorSettings();
         }
+        
+        #region Conversion
         
         /// <summary>
         /// Converts specified dictionary list into collection of strongly typed objects.
@@ -37,6 +53,7 @@ namespace Arango.Client
             
             return list;
         }
+        
         /// <summary>
         /// Converts specified object into document.
         /// </summary>
@@ -105,6 +122,7 @@ namespace Arango.Client
                 
             return document;
         }
+        
         /// <summary>
         /// Converts specified object list into collection of documents.
         /// </summary>
@@ -171,6 +189,8 @@ namespace Arango.Client
             
             return outputCollection;
         }
+        
+        #endregion
     }
 }
 

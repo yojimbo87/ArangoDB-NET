@@ -74,29 +74,68 @@ namespace Arango.Tests
             Assert.AreEqual((int)demo.MyFavoriteColor, getDocResult2.Value.Int("MyFavoriteColor"));
         }
         
+        [Test()]
+        public void Issue_No15_List_save_and_retrieve()
+        {
+            Database.CreateTestCollection(Database.TestDocumentCollectionName, ACollectionType.Document);
+            var db = new ADatabase(Database.Alias);
+            
+            var entity = new IssueNo15Entity();
+            entity.ListNumbers = new List<int> { 1, 2, 3 };
+            entity.ArrayNumbers = new int[] { 4, 5, 6};
+            
+            var createResult = db.Document.Create<IssueNo15Entity>(Database.TestDocumentCollectionName, entity);
+            
+            Assert.IsTrue(createResult.Success);
+            
+            var getresult = db.Document.Get<IssueNo15Entity>(createResult.Value.ID());
+            
+            Assert.IsTrue(getresult.Success);
+            Assert.IsTrue(getresult.HasValue);
+            
+            for (int i = 0; i < getresult.Value.ListNumbers.Count; i++)
+            {
+                Assert.AreEqual(entity.ListNumbers[i], getresult.Value.ListNumbers[i]);
+            }
+            
+            for (int i = 0; i < getresult.Value.ArrayNumbers.Length; i++)
+            {
+                Assert.AreEqual(entity.ArrayNumbers[i], getresult.Value.ArrayNumbers[i]);
+            }
+        }
+        
+        [Test()]
+        public void Issue_No16_SortedList()
+        {
+            Database.CreateTestCollection(Database.TestDocumentCollectionName, ACollectionType.Document);
+            var db = new ADatabase(Database.Alias);
+            
+            var entity = new IssueNo16Entity();
+            entity.SortedList = new SortedList<int, bool>();
+            entity.SortedList.Add(1, true);
+            entity.SortedList.Add(2, false);
+            entity.SortedList.Add(3, false);
+            entity.SortedList.Add(4, false);
+            
+            var createResult = db.Document.Create<IssueNo16Entity>(Database.TestDocumentCollectionName, entity);
+            
+            Assert.IsTrue(createResult.Success);
+            
+            var getResult = db.Document.Get<IssueNo16Entity>(createResult.Value.ID());
+            
+            Assert.IsTrue(getResult.Success);
+            Assert.IsTrue(getResult.HasValue);
+            
+            for (int i = 0; i < getResult.Value.SortedList.Count; i++)
+            {
+                Assert.AreEqual(entity.SortedList.ElementAt(i).Key, getResult.Value.SortedList.ElementAt(i).Key);
+                Assert.AreEqual(entity.SortedList.ElementAt(i).Value, getResult.Value.SortedList.ElementAt(i).Value);
+            }
+        }
+        
         public void Dispose()
         {
             Database.DeleteTestDatabase(Database.TestDatabaseGeneral);
-        }
-    }
-    
-    public class IssueNo8Entity
-    {
-        public Guid SomeOtherId { get; set; }
-        public string Name { get; set; }
-    }
-    
-    public class IssueNo9Entity
-    {
-        public Guid SomeOtherId { get; set; }
-
-        public string Name { get; set; }
-    
-        public Color MyFavoriteColor { get; set; }
-        
-        public enum Color
-        {
-            Blue, Red
         }
     }
 }
