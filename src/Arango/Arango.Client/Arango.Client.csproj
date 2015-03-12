@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExternalLibraries\dictator\AliasField.cs" />
+    <Compile Include="ExternalLibraries\dictator\Constraint.cs" />
     <Compile Include="ExternalLibraries\dictator\DateTimeFormat.cs" />
     <Compile Include="ExternalLibraries\dictator\Dictator.cs" />
     <Compile Include="ExternalLibraries\dictator\DictatorSettings.cs" />
@@ -57,6 +58,9 @@
     <Compile Include="ExternalLibraries\dictator\InvalidFieldTypeException.cs" />
     <Compile Include="ExternalLibraries\dictator\MergeBehavior.cs" />
     <Compile Include="ExternalLibraries\dictator\NonExistingFieldException.cs" />
+    <Compile Include="ExternalLibraries\dictator\Rule.cs" />
+    <Compile Include="ExternalLibraries\dictator\Schema.cs" />
+    <Compile Include="ExternalLibraries\dictator\ValidationResult.cs" />
     <Compile Include="ExternalLibraries\fastJSON\dynamic.cs" />
     <Compile Include="ExternalLibraries\fastJSON\Formatter.cs" />
     <Compile Include="ExternalLibraries\fastJSON\Getters.cs" />

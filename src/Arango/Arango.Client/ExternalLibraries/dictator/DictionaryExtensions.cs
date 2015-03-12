@@ -1158,6 +1158,14 @@ namespace Arango.Client
             
             foreach (var field in dictionary)
             {
+                // null value is a special case so it should be processed first
+                if (field.Value == null)
+                {
+                    clone.Add(field.Key, null);
+                    
+                    continue;
+                }
+                
                 var fieldType = field.Value.GetType();
                 
                 if (fieldType.IsValueType || fieldType.IsEnum || fieldType.Equals(typeof(System.String)))
