@@ -21,7 +21,8 @@ namespace Arango.Client
         /// </summary>
         public ACollection Type(ACollectionType value)
         {
-            _parameters.Enum(ParameterName.Type, value);
+            // set enum format explicitely to override global setting
+            _parameters.Enum(ParameterName.Type, value, EnumFormat.Object);
         	
         	return this;
         }
@@ -83,8 +84,8 @@ namespace Arango.Client
         /// </summary>
         public ACollection KeyGeneratorType(AKeyGeneratorType value)
         {
-            // needs to be in string format
-            _parameters.Enum(ParameterName.KeyOptionsType, value.ToString().ToLower());
+            // needs to be in string format - set enum format explicitely to override global setting
+            _parameters.Enum(ParameterName.KeyOptionsType, value.ToString().ToLower(), EnumFormat.String);
         	
         	return this;
         }
