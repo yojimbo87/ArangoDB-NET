@@ -87,6 +87,8 @@
     <Compile Include="Public\AEdge.cs" />
     <Compile Include="Public\AError.cs" />
     <Compile Include="Public\AFunction.cs" />
+    <Compile Include="Public\AIndex.cs" />
+    <Compile Include="Public\AIndexType.cs" />
     <Compile Include="Public\AKeyGeneratorType.cs" />
     <Compile Include="Public\AQuery.cs" />
     <Compile Include="Public\AResult.cs" />

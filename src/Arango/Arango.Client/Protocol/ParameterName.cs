@@ -7,6 +7,7 @@ namespace Arango.Client.Protocol
         internal const string Action = "action";
         internal const string BatchSize = "batchSize";
         internal const string BindVars = "bindVars";
+        internal const string ByteSize = "byteSize";
         internal const string Collection = "collection";
         internal const string Collections = "collections";
         internal const string Code = "code";
@@ -15,7 +16,9 @@ namespace Arango.Client.Protocol
         internal const string DoCompact = "doCompact";
         internal const string Direction = "direction";
         internal const string ExcludeSystem = "excludeSystem";
+        internal const string Fields = "fields";
         internal const string From = "from";
+        internal const string GeoJson = "geoJson";
         internal const string Group = "group";
         internal const string IfMatch = "If-Match";
         internal const string IfNoneMatch = "If-None-Match";
@@ -30,6 +33,7 @@ namespace Arango.Client.Protocol
         internal const string KeyOptionsOffset = "keyOptions.offset";
         internal const string LockTimeout = "lockTimeout";
         internal const string MergeObjects = "mergeObjects";
+        internal const string MinLength = "minLength";
         internal const string Name = "name";
         internal const string Namespace = "namespace";
         internal const string NumberOfShards = "numberOfShards";
@@ -40,9 +44,12 @@ namespace Arango.Client.Protocol
         internal const string Policy = "policy";
         internal const string Query = "query";
         internal const string ShardKeys = "shardKeys";
+        internal const string Size = "size";
+        internal const string Sparse = "sparse";
         internal const string To = "to";
         internal const string TTL = "ttl";
         internal const string Type = "type";
+        internal const string Unique = "unique";
         internal const string Vertex = "vertex";
         internal const string WaitForSync = "waitForSync";
         internal const string WithRevisions = "withRevisions";

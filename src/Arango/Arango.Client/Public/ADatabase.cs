@@ -56,17 +56,6 @@ namespace Arango.Client
                 return new AEdge(_connection);
             }
         }
-        
-        /// <summary>
-        /// Provides access to query operations in current database context.
-        /// </summary>
-        public AQuery Query
-        {
-            get
-            {
-                return new AQuery(_connection);
-            }
-        }
 
         /// <summary>
         /// Provides access to AQL user function management operations in current database context.
@@ -76,6 +65,28 @@ namespace Arango.Client
             get
             {
                 return new AFunction(_connection);
+            }
+        }
+        
+        /// <summary>
+        /// Provides access to index operations in current database context.
+        /// </summary>
+        public AIndex Index
+        {
+            get
+            {
+                return new AIndex(_connection);
+            }
+        }
+        
+        /// <summary>
+        /// Provides access to query operations in current database context.
+        /// </summary>
+        public AQuery Query
+        {
+            get
+            {
+                return new AQuery(_connection);
             }
         }
         

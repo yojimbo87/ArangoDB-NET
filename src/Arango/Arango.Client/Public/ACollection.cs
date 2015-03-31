@@ -546,6 +546,43 @@ namespace Arango.Client
         
         #endregion
         
+        #region Get all edges (GET)
+        
+        /// <summary>
+        /// Retrieves list of edges in specified collection.
+        /// </summary>
+        public AResult<List<string>> GetAllIndexes(string collectionName)
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Index, "");
+
+            // required
+            request.QueryString.Add(ParameterName.Collection, collectionName);
+            
+            var response = _connection.Send(request);
+            var result = new AResult<List<string>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Value = (response.Data as Dictionary<string, object>).List<string>("indexes");
+                        result.Success = (result.Value != null);
+                    }
+                    break;
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
         #region Truncate collection (PUT)
         
         /// <summary>
