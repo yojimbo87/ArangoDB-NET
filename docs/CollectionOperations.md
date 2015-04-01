@@ -9,6 +9,7 @@
 - [Retrieve collection checksum](#retrieve-collection-checksum)
 - [Retrieve all documents](#retrieve-all-documents)
 - [Retrieve all edges](#retrieve-all-edges)
+- [Retrieve all indexes](#retrieve-all-indexes)
 - [Truncate collection](#truncate-collection)
 - [Load collection](#load-collection)
 - [Unload collection](#unload-collection)
@@ -253,6 +254,25 @@ if (getEdgesResult.Success)
     foreach (var item in getEdgesResult.Value)
     {
         var key = item;
+    }
+}
+```
+
+## Retrieve all indexes
+
+Retrieves indexes in specified collection.
+
+```csharp
+var db = new ADatabase("myDatabaseAlias");
+
+var getIndexesResult = db.Collection
+    .GetAllIndexes("MyEdgeCollection");
+
+if (getIndexesResult.Success)
+{
+    foreach (var index in getIndexesResult.Value.List<Dictionary<string, object>>("indexes"))
+    {
+        var indexID = index.String("id");
     }
 }
 ```

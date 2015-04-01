@@ -21,7 +21,8 @@ namespace Arango.Client
         /// </summary>
         public ACollection Type(ACollectionType value)
         {
-            _parameters.Enum(ParameterName.Type, value);
+            // set enum format explicitely to override global setting
+            _parameters.Enum(ParameterName.Type, value, EnumFormat.Object);
         	
         	return this;
         }
@@ -83,8 +84,8 @@ namespace Arango.Client
         /// </summary>
         public ACollection KeyGeneratorType(AKeyGeneratorType value)
         {
-            // needs to be in string format
-            _parameters.Enum(ParameterName.KeyOptionsType, value.ToString().ToLower());
+            // needs to be in string format - set enum format explicitely to override global setting
+            _parameters.Enum(ParameterName.KeyOptionsType, value.ToString().ToLower(), EnumFormat.String);
         	
         	return this;
         }
@@ -529,6 +530,43 @@ namespace Arango.Client
                     if (response.DataType == DataType.Document)
                     {
                         result.Value = (response.Data as Dictionary<string, object>).List<string>("documents");
+                        result.Success = (result.Value != null);
+                    }
+                    break;
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Get all indexes (GET)
+        
+        /// <summary>
+        /// Retrieves list of indexes in specified collection.
+        /// </summary>
+        public AResult<Dictionary<string, object>> GetAllIndexes(string collectionName)
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Index, "");
+
+            // required
+            request.QueryString.Add(ParameterName.Collection, collectionName);
+            
+            var response = _connection.Send(request);
+            var result = new AResult<Dictionary<string, object>>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 200:
+                    if (response.DataType == DataType.Document)
+                    {
+                        result.Value = (response.Data as Dictionary<string, object>);
                         result.Success = (result.Value != null);
                     }
                     break;
