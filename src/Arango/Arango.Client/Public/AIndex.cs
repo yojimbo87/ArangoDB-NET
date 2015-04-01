@@ -103,7 +103,7 @@ namespace Arango.Client
         #region Create index (POST)
         
         /// <summary>
-        /// Creates new index within specified collection in current database context.
+        /// Creates index within specified collection in current database context.
         /// </summary>
         public AResult<Dictionary<string, object>> Create(string collectionName)
         {
