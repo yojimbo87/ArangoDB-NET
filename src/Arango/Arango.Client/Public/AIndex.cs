@@ -93,7 +93,7 @@ namespace Arango.Client
         /// </summary>
         public AIndex Unique(bool value)
         {
-            _parameters.Bool(ParameterName.Fields, value);
+            _parameters.Bool(ParameterName.Unique, value);
         	
         	return this;
         }
@@ -114,29 +114,28 @@ namespace Arango.Client
             request.QueryString.Add(ParameterName.Collection, collectionName);
             
             // required
-            bodyDocument.String(ParameterName.Type, collectionName);
+            bodyDocument.String(ParameterName.Type, _parameters.String(ParameterName.Type));
             
-            switch (_parameters.String(ParameterName.Type))
+            switch (_parameters.Enum<AIndexType>(ParameterName.Type))
             {
-                case "cap":
+                case AIndexType.Cap:
                     Request.TrySetBodyParameter(ParameterName.ByteSize, _parameters, bodyDocument);
                     Request.TrySetBodyParameter(ParameterName.Size, _parameters, bodyDocument);
                     break;
-                case "fulltext":
+                case AIndexType.Fulltext:
                     Request.TrySetBodyParameter(ParameterName.Fields, _parameters, bodyDocument);
                     Request.TrySetBodyParameter(ParameterName.MinLength, _parameters, bodyDocument);
-                    Request.TrySetBodyParameter(ParameterName.Unique, _parameters, bodyDocument);
                     break;
-                case "geo":
+                case AIndexType.Geo:
                     Request.TrySetBodyParameter(ParameterName.Fields, _parameters, bodyDocument);
                     Request.TrySetBodyParameter(ParameterName.GeoJson, _parameters, bodyDocument);
                     break;
-                case "hash":
+                case AIndexType.Hash:
                     Request.TrySetBodyParameter(ParameterName.Fields, _parameters, bodyDocument);
                     Request.TrySetBodyParameter(ParameterName.Sparse, _parameters, bodyDocument);
                     Request.TrySetBodyParameter(ParameterName.Unique, _parameters, bodyDocument);
                     break;
-                case "skiplist":
+                case AIndexType.Skiplist:
                     Request.TrySetBodyParameter(ParameterName.Fields, _parameters, bodyDocument);
                     Request.TrySetBodyParameter(ParameterName.Sparse, _parameters, bodyDocument);
                     Request.TrySetBodyParameter(ParameterName.Unique, _parameters, bodyDocument);

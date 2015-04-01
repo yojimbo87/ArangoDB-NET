@@ -360,6 +360,23 @@ namespace Arango.Tests
             Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
         }
         
+        [Test()]
+        public void Should_get_all_indexes_in_collection()
+        {
+            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
+            Database.CreateTestCollection(Database.TestDocumentCollectionName, ACollectionType.Document);
+            var db = new ADatabase(Database.Alias);
+            
+            var operationResult = db.Collection
+                .GetAllIndexes(Database.TestDocumentCollectionName);
+            
+            Assert.AreEqual(200, operationResult.StatusCode);
+            Assert.IsTrue(operationResult.Success);
+            Assert.IsTrue(operationResult.HasValue);
+            Assert.IsTrue(operationResult.Value.Size("indexes") > 0);
+            Assert.IsTrue(operationResult.Value.IsDocument("identifiers"));
+        }
+        
         #endregion
         
         #region Update/change operations

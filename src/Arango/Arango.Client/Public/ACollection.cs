@@ -546,12 +546,12 @@ namespace Arango.Client
         
         #endregion
         
-        #region Get all edges (GET)
+        #region Get all indexes (GET)
         
         /// <summary>
-        /// Retrieves list of edges in specified collection.
+        /// Retrieves list of indexes in specified collection.
         /// </summary>
-        public AResult<List<string>> GetAllIndexes(string collectionName)
+        public AResult<Dictionary<string, object>> GetAllIndexes(string collectionName)
         {
             var request = new Request(HttpMethod.GET, ApiBaseUri.Index, "");
 
@@ -559,14 +559,14 @@ namespace Arango.Client
             request.QueryString.Add(ParameterName.Collection, collectionName);
             
             var response = _connection.Send(request);
-            var result = new AResult<List<string>>(response);
+            var result = new AResult<Dictionary<string, object>>(response);
             
             switch (response.StatusCode)
             {
                 case 200:
                     if (response.DataType == DataType.Document)
                     {
-                        result.Value = (response.Data as Dictionary<string, object>).List<string>("indexes");
+                        result.Value = (response.Data as Dictionary<string, object>);
                         result.Success = (result.Value != null);
                     }
                     break;
