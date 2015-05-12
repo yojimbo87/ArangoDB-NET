@@ -212,7 +212,7 @@ if (getCollectionResult.Success)
 
 ## Retrieve all documents
 
-Retrieves list of documents in specified collection.
+Retrieves list of keys, IDs, or URI paths for all documents in the specified collection.
 
 Applicable optional parameters available through fluent API:
 
@@ -236,7 +236,7 @@ if (getDocumentsResult.Success)
 
 ## Retrieve all edges
 
-Retrieves list of edges in specified collection.
+Retrieves list of URIs for all edges in specified collection.
 
 Applicable optional parameters available through fluent API:
 
