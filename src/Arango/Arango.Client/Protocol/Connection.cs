@@ -67,6 +67,7 @@ namespace Arango.Client.Protocol
             }
 
             httpRequest.KeepAlive = true;
+            httpRequest.Proxy = null;
             httpRequest.SendChunked = false;
             httpRequest.Method = request.HttpMethod.ToString();
             httpRequest.UserAgent = ASettings.DriverName + "/" + ASettings.DriverVersion;
