@@ -51,13 +51,13 @@ var createCollectionResult = db.Collection
     
 if (createCollectionResult.Success)
 {
-    var id = createResult.Value.String("id");
-    var name = createResult.Value.String("name");
-    var waitForSync = createResult.Value.Bool("waitForSync");
-    var isVolatile = createResult.Value.Bool("isVolatile");
-    var isSystem = createResult.Value.Bool("isSystem");
-    var status = createResult.Value.Enum<ACollectionStatus>("status");
-    var type = createResult.Value.Enum<ACollectionType>("type");
+    var id = createCollectionResult.Value.String("id");
+    var name = createCollectionResult.String("name");
+    var waitForSync = createCollectionResult.Value.Bool("waitForSync");
+    var isVolatile = createCollectionResult.Value.Bool("isVolatile");
+    var isSystem = createCollectionResult.Value.Bool("isSystem");
+    var status = createCollectionResult.Value.Enum<ACollectionStatus>("status");
+    var type = createCollectionResult.Value.Enum<ACollectionType>("type");
 }
 ```
 
