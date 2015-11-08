@@ -1,6 +1,7 @@
 # Basic usage
 
 - [Connection management](#connection-management)
+- [Checking and removing existing connection](#checking-and-removing-existing-connection)
 - [Database context](#database-context)
 - [AResult object](#aresult-object)
 - [AError object](#aerror-object)
@@ -26,11 +27,17 @@ ASettings.AddConnection(
     "usr",
     "pwd"
 );
+```
 
-// checks if the specific connection data exists
+## Checking and removing existing connections
+
+Existing connections can be checked and removed with `HasConnection` and `RemoveConnection` methods exposed through `ASettings` static class.
+
+```
+// checks if the specific connection stored under specific alias exists
 if (ASettings.HasConnection("someDatabaseAlias"))
 {
-    // removes specified connection data
+    // removes specified connection
     ASettings.RemoveConnection("someDatabaseAlias");
 }
 ```
