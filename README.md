@@ -13,6 +13,7 @@ There are following ways to install the driver:
 
 - [Basic usage](docs/BasicUsage.md)
   - [Connection management](docs/BasicUsage.md#connection-management)
+  - [Checking and removing existing connections](docs/BasicUsage.md#checking-and-removing-existing-connections)
   - [Database context](docs/BasicUsage.md#database-context)
   - [AResult object](docs/BasicUsage.md#aresult-object)
   - [AError object](docs/BasicUsage.md#aerror-object)
