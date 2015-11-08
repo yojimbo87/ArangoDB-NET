@@ -54,6 +54,7 @@
   <ItemGroup>
     <Compile Include="Database.cs" />
     <Compile Include="Entities\PerformanceEntity.cs" />
+    <Compile Include="Entities\Release.cs" />
     <Compile Include="Performance.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
