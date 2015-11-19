@@ -9,6 +9,9 @@ namespace Arango.Client
 {
     public class AQuery
     {
+        public string LastRequest;
+        public string LastResponse;
+
         readonly Dictionary<string, object> _parameters = new Dictionary<string, object>();
         readonly Connection _connection;
         readonly StringBuilder _query = new StringBuilder();
@@ -139,6 +142,26 @@ namespace Arango.Client
             
             return result;
         }
+        public AResult<List<T>> ToListFast<T>()
+        {
+            var listResult = ToList();
+            var jsonx = Arango.fastJSON.JSON.ToObject<ArangoResultWrapper<T>>(LastResponse);
+            var result = new AResult<List<T>>();
+            result.Value = new List<T>();
+            result.Value = jsonx.result.ToList();
+
+            result.StatusCode = listResult.StatusCode;
+            result.Success = listResult.Success;
+            result.Extra = listResult.Extra;
+            result.Error = listResult.Error;
+
+            return result;
+        }
+        // Looks like it must be public for fastJSON to use it
+        public class ArangoResultWrapper<T>
+        {
+            public List<T> result { get; set; }
+        }
         
         /// <summary>
         /// Retrieves result value as list of objects.
@@ -165,8 +188,9 @@ namespace Arango.Client
             // TODO: options parameter
             
             request.Body = JSON.ToJSON(bodyDocument, ASettings.JsonParameters);
-            
+            this.LastRequest = request.Body;            
             var response = _connection.Send(request);
+            this.LastResponse = response.Body;
             var result = new AResult<List<object>>(response);
             
             switch (response.StatusCode)
