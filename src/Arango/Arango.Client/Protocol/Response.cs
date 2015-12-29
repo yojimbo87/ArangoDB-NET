@@ -24,20 +24,20 @@ namespace Arango.Client.Protocol
             else
             {
                 var trimmedBody = Body.Trim();
-                
-                // body contains JSON array
-                if (trimmedBody[0] == '[')
+
+                switch (trimmedBody[0])
                 {
-                    DataType = DataType.List;
-                }
-                // body contains JSON object
-                else if (trimmedBody[0] == '{')
-                {
-                    DataType = DataType.Document;
-                }
-                else
-                {
-                    DataType = DataType.Primitive;
+                    // body contains JSON array
+                    case '[':
+                        DataType = DataType.List;
+                        break;
+                    // body contains JSON object
+                    case '{':
+                        DataType = DataType.Document;
+                        break;
+                    default:
+                        DataType = DataType.Primitive;
+                        break;
                 }
                 
                 Data = JSON.Parse(trimmedBody);
