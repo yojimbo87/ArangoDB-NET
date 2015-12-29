@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Arango.fastJSON
 {
+
     /// <summary>
     /// This class encodes and decodes JSON strings.
     /// Spec. details, see http://www.json.org/
@@ -32,13 +33,10 @@ namespace Arango.fastJSON
         readonly StringBuilder s = new StringBuilder();
         Token lookAheadToken = Token.None;
         int index;
-        bool _ignorecase = false;
 
-
-        internal JsonParser(string json, bool ignorecase)
+        internal JsonParser(string json)
         {
-            this.json = json;//.ToCharArray();
-            _ignorecase = ignorecase;
+            this.json = json;
         }
 
         public object Decode()
@@ -69,8 +67,6 @@ namespace Arango.fastJSON
                         {
                             // name
                             string name = ParseString();
-                            if (_ignorecase)
-                                name = name.ToLower();
 
                             // :
                             if (NextToken() != Token.Colon)
@@ -303,13 +299,13 @@ namespace Arango.fastJSON
                 break;
             } while (true);
 
-			if (dec)
-			{
-				string s = json.Substring(startIndex, index - startIndex);
-				return double.Parse(s, NumberFormatInfo.InvariantInfo);
-			}
-			long num;
-			return JSON.CreateLong(out num, json, startIndex, index - startIndex);
+            if (dec)
+            {
+                string s = json.Substring(startIndex, index - startIndex);
+                return double.Parse(s, NumberFormatInfo.InvariantInfo);
+            }
+            long num;
+            return JSON.CreateLong(out num, json, startIndex, index - startIndex);
         }
 
         private Token LookAhead()
