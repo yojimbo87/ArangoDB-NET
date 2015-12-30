@@ -170,11 +170,10 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 201:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Value = (response.Data as Dictionary<string, object>).Bool("result");
-                        result.Success = result.Value;
-                    }
+                    var body = response.BodyToObject<Body<bool>>();
+                    
+                    result.Success = (body != null);
+                    result.Value = body.Result;
                     break;
                 case 400:
                 case 403:
@@ -206,11 +205,10 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Value = (response.Data as Dictionary<string, object>).Document("result");
-                        result.Success = (result.Value != null);
-                    }
+                    var body = response.BodyToObject<Body<Dictionary<string, object>>>();
+                    
+                    result.Success = (body != null);
+                    result.Value = body.Result;
                     break;
                 case 400:
                 case 404:
@@ -241,11 +239,10 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Value = (response.Data as Dictionary<string, object>).List<string>("result");
-                        result.Success = (result.Value != null);
-                    }
+                    var body = response.BodyToObject<Body<List<string>>>();
+                    
+                    result.Success = (body != null);
+                    result.Value = body.Result;
                     break;
                 case 400:
                 default:
@@ -275,11 +272,10 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Value = (response.Data as Dictionary<string, object>).List<string>("result");
-                        result.Success = (result.Value != null);
-                    }
+                    var body = response.BodyToObject<Body<List<string>>>();
+                    
+                    result.Success = (body != null);
+                    result.Value = body.Result;
                     break;
                 case 400:
                 case 403:
@@ -313,11 +309,10 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Value = (response.Data as Dictionary<string, object>).List<Dictionary<string, object>>("collections");
-                        result.Success = (result.Value != null);
-                    }
+                    var body = (response.ParseBody() as Dictionary<string, object>);
+                    
+                    result.Success = (body != null);
+                    result.Value = body.List<Dictionary<string, object>>("collections");
                     break;
                 case 400:
                 case 403:
@@ -348,11 +343,10 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Value = (response.Data as Dictionary<string, object>).Bool("result");
-                        result.Success = result.Value;
-                    }
+                    var body = response.BodyToObject<Body<bool>>();
+                    
+                    result.Success = (body != null);
+                    result.Value = body.Result;
                     break;
                 case 400:
                 case 403:

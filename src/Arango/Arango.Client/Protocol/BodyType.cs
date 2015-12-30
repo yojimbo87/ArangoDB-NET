@@ -2,7 +2,7 @@
 
 namespace Arango.Client.Protocol
 {
-    public enum DataType
+    internal enum BodyType
     {
         Null,
         Primitive,

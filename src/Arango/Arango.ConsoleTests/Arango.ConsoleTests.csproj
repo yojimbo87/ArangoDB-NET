@@ -72,5 +72,20 @@
   <ItemGroup>
     <Folder Include="Entities" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="ProfilingSessions\Session20151229_132729.sdps" />
+    <Content Include="ProfilingSessions\Session20151229_132835.sdps" />
+    <Content Include="ProfilingSessions\Session20151229_133220.sdps" />
+    <Content Include="ProfilingSessions\Session20151229_133504.sdps" />
+    <Content Include="ProfilingSessions\Session20151229_133731.sdps" />
+    <Content Include="ProfilingSessions\Session20151229_133823.sdps" />
+    <Content Include="ProfilingSessions\Session20151229_134733.sdps" />
+    <Content Include="ProfilingSessions\Session20151229_135751.sdps" />
+    <Content Include="ProfilingSessions\Session20151229_135849.sdps" />
+    <Content Include="ProfilingSessions\Session20151229_140304.sdps" />
+    <Content Include="ProfilingSessions\Session20151229_140433.sdps" />
+    <Content Include="ProfilingSessions\Session20151229_140607.sdps" />
+    <Content Include="ProfilingSessions\Session20151230_102253.sdps" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
