@@ -479,6 +479,12 @@ namespace Arango.fastJSON
 
         private object RootDictionary(object parse, Type type)
         {
+            if ((parse is Dictionary<string, object>) &&
+                (type == typeof(Dictionary<string, object>)))
+            {
+                return (Dictionary<string, object>)parse;
+            }
+            
             Type[] gtypes = Reflection.Instance.GetGenericArguments(type);
             Type t1 = null;
             Type t2 = null;
@@ -495,7 +501,7 @@ namespace Arango.fastJSON
                 {
                     object v;
                     object k = ChangeType(kv.Key, t1);
-
+                    
                     if (kv.Value is Dictionary<string, object>)
                         v = ParseDictionary(kv.Value as Dictionary<string, object>, null, t2, null);
 
@@ -521,6 +527,11 @@ namespace Arango.fastJSON
 
         internal object ParseDictionary(Dictionary<string, object> d, Dictionary<string, object> globaltypes, Type type, object input)
         {
+            if (type == typeof(Dictionary<string, object>))
+            {
+                return d;
+            }
+            
             object tn = "";
             if (type == typeof(NameValueCollection))
                 return CreateNV(d);
@@ -786,7 +797,11 @@ namespace Arango.fastJSON
 
         private object CreateGenericList(List<object> data, Type pt, Type bt, Dictionary<string, object> globalTypes)
         {
-            IList col = (IList)Reflection.Instance.FastCreateInstance(pt);
+            var foo = Reflection.Instance.FastCreateInstance(pt);
+            IList col = (IList)foo;
+            
+            //IList col = new List<object>();
+            
             // create an array of objects
             foreach (object ob in data)
             {
