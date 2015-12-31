@@ -151,7 +151,7 @@ namespace Arango.Client.Protocol
 
                     if (response.BodyType == BodyType.Document)
                     {
-                        var body = response.BodyToObject<Body<object>>();
+                        var body = response.ParseBody<Body<object>>();
                         
                         if ((body != null) && body.Error)
                         {

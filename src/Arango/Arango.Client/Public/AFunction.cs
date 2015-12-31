@@ -111,7 +111,8 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    var body = ((IEnumerable)response.ParseBody()).Cast<Dictionary<string, object>>().ToList();
+                    //var body = ((IEnumerable)response.ParseBody()).Cast<Dictionary<string, object>>().ToList();
+                    var body = response.ParseBody<List<Dictionary<string, object>>>();
                     
                     result.Success = (body != null);
                     result.Value = body;

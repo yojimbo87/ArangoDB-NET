@@ -40,18 +40,8 @@ namespace Arango.Client.Protocol
                 }
             }
         }
-        
-        internal object ParseBody()
-        {
-            if (string.IsNullOrEmpty(Body))
-            {
-                return null;
-            }
-            
-            return JSON.Parse(Body);
-        }
-        
-        internal T BodyToObject<T>()
+
+        internal T ParseBody<T>()
         {
             if (string.IsNullOrEmpty(Body))
             {

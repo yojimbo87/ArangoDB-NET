@@ -153,7 +153,7 @@ namespace Arango.Client
             {
                 case 200:
                 case 201:
-                    var body = (response.ParseBody() as Dictionary<string, object>);
+                    var body = response.ParseBody<Dictionary<string, object>>();
                     
                     result.Success = (body != null);
                     result.Value = body;
@@ -193,7 +193,7 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    var body = (response.ParseBody() as Dictionary<string, object>);
+                    var body = response.ParseBody<Dictionary<string, object>>();
                     
                     result.Success = (body != null);
                     result.Value = body;
@@ -232,7 +232,7 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    var body = (response.ParseBody() as Dictionary<string, object>);
+                    var body = response.ParseBody<Dictionary<string, object>>();
                     
                     result.Success = (body != null);
                     result.Value = body;

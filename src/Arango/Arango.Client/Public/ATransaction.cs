@@ -111,7 +111,7 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    var body = response.BodyToObject<Body<T>>();
+                    var body = response.ParseBody<Body<T>>();
                     
                     result.Success = (body != null);
                     result.Value = body.Result;

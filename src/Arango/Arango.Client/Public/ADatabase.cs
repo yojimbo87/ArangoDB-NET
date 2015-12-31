@@ -170,7 +170,7 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 201:
-                    var body = response.BodyToObject<Body<bool>>();
+                    var body = response.ParseBody<Body<bool>>();
                     
                     result.Success = (body != null);
                     result.Value = body.Result;
@@ -205,7 +205,7 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    var body = response.BodyToObject<Body<Dictionary<string, object>>>();
+                    var body = response.ParseBody<Body<Dictionary<string, object>>>();
                     
                     result.Success = (body != null);
                     result.Value = body.Result;
@@ -239,7 +239,7 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    var body = response.BodyToObject<Body<List<string>>>();
+                    var body = response.ParseBody<Body<List<string>>>();
                     
                     result.Success = (body != null);
                     result.Value = body.Result;
@@ -272,7 +272,7 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    var body = response.BodyToObject<Body<List<string>>>();
+                    var body = response.ParseBody<Body<List<string>>>();
                     
                     result.Success = (body != null);
                     result.Value = body.Result;
@@ -309,7 +309,7 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    var body = (response.ParseBody() as Dictionary<string, object>);
+                    var body = response.ParseBody<Dictionary<string, object>>();
                     
                     result.Success = (body != null);
                     result.Value = body.List<Dictionary<string, object>>("collections");
@@ -343,7 +343,7 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    var body = response.BodyToObject<Body<bool>>();
+                    var body = response.ParseBody<Body<bool>>();
                     
                     result.Success = (body != null);
                     result.Value = body.Result;
