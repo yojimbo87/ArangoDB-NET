@@ -484,6 +484,7 @@ namespace Arango.Client
         
         private void CopyExtraBodyFields<T>(Body<T> source, Dictionary<string, object> destination)
         {
+            destination.String("id", source.ID);
             destination.Long("count", source.Count);
             destination.Bool("cached", source.Cached);
             
