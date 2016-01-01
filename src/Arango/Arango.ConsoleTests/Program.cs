@@ -5,6 +5,11 @@ using Arango.fastJSON;
 
 namespace Arango.ConsoleTests
 {
+    public class IssueNo16Entity
+    {
+        public SortedList<int, bool> SortedList { get; set; }
+    }
+    
     class Program
     {
         public static void Main(string[] args)
@@ -12,7 +17,7 @@ namespace Arango.ConsoleTests
             //InsertTest();
             //PerformanceTests();
             
-            JsonToObjectHeatUp();
+            /*JsonToObjectHeatUp();
             JsonToObjectAsDictionaryHeatup();
             JsonParseHeatUp();
             
@@ -23,7 +28,24 @@ namespace Arango.ConsoleTests
                 JsonToObjectTest();
                 JsonToObjectAsDictionaryTest();
                 JsonParseTest();
-            }
+            }*/
+            
+            var entity = new IssueNo16Entity();
+            entity.SortedList = new SortedList<int, bool>();
+            entity.SortedList.Add(1, true);
+            entity.SortedList.Add(2, false);
+            entity.SortedList.Add(3, false);
+            entity.SortedList.Add(4, false);
+            
+            var doc = Dictator.ToDocument(entity);
+            var json = JSON.ToNiceJSON(doc, new JSONParameters {});
+            
+            Console.WriteLine(json);
+            
+            var t = entity.SortedList.GetType();
+            
+            var des1 = JSON.ToObject<Dictionary<string, object>>(json);
+            var des2 = JSON.ToObject<IssueNo16Entity>(json);
             
             Console.Write("Press any key to continue . . . ");
             Console.ReadKey(true);

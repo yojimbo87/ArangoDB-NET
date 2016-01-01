@@ -634,6 +634,7 @@ namespace Arango.fastJSON
 #if !SILVERLIGHT
                             case myPropInfoType.DataSet: oset = CreateDataset((Dictionary<string, object>)v, globaltypes); break;
                             case myPropInfoType.DataTable: oset = CreateDataTable((Dictionary<string, object>)v, globaltypes); break;
+                            case myPropInfoType.SortedList: oset = CreateSortedList((List<object>)v, pi, globaltypes); break;
                             case myPropInfoType.Hashtable: // same case as Dictionary
 #endif
                             case myPropInfoType.Dictionary: oset = CreateDictionary((List<object>)v, pi.pt, pi.GenericTypes, globaltypes); break;
@@ -1014,6 +1015,42 @@ namespace Arango.fastJSON
             }
 
             return dt;
+        }
+        
+        private object CreateSortedList(List<object> reader, myPropInfo pi, Dictionary<string, object> globalTypes)
+        {
+            Type pt = pi.pt;
+            
+            IDictionary col = (IDictionary)Reflection.Instance.FastCreateInstance(pt);
+            
+            Type[] types = pt.GetGenericArguments();
+            Type t1 = null;
+            Type t2 = null;
+            if (types != null)
+            {
+                t1 = types[0];
+                t2 = types[1];
+            }
+
+            foreach (Dictionary<string, object> values in reader)
+            {
+                object key = values["k"];
+                object val = values["v"];
+
+                if (key is Dictionary<string, object>)
+                    key = ParseDictionary((Dictionary<string, object>)key, globalTypes, t1, null);
+                else
+                    key = ChangeType(key, t1);
+
+                if (val is Dictionary<string, object>)
+                    val = ParseDictionary((Dictionary<string, object>)val, globalTypes, t2, null);
+                else
+                    val = ChangeType(val, t2);
+
+                col.Add(key, val);
+            }
+
+            return col;
         }
 #endif
         #endregion

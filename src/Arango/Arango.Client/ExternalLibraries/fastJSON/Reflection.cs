@@ -37,6 +37,7 @@ namespace Arango.fastJSON
         StringDictionary,
 #if !SILVERLIGHT
         Hashtable,
+        SortedList,
         DataSet,
         DataTable,
 #endif
@@ -220,6 +221,7 @@ namespace Arango.fastJSON
             }
 #if !SILVERLIGHT
             else if (t == typeof(Hashtable)) d_type = myPropInfoType.Hashtable;
+            else if (t.Name.Contains("SortedList")) d_type = myPropInfoType.SortedList;
             else if (t == typeof(DataSet)) d_type = myPropInfoType.DataSet;
             else if (t == typeof(DataTable)) d_type = myPropInfoType.DataTable;
 #endif
