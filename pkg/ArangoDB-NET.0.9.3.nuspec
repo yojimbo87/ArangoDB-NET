@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>ArangoDB-NET</id>
+        <version>0.9.3</version>
+        <title>ArangoDB-NET</title>
+        <authors>yojimbo87</authors>
+        <owners>yojimbo87</owners>
+        <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+        <projectUrl>https://github.com/yojimbo87/ArangoDB-NET</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>ArangoDB-NET is C# based driver for .NET/mono framework which implements ArangoDB REST API.</description>
+        <tags>arango arangodb database document graph C# .net mono</tags>
+    </metadata>
+    <files>
+        <file src="..\src\Arango\Arango.Client\bin\Release\Arango.Client.dll" target="lib\Arango.Client.dll" />
+    </files>
+</package>

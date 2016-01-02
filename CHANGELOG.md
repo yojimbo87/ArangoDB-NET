@@ -6,7 +6,7 @@
 
 Tested against ArangoDB 2.6.12, 2.7.3, 2.8.0-beta3
 
-- Faster deserialization of retrieved documents
+- Faster deserialization of retrieved documents.
 
 ### 0.9.2
 
