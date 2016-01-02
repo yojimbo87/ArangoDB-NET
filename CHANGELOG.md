@@ -8,14 +8,14 @@ Tested against ArangoDB 2.6.12, 2.7.3, 2.8.0-beta3
 
 - Faster deserialization of retrieved documents.
 
+## Previous releases
+
 ### 0.9.2
 
 Tested against ArangoDB 2.5.1
 
 - Implementation of [index operations](docs/IndexOperations.md) API [#15](https://github.com/yojimbo87/ArangoDB-NET/issues/20).
 - Enforce enum format for internal operation parameters to prevent potential format override from global settings.
-
-## Previous releases
 
 ### 0.9.1
 
