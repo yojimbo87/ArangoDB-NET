@@ -515,7 +515,7 @@ namespace Arango.Client
         /// </summary>
         public static bool Has(this Dictionary<string, object> dictionary, string fieldPath)
         {
-            return HasFieldValue(dictionary, fieldPath);           
+            return HasField(dictionary, fieldPath); 
         }
         /// <summary>
         /// Checks if specified field has null value.
@@ -1324,6 +1324,67 @@ namespace Arango.Client
         #region Private methods
         
         /// <summary>
+        ///  Checks if specified field is present in dictionary.
+        /// </summary>
+        // TODO: can this be refactored with GetFieldValue method?
+        static bool HasField(Dictionary<string, object> dictionary, string fieldPath)
+        {
+            object fieldValue = null;
+            var fieldNames = new[] { fieldPath };
+            var parentDictionary = dictionary;
+
+            // split field path to separate field name elements if necessary
+            if (fieldPath.Contains("."))
+            {
+                fieldNames = fieldPath.Split('.');
+            }
+
+            for (int i = 0; i < fieldNames.Length; i++)
+            {
+                var fieldName = fieldNames[i];
+                var arrayContent = "";
+
+                if (fieldName.Contains("[") && fieldName.Contains("]"))
+                {
+                    var firstIndex = fieldName.IndexOf('[');
+                    var lastIndex = fieldName.IndexOf(']');
+
+                    arrayContent = fieldName.Substring(firstIndex + 1, lastIndex - firstIndex - 1);
+                    fieldName = fieldName.Substring(0, firstIndex);
+                }
+
+                // field is not present in dictionary
+                if (!parentDictionary.ContainsKey(fieldName))
+                {
+                    return false;
+                }
+
+                // current field name is final - retrieve field value and break loop
+                if (i == (fieldNames.Length - 1))
+                {
+                    fieldValue = GetFieldObject(fieldName, arrayContent, parentDictionary);
+
+                    break;
+                }
+
+                var tempParentObject = GetFieldObject(fieldName, arrayContent, parentDictionary);
+
+                // descendant field is dictionary - set is as current parent dictionary
+                if (tempParentObject is Dictionary<string, object>)
+                {
+                    parentDictionary = (Dictionary<string, object>)tempParentObject;
+                }
+                // can not continue with processing - field not present
+                else
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        
+        /// <summary>
         /// Retrieves value from specified field path.
         /// </summary>
         /// <exception cref="NonExistingFieldException">Field does not exist in specified path.</exception>
@@ -1384,65 +1445,6 @@ namespace Arango.Client
             
             return fieldValue;
         }
-
-        static bool HasFieldValue(Dictionary<string, object> dictionary, string fieldPath)
-        {
-            object fieldValue = null;
-            var fieldNames = new[] { fieldPath };
-            var parentDictionary = dictionary;
-
-            // split field path to separate field name elements if necessary
-            if (fieldPath.Contains("."))
-            {
-                fieldNames = fieldPath.Split('.');
-            }
-
-            for (int i = 0; i < fieldNames.Length; i++)
-            {
-                var fieldName = fieldNames[i];
-                var arrayContent = "";
-
-                if (fieldName.Contains("[") && fieldName.Contains("]"))
-                {
-                    var firstIndex = fieldName.IndexOf('[');
-                    var lastIndex = fieldName.IndexOf(']');
-
-                    arrayContent = fieldName.Substring(firstIndex + 1, lastIndex - firstIndex - 1);
-                    fieldName = fieldName.Substring(0, firstIndex);
-                }
-
-                // throw exception if the field is not present in dictionary
-                if (!parentDictionary.ContainsKey(fieldName))
-                {
-                    return false;
-                }
-
-                // current field name is final - retrieve field value and break loop
-                if (i == (fieldNames.Length - 1))
-                {
-                    fieldValue = GetFieldObject(fieldName, arrayContent, parentDictionary);
-
-                    break;
-                }
-
-                var tempParentObject = GetFieldObject(fieldName, arrayContent, parentDictionary);
-
-                // descendant field is dictionary - set is as current parent dictionary
-                if (tempParentObject is Dictionary<string, object>)
-                {
-                    parentDictionary = (Dictionary<string, object>)tempParentObject;
-                }
-                // can not continue with processing - throw exception
-                else
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-
         /// <summary>
         /// Retrieves object from specified field depending on array content.
         /// </summary>

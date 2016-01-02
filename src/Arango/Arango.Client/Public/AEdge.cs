@@ -142,11 +142,10 @@ namespace Arango.Client
             {
                 case 201:
                 case 202:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Value = (response.Data as Dictionary<string, object>);
-                        result.Success = (result.Value != null);
-                    }
+                    var body = response.ParseBody<Dictionary<string, object>>();
+                    
+                    result.Success = (body != null);
+                    result.Value = body;
                     break;
                 case 400:
                 case 404:
@@ -238,6 +237,15 @@ namespace Arango.Client
         /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
         public AResult<Dictionary<string, object>> Get(string id)
         {
+            return Get<Dictionary<string, object>>(id);
+        }
+        
+        /// <summary>
+        /// Retrieves specified edge.
+        /// </summary>
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public AResult<T> Get<T>(string id)
+        {
             if (!ADocument.IsID(id))
             {
                 throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
@@ -251,22 +259,20 @@ namespace Arango.Client
             request.TrySetHeaderParameter(ParameterName.IfNoneMatch, _parameters);
             
             var response = _connection.Send(request);
-            var result = new AResult<Dictionary<string, object>>(response);
+            var result = new AResult<T>(response);
             
             switch (response.StatusCode)
             {
                 case 200:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Value = (response.Data as Dictionary<string, object>);
-                        result.Success = (result.Value != null);
-                    }
+                    var body = response.ParseBody<T>();
+                    
+                    result.Success = (body != null);
+                    result.Value = body;
                     break;
                 case 412:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Value = (response.Data as Dictionary<string, object>);
-                    }
+                    body = response.ParseBody<T>();
+
+                    result.Value = body;
                     break;
                 case 304:
                 case 404:
@@ -276,28 +282,6 @@ namespace Arango.Client
             }
             
             _parameters.Clear();
-            
-            return result;
-        }
-        
-        /// <summary>
-        /// Retrieves specified edge.
-        /// </summary>
-        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
-        public AResult<T> Get<T>(string id)
-        {
-            var getResult = Get(id);
-            var result = new AResult<T>();
-            
-            result.StatusCode = getResult.StatusCode;
-            result.Success = getResult.Success;
-            result.Extra = getResult.Extra;
-            result.Error = getResult.Error;
-            
-            if (getResult.Success)
-            {
-                result.Value = getResult.Value.ToObject<T>();
-            }
             
             return result;
         }
@@ -329,10 +313,13 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    if (response.DataType == DataType.Document)
+                    var body = response.ParseBody<Dictionary<string, object>>();
+                    
+                    result.Success = (body != null);
+                    
+                    if (result.Success)
                     {
-                        result.Value = (response.Data as Dictionary<string, object>).List<Dictionary<string, object>>("edges");
-                        result.Success = (result.Value != null);
+                        result.Value = body.List<Dictionary<string, object>>("edges");
                     }
                     break;
                 case 400:
@@ -387,17 +374,15 @@ namespace Arango.Client
             {
                 case 201:
                 case 202:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Value = (response.Data as Dictionary<string, object>);
-                        result.Success = (result.Value != null);
-                    }
+                    var body = response.ParseBody<Dictionary<string, object>>();
+                    
+                    result.Success = (body != null);
+                    result.Value = body;
                     break;
                 case 412:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Value = (response.Data as Dictionary<string, object>);
-                    }
+                    body = response.ParseBody<Dictionary<string, object>>();
+
+                    result.Value = body;
                     break;
                 case 400:
                 case 404:
@@ -465,17 +450,15 @@ namespace Arango.Client
             {
                 case 201:
                 case 202:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Value = (response.Data as Dictionary<string, object>);
-                        result.Success = (result.Value != null);
-                    }
+                    var body = response.ParseBody<Dictionary<string, object>>();
+                    
+                    result.Success = (body != null);
+                    result.Value = body;
                     break;
                 case 412:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Value = (response.Data as Dictionary<string, object>);
-                    }
+                    body = response.ParseBody<Dictionary<string, object>>();
+
+                    result.Value = body;
                     break;
                 case 400:
                 case 404:
@@ -541,17 +524,15 @@ namespace Arango.Client
             {
                 case 200:
                 case 202:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Value = (response.Data as Dictionary<string, object>);
-                        result.Success = (result.Value != null);
-                    }
+                    var body = response.ParseBody<Dictionary<string, object>>();
+                    
+                    result.Success = (body != null);
+                    result.Value = body;
                     break;
                 case 412:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Value = (response.Data as Dictionary<string, object>);
-                    }
+                    body = response.ParseBody<Dictionary<string, object>>();
+
+                    result.Value = body;
                     break;
                 case 404:
                 default:

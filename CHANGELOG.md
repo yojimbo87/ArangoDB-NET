@@ -2,6 +2,12 @@
 
 ## Current stable release
 
+### 0.9.3
+
+Tested against ArangoDB 2.6.12, 2.7.3, 2.8.0-beta3
+
+- Faster deserialization of retrieved documents.
+
 ### 0.9.2
 
 Tested against ArangoDB 2.5.1

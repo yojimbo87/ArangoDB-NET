@@ -90,27 +90,14 @@ namespace Arango.Client
         /// </summary>
         public AResult<List<Dictionary<string, object>>> ToDocuments()
         {
-            var type = typeof(Dictionary<string, object>);
-            var listResult = ToList();
-            var result = new AResult<List<Dictionary<string, object>>>();
-            
-            result.StatusCode = listResult.StatusCode;
-            result.Success = listResult.Success;
-            result.Extra = listResult.Extra;
-            result.Error = listResult.Error;
-            
-            if (listResult.Success)
-            {
-                result.Value = listResult.Value.Select(o => Convert.ChangeType(o, type)).Cast<Dictionary<string, object>>().ToList();
-            }
-            
-            return result;
+            return ToList<Dictionary<string, object>>();
         }
         
+        // TODO: remove after unit tests are passing
         /// <summary>
         /// Retrieves result value as list of generic objects.
         /// </summary>
-        public AResult<List<T>> ToList<T>()
+        /*public AResult<List<T>> ToList<T>()
         {
             var type = typeof(T);
             var listResult = ToList();
@@ -141,32 +128,12 @@ namespace Arango.Client
             }
             
             return result;
-        }
-        public AResult<List<T>> ToListFast<T>()
-        {
-            var listResult = ToList();
-            var jsonx = Arango.fastJSON.JSON.ToObject<ArangoResultWrapper<T>>(LastResponse);
-            var result = new AResult<List<T>>();
-            result.Value = new List<T>();
-            result.Value = jsonx.result.ToList();
-
-            result.StatusCode = listResult.StatusCode;
-            result.Success = listResult.Success;
-            result.Extra = listResult.Extra;
-            result.Error = listResult.Error;
-
-            return result;
-        }
-        // Looks like it must be public for fastJSON to use it
-        public class ArangoResultWrapper<T>
-        {
-            public List<T> result { get; set; }
-        }
+        }*/
         
         /// <summary>
         /// Retrieves result value as list of objects.
         /// </summary>
-        public AResult<List<object>> ToList()
+        public AResult<List<T>> ToList<T>()
         {
             var request = new Request(HttpMethod.POST, ApiBaseUri.Cursor, "");
             var bodyDocument = new Dictionary<string, object>();
@@ -188,42 +155,40 @@ namespace Arango.Client
             // TODO: options parameter
             
             request.Body = JSON.ToJSON(bodyDocument, ASettings.JsonParameters);
-            this.LastRequest = request.Body;            
+            //this.LastRequest = request.Body;            
             var response = _connection.Send(request);
-            this.LastResponse = response.Body;
-            var result = new AResult<List<object>>(response);
+            //this.LastResponse = response.Body;
+            var result = new AResult<List<T>>(response);
             
             switch (response.StatusCode)
             {
                 case 201:
-                    if (response.DataType == DataType.Document)
+                    var body = response.ParseBody<Body<List<T>>>();
+                    
+                    result.Success = (body != null);
+                    
+                    if (result.Success)
                     {
-                        var responseDocument = (response.Data as Dictionary<string, object>);
+                        result.Value = new List<T>();
+                        result.Value.AddRange(body.Result);
+                        result.Extra = new Dictionary<string, object>();
                         
-                        result.Success = (responseDocument != null);
+                        CopyExtraBodyFields<List<T>>(body, result.Extra);
                         
-                        if (result.Success)
+                        if (body.HasMore)
                         {
-                            result.Value = new List<object>();
-                            result.Value.AddRange(responseDocument.List<object>("result"));
-                            result.Extra = responseDocument.CloneExcept("code", "error", "hasMore", "result");
+                            var putResult = Put<T>(body.ID);
                             
-                            if (responseDocument.IsBool("hasMore") && responseDocument.Bool("hasMore"))
+                            result.Success = putResult.Success;
+                            result.StatusCode = putResult.StatusCode;
+                            
+                            if (putResult.Success)
                             {
-                                var cursorID = responseDocument.String("id");
-                                var putResult = Put(cursorID);
-                                
-                                result.Success = putResult.Success;
-                                result.StatusCode = putResult.StatusCode;
-                                
-                                if (putResult.Success)
-                                {
-                                    result.Value.AddRange(putResult.Value);
-                                }
-                                else
-                                {
-                                    result.Error = putResult.Error;
-                                }
+                                result.Value.AddRange(putResult.Value);
+                            }
+                            else
+                            {
+                                result.Error = putResult.Error;
                             }
                         }
                     }
@@ -253,7 +218,7 @@ namespace Arango.Client
         public AResult<Dictionary<string, object>> ToDocument()
         {
             var type = typeof(Dictionary<string, object>);
-            var listResult = ToList();
+            var listResult = ToList<Dictionary<string, object>>();
             var result = new AResult<Dictionary<string, object>>();
             
             result.StatusCode = listResult.StatusCode;
@@ -309,7 +274,7 @@ namespace Arango.Client
         /// </summary>
         public AResult<object> ToObject()
         {
-            var listResult = ToList();
+            var listResult = ToList<object>();
             var result = new AResult<object>();
             
             result.StatusCode = listResult.StatusCode;
@@ -336,43 +301,39 @@ namespace Arango.Client
         
         #region More results in cursor (PUT)
         
-        internal AResult<List<object>> Put(string cursorID)
+        internal AResult<List<T>> Put<T>(string cursorID)
         {
             var request = new Request(HttpMethod.PUT, ApiBaseUri.Cursor, "/" + cursorID);
             
             var response = _connection.Send(request);
-            var result = new AResult<List<object>>(response);
+            var result = new AResult<List<T>>(response);
             
             switch (response.StatusCode)
             {
-                case 200:
-                    if (response.DataType == DataType.Document)
+                case 200:                    
+                    var body = response.ParseBody<Body<List<T>>>();
+                    
+                    result.Success = (body.Result != null);
+                    
+                    if (result.Success)
                     {
-                        var responseDocument = (response.Data as Dictionary<string, object>);
+                        result.Value = new List<T>();
+                        result.Value.AddRange(body.Result);
                         
-                        result.Success = (responseDocument != null);
-                        
-                        if (result.Success)
+                        if (body.HasMore)
                         {
-                            result.Value = new List<object>();
-                            result.Value.AddRange(responseDocument.List<object>("result"));
+                            var putResult = Put<T>(body.ID);
                             
-                            if (responseDocument.IsBool("hasMore") && responseDocument.Bool("hasMore"))
+                            result.Success = putResult.Success;
+                            result.StatusCode = putResult.StatusCode;
+                            
+                            if (putResult.Success)
                             {
-                                var resultCursorID = responseDocument.String("id");
-                                var putResult = Put(resultCursorID);
-                                
-                                result.Success = putResult.Success;
-                                result.StatusCode = putResult.StatusCode;
-                                
-                                if (putResult.Success)
-                                {
-                                    result.Value.AddRange(putResult.Value);
-                                }
-                                else
-                                {
-                                    result.Error = putResult.Error;
-                                }
+                                result.Value.AddRange(putResult.Value);
+                            }
+                            else
+                            {
+                                result.Error = putResult.Error;
                             }
                         }
                     }
@@ -409,13 +370,55 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    if (response.DataType == DataType.Document)
+                    var body = response.ParseBody<Dictionary<string, object>>();
+                    
+                    result.Success = (body != null);
+                    
+                    if (result.Success)
                     {
-                        result.Value = (response.Data as Dictionary<string, object>).CloneExcept("code", "error");
-                        result.Success = (result.Value != null);
+                        result.Value = body.CloneExcept("code", "error");
                     }
                     break;
                 case 400:
+                default:
+                    // Arango error
+                    break;
+            }
+            
+            _parameters.Clear();
+            _bindVars.Clear();
+            _query.Clear();
+            
+            return result;
+        }
+        
+        #endregion
+        
+        #region Delete cursor (DELETE)
+
+        // TODO: check docs - https://docs.arangodb.com/HttpAqlQuery/index.html
+        // in docs status code is 200 and it isn't clear what is returned in data
+        /// <summary>
+        /// Deletes specified AQL query cursor.
+        /// </summary>
+        public AResult<bool> DeleteCursor(string cursorID)
+        {
+            var request = new Request(HttpMethod.DELETE, ApiBaseUri.Cursor, "/" + cursorID);
+            
+            var response = _connection.Send(request);
+            var result = new AResult<bool>(response);
+            
+            switch (response.StatusCode)
+            {
+                case 202:
+                    if (response.BodyType == BodyType.Document)
+                    {
+                        result.Success = true;
+                        result.Value = true;
+                    }
+                    break;
+                case 400:
+                case 404:
                 default:
                     // Arango error
                     break;
@@ -479,41 +482,16 @@ namespace Arango.Client
         	return cleanQuery.ToString();
         }
         
-        #region Delete cursor (DELETE)
-
-        /// <summary>
-        /// Deletes specified AQL query cursor.
-        /// </summary>
-        public AResult<bool> DeleteCursor(string cursorID)
+        private void CopyExtraBodyFields<T>(Body<T> source, Dictionary<string, object> destination)
         {
-            var request = new Request(HttpMethod.DELETE, ApiBaseUri.Cursor, "/" + cursorID);
+            destination.String("id", source.ID);
+            destination.Long("count", source.Count);
+            destination.Bool("cached", source.Cached);
             
-            var response = _connection.Send(request);
-            var result = new AResult<bool>(response);
-            
-            switch (response.StatusCode)
+            if (source.Extra != null)
             {
-                case 202:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Success = true;
-                        result.Value = true;
-                    }
-                    break;
-                case 400:
-                case 404:
-                default:
-                    // Arango error
-                    break;
+                destination.Document("extra", (Dictionary<string, object>)source.Extra);
             }
-            
-            _parameters.Clear();
-            _bindVars.Clear();
-            _query.Clear();
-            
-            return result;
         }
-        
-        #endregion
     }
 }

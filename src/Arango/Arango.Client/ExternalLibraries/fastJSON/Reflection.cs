@@ -4,7 +4,9 @@ using System.Text;
 using System.Reflection.Emit;
 using System.Reflection;
 using System.Collections;
+#if !SILVERLIGHT
 using System.Data;
+#endif
 using System.Collections.Specialized;
 
 namespace Arango.fastJSON
@@ -12,9 +14,11 @@ namespace Arango.fastJSON
     internal struct Getters
     {
         public string Name;
+        public string lcName;
+        //public string OtherName;
         public Reflection.GenericGetter Getter;
-        //public Type propertyType;
     }
+
     internal enum myPropInfoType
     {
         Int,
@@ -33,19 +37,13 @@ namespace Arango.fastJSON
         StringDictionary,
 #if !SILVERLIGHT
         Hashtable,
+        SortedList,
         DataSet,
         DataTable,
 #endif
         Custom,
         Unknown,
     }
-
-    //[Flags]
-    //internal enum myPropInfoFlags
-    //{
-    //    Filled = 1,// << 0,
-    //    CanWrite = 2//1 << 1
-    //}
 
     internal struct myPropInfo
     {
@@ -57,7 +55,6 @@ namespace Arango.fastJSON
         public Type[] GenericTypes;
         public string Name;
         public myPropInfoType Type;
-        //public myPropInfoFlags Flags;
         public bool CanWrite;
 
         public bool IsClass;
@@ -149,7 +146,7 @@ namespace Arango.fastJSON
             }
         }
 
-        public Dictionary<string, myPropInfo> Getproperties(Type type, string typename, bool IgnoreCaseOnDeserialize, bool customType)
+        public Dictionary<string, myPropInfo> Getproperties(Type type, string typename, bool customType)
         {
             Dictionary<string, myPropInfo> sd = null;
             if (_propertycache.TryGetValue(typename, out sd))
@@ -159,32 +156,32 @@ namespace Arango.fastJSON
             else
             {
                 sd = new Dictionary<string, myPropInfo>();
-                PropertyInfo[] pr = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                PropertyInfo[] pr = type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
                 foreach (PropertyInfo p in pr)
                 {
+                    if (p.GetIndexParameters().Length > 0)
+                    {// Property is an indexer
+                        continue;
+                    }
                     myPropInfo d = CreateMyProp(p.PropertyType, p.Name, customType);
-                    //if (p.CanWrite)
-                    //    d.Flags |= myPropInfoFlags.CanWrite;
                     d.setter = Reflection.CreateSetMethod(type, p);
                     if (d.setter != null)
-                        d.CanWrite = true;// Flags |= myPropInfoFlags.CanWrite;
+                        d.CanWrite = true;
                     d.getter = Reflection.CreateGetMethod(type, p);
-                    if (IgnoreCaseOnDeserialize)
-                        sd.Add(p.Name.ToLower(), d);
-                    else
-                        sd.Add(p.Name, d);
+                    sd.Add(p.Name.ToLower(), d);
                 }
-                FieldInfo[] fi = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
+                FieldInfo[] fi = type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
                 foreach (FieldInfo f in fi)
                 {
                     myPropInfo d = CreateMyProp(f.FieldType, f.Name, customType);
-                    d.CanWrite = true;// Flags |= myPropInfoFlags.CanWrite;
-                    d.setter = Reflection.CreateSetField(type, f);
-                    d.getter = Reflection.CreateGetField(type, f);
-                    if (IgnoreCaseOnDeserialize)
+                    if (f.IsLiteral == false)
+                    {
+                        d.setter = Reflection.CreateSetField(type, f);
+                        if (d.setter != null)
+                            d.CanWrite = true;
+                        d.getter = Reflection.CreateGetField(type, f);
                         sd.Add(f.Name.ToLower(), d);
-                    else
-                        sd.Add(f.Name, d);
+                    }
                 }
 
                 _propertycache.Add(typename, sd);
@@ -196,7 +193,6 @@ namespace Arango.fastJSON
         {
             myPropInfo d = new myPropInfo();
             myPropInfoType d_type = myPropInfoType.Unknown;
-            //myPropInfoFlags d_flags = myPropInfoFlags.Filled ;//| myPropInfoFlags.CanWrite;
 
             if (t == typeof(int) || t == typeof(int?)) d_type = myPropInfoType.Int;
             else if (t == typeof(long) || t == typeof(long?)) d_type = myPropInfoType.Long;
@@ -225,6 +221,7 @@ namespace Arango.fastJSON
             }
 #if !SILVERLIGHT
             else if (t == typeof(Hashtable)) d_type = myPropInfoType.Hashtable;
+            else if (t.Name.Contains("SortedList")) d_type = myPropInfoType.SortedList;
             else if (t == typeof(DataSet)) d_type = myPropInfoType.DataSet;
             else if (t == typeof(DataTable)) d_type = myPropInfoType.DataTable;
 #endif
@@ -246,7 +243,6 @@ namespace Arango.fastJSON
             d.Name = name;
             d.changeType = GetChangeType(t);
             d.Type = d_type;
-            //d.Flags = d_flags;
 
             return d;
         }
@@ -405,15 +401,28 @@ namespace Arango.fastJSON
             }
             else
             {
-                il.Emit(OpCodes.Ldarg_0);
-                il.Emit(OpCodes.Castclass, propertyInfo.DeclaringType);
-                il.Emit(OpCodes.Ldarg_1);
-                if (propertyInfo.PropertyType.IsClass)
-                    il.Emit(OpCodes.Castclass, propertyInfo.PropertyType);
+                if (!setMethod.IsStatic)
+                {
+                    il.Emit(OpCodes.Ldarg_0);
+                    il.Emit(OpCodes.Castclass, propertyInfo.DeclaringType);
+                    il.Emit(OpCodes.Ldarg_1);
+                    if (propertyInfo.PropertyType.IsClass)
+                        il.Emit(OpCodes.Castclass, propertyInfo.PropertyType);
+                    else
+                        il.Emit(OpCodes.Unbox_Any, propertyInfo.PropertyType);
+                    il.EmitCall(OpCodes.Callvirt, setMethod, null);
+                    il.Emit(OpCodes.Ldarg_0);
+                }
                 else
-                    il.Emit(OpCodes.Unbox_Any, propertyInfo.PropertyType);
-                il.EmitCall(OpCodes.Callvirt, setMethod, null);
-                il.Emit(OpCodes.Ldarg_0);
+                {
+                    il.Emit(OpCodes.Ldarg_0);
+                    il.Emit(OpCodes.Ldarg_1);
+                    if (propertyInfo.PropertyType.IsClass)
+                        il.Emit(OpCodes.Castclass, propertyInfo.PropertyType);
+                    else
+                        il.Emit(OpCodes.Unbox_Any, propertyInfo.PropertyType);
+                    il.Emit(OpCodes.Call, setMethod);
+                }
             }
 
             il.Emit(OpCodes.Ret);
@@ -474,9 +483,15 @@ namespace Arango.fastJSON
             }
             else
             {
-                il.Emit(OpCodes.Ldarg_0);
-                il.Emit(OpCodes.Castclass, propertyInfo.DeclaringType);
-                il.EmitCall(OpCodes.Callvirt, getMethod, null);
+                if (!getMethod.IsStatic)
+                {
+                    il.Emit(OpCodes.Ldarg_0);
+                    il.Emit(OpCodes.Castclass, propertyInfo.DeclaringType);
+                    il.EmitCall(OpCodes.Callvirt, getMethod, null);
+                }
+                else
+                    il.Emit(OpCodes.Call, getMethod);
+
                 if (propertyInfo.PropertyType.IsValueType)
                     il.Emit(OpCodes.Box, propertyInfo.PropertyType);
             }
@@ -486,21 +501,25 @@ namespace Arango.fastJSON
             return (GenericGetter)getter.CreateDelegate(typeof(GenericGetter));
         }
 
-        internal Getters[] GetGetters(Type type, JSONParameters param)
+        internal Getters[] GetGetters(Type type, bool ShowReadOnlyProperties, List<Type> IgnoreAttributes)//JSONParameters param)
         {
             Getters[] val = null;
             if (_getterscache.TryGetValue(type, out val))
                 return val;
 
-            PropertyInfo[] props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            PropertyInfo[] props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
             List<Getters> getters = new List<Getters>();
             foreach (PropertyInfo p in props)
             {
-                if (!p.CanWrite && param.ShowReadOnlyProperties == false) continue;
-                if (param.IgnoreAttributes != null)
+                if (p.GetIndexParameters().Length > 0)
+                {// Property is an indexer
+                    continue;
+                }
+                if (!p.CanWrite && ShowReadOnlyProperties == false) continue;
+                if (IgnoreAttributes != null)
                 {
                     bool found = false;
-                    foreach (var ignoreAttr in param.IgnoreAttributes)
+                    foreach (var ignoreAttr in IgnoreAttributes)
                     {
                         if (p.IsDefined(ignoreAttr, false))
                         {
@@ -513,16 +532,16 @@ namespace Arango.fastJSON
                 }
                 GenericGetter g = CreateGetMethod(type, p);
                 if (g != null)
-                    getters.Add(new Getters { Getter = g, Name = p.Name });
+                    getters.Add(new Getters { Getter = g, Name = p.Name, lcName = p.Name.ToLower() });
             }
 
-            FieldInfo[] fi = type.GetFields(BindingFlags.Instance | BindingFlags.Public);
+            FieldInfo[] fi = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static);
             foreach (var f in fi)
             {
-                if (param.IgnoreAttributes != null)
+                if (IgnoreAttributes != null)
                 {
                     bool found = false;
-                    foreach (var ignoreAttr in param.IgnoreAttributes)
+                    foreach (var ignoreAttr in IgnoreAttributes)
                     {
                         if (f.IsDefined(ignoreAttr, false))
                         {
@@ -533,10 +552,12 @@ namespace Arango.fastJSON
                     if (found)
                         continue;
                 }
-
-                GenericGetter g = CreateGetField(type, f);
-                if (g != null)
-                    getters.Add(new Getters { Getter = g, Name = f.Name });
+                if (f.IsLiteral == false)
+                {
+                    GenericGetter g = CreateGetField(type, f);
+                    if (g != null)
+                        getters.Add(new Getters { Getter = g, Name = f.Name, lcName = f.Name.ToLower() });
+                }
             }
             val = getters.ToArray();
             _getterscache.Add(type, val);

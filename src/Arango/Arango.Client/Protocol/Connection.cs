@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using Arango.fastJSON;
 
 namespace Arango.Client.Protocol
 {
@@ -117,7 +118,7 @@ namespace Arango.Client.Protocol
                     responseStream.Dispose();
                 }
 
-                response.DeserializeBody();
+                response.GetBodyDataType();
             }
             catch (WebException webException)
             {
@@ -141,23 +142,30 @@ namespace Arango.Client.Protocol
                                 response.Body = exceptionReader.ReadToEnd();
                             }
                             
-                            response.DeserializeBody();
+                            response.GetBodyDataType();
                         }
                     }
 
                     response.Error = new AEerror();
-                    response.Error.StatusCode = response.StatusCode;
-                    response.Error.Number = 0;
-                    response.Error.Message = "Protocol error: " + webException.Message;
                     response.Error.Exception = webException;
 
-                    if (response.DataType == DataType.Document)
+                    if (response.BodyType == BodyType.Document)
                     {
-                        var document = (Dictionary<string, object>)response.Data;
+                        var body = response.ParseBody<Body<object>>();
                         
-                        response.Error.StatusCode = document.Int("code");
-                        response.Error.Number = document.Int("errorNum");
-                        response.Error.Message = "ArangoDB error: " + document.String("errorMessage");
+                        if ((body != null) && body.Error)
+                        {
+                            response.Error.StatusCode = body.Code;
+                            response.Error.Number = body.ErrorNum;
+                            response.Error.Message = "ArangoDB error: " + body.ErrorMessage;
+                        }
+                    }
+                    
+                    if (string.IsNullOrEmpty(response.Error.Message))
+                    {
+                        response.Error.StatusCode = response.StatusCode;
+                        response.Error.Number = 0;
+                        response.Error.Message = "Protocol error: " + webException.Message;
                     }
                 }
                 else

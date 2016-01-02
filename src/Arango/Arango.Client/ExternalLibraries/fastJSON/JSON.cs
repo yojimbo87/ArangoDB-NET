@@ -44,6 +44,7 @@ namespace Arango.fastJSON
         /// <summary>
         /// Ignore case when processing json and deserializing 
         /// </summary>
+        [Obsolete("Not needed anymore and will always match")]
         public bool IgnoreCaseOnDeserialize = false;
         /// <summary>
         /// Anonymous types have read only properties 
@@ -79,11 +80,26 @@ namespace Arango.fastJSON
         /// Serialize DateTime milliseconds i.e. yyyy-MM-dd HH:mm:ss.nnn (default = false)
         /// </summary>
         public bool DateTimeMilliseconds = false;
+        /// <summary>
+        /// Maximum depth for circular references in inline mode (default = 20)
+        /// </summary>
+        public byte SerializerMaxDepth = 20;
+        /// <summary>
+        /// Inline circular or already seen objects instead of replacement with $i (default = False) 
+        /// </summary>
+        public bool InlineCircularReferences = false;
+        /// <summary>
+        /// Save property/field names as lowercase (default = false)
+        /// </summary>
+        public bool SerializeToLowerCaseNames = false;
 
         public void FixValues()
         {
             if (UseExtensions == false) // disable conflicting params
+            {
                 UsingGlobalTypes = false;
+                InlineCircularReferences = true;
+            }
             if (EnableAnonymousTypes)
                 ShowReadOnlyProperties = true;
         }
@@ -95,7 +111,6 @@ namespace Arango.fastJSON
         /// Globally set-able parameters for controlling the serializer
         /// </summary>
         public static JSONParameters Parameters = new JSONParameters();
-
         /// <summary>
         /// Create a formatted json string (beautified) from an object
         /// </summary>
@@ -147,7 +162,7 @@ namespace Arango.fastJSON
         /// <returns></returns>
         public static object Parse(string json)
         {
-            return new JsonParser(json, JSON.Parameters.IgnoreCaseOnDeserialize).Decode();
+            return new JsonParser(json).Decode();
         }
 #if net4
         /// <summary>
@@ -218,7 +233,7 @@ namespace Arango.fastJSON
         /// <returns></returns>
         public static object FillObject(object input, string json)
         {
-            Dictionary<string, object> ht = new JsonParser(json, Parameters.IgnoreCaseOnDeserialize).Decode() as Dictionary<string, object>;
+            Dictionary<string, object> ht = new JsonParser(json).Decode() as Dictionary<string, object>;
             if (ht == null) return null;
             return new deserializer(Parameters).ParseDictionary(ht, null, input.GetType(), input);
         }
@@ -304,7 +319,6 @@ namespace Arango.fastJSON
         private bool _usingglobals = false;
         private Dictionary<object, int> _circobj = new Dictionary<object, int>();
         private Dictionary<int, object> _cirrev = new Dictionary<int, object>();
-        //private bool _circular = true;
 
         public T ToObject<T>(string json)
         {
@@ -342,14 +356,13 @@ namespace Arango.fastJSON
                 _params.UsingGlobalTypes = false;
             _usingglobals = _params.UsingGlobalTypes;
 
-            object o = new JsonParser(json, _params.IgnoreCaseOnDeserialize).Decode();
+            object o = new JsonParser(json).Decode();
             if (o == null)
                 return null;
 #if !SILVERLIGHT
             if (type != null && type == typeof(DataSet))
                 return CreateDataset(o as Dictionary<string, object>, null);
-
-            if (type != null && type == typeof(DataTable))
+            else if (type != null && type == typeof(DataTable))
                 return CreateDataTable(o as Dictionary<string, object>, null);
 #endif
             if (o is IDictionary)
@@ -359,22 +372,18 @@ namespace Arango.fastJSON
                 else // deserialize an object
                     return ParseDictionary(o as Dictionary<string, object>, null, type, null);
             }
-
-            if (o is List<object>)
+            else if (o is List<object>)
             {
                 if (type != null && t == typeof(Dictionary<,>)) // kv format
                     return RootDictionary(o, type);
-
-                if (type != null && t == typeof(List<>)) // deserialize to generic list
+                else if (type != null && t == typeof(List<>)) // deserialize to generic list
                     return RootList(o, type);
-
-                if (type == typeof(Hashtable))
+                else if (type == typeof(Hashtable))
                     return RootHashTable((List<object>)o);
                 else
                     return (o as List<object>).ToArray();
             }
-
-            if (type != null && o.GetType() != type)
+            else if (type != null && o.GetType() != type)
                 return ChangeType(o, type);
 
             return o;
@@ -411,9 +420,6 @@ namespace Arango.fastJSON
 
             else if (conversionType == typeof(string))
                 return (string)value;
-
-            //else if (conversionType == typeof(Guid))
-            //    return CreateGuid((string)value);
 
             else if (conversionType.IsEnum)
                 return CreateEnum(conversionType, value);
@@ -473,6 +479,12 @@ namespace Arango.fastJSON
 
         private object RootDictionary(object parse, Type type)
         {
+            if ((parse is Dictionary<string, object>) &&
+                (type == typeof(Dictionary<string, object>)))
+            {
+                return (Dictionary<string, object>)parse;
+            }
+            
             Type[] gtypes = Reflection.Instance.GetGenericArguments(type);
             Type t1 = null;
             Type t2 = null;
@@ -489,7 +501,7 @@ namespace Arango.fastJSON
                 {
                     object v;
                     object k = ChangeType(kv.Key, t1);
-
+                    
                     if (kv.Value is Dictionary<string, object>)
                         v = ParseDictionary(kv.Value as Dictionary<string, object>, null, t2, null);
 
@@ -515,13 +527,16 @@ namespace Arango.fastJSON
 
         internal object ParseDictionary(Dictionary<string, object> d, Dictionary<string, object> globaltypes, Type type, object input)
         {
+            if (type == typeof(Dictionary<string, object>))
+            {
+                return d;
+            }
+            
             object tn = "";
             if (type == typeof(NameValueCollection))
                 return CreateNV(d);
             if (type == typeof(StringDictionary))
                 return CreateSD(d);
-            //if (_circular == false)
-            //    _circular = d.TryGetValue("$circular", out tn);
 
             if (d.TryGetValue("$i", out tn))
             {
@@ -570,22 +585,20 @@ namespace Arango.fastJSON
                 else
                     o = Reflection.Instance.FastCreateInstance(type);
             }
-            //if (_circular)
+            int circount = 0;
+            if (_circobj.TryGetValue(o, out circount) == false)
             {
-                int i = 0;
-                if (_circobj.TryGetValue(o, out i) == false)
-                {
-                    i = _circobj.Count + 1;
-                    _circobj.Add(o, i);
-                    _cirrev.Add(i, o);
-                }
+                circount = _circobj.Count + 1;
+                _circobj.Add(o, circount);
+                _cirrev.Add(circount, o);
             }
 
-            Dictionary<string, myPropInfo> props = Reflection.Instance.Getproperties(type, typename, _params.IgnoreCaseOnDeserialize, Reflection.Instance.IsTypeRegistered(type));
-            foreach (string n in d.Keys)
+            Dictionary<string, myPropInfo> props = Reflection.Instance.Getproperties(type, typename, Reflection.Instance.IsTypeRegistered(type));
+            foreach (var kv in d)
             {
-                string name = n;
-                if (_params.IgnoreCaseOnDeserialize) name = name.ToLower();
+                var n = kv.Key;
+                var v = kv.Value;
+                string name = n.ToLower();
                 if (name == "$map")
                 {
                     ProcessMap(o, props, (Dictionary<string, object>)d[name]);
@@ -594,9 +607,9 @@ namespace Arango.fastJSON
                 myPropInfo pi;
                 if (props.TryGetValue(name, out pi) == false)
                     continue;
-                if (pi.CanWrite)// (pi.Flags & (/*myPropInfoFlags.Filled | */myPropInfoFlags.CanWrite)) != 0)
+                if (pi.CanWrite)
                 {
-                    object v = d[name];
+                    //object v = d[n];
 
                     if (v != null)
                     {
@@ -621,6 +634,7 @@ namespace Arango.fastJSON
 #if !SILVERLIGHT
                             case myPropInfoType.DataSet: oset = CreateDataset((Dictionary<string, object>)v, globaltypes); break;
                             case myPropInfoType.DataTable: oset = CreateDataTable((Dictionary<string, object>)v, globaltypes); break;
+                            case myPropInfoType.SortedList: oset = CreateSortedList((List<object>)v, pi, globaltypes); break;
                             case myPropInfoType.Hashtable: // same case as Dictionary
 #endif
                             case myPropInfoType.Dictionary: oset = CreateDictionary((List<object>)v, pi.pt, pi.GenericTypes, globaltypes); break;
@@ -687,7 +701,7 @@ namespace Arango.fastJSON
             }
         }
 
-        private int CreateInteger(/*out int num,*/ string s, int index, int count)
+        private int CreateInteger(string s, int index, int count)
         {
             int num = 0;
             bool neg = false;
@@ -732,7 +746,7 @@ namespace Arango.fastJSON
         {
             bool utc = false;
             //                   0123456789012345678 9012 9/3
-            // datetime format = yyyy-MM-dd HH:mm:ss .nnn  Z
+            // datetime format = yyyy-MM-ddTHH:mm:ss .nnn  Z
             int year;
             int month;
             int day;
@@ -741,16 +755,15 @@ namespace Arango.fastJSON
             int sec;
             int ms = 0;
 
-            year = CreateInteger(/*out year,*/ value, 0, 4);
-            month = CreateInteger(/*out month,*/ value, 5, 2);
-            day = CreateInteger(/*out day,*/ value, 8, 2);
-            hour = CreateInteger(/*out hour,*/ value, 11, 2);
-            min = CreateInteger(/*out min,*/ value, 14, 2);
-            sec = CreateInteger(/*out sec,*/ value, 17, 2);
+            year = CreateInteger(value, 0, 4);
+            month = CreateInteger(value, 5, 2);
+            day = CreateInteger(value, 8, 2);
+            hour = CreateInteger(value, 11, 2);
+            min = CreateInteger(value, 14, 2);
+            sec = CreateInteger(value, 17, 2);
             if (value.Length > 21 && value[19] == '.')
-                ms = CreateInteger(/*out ms,*/ value, 20, 3);
+                ms = CreateInteger(value, 20, 3);
 
-            //if (value.EndsWith("Z"))
             if (value[value.Length - 1] == 'Z')
                 utc = true;
 
@@ -767,8 +780,14 @@ namespace Arango.fastJSON
             for (int i = 0; i < data.Count; i++)
             {
                 object ob = data[i];
+                if (ob == null)
+                {
+                    continue;
+                }
                 if (ob is IDictionary)
                     col.SetValue(ParseDictionary((Dictionary<string, object>)ob, globalTypes, bt, null), i);
+                else if (ob is ICollection)
+                    col.SetValue(CreateArray((List<object>)ob, bt, bt.GetElementType(), globalTypes), i);
                 else
                     col.SetValue(ChangeType(ob, bt), i);
             }
@@ -779,10 +798,15 @@ namespace Arango.fastJSON
 
         private object CreateGenericList(List<object> data, Type pt, Type bt, Dictionary<string, object> globalTypes)
         {
-            IList col = (IList)Reflection.Instance.FastCreateInstance(pt);
+            var foo = Reflection.Instance.FastCreateInstance(pt);
+            IList col = (IList)foo;
+            
+            //IList col = new List<object>();
+            
             // create an array of objects
             foreach (object ob in data)
             {
+
                 if (ob is IDictionary)
                     col.Add(ParseDictionary((Dictionary<string, object>)ob, globalTypes, bt, null));
 
@@ -819,8 +843,12 @@ namespace Arango.fastJSON
                     val = ParseDictionary((Dictionary<string, object>)values.Value, globalTypes, t2, null);
 
                 else if (types != null && t2.IsArray)
-                    val = CreateArray((List<object>)values.Value, t2, t2.GetElementType(), globalTypes);
-
+                {
+                    if (values.Value is Array)
+                        val = values.Value;
+                    else
+                        val = CreateArray((List<object>)values.Value, t2, t2.GetElementType(), globalTypes);
+                }
                 else if (values.Value is IList)
                     val = CreateGenericList((List<object>)values.Value, t2, t1, globalTypes);
 
@@ -987,6 +1015,42 @@ namespace Arango.fastJSON
             }
 
             return dt;
+        }
+        
+        private object CreateSortedList(List<object> reader, myPropInfo pi, Dictionary<string, object> globalTypes)
+        {
+            Type pt = pi.pt;
+            
+            IDictionary col = (IDictionary)Reflection.Instance.FastCreateInstance(pt);
+            
+            Type[] types = pt.GetGenericArguments();
+            Type t1 = null;
+            Type t2 = null;
+            if (types != null)
+            {
+                t1 = types[0];
+                t2 = types[1];
+            }
+
+            foreach (Dictionary<string, object> values in reader)
+            {
+                object key = values["k"];
+                object val = values["v"];
+
+                if (key is Dictionary<string, object>)
+                    key = ParseDictionary((Dictionary<string, object>)key, globalTypes, t1, null);
+                else
+                    key = ChangeType(key, t1);
+
+                if (val is Dictionary<string, object>)
+                    val = ParseDictionary((Dictionary<string, object>)val, globalTypes, t2, null);
+                else
+                    val = ChangeType(val, t2);
+
+                col.Add(key, val);
+            }
+
+            return col;
         }
 #endif
         #endregion

@@ -31,9 +31,9 @@ namespace Arango.Tests
             var queryResult = db.Query
                 .BindVar("celsius", celsius)
                 .Aql("return myfunctions::temperature::celsiustofahrenheit(@celsius)")
-                .ToList();
+                .ToList<float>();
             
-            Assert.AreEqual(fahrenheit, Convert.ToSingle(queryResult.Value.First()));
+            Assert.AreEqual(fahrenheit, queryResult.Value.First());
         }
         
         [Test()]
@@ -98,9 +98,9 @@ namespace Arango.Tests
             var queryResult = db.Query
                 .BindVar("celsius", celsius)
                 .Aql("return myfunctions::temperature::celsiustofahrenheit(@celsius)")
-                .ToList();
+                .ToList<float>();
             
-            Assert.AreEqual(fahrenheit, Convert.ToSingle(queryResult.Value.First()));
+            Assert.AreEqual(fahrenheit, queryResult.Value.First());
         }
         
         [Test()]

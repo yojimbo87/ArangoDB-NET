@@ -224,7 +224,7 @@ namespace Arango.Tests
                 FOR item IN {0}
                     RETURN item
                 ", Database.TestDocumentCollectionName))
-                .ToList();
+                .ToList<object>();
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
@@ -265,7 +265,7 @@ namespace Arango.Tests
                 FOR item IN {0}
                     RETURN item
                 ", Database.TestDocumentCollectionName))
-                .ToList<Dictionary<string, object>>();
+                .ToDocuments();
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
@@ -315,7 +315,7 @@ namespace Arango.Tests
                 FOR item IN {0}
                     RETURN item
                 ", Database.TestDocumentCollectionName))
-                .ToList();
+                .ToList<object>();
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
@@ -348,7 +348,7 @@ namespace Arango.Tests
                 FOR item IN {0}
                     RETURN item
                 ", Database.TestDocumentCollectionName))
-                .ToList();
+                .ToList<object>();
 
             Assert.AreEqual(200, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
@@ -369,7 +369,7 @@ namespace Arango.Tests
                     FILTER item.bar == @barNumber
                     RETURN item
                 ", Database.TestDocumentCollectionName))
-                .ToList();
+                .ToList<object>();
 
             Assert.AreEqual(201, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
@@ -401,7 +401,7 @@ namespace Arango.Tests
                 queryOperation.BatchSize(1);
             }
             
-            var queryResult = queryOperation.ToList();
+            var queryResult = queryOperation.ToList<object>();
 
             Assert.AreEqual(200, queryResult.StatusCode);
             Assert.IsTrue(queryResult.Success);
@@ -453,7 +453,7 @@ namespace Arango.Tests
                 FOR item IN {0}
                     RETURN item
                 ", Database.TestDocumentCollectionName))
-                .ToList();
+                .ToList<object>();
 
             Assert.IsTrue(queryResult.Extra.IsString("id"));
             

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using Arango.fastJSON;
 
@@ -9,39 +10,45 @@ namespace Arango.Client.Protocol
         internal int StatusCode { get; set; }
         internal WebHeaderCollection Headers { get; set; }
         internal string Body { get; set; }
-        internal DataType DataType { get; set; }
-        internal object Data { get; set; }
+        internal BodyType BodyType { get; set; }
         internal Exception Exception { get; set; }
         internal AEerror Error { get; set; }
         
-        internal void DeserializeBody()
+        internal void GetBodyDataType()
         {            
             if (string.IsNullOrEmpty(Body))
             {
-                DataType = DataType.Null;
-                Data = null;
+                BodyType = BodyType.Null;
             }
             else
             {
                 var trimmedBody = Body.Trim();
-                
-                // body contains JSON array
-                if (trimmedBody[0] == '[')
+
+                switch (trimmedBody[0])
                 {
-                    DataType = DataType.List;
+                    // body contains JSON array
+                    case '[':
+                        BodyType = BodyType.List;
+                        break;
+                    // body contains JSON object
+                    case '{':
+                        BodyType = BodyType.Document;
+                        break;
+                    default:
+                        BodyType = BodyType.Primitive;
+                        break;
                 }
-                // body contains JSON object
-                else if (trimmedBody[0] == '{')
-                {
-                    DataType = DataType.Document;
-                }
-                else
-                {
-                    DataType = DataType.Primitive;
-                }
-                
-                Data = JSON.Parse(trimmedBody);
             }
+        }
+
+        internal T ParseBody<T>()
+        {
+            if (string.IsNullOrEmpty(Body))
+            {
+                return default(T);
+            }
+            
+            return JSON.ToObject<T>(Body);
         }
     }
 }

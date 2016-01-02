@@ -2,7 +2,7 @@
 
 namespace Arango.Client.Protocol
 {
-    public enum HttpMethod
+    internal enum HttpMethod
     {
         DELETE,
         GET,

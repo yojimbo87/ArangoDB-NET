@@ -77,11 +77,8 @@ namespace Arango.Client
             {
                 case 200:
                 case 201:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Success = true;
-                        result.Value = true;
-                    }
+                    result.Success = true;
+                    result.Value = true;
                     break;
                 case 400:
                 default:
@@ -114,11 +111,11 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    if (response.DataType == DataType.List)
-                    {
-                        result.Value = ((IEnumerable)response.Data).Cast<Dictionary<string, object>>().ToList();
-                        result.Success = (result.Value != null);
-                    }
+                    //var body = ((IEnumerable)response.ParseBody()).Cast<Dictionary<string, object>>().ToList();
+                    var body = response.ParseBody<List<Dictionary<string, object>>>();
+                    
+                    result.Success = (body != null);
+                    result.Value = body;
                     break;
                 default:
                     // Arango error
@@ -150,11 +147,8 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    if (response.DataType == DataType.Document)
-                    {
-                        result.Success = true;
-                        result.Value = true;
-                    }
+                    result.Success = true;
+                    result.Value = true;
                     break;
                 case 400:
                 case 404:

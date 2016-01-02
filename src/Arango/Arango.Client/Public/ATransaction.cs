@@ -111,12 +111,10 @@ namespace Arango.Client
             switch (response.StatusCode)
             {
                 case 200:
-                    if (response.DataType == DataType.Document)
-                    {
-                        var transaction = (response.Data as Dictionary<string, object>).ToObject<Transaction<T>>();
-                        result.Value = transaction.result;
-                        result.Success = (result.Value != null);
-                    }
+                    var body = response.ParseBody<Body<T>>();
+                    
+                    result.Success = (body != null);
+                    result.Value = body.Result;
                     break;
                 case 400:
                 case 404:
