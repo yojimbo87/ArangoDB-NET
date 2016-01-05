@@ -9,9 +9,6 @@ namespace Arango.Client
 {
     public class AQuery
     {
-        public string LastRequest;
-        public string LastResponse;
-
         readonly Dictionary<string, object> _parameters = new Dictionary<string, object>();
         readonly Connection _connection;
         readonly StringBuilder _query = new StringBuilder();
@@ -92,43 +89,6 @@ namespace Arango.Client
         {
             return ToList<Dictionary<string, object>>();
         }
-        
-        // TODO: remove after unit tests are passing
-        /// <summary>
-        /// Retrieves result value as list of generic objects.
-        /// </summary>
-        /*public AResult<List<T>> ToList<T>()
-        {
-            var type = typeof(T);
-            var listResult = ToList();
-            var result = new AResult<List<T>>();
-            
-            result.StatusCode = listResult.StatusCode;
-            result.Success = listResult.Success;
-            result.Extra = listResult.Extra;
-            result.Error = listResult.Error;
-            
-            if (listResult.Success)
-            {
-                if (type.IsPrimitive ||
-        		    (type == typeof(string)) ||
-	                (type == typeof(DateTime)) ||
-	                (type == typeof(decimal)))
-        		{
-        			result.Value = listResult.Value.Select(o => Convert.ChangeType(o, type)).Cast<T>().ToList();
-        		}
-                else if (type.IsClass && (type.Name != "String"))
-                {
-                    result.Value = listResult.Value.Select(o => ((Dictionary<string, object>)o).ToObject<T>()).ToList();
-                }
-                else
-        		{
-        			result.Value = listResult.Value.Select(o => Convert.ChangeType(o, type)).Cast<T>().ToList();
-        		}
-            }
-            
-            return result;
-        }*/
         
         /// <summary>
         /// Retrieves result value as list of objects.
