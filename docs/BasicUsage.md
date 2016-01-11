@@ -70,7 +70,7 @@ Once the operation is executed, returned data are contained within `AResult` obj
 In case of operation failure driver doesn't throw exceptions explicitely, but `AResult` object `Error` property would contain instance of `AError` object with following properties:
 
 - `StatusCode` - Integer value of the operation response HTTP status code.
-- `Number` - Integer value indicating [ArangoDB internal error code](https://docs.arangodb.com/ErrorCodes/README.html).
+- `Number` - Integer value indicating [ArangoDB internal error code](https://docs.arangodb.com/ErrorCodes/index.html).
 - `Message` - String value containing error description.
 - `Exception` - Exception object with further information about failure.
 
@@ -78,11 +78,11 @@ In case of operation failure driver doesn't throw exceptions explicitely, but `A
 
 JSON objects are by default represented as `Dictionary<string, object>`. In order to simplify the usage of dictionaries (aka documents), driver comes equipped with embedded [dictator library](https://github.com/yojimbo87/dictator) which provide helpful set of methods to provide easier way to handle data stored in these objects. Dictator also provides methods for [conversion](https://github.com/yojimbo87/dictator#convert-document-to-strongly-typed-object) of documents to generic objects and [vice versa](https://github.com/yojimbo87/dictator#convert-strongly-typed-object-to-document). Custom classes can also take advantage of several [property attributes](https://github.com/yojimbo87/dictator#property-attributes).
 
-Internal serialization and deserialization of JSON documents is done by embedded [fastJSON library](http://www.codeproject.com/Articles/159450/fastJSON) which functionality is accessible through `Arango.fastJSON` namespace.
+Internal serialization and deserialization of JSON documents is done by embedded [fastJSON library](https://github.com/mgholam/fastJSON) which functionality is accessible through `Arango.fastJSON` namespace.
 
 ## Serialization options
 
-`ASettings.JsonParameters` static property can be used to set custom serialization options which are provided by [fastJSON](http://www.codeproject.com/Articles/159450/fastJSON) library. By default all options are set to their default values except `UseEscapedUnicode` and `UseFastGuid` which are both set to false value. Advantage of this approach is the ability to, for example, explicitely set `UseValuesOfEnums` to true value which will result in Enum type fields being stored as integers instead of strings.
+`ASettings.JsonParameters` static property can be used to set custom serialization options which are provided by [fastJSON](https://github.com/mgholam/fastJSON) library. By default all options are set to their default values except `UseEscapedUnicode` and `UseFastGuid` which are both set to false value. Advantage of this approach is the ability to, for example, explicitely set `UseValuesOfEnums` to true value which will result in Enum type fields being stored as integers instead of strings.
 
 ## Document ID, key and revision
 
@@ -100,7 +100,7 @@ Apart from standard dictionary extensions provided by [dictator](https://github.
 - `IsID(string fieldPath)` - Checks if specified field path has valid document ID value in the format of `collection/key`.
 - `IsKey(string fieldPath)` - Checks if specified field path has valid document key value.
 
-`ADocument` class provides several static methods for format validation of [ID](https://docs.arangodb.com/Glossary/README.html#document_handle), [key](https://docs.arangodb.com/NamingConventions/DocumentKeys.html) and [revision](https://docs.arangodb.com/Glossary/README.html#document_revision) values: 
+`ADocument` class provides several static methods for format validation of [ID](https://docs.arangodb.com/Glossary/index.html#document_handle), [key](https://docs.arangodb.com/NamingConventions/DocumentKeys.html) and [revision](https://docs.arangodb.com/Glossary/index.html#document_revision) values: 
 
 - `ADocument.IsID(string id)` - Determines if specified value has valid document `_id` format. 
 - `ADocument.IsKey(string key)` - Determines if specified value has valid document `_key` format.
