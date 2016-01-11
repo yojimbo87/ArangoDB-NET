@@ -90,6 +90,7 @@
     <Compile Include="Public\AIndex.cs" />
     <Compile Include="Public\AIndexType.cs" />
     <Compile Include="Public\AKeyGeneratorType.cs" />
+    <Compile Include="Public\AQL.cs" />
     <Compile Include="Public\AQuery.cs" />
     <Compile Include="Public\AResult.cs" />
     <Compile Include="Public\AReturnListType.cs" />

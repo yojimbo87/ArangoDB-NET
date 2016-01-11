@@ -52,6 +52,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AqlTests.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Entities\PerformanceEntity.cs" />
     <Compile Include="Entities\Release.cs" />
