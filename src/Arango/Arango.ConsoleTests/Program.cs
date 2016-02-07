@@ -25,7 +25,8 @@ namespace Arango.ConsoleTests
                 JsonParseTest();
             }*/
             
-            AqlTests.TestAqlGenerator();
+            //AqlTests.TestAqlGenerator();
+            InheritanceTests.TestCollectionInheritance();
             
             Console.Write("Press any key to continue . . . ");
             Console.ReadKey(true);
