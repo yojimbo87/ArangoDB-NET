@@ -104,12 +104,12 @@ namespace Arango.Client.Protocol
                 using (var responseStream = httpResponse.GetResponseStream())
                 using (var reader = new StreamReader(responseStream))
                 {
-                        response.StatusCode = (int)httpResponse.StatusCode;
-                        response.Headers = httpResponse.Headers;
-                        response.Body = reader.ReadToEnd();
+                    response.StatusCode = (int)httpResponse.StatusCode;
+                    response.Headers = httpResponse.Headers;
+                    response.Body = reader.ReadToEnd();
 
-                        reader.Close();
-                        responseStream.Close();
+                    reader.Close();
+                    responseStream.Close();
                 }
 
                 response.GetBodyDataType();
