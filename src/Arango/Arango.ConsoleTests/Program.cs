@@ -9,8 +9,21 @@ namespace Arango.ConsoleTests
     {
         public static void Main(string[] args)
         {
+            /*var dummy = new Dummy
+            {
+                Foo = "whoa",
+                Bar = 123,
+                Str = "small str",
+                Ignore = "should be igored",
+                IgnoreNullValue = null
+            };
+
+            var converted = DictionaryExtensions.StripObject(dummy);
+
+            Console.WriteLine(JSON.ToJSON(converted, new JSONParameters { UseEscapedUnicode = false, UseFastGuid = false, UseExtensions = false }));*/
+
             //InsertTest();
-            //PerformanceTests();
+            PerformanceTests();
             
             /*JsonToObjectHeatUp();
             JsonToObjectAsDictionaryHeatup();
@@ -59,12 +72,15 @@ namespace Arango.ConsoleTests
         
         static void PerformanceTests()
         {
+            var iterationCount = 10000;
             var performance = new Performance();
             
-            //performance.TestSimpleSequentialHttpPostRequests();
+            performance.TestArangoClientSequentialInsertion(iterationCount);
+            performance.TestSimpleSequentialHttpPostRequests(iterationCount);
+
             //performance.TestRestSharpHttpPostRequests();
             //performance.TestSimpleParallelHttpPostRequests();
-            
+
             performance.Dispose();
         }
         
@@ -159,5 +175,14 @@ namespace Arango.ConsoleTests
     {
         public string Foo { get; set; }
         public long Bar { get; set; }
+
+        [AliasField("str")]
+        public string Str { get; set; }
+
+        [IgnoreField]
+        public string Ignore { get; set; }
+
+        [IgnoreNullValue]
+        public object IgnoreNullValue { get; set; }
     }
 }
