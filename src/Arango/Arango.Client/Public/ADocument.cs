@@ -150,7 +150,8 @@ namespace Arango.Client
         /// </summary>
         public AResult<Dictionary<string, object>> Create<T>(string collectionName, T obj)
         {
-            return Create(collectionName, JSON.ToJSON(obj, ASettings.JsonParameters));
+            //return Create(collectionName, JSON.ToJSON(DictionaryExtensions.StripObject(obj), ASettings.JsonParameters));
+            return Create(collectionName, Dictator.ToDocument(obj));
         }
         
         #endregion
@@ -341,7 +342,7 @@ namespace Arango.Client
         /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
         public AResult<Dictionary<string, object>> Update<T>(string id, T obj)
         {
-            return Update(id, JSON.ToJSON(obj, ASettings.JsonParameters));
+            return Update(id, Dictator.ToDocument(obj));
         }
         
         #endregion
@@ -417,7 +418,7 @@ namespace Arango.Client
         /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
         public AResult<Dictionary<string, object>> Replace<T>(string id, T obj)
         {
-            return Replace(id, JSON.ToJSON(obj, ASettings.JsonParameters));
+            return Replace(id, Dictator.ToDocument(obj));
         }
         
         #endregion
