@@ -68,32 +68,44 @@ namespace Arango.Client
             }
             else
             {
+                string fieldName;
+                object propertyValue;
+                IEnumerable<Attribute> customAttributes;
+                bool skipField;
+
                 foreach (var propertyInfo in inputObjectType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
-                {                    
-                    // skip property if it should be ingored
-                    if (propertyInfo.IsDefined(typeof(IgnoreField)))
+                {
+                    fieldName = propertyInfo.Name;
+                    propertyValue = propertyInfo.GetValue(obj);
+                    customAttributes = propertyInfo.GetCustomAttributes();
+                    skipField = false;
+
+                    foreach (var attribute in customAttributes)
+                    {
+                        // skip property if it should be ingored
+                        if (attribute is IgnoreField)
+                        {
+                            skipField = true;
+                        }
+                        // skip property if it should ingore null value
+                        else if ((attribute is IgnoreNullValue) && (propertyValue == null))
+                        {
+                            skipField = true;
+                        }
+                        // set field name as property alias if present
+                        else if (attribute is AliasField)
+                        {
+                            var aliasFieldAttribute = (AliasField)propertyInfo.GetCustomAttribute(typeof(AliasField));
+
+                            fieldName = aliasFieldAttribute.Alias;
+                        }
+                    }
+
+                    if (skipField)
                     {
                         continue;
                     }
-                    
-                    var propertyValue = propertyInfo.GetValue(obj);
-                    
-                    // skip property if it should ingore null value
-                    if (propertyInfo.IsDefined(typeof(IgnoreNullValue)) && (propertyValue == null))
-                    {
-                        continue;
-                    }
-                    
-                    var fieldName = propertyInfo.Name;
-                    
-                    // set field name as property alias if present
-                    if (propertyInfo.IsDefined(typeof(AliasField)))
-                    {
-                        var aliasFieldAttribute = (AliasField)propertyInfo.GetCustomAttribute(typeof(AliasField));
-                        
-                        fieldName = aliasFieldAttribute.Alias;
-                    }
-                    
+
                     if (propertyValue == null)
                     {
                         document.Object(fieldName, null);
