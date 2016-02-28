@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
-using Arango.fastJSON;
 
 namespace Arango.Client.Protocol
 {
@@ -59,8 +57,7 @@ namespace Arango.Client.Protocol
 
         internal Response Send(Request request)
         {
-            var uri = BaseUri + request.GetRelativeUri();
-            var httpRequest = HttpWebRequest.CreateHttp(uri);
+            var httpRequest = HttpWebRequest.CreateHttp(BaseUri + request.GetRelativeUri());
 
             if (request.Headers.Count > 0)
             {
@@ -86,13 +83,13 @@ namespace Arango.Client.Protocol
                 httpRequest.ContentType = "application/json; charset=utf-8";
 
                 var data = Encoding.UTF8.GetBytes(request.Body);
-                var stream = httpRequest.GetRequestStream();
 
-                stream.Write(data, 0, data.Length);
-                stream.Flush();
-
-                stream.Close();
-                stream.Dispose();
+                using (var stream = httpRequest.GetRequestStream())
+                {
+                    stream.Write(data, 0, data.Length);
+                    stream.Flush();
+                    stream.Close();
+                }
             }
             else
             {
@@ -104,18 +101,15 @@ namespace Arango.Client.Protocol
             try
             {
                 using (var httpResponse = (HttpWebResponse)httpRequest.GetResponse())
+                using (var responseStream = httpResponse.GetResponseStream())
+                using (var reader = new StreamReader(responseStream))
                 {
-                    var responseStream = httpResponse.GetResponseStream();
-                    var reader = new StreamReader(responseStream);
-
                     response.StatusCode = (int)httpResponse.StatusCode;
                     response.Headers = httpResponse.Headers;
                     response.Body = reader.ReadToEnd();
 
                     reader.Close();
-                    reader.Dispose();
                     responseStream.Close();
-                    responseStream.Dispose();
                 }
 
                 response.GetBodyDataType();
@@ -140,6 +134,9 @@ namespace Arango.Client.Protocol
                             using (var exceptionReader = new StreamReader(exceptionResponseStream))
                             {
                                 response.Body = exceptionReader.ReadToEnd();
+
+                                exceptionReader.Close();
+                                exceptionResponseStream.Close();
                             }
                             
                             response.GetBodyDataType();

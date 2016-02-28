@@ -63,52 +63,39 @@ namespace Arango.ConsoleTests
             Console.WriteLine("Elapsed time [s]: {0}", stopwatch.Elapsed.TotalMilliseconds / 1000);
         }
         
-        public void TestSimpleSequentialHttpPostRequests()
+        public void TestSimpleSequentialHttpPostRequests(int iterationCount)
         {
-            Console.WriteLine("Operation start: TestSimpleSequentialHttpPostRequests");
+            Console.WriteLine("Operation start: TestSimpleSequentialHttpPostRequests\n");
             
             var db = new ADatabase(Database.Alias);
             
-            var entity = new PerformanceEntity();
-            entity.Id = "1234567890123456789012345678901234";
-            entity.Key = "1234567";
-            entity.Revision = "1234567";
-            entity.Name = "Mohamad Abu Bakar";
-            entity.IcNumber = "1234567-12-3444";
-            entity.Department = "IT Department";
-            entity.Height = 1234;
-            entity.DateOfBirth = new DateTime(2015, 1, 27, 3, 33, 3);
-            entity.Salary = 3333;
+            //ServicePointManager.DefaultConnectionLimit = 40;
+            //ServicePointManager.Expect100Continue = false;
+            //ServicePointManager.UseNagleAlgorithm = false;
             
-            var jsonEntity = JSON.ToJSON(entity);
-            
-            ServicePointManager.DefaultConnectionLimit = 40;
-            ServicePointManager.Expect100Continue = false;
-            ServicePointManager.UseNagleAlgorithm = false;
-            
-            ExecuteTimedTest(10, () => {
-                for (int i = 0; i < 10000; i++)
-                {
-                    SimpleHttpPostCreateDocument(
-                        "http://localhost:8529/_db/" + Database.TestDatabaseGeneral + "/_api/document?collection=" + Database.TestDocumentCollectionName, 
-                        jsonEntity
-                    );
-                }
+            ExecuteTimedTest(iterationCount, () => {
+                var entity = new PerformanceEntity();
+                entity.Id = "1234567890123456789012345678901234";
+                entity.Key = "1234567";
+                entity.Revision = "1234567";
+                entity.Name = "Mohamad Abu Bakar";
+                entity.IcNumber = "1234567-12-3444";
+                entity.Department = "IT Department";
+                entity.Height = 1234;
+                entity.DateOfBirth = new DateTime(2015, 1, 27, 3, 33, 3);
+                entity.Salary = 3333;
+
+                var jsonEntity = JSON.ToJSON(entity);
+
+                var response = SimpleHttpPostCreateDocument(
+                    "http://localhost:8529/_db/" + Database.TestDatabaseGeneral + "/_api/document?collection=" + Database.TestDocumentCollectionName, 
+                    jsonEntity
+                );
+
+                var deserializedResponse = JSON.ToObject<Dictionary<string, object>>(response);
             });
 
-//            Stopwatch stopwatch = Stopwatch.StartNew();
-//            
-//            for (int i = 0; i < 10000; i++)
-//            {
-//                SimpleHttpPostCreateDocument(
-//                    "http://localhost:8529/_db/" + Database.TestDatabaseGeneral + "/_api/document?collection=" + Database.TestDocumentCollectionName, 
-//                    jsonEntity
-//                );
-//            }
-//            
-//            Console.WriteLine("Elapsed time [s]: {0}", stopwatch.Elapsed.TotalMilliseconds / 1000);
-            
-            Console.WriteLine("Operation end: TestSimpleSequentialHttpPostRequests");
+            Console.WriteLine("\nOperation end: TestSimpleSequentialHttpPostRequests");
         }
         
         public void TestRestSharpHttpPostRequests()
@@ -149,11 +136,39 @@ namespace Arango.ConsoleTests
             Console.WriteLine("Operation end: TestRestSharpHttpPostRequests");
         }
         
-        public string SimpleHttpPostCreateDocument(string uri, string body)
+        public void TestArangoClientSequentialInsertion(int iterationCount)
         {
+            Console.WriteLine("Operation start: TestArangoClientSequentialInsertion\n");
+            
+            var db = new ADatabase(Database.Alias);
+            
+            ExecuteTimedTest(iterationCount, () => {
+                var entity = new PerformanceEntity();
+                entity.Id = "1234567890123456789012345678901234";
+                entity.Key = "1234567";
+                entity.Revision = "1234567";
+                entity.Name = "Mohamad Abu Bakar";
+                entity.IcNumber = "1234567-12-3444";
+                entity.Department = "IT Department";
+                entity.Height = 1234;
+                entity.DateOfBirth = new DateTime(2015, 1, 27, 3, 33, 3);
+                entity.Salary = 3333;
+                
+                var createResult = db.Document.Create(Database.TestDocumentCollectionName, entity);
+            });
+            
+            Console.WriteLine("\nOperation end: TestArangoClientSequentialInsertion");
+        }
+        
+        public string SimpleHttpPostCreateDocument(string uriString, string body, string username = "test", string password = "test")
+        {
+            //var stopwatch = Stopwatch.StartNew();
+            int statusCode = 0;
+            WebHeaderCollection headers = null;
+
             var responseBody = "";
             //var httpRequest = HttpWebRequest.CreateHttp(uri);
-            var httpRequest = HttpWebRequest.CreateHttp(new Uri(uri));
+            var httpRequest = HttpWebRequest.CreateHttp(new Uri(uriString));
 
             httpRequest.KeepAlive = true;
             httpRequest.SendChunked = false;
@@ -161,13 +176,13 @@ namespace Arango.ConsoleTests
             httpRequest.Method = "POST";
             httpRequest.UserAgent = ASettings.DriverName + "/" + ASettings.DriverVersion;
 
-            /*if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
+            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
             {
                 httpRequest.Headers.Add(
                     "Authorization", 
-                    "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(Username + ":" + Password))
+                    "Basic " + Convert.ToBase64String(Encoding.ASCII.GetBytes(username + ":" + password))
                 );
-            }*/
+            }
 
             if (!string.IsNullOrEmpty(body))
             {
@@ -181,8 +196,6 @@ namespace Arango.ConsoleTests
                     stream.Flush();
                     stream.Close();
                 }
-                
-                //stream.Dispose();
             }
             else
             {
@@ -192,18 +205,15 @@ namespace Arango.ConsoleTests
             try
             {
                 using (var httpResponse = (HttpWebResponse)httpRequest.GetResponse())
+                using (var responseStream = httpResponse.GetResponseStream())
+                using (var reader = new StreamReader(responseStream))
                 {
-                    using (var responseStream = httpResponse.GetResponseStream())
-                    using (var reader = new StreamReader(responseStream))
-                    {
-                        responseBody = reader.ReadToEnd();
+                    statusCode = (int)httpResponse.StatusCode;
+                    headers = httpResponse.Headers;
+                    responseBody = reader.ReadToEnd();
                         
-                        reader.Close();
-                        responseStream.Close();
-                    }
-                    
-                    //reader.Dispose();
-                    //responseStream.Dispose();
+                    reader.Close();
+                    responseStream.Close();
                 }
             }
             catch (WebException webException)
@@ -231,7 +241,9 @@ namespace Arango.ConsoleTests
                     throw;
                 }
             }
-            
+
+            //Console.WriteLine("{0}", stopwatch.Elapsed.TotalMilliseconds);
+
             return responseBody;
         }
         
@@ -252,12 +264,13 @@ namespace Arango.ConsoleTests
         
             double averageMs = (totalElapsed / iterations);
             
+            Console.WriteLine("Total: {0:F2}ms.", totalElapsed);
             Console.WriteLine("Average: {0:F2}ms.", averageMs);
         }
         
         static double Execute(Action action)
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
+            var stopwatch = Stopwatch.StartNew();
             
             action();
             

@@ -150,6 +150,7 @@ namespace Arango.Client
         /// </summary>
         public AResult<Dictionary<string, object>> Create<T>(string collectionName, T obj)
         {
+            //return Create(collectionName, JSON.ToJSON(DictionaryExtensions.StripObject(obj), ASettings.JsonParameters));
             return Create(collectionName, Dictator.ToDocument(obj));
         }
         

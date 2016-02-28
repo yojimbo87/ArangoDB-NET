@@ -19,7 +19,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines driver version.
         /// </summary>
-        public const string DriverVersion = "0.9.3";
+        public const string DriverVersion = "0.9.4";
         
         /// <summary>
         /// Determines JSON serialization options.
@@ -28,7 +28,7 @@ namespace Arango.Client
         
         static ASettings()
         {
-            JsonParameters = new JSONParameters { UseEscapedUnicode = false, UseFastGuid = false };
+            JsonParameters = new JSONParameters { UseEscapedUnicode = false, UseFastGuid = false, UseExtensions = false };
         }
         
         #region AddConnection
