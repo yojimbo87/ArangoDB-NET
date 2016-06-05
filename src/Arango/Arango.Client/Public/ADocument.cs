@@ -102,7 +102,7 @@ namespace Arango.Client
         /// </summary>
         public AResult<Dictionary<string, object>> Create(string collectionName, string json)
         {
-            var request = new Request(HttpMethod.POST, ApiBaseUri.Document, "");
+            var request = new Request(HttpMethod.POST, ApiBaseUri.Document);
             
             // required
             request.QueryString.Add(ParameterName.Collection, collectionName);

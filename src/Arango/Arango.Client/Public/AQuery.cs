@@ -95,7 +95,7 @@ namespace Arango.Client
         /// </summary>
         public AResult<List<T>> ToList<T>()
         {
-            var request = new Request(HttpMethod.POST, ApiBaseUri.Cursor, "");
+            var request = new Request(HttpMethod.POST, ApiBaseUri.Cursor);
             var bodyDocument = new Dictionary<string, object>();
             
             // required
@@ -316,7 +316,7 @@ namespace Arango.Client
         /// </summary>
         public AResult<Dictionary<string, object>> Parse(string query)
         {
-            var request = new Request(HttpMethod.POST, ApiBaseUri.Query, "");
+            var request = new Request(HttpMethod.POST, ApiBaseUri.Query);
             var bodyDocument = new Dictionary<string, object>();
             
             // required

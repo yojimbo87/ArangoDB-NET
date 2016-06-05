@@ -78,7 +78,7 @@ namespace Arango.Client
         /// </summary>
         public AResult<T> Execute<T>(string action)
         {
-            var request = new Request(HttpMethod.POST, ApiBaseUri.Transaction, "");
+            var request = new Request(HttpMethod.POST, ApiBaseUri.Transaction);
             var bodyDocument = new Dictionary<string, object>();
             
             // required

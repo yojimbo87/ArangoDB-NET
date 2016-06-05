@@ -107,7 +107,7 @@ namespace Arango.Client
         /// </summary>
         public AResult<Dictionary<string, object>> Create(string collectionName)
         {
-            var request = new Request(HttpMethod.POST, ApiBaseUri.Index, "");
+            var request = new Request(HttpMethod.POST, ApiBaseUri.Index);
             var bodyDocument = new Dictionary<string, object>();
             
             // required

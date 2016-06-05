@@ -120,7 +120,7 @@ namespace Arango.Client
                 throw new ArgumentException("Specified toID value (" + toID + ") has invalid format.");
             }
             
-            var request = new Request(HttpMethod.POST, ApiBaseUri.Edge, "");
+            var request = new Request(HttpMethod.POST, ApiBaseUri.Edge);
             
             // required
             request.QueryString.Add(ParameterName.Collection, collectionName);

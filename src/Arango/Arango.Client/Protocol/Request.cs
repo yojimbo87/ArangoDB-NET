@@ -11,12 +11,14 @@ namespace Arango.Client.Protocol
         internal WebHeaderCollection Headers = new WebHeaderCollection();
         internal Dictionary<string, string> QueryString = new Dictionary<string, string>();
         internal string Body { get; set; }
-        
-        internal Request(HttpMethod httpMethod, string apiUri, string operationUri)
+
+        internal Request(HttpMethod httpMethod, string apiUri)
         {
             HttpMethod = httpMethod;
-            OperationUri = apiUri + operationUri;
+            OperationUri = apiUri;
         }
+
+        internal Request(HttpMethod httpMethod, string apiUri, string operationUri) : this(httpMethod, apiUri + operationUri) {}
         
         internal string GetRelativeUri()
         {

@@ -58,7 +58,7 @@ namespace Arango.Client
         /// </summary>
         public AResult<bool> Register(string name, string code)
         {
-            var request = new Request(HttpMethod.POST, ApiBaseUri.AqlFunction, "");
+            var request = new Request(HttpMethod.POST, ApiBaseUri.AqlFunction);
             var bodyDocument = new Dictionary<string, object>();
             
             // required
@@ -100,7 +100,7 @@ namespace Arango.Client
         /// </summary>
         public AResult<List<Dictionary<string, object>>> List()
         {
-            var request = new Request(HttpMethod.GET, ApiBaseUri.AqlFunction, "");
+            var request = new Request(HttpMethod.GET, ApiBaseUri.AqlFunction);
             
             // optional
             request.TrySetQueryStringParameter(ParameterName.Namespace, _parameters);

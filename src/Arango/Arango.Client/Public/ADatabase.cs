@@ -67,7 +67,18 @@ namespace Arango.Client
                 return new AFunction(_connection);
             }
         }
-        
+
+        /// <summary>
+        /// Provides access to graph operations in current database context.
+        /// </summary>
+        public AGraph Graph
+        {
+            get
+            {
+                return new AGraph(_connection);
+            }
+        }
+
         /// <summary>
         /// Provides access to index operations in current database context.
         /// </summary>
@@ -124,7 +135,7 @@ namespace Arango.Client
         /// </summary>
         public AResult<bool> Create(string databaseName, List<AUser> users)
         {
-            var request = new Request(HttpMethod.POST, ApiBaseUri.Database, "");
+            var request = new Request(HttpMethod.POST, ApiBaseUri.Database);
             var bodyDocument = new Dictionary<string, object>();
             
             // required: database name
@@ -264,7 +275,7 @@ namespace Arango.Client
         /// </summary>
         public AResult<List<string>> GetAllDatabases()
         {
-            var request = new Request(HttpMethod.GET, ApiBaseUri.Database, "");
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Database);
             
             var response = _connection.Send(request);
             var result = new AResult<List<string>>(response);
@@ -298,7 +309,7 @@ namespace Arango.Client
         /// </summary>
         public AResult<List<Dictionary<string, object>>> GetAllCollections()
         {
-            var request = new Request(HttpMethod.GET, ApiBaseUri.Collection, "");
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Collection);
             
             // optional
             request.TrySetQueryStringParameter(ParameterName.ExcludeSystem, _parameters);

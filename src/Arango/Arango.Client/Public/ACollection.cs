@@ -198,7 +198,7 @@ namespace Arango.Client
         /// </summary>
         public AResult<Dictionary<string, object>> Create(string collectionName)
         {
-            var request = new Request(HttpMethod.POST, ApiBaseUri.Collection, "");
+            var request = new Request(HttpMethod.POST, ApiBaseUri.Collection);
             var bodyDocument = new Dictionary<string, object>();
             
             // required
@@ -468,7 +468,7 @@ namespace Arango.Client
         /// </summary>
         public AResult<List<string>> GetAllDocuments(string collectionName)
         {
-            var request = new Request(HttpMethod.GET, ApiBaseUri.Document, "");
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Document);
 
             // required
             request.QueryString.Add(ParameterName.Collection, collectionName);
@@ -506,7 +506,7 @@ namespace Arango.Client
         /// </summary>
         public AResult<List<string>> GetAllEdges(string collectionName)
         {
-            var request = new Request(HttpMethod.GET, ApiBaseUri.Edge, "");
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Edge);
 
             // required
             request.QueryString.Add(ParameterName.Collection, collectionName);
@@ -544,7 +544,7 @@ namespace Arango.Client
         /// </summary>
         public AResult<Dictionary<string, object>> GetAllIndexes(string collectionName)
         {
-            var request = new Request(HttpMethod.GET, ApiBaseUri.Index, "");
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Index);
 
             // required
             request.QueryString.Add(ParameterName.Collection, collectionName);
