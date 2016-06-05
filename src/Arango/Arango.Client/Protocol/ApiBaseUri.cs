@@ -11,6 +11,7 @@ namespace Arango.Client.Protocol
         internal static string Document = "_api/document";
         internal static string Edge = "_api/edge";
         internal static string Edges = "_api/edges";
+        internal static string Gharial = "_api/gharial";
         internal static string Index = "_api/index";
         internal static string Query = "_api/query";
         internal static string Transaction = "_api/transaction";

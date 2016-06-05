@@ -87,6 +87,7 @@
     <Compile Include="Public\AEdge.cs" />
     <Compile Include="Public\AError.cs" />
     <Compile Include="Public\AFunction.cs" />
+    <Compile Include="Public\AGraph.cs" />
     <Compile Include="Public\AIndex.cs" />
     <Compile Include="Public\AIndexType.cs" />
     <Compile Include="Public\AKeyGeneratorType.cs" />
@@ -99,12 +100,6 @@
     <Compile Include="Public\AUser.cs" />
     <Compile Include="Public\DictionaryExtensions.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ExternalLibraries" />
-    <Folder Include="ExternalLibraries\fastJSON" />
-    <Folder Include="ExternalLibraries\dictator" />
-    <Folder Include="Protocol" />
-    <Folder Include="Public" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
