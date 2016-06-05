@@ -15,6 +15,7 @@ namespace Arango.Client.Protocol
         internal const string CreateCollection = "createCollection";
         internal const string DoCompact = "doCompact";
         internal const string Direction = "direction";
+        internal const string EdgeDefinitions = "edgeDefinitions";
         internal const string ExcludeSystem = "excludeSystem";
         internal const string Fields = "fields";
         internal const string From = "from";
@@ -40,6 +41,7 @@ namespace Arango.Client.Protocol
         internal const string OptionsFullCount = "options.fullCount";
         internal const string OptionsMaxPlans = "options.maxPlans";
         internal const string OptionsOptimizerRules = "options.optimizer.rules";
+        internal const string OrphanCollections = "orphanCollections";
         internal const string Params = "params";
         internal const string Policy = "policy";
         internal const string Query = "query";
