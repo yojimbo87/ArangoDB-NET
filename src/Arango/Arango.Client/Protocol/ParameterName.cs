@@ -13,8 +13,9 @@ namespace Arango.Client.Protocol
         internal const string Code = "code";
         internal const string Count = "count";
         internal const string CreateCollection = "createCollection";
-        internal const string DoCompact = "doCompact";
         internal const string Direction = "direction";
+        internal const string DoCompact = "doCompact";
+        internal const string DropCollections = "dropCollections";
         internal const string EdgeDefinitions = "edgeDefinitions";
         internal const string ExcludeSystem = "excludeSystem";
         internal const string Fields = "fields";

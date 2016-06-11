@@ -18,7 +18,7 @@ namespace Arango.Client
         #region Parameters
 
         /// <summary>
-        /// Determines whether collection should be created if it does not exist. Default value: false.
+        /// Adds edge definition which represents directed relation of a graph.
         /// </summary>
         public AGraph AddEdgeDefinition(string collectionName, List<string> fromList, List<string> toList)
         {
@@ -30,6 +30,16 @@ namespace Arango.Client
             };
 
             _parameters.Object(ParameterName.EdgeDefinitions + "[*]", edgeDifinition);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Determines if delete operation should also drop collections of specified graph. Collections will only be dropped if they are not used in other graphs. Default value: false.
+        /// </summary>
+        public AGraph DropCollections(bool value)
+        {
+            _parameters.Bool(ParameterName.DropCollections, value);
 
             return this;
         }
@@ -133,6 +143,43 @@ namespace Arango.Client
                     // Arango error
                     break;
             }
+
+            return result;
+        }
+
+        #endregion
+
+        #region Delete (DELETE)
+
+        /// <summary>
+        /// Deletes specified graph and returns boolean value which indicates if operation was successful.
+        /// </summary>
+        public AResult<bool> Delete(string graphName)
+        {
+            var request = new Request(HttpMethod.DELETE, ApiBaseUri.Gharial, "/" + graphName);
+
+            var response = _connection.Send(request);
+
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.DropCollections, _parameters);
+
+            var result = new AResult<bool>(response);
+
+            switch (response.StatusCode)
+            {
+                case 200:
+                    var body = response.ParseBody<Dictionary<string, object>>();
+
+                    result.Success = (body != null);
+                    result.Value = body.Bool("removed");
+                    break;
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+
+            _parameters.Clear();
 
             return result;
         }

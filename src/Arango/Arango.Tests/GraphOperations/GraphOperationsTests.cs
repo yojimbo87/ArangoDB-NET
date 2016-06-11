@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using Arango.Client;
 
@@ -9,6 +8,11 @@ namespace Arango.Tests.GraphOperations
     [TestFixture()]
     public class GraphOperationsTests : IDisposable
     {
+        private const string _collectionName = "testGraphCollection001";
+        private const string _graphName = "testGraph001";
+        private List<string> _fromList = new List<string> { "fromFoo" };
+        private List<string> _toList = new List<string> { "toBar" };
+
         public GraphOperationsTests()
         {
             Database.CreateTestDatabase(Database.TestDatabaseGeneral);
@@ -20,16 +24,12 @@ namespace Arango.Tests.GraphOperations
         public void Should_create_graph()
         {
             // given
-            var collectionName = "testGraphCollection001";
-            var fromList = new List<string> { "fromFoo" };
-            var toList = new List<string> { "toBar" };
-            var graphName = "testGraph001";
             var db = new ADatabase(Database.Alias);
 
             // when
             var createResult = db.Graph
-                .AddEdgeDefinition(collectionName, fromList, toList)
-                .Create(graphName);
+                .AddEdgeDefinition(_collectionName, _fromList, _toList)
+                .Create(_graphName);
 
             // then
             Assert.AreEqual(201, createResult.StatusCode);
@@ -37,14 +37,16 @@ namespace Arango.Tests.GraphOperations
             Assert.IsTrue(createResult.HasValue);
             Assert.IsTrue(ADocument.IsID(createResult.Value.String("_id")));
             Assert.IsTrue(ADocument.IsRev(createResult.Value.String("_rev")));
-            Assert.AreEqual(graphName, createResult.Value.String("name"));
+            Assert.AreEqual(_graphName, createResult.Value.String("name"));
             Assert.AreEqual(1, createResult.Value.Size("edgeDefinitions"));
-            Assert.AreEqual(collectionName, createResult.Value.String("edgeDefinitions[0].collection"));
-            Assert.AreEqual(fromList.Count, createResult.Value.Size("edgeDefinitions[0].from"));
-            Assert.AreEqual(fromList[0], createResult.Value.String("edgeDefinitions[0].from[0]"));
-            Assert.AreEqual(toList.Count, createResult.Value.Size("edgeDefinitions[0].to"));
-            Assert.AreEqual(toList[0], createResult.Value.String("edgeDefinitions[0].to[0]"));
+            Assert.AreEqual(_collectionName, createResult.Value.String("edgeDefinitions[0].collection"));
+            Assert.AreEqual(_fromList.Count, createResult.Value.Size("edgeDefinitions[0].from"));
+            Assert.AreEqual(_fromList[0], createResult.Value.String("edgeDefinitions[0].from[0]"));
+            Assert.AreEqual(_toList.Count, createResult.Value.Size("edgeDefinitions[0].to"));
+            Assert.AreEqual(_toList[0], createResult.Value.String("edgeDefinitions[0].to[0]"));
             Assert.AreEqual(0, createResult.Value.Size("orphanCollections"));
+
+            ClearGraph(_graphName);
         }
 
         #endregion
@@ -68,6 +70,38 @@ namespace Arango.Tests.GraphOperations
         }
 
         #endregion
+
+        #region Delete operations
+
+        [Test()]
+        public void Should_delete_graph()
+        {
+            // given
+            var db = new ADatabase(Database.Alias);
+
+            var createResult = db.Graph
+                .AddEdgeDefinition(_collectionName, _fromList, _toList)
+                .Create(_graphName);
+
+            Assert.AreEqual(201, createResult.StatusCode);
+
+            // when
+            var deleteResult = db.Graph
+                .Delete(_graphName);
+
+            // then
+            Assert.AreEqual(200, deleteResult.StatusCode);
+            Assert.IsTrue(deleteResult.Success);
+            Assert.IsTrue(deleteResult.HasValue);
+            Assert.IsTrue(deleteResult.Value);
+        }
+
+        #endregion
+
+        private void ClearGraph(string graphName)
+        {
+
+        }
 
         public void Dispose()
         {
