@@ -20,11 +20,11 @@ namespace Arango.Client
         /// <summary>
         /// Determines whether collection should be created if it does not exist. Default value: false.
         /// </summary>
-        public AGraph AddEdgeDefinition(string collection, List<string> fromList, List<string> toList)
+        public AGraph AddEdgeDefinition(string collectionName, List<string> fromList, List<string> toList)
         {
             var edgeDifinition = new Dictionary<string, object>
             {
-                { "collection",  collection },
+                { "collection",  collectionName },
                 { "from", fromList },
                 { "to", toList }
             };
@@ -62,8 +62,12 @@ namespace Arango.Client
                 case 201:
                     var body = response.ParseBody<Dictionary<string, object>>();
 
-                    result.Success = (body != null);
-                    result.Value = body;
+                    result.Success = (body != null) && body.Has("graph");
+
+                    if (body.Has("graph"))
+                    {
+                        result.Value = body.Object<Dictionary<string, object>>("graph");
+                    }
                     break;
                 case 409:
                 default:
@@ -106,8 +110,33 @@ namespace Arango.Client
             return result;
         }
 
+        /// <summary>
+        /// Retrieves specified graph.
+        /// </summary>
+        public AResult<Dictionary<string, object>> Get(string graphName)
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Gharial, "/" + graphName);
+
+            var response = _connection.Send(request);
+            var result = new AResult<Dictionary<string, object>>(response);
+
+            switch (response.StatusCode)
+            {
+                case 200:
+                    var body = response.ParseBody<Dictionary<string, object>>();
+
+                    result.Success = (body != null);
+                    result.Value = body.Object<Dictionary<string, object>>("graph");
+                    break;
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+
+            return result;
+        }
+
         #endregion
-
-
     }
 }
