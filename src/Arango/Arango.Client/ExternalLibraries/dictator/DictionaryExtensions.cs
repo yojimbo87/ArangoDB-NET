@@ -1539,8 +1539,14 @@ namespace Arango.Client
         {
             if (!string.IsNullOrEmpty(arrayContent))
             {
-                var collection = ((IList)fieldDocument[fieldName]);
+                // create field if it doesn't exist
+                if (!fieldDocument.ContainsKey(fieldName))
+                {
+                    fieldDocument[fieldName] = new List<object>();
+                }
                 
+                var collection = ((IList)fieldDocument[fieldName]);
+
                 // append value to collection
                 if (arrayContent == "*")
                 {
