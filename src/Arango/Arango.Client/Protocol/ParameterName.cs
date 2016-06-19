@@ -40,7 +40,6 @@ namespace Arango.Client.Protocol
         internal const string OptionsMaxPlans = "options.maxPlans";
         internal const string OptionsOptimizerRules = "options.optimizer.rules";
         internal const string Params = "params";
-        internal const string Policy = "policy";
         internal const string Query = "query";
         internal const string ShardKeys = "shardKeys";
         internal const string Size = "size";

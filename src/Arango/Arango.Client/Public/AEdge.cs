@@ -39,18 +39,6 @@ namespace Arango.Client
         }
         
         /// <summary>
-        /// Conditionally operate on edge with specified revision and update policy.
-        /// </summary>
-        public AEdge IfMatch(string revision, AUpdatePolicy updatePolicy)
-        {
-            _parameters.String(ParameterName.IfMatch, revision);
-            // needs to be string value
-            _parameters.String(ParameterName.Policy, updatePolicy.ToString().ToLower());
-        	
-        	return this;
-        }
-        
-        /// <summary>
         /// Conditionally operate on edge which current revision does not match specified revision.
         /// </summary>
         public AEdge IfNoneMatch(string revision)
@@ -343,11 +331,6 @@ namespace Arango.Client
             // optional
             request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
             // optional
-            if (_parameters.Has(ParameterName.IfMatch))
-            {
-                request.TrySetQueryStringParameter(ParameterName.Policy, _parameters);
-            }
-            // optional
             request.TrySetQueryStringParameter(ParameterName.KeepNull, _parameters);
             // optional
             request.TrySetQueryStringParameter(ParameterName.MergeObjects, _parameters);
@@ -422,11 +405,6 @@ namespace Arango.Client
             request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
             // optional
             request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
-            // optional
-            if (_parameters.Has(ParameterName.IfMatch))
-            {
-                request.TrySetQueryStringParameter(ParameterName.Policy, _parameters);
-            }
 
             request.Body = json;
             
@@ -498,11 +476,6 @@ namespace Arango.Client
             request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
             // optional
             request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
-            // optional
-            if (_parameters.Has(ParameterName.IfMatch))
-            {
-                request.TrySetQueryStringParameter(ParameterName.Policy, _parameters);
-            }
             
             var response = _connection.Send(request);
             var result = new AResult<Dictionary<string, object>>(response);

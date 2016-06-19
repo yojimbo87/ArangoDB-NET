@@ -95,16 +95,9 @@
     <Compile Include="Public\AReturnListType.cs" />
     <Compile Include="Public\ASettings.cs" />
     <Compile Include="Public\ATransaction.cs" />
-    <Compile Include="Public\AUpdatePolicy.cs" />
     <Compile Include="Public\AUser.cs" />
     <Compile Include="Public\DictionaryExtensions.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ExternalLibraries" />
-    <Folder Include="ExternalLibraries\fastJSON" />
-    <Folder Include="ExternalLibraries\dictator" />
-    <Folder Include="Protocol" />
-    <Folder Include="Public" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

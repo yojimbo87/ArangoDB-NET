@@ -664,52 +664,6 @@ namespace Arango.Tests
         }
         
         [Test()]
-        public void Should_update_edge_with_ifMatch_and_lastUpdatePolicy()
-        {
-        	Database.ClearTestCollection(Database.TestEdgeCollectionName);
-            var db = new ADatabase(Database.Alias);
-
-            var document = new Dictionary<string, object>()
-                .String("foo", "some string")
-                .Int("bar", 12345);
-            
-            var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
-            
-            var newDocument = new Dictionary<string, object>()
-                .String("foo", "some other new string")
-                .Int("bar", 54321)
-                .Int("baz", 12345);
-            
-            var updateResult = db.Edge
-                .IfMatch("123456789", AUpdatePolicy.Last)
-                .Update(createResult.Value.String("_id"), newDocument);
-            
-            Assert.AreEqual(202, updateResult.StatusCode);
-            Assert.IsTrue(updateResult.Success);
-            Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
-            
-            var getResult = db.Document
-                .Get(updateResult.Value.String("_id"));
-            
-            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
-            
-            Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
-            Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
-            
-            Assert.AreNotEqual(getResult.Value.Int("bar"), document.Int("bar"));
-            Assert.AreEqual(getResult.Value.Int("bar"), newDocument.Int("bar"));
-            
-            // by default JSON integers are deserialized to long type
-            Assert.IsTrue(getResult.Value.IsLong("baz"));
-        }
-        
-        [Test()]
         public void Should_update_edge_with_keepNull()
         {
             Database.ClearTestCollection(Database.TestEdgeCollectionName);
@@ -1053,51 +1007,6 @@ namespace Arango.Tests
         }
         
         [Test()]
-        public void Should_replace_edge_with_ifMatch_and_lastUpdatePolicy()
-        {
-        	Database.ClearTestCollection(Database.TestEdgeCollectionName);
-            var db = new ADatabase(Database.Alias);
-
-            var document = new Dictionary<string, object>()
-                .String("foo", "some string")
-                .Int("bar", 12345);
-            
-            var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
-            
-            document.Merge(createResult.Value);
-            
-            var newDocument = new Dictionary<string, object>()
-                .String("foo", "some other new string")
-                .Int("baz", 54321);
-            
-            var replaceResult = db.Edge
-                .IfMatch("123456789", AUpdatePolicy.Last)
-                .Replace(createResult.Value.String("_id"), newDocument);
-            
-            Assert.AreEqual(202, replaceResult.StatusCode);
-            Assert.IsTrue(replaceResult.Success);
-            Assert.IsTrue(replaceResult.HasValue);
-            Assert.AreEqual(replaceResult.Value.String("_id"), document.String("_id"));
-            Assert.AreEqual(replaceResult.Value.String("_key"), document.String("_key"));
-            Assert.AreNotEqual(replaceResult.Value.String("_rev"), document.String("_rev"));
-            
-            var getResult = db.Document
-                .Get(replaceResult.Value.String("_id"));
-            
-            Assert.AreEqual(getResult.Value.String("_id"), replaceResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), replaceResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), replaceResult.Value.String("_rev"));
-            
-            Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
-            Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
-            
-            Assert.AreEqual(getResult.Value.Int("baz"), newDocument.Int("baz"));
-            
-            Assert.IsFalse(getResult.Value.Has("bar"));
-        }
-        
-        [Test()]
         public void Should_replace_edge_with_generic_object()
         {
             Database.ClearTestCollection(Database.TestEdgeCollectionName);
@@ -1236,31 +1145,6 @@ namespace Arango.Tests
             
             Assert.AreEqual(412, deleteResult.StatusCode);
             Assert.IsFalse(deleteResult.Success);
-            Assert.IsTrue(deleteResult.HasValue);
-            Assert.AreEqual(deleteResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(deleteResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreEqual(deleteResult.Value.String("_rev"), createResult.Value.String("_rev"));
-        }
-        
-        [Test()]
-        public void Should_delete_edge_with_ifMatch_and_lastUpdatePolicy()
-        {
-            Database.ClearTestCollection(Database.TestEdgeCollectionName);
-            var db = new ADatabase(Database.Alias);
-
-            var document = new Dictionary<string, object>()
-                .String("foo", "some string")
-                .Int("bar", 12345);
-            
-            var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
-            
-            var deleteResult = db.Document
-                .IfMatch("123456789", AUpdatePolicy.Last)
-                .Delete(createResult.Value.String("_id"));
-            
-            Assert.AreEqual(202, deleteResult.StatusCode);
-            Assert.IsTrue(deleteResult.Success);
             Assert.IsTrue(deleteResult.HasValue);
             Assert.AreEqual(deleteResult.Value.String("_id"), createResult.Value.String("_id"));
             Assert.AreEqual(deleteResult.Value.String("_key"), createResult.Value.String("_key"));
