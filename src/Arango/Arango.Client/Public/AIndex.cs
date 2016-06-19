@@ -118,10 +118,6 @@ namespace Arango.Client
             
             switch (_parameters.Enum<AIndexType>(ParameterName.Type))
             {
-                case AIndexType.Cap:
-                    Request.TrySetBodyParameter(ParameterName.ByteSize, _parameters, bodyDocument);
-                    Request.TrySetBodyParameter(ParameterName.Size, _parameters, bodyDocument);
-                    break;
                 case AIndexType.Fulltext:
                     Request.TrySetBodyParameter(ParameterName.Fields, _parameters, bodyDocument);
                     Request.TrySetBodyParameter(ParameterName.MinLength, _parameters, bodyDocument);

@@ -15,28 +15,6 @@ namespace Arango.Tests
 		}
         
         [Test()]
-        public void Should_create_cap_contraint()
-        {
-        	Database.CreateTestCollection(Database.TestDocumentCollectionName, ACollectionType.Document);
-            var db = new ADatabase(Database.Alias);
-
-            var createResult = db.Index
-                .Type(AIndexType.Cap)
-                .Size(10)
-                .Create(Database.TestDocumentCollectionName);
-            
-            Assert.AreEqual(201, createResult.StatusCode);
-            Assert.IsTrue(createResult.Success);
-            Assert.IsTrue(createResult.HasValue);
-            Assert.IsTrue(createResult.Value.IsID("id"));
-            Assert.AreEqual(AIndexType.Cap, createResult.Value.Enum<AIndexType>("type"));
-            Assert.IsFalse(createResult.Value.Bool("unique"));
-            Assert.AreEqual(10, createResult.Value.Long("size"));
-            Assert.AreEqual(0, createResult.Value.Long("byteSize"));
-            Assert.IsTrue(createResult.Value.Bool("isNewlyCreated"));
-        }
-        
-        [Test()]
         public void Should_create_fulltext_index()
         {
         	Database.CreateTestCollection(Database.TestDocumentCollectionName, ACollectionType.Document);
