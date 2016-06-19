@@ -271,7 +271,7 @@ namespace Arango.Tests
             Assert.AreEqual(createResult.Value.Int("status"), getResult.Value.Int("status"));
             Assert.AreEqual(createResult.Value.Int("type"), getResult.Value.Int("type"));
             Assert.IsTrue(getResult.Value.IsString("revision"));
-            Assert.IsTrue(getResult.Value.IsLong("checksum"));
+            Assert.IsTrue(getResult.Value.IsString("checksum"));
         }
         
         [Test()]
