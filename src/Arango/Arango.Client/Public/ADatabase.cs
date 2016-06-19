@@ -312,7 +312,7 @@ namespace Arango.Client
                     var body = response.ParseBody<Dictionary<string, object>>();
                     
                     result.Success = (body != null);
-                    result.Value = body.List<Dictionary<string, object>>("collections");
+                    result.Value = body.List<Dictionary<string, object>>("result");
                     break;
                 case 400:
                 case 403:
