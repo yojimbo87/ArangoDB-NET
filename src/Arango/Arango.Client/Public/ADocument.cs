@@ -90,10 +90,8 @@ namespace Arango.Client
         /// </summary>
         public AResult<Dictionary<string, object>> Create(string collectionName, string json)
         {
-            var request = new Request(HttpMethod.POST, ApiBaseUri.Document, "");
+            var request = new Request(HttpMethod.POST, ApiBaseUri.Document, "/" + collectionName);
             
-            // required
-            request.QueryString.Add(ParameterName.Collection, collectionName);
             // optional
             request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
             // optional
