@@ -45,17 +45,6 @@ namespace Arango.Client
                 return new ADocument(_connection);
             }
         }
-        
-        /// <summary>
-        /// Provides access to edge operations in current database context.
-        /// </summary>
-        public AEdge Edge
-        {
-            get
-            {
-                return new AEdge(_connection);
-            }
-        }
 
         /// <summary>
         /// Provides access to AQL user function management operations in current database context.

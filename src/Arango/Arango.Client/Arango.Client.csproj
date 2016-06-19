@@ -84,7 +84,6 @@
     <Compile Include="Public\ADatabase.cs" />
     <Compile Include="Public\ADirection.cs" />
     <Compile Include="Public\ADocument.cs" />
-    <Compile Include="Public\AEdge.cs" />
     <Compile Include="Public\AError.cs" />
     <Compile Include="Public\AFunction.cs" />
     <Compile Include="Public\AIndex.cs" />

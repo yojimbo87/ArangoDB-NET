@@ -139,20 +139,104 @@ namespace Arango.Client
             //return Create(collectionName, JSON.ToJSON(DictionaryExtensions.StripObject(obj), ASettings.JsonParameters));
             return Create(collectionName, Dictator.ToDocument(obj));
         }
-        
+
         #endregion
-        
+
+        #region Create edge (POST)
+
+        /// <summary>
+        /// Creates new edge document with document data in current database context.
+        /// </summary>
+        /// <exception cref="ArgumentException">Specified document does not contain '_from' and '_to' fields.</exception>
+        public AResult<Dictionary<string, object>> CreateEdge(string collectionName, Dictionary<string, object> document)
+        {
+            if (!document.Has("_from") && !document.Has("_to"))
+            {
+                throw new ArgumentException("Specified document does not contain '_from' and '_to' fields.");
+            }
+
+            return Create(collectionName, JSON.ToJSON(document, ASettings.JsonParameters));
+        }
+
+        /// <summary>
+        /// Creates new edge document within specified collection between two document vertices in current database context.
+        /// </summary>
+        /// <exception cref="ArgumentException">Specified 'from' and 'to' ID values have invalid format.</exception>
+        public AResult<Dictionary<string, object>> CreateEdge(string collectionName, string fromID, string toID)
+        {
+            if (!IsID(fromID))
+            {
+                throw new ArgumentException("Specified 'from' value (" + fromID + ") has invalid format.");
+            }
+
+            if (!IsID(toID))
+            {
+                throw new ArgumentException("Specified 'to' value (" + toID + ") has invalid format.");
+            }
+
+            var document = new Dictionary<string, object>
+            {
+                { "_from", fromID  },
+                { "_to", toID  },
+            };
+
+            return Create(collectionName, document);
+        }
+
+        /// <summary>
+        /// Creates new edge with document data within specified collection between two document vertices in current database context.
+        /// </summary>
+        /// <exception cref="ArgumentException">Specified 'from' and 'to' ID values have invalid format.</exception>
+        public AResult<Dictionary<string, object>> CreateEdge(string collectionName, string fromID, string toID, Dictionary<string, object> document)
+        {
+            if (!IsID(fromID))
+            {
+                throw new ArgumentException("Specified 'from' value (" + fromID + ") has invalid format.");
+            }
+
+            if (!IsID(toID))
+            {
+                throw new ArgumentException("Specified 'to' value (" + toID + ") has invalid format.");
+            }
+
+            document.From(fromID);
+            document.To(toID);
+
+            return Create(collectionName, JSON.ToJSON(document, ASettings.JsonParameters));
+        }
+
+        /// <summary>
+        /// Creates new edge with document data within specified collection between two document vertices in current database context.
+        /// </summary>
+        /// <exception cref="ArgumentException">Specified 'from' and 'to' ID values have invalid format.</exception>
+        public AResult<Dictionary<string, object>> CreateEdge<T>(string collectionName, string fromID, string toID, T obj)
+        {
+            if (!IsID(fromID))
+            {
+                throw new ArgumentException("Specified 'from' value (" + fromID + ") has invalid format.");
+            }
+
+            if (!IsID(toID))
+            {
+                throw new ArgumentException("Specified 'to' value (" + toID + ") has invalid format.");
+            }
+
+            return CreateEdge(collectionName, fromID, toID, Dictator.ToDocument(obj));
+        }
+
+        #endregion
+
         #region Check (HEAD)
-        
+
         /// <summary>
         /// Checks for existence of specified document.
         /// </summary>
-        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        /// <exception cref="ArgumentException">Specified 'id' value has invalid format.</exception>
         public AResult<string> Check(string id)
         {
-            if (!ADocument.IsID(id))
+            if (!IsID(id))
             {
-                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
+                throw new ArgumentException("Specified 'id' value (" + id + ") has invalid format.");
             }
             
             var request = new Request(HttpMethod.HEAD, ApiBaseUri.Document, "/" + id);
@@ -199,21 +283,12 @@ namespace Arango.Client
         /// <summary>
         /// Retrieves specified document.
         /// </summary>
-        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
-        public AResult<Dictionary<string, object>> Get(string id)
-        {
-            return Get<Dictionary<string, object>>(id);
-        }
-        
-        /// <summary>
-        /// Retrieves specified document.
-        /// </summary>
-        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        /// <exception cref="ArgumentException">Specified 'id' value has invalid format.</exception>
         public AResult<T> Get<T>(string id)
         {
-            if (!ADocument.IsID(id))
+            if (!IsID(id))
             {
-                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
+                throw new ArgumentException("Specified 'id' value (" + id + ") has invalid format.");
             }
             
             var request = new Request(HttpMethod.GET, ApiBaseUri.Document, "/" + id);
@@ -250,20 +325,77 @@ namespace Arango.Client
             
             return result;
         }
-        
+
+        /// <summary>
+        /// Retrieves specified document.
+        /// </summary>
+        public AResult<Dictionary<string, object>> Get(string id)
+        {
+            return Get<Dictionary<string, object>>(id);
+        }
+
         #endregion
-        
+
+        #region Get in/out/any edges (GET)
+
+        /// <summary>
+        /// Retrieves list of edges from specified edge type collection to specified document vertex with given direction.
+        /// </summary>
+        /// <exception cref="ArgumentException">Specified 'startVertexID' value has invalid format.</exception>
+        public AResult<List<Dictionary<string, object>>> GetEdges(string collectionName, string startVertexID, ADirection direction)
+        {
+            if (!IsID(startVertexID))
+            {
+                throw new ArgumentException("Specified 'startVertexID' value (" + startVertexID + ") has invalid format.");
+            }
+
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Edges, "/" + collectionName);
+
+            // required
+            request.QueryString.Add(ParameterName.Vertex, startVertexID);
+            // required
+            request.QueryString.Add(ParameterName.Direction, direction.ToString().ToLower());
+
+            var response = _connection.Send(request);
+            var result = new AResult<List<Dictionary<string, object>>>(response);
+
+            switch (response.StatusCode)
+            {
+                case 200:
+                    var body = response.ParseBody<Dictionary<string, object>>();
+
+                    result.Success = (body != null);
+
+                    if (result.Success)
+                    {
+                        result.Value = body.List<Dictionary<string, object>>("edges");
+                    }
+                    break;
+                case 400:
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+
+            _parameters.Clear();
+
+            return result;
+        }
+
+        #endregion
+
         #region Update (PATCH)
-        
+
         /// <summary>
         /// Updates existing document identified by its handle with new document data.
         /// </summary>
-        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        /// <exception cref="ArgumentException">Specified 'id' value has invalid format.</exception>
         public AResult<Dictionary<string, object>> Update(string id, string json)
         {
-            if (!ADocument.IsID(id))
+            if (!IsID(id))
             {
-                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
+                throw new ArgumentException("Specified 'id' value (" + id + ") has invalid format.");
             }
             
             var request = new Request(HttpMethod.PATCH, ApiBaseUri.Document, "/" + id);
@@ -311,7 +443,6 @@ namespace Arango.Client
         /// <summary>
         /// Updates existing document identified by its handle with new document data.
         /// </summary>
-        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
         public AResult<Dictionary<string, object>> Update(string id, Dictionary<string, object> document)
         {
             return Update(id, JSON.ToJSON(document, ASettings.JsonParameters));
@@ -320,7 +451,6 @@ namespace Arango.Client
         /// <summary>
         /// Updates existing document identified by its handle with new document data.
         /// </summary>
-        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
         public AResult<Dictionary<string, object>> Update<T>(string id, T obj)
         {
             return Update(id, Dictator.ToDocument(obj));
@@ -333,12 +463,12 @@ namespace Arango.Client
         /// <summary>
         /// Completely replaces existing document identified by its handle with new document data.
         /// </summary>
-        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        /// <exception cref="ArgumentException">Specified 'id' value has invalid format.</exception>
         public AResult<Dictionary<string, object>> Replace(string id, string json)
         {
-            if (!ADocument.IsID(id))
+            if (!IsID(id))
             {
-                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
+                throw new ArgumentException("Specified 'id' value (" + id + ") has invalid format.");
             }
             
             var request = new Request(HttpMethod.PUT, ApiBaseUri.Document, "/" + id);
@@ -396,20 +526,68 @@ namespace Arango.Client
         {
             return Replace(id, Dictator.ToDocument(obj));
         }
-        
+
         #endregion
-        
+
+        #region Replace edge (PUT)
+
+        /// <summary>
+        /// Completely replaces existing edge identified by its handle with new edge data.
+        /// </summary>
+        /// <exception cref="ArgumentException">Specified document does not contain '_from' and '_to' fields.</exception>
+        public AResult<Dictionary<string, object>> ReplaceEdge(string id, Dictionary<string, object> document)
+        {
+            if (!document.Has("_from") && !document.Has("_to"))
+            {
+                throw new ArgumentException("Specified document does not contain '_from' and '_to' fields.");
+            }
+
+            return Replace(id, JSON.ToJSON(document, ASettings.JsonParameters));
+        }
+
+        /// <summary>
+        /// Completely replaces existing edge identified by its handle with new edge data.
+        /// </summary>
+        /// <exception cref="ArgumentException">Specified 'from' or 'to' ID values have invalid format.</exception>
+        public AResult<Dictionary<string, object>> ReplaceEdge(string id, string fromID, string toID, Dictionary<string, object> document)
+        {
+            if (!IsID(fromID))
+            {
+                throw new ArgumentException("Specified 'from' value (" + fromID + ") has invalid format.");
+            }
+
+            if (!IsID(toID))
+            {
+                throw new ArgumentException("Specified 'to' value (" + toID + ") has invalid format.");
+            }
+
+            document.From(fromID);
+            document.To(toID);
+
+            return Replace(id, JSON.ToJSON(document, ASettings.JsonParameters));
+        }
+
+        /// <summary>
+        /// Completely replaces existing edge identified by its handle with new edge data.
+        /// </summary>
+        public AResult<Dictionary<string, object>> ReplaceEdge<T>(string id, string fromID, string toID, T obj)
+        {
+            return ReplaceEdge(id, fromID, toID, Dictator.ToDocument(obj));
+        }
+
+        #endregion
+
         #region Delete (DELETE)
-        
+
         /// <summary>
         /// Deletes specified document.
         /// </summary>
-        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        /// <exception cref="ArgumentException">Specified 'id' value has invalid format.</exception>
         public AResult<Dictionary<string, object>> Delete(string id)
         {
-            if (!ADocument.IsID(id))
+            if (!IsID(id))
             {
-                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
+                throw new ArgumentException("Specified 'id' value (" + id + ") has invalid format.");
             }
             
             var request = new Request(HttpMethod.DELETE, ApiBaseUri.Document, "/" + id);
