@@ -70,6 +70,17 @@ namespace Arango.Client
         	return this;
         }
 
+        /// <summary>
+        /// Determines whether to return additionally the complete new document under the attribute new in the result. Default value: false.
+        /// </summary>
+        public AEdge ReturnNew(bool value)
+        {
+            // needs to be string value
+            _parameters.String(ParameterName.ReturnNew, value.ToString().ToLower());
+
+            return this;
+        }
+
         #endregion
 
         #region Create (POST)
@@ -85,6 +96,8 @@ namespace Arango.Client
             request.QueryString.Add(ParameterName.Collection, collectionName);
             // optional
             request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.ReturnNew, _parameters);
 
             request.Body = json;
 

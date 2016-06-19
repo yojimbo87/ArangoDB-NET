@@ -37,7 +37,35 @@ namespace Arango.Tests
             Assert.IsTrue(createResult.Value.IsString("_key"));
             Assert.IsTrue(createResult.Value.IsString("_rev"));
         }
-        
+
+        [Test()]
+        public void Should_create_document_with_returnNew_parameter()
+        {
+            Database.ClearTestCollection(Database.TestDocumentCollectionName);
+            var db = new ADatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "foo string value")
+                .Int("bar", 12345);
+
+            var createResult = db.Document
+                .ReturnNew(true)
+                .Create(Database.TestDocumentCollectionName, document);
+
+            Assert.AreEqual(202, createResult.StatusCode);
+            Assert.IsTrue(createResult.Success);
+            Assert.IsTrue(createResult.HasValue);
+            Assert.IsTrue(createResult.Value.IsString("_id"));
+            Assert.IsTrue(createResult.Value.IsString("_key"));
+            Assert.IsTrue(createResult.Value.IsString("_rev"));
+            Assert.IsTrue(createResult.Value.Has("new"));
+            Assert.AreEqual(createResult.Value.String("_id"), createResult.Value.String("new._id"));
+            Assert.AreEqual(createResult.Value.String("_key"), createResult.Value.String("new._key"));
+            Assert.AreEqual(createResult.Value.String("_rev"), createResult.Value.String("new._rev"));
+            Assert.AreEqual(document.String("foo"), createResult.Value.String("new.foo"));
+            Assert.AreEqual(document.Int("bar"), createResult.Value.Int("new.bar"));
+        }
+
         [Test()]
         public void Should_create_document_with_waitForSync()
         {

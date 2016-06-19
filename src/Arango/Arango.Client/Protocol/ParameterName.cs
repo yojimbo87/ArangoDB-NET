@@ -41,6 +41,7 @@ namespace Arango.Client.Protocol
         internal const string OptionsOptimizerRules = "options.optimizer.rules";
         internal const string Params = "params";
         internal const string Query = "query";
+        internal const string ReturnNew = "returnNew";
         internal const string ShardKeys = "shardKeys";
         internal const string Size = "size";
         internal const string Sparse = "sparse";

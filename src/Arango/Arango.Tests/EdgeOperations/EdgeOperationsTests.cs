@@ -93,7 +93,39 @@ namespace Arango.Tests
             Assert.AreEqual(getResult.Value.String("foo"), document.String("foo"));
             Assert.AreEqual(getResult.Value.Int("bar"), document.Int("bar"));
         }
-        
+
+        [Test()]
+        public void Should_create_edge_with_returnNew_parameter()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+            var db = new ADatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .From(_documents[0].String("_id"))
+                .To(_documents[1].String("_id"))
+                .String("foo", "foo string value")
+                .Int("bar", 12345);
+
+            var createResult = db.Edge
+                .ReturnNew(true)
+                .Create(Database.TestEdgeCollectionName, document);
+
+            Assert.AreEqual(202, createResult.StatusCode);
+            Assert.IsTrue(createResult.Success);
+            Assert.IsTrue(createResult.HasValue);
+            Assert.IsTrue(createResult.Value.IsString("_id"));
+            Assert.IsTrue(createResult.Value.IsString("_key"));
+            Assert.IsTrue(createResult.Value.IsString("_rev"));
+            Assert.IsTrue(createResult.Value.Has("new"));
+            Assert.AreEqual(createResult.Value.String("_id"), createResult.Value.String("new._id"));
+            Assert.AreEqual(createResult.Value.String("_key"), createResult.Value.String("new._key"));
+            Assert.AreEqual(createResult.Value.String("_rev"), createResult.Value.String("new._rev"));
+            Assert.AreEqual(document.String("_from"), createResult.Value.String("new._from"));
+            Assert.AreEqual(document.String("_to"), createResult.Value.String("new._to"));
+            Assert.AreEqual(document.String("foo"), createResult.Value.String("new.foo"));
+            Assert.AreEqual(document.Int("bar"), createResult.Value.Int("new.bar"));
+        }
+
         [Test()]
         public void Should_create_edge_from_generic_object()
         {
