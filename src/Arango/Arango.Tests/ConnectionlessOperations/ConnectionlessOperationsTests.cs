@@ -114,7 +114,9 @@ namespace Arango.Tests
             var doc = new Dictionary<string, object>()
                 .ID("col/123_a:b-c")
                 .Key("123_a:b-c")
-                .Rev("123456789");
+                .Rev("123456789")
+                .From("col2/456_d:e-f")
+                .To("col3/789_g:h-i");
             
             Assert.IsTrue(doc.HasID());
             Assert.AreEqual("col/123_a:b-c", doc.ID());
@@ -122,7 +124,11 @@ namespace Arango.Tests
             Assert.AreEqual("123_a:b-c", doc.Key());
             Assert.IsTrue(doc.HasRev());
             Assert.AreEqual("123456789", doc.Rev());
-            
+            Assert.IsTrue(doc.HasFrom());
+            Assert.AreEqual("col2/456_d:e-f", doc.From());
+            Assert.IsTrue(doc.HasTo());
+            Assert.AreEqual("col3/789_g:h-i", doc.To());
+
             Assert.Throws<ArgumentException>(() => {
                  var doc1 = new Dictionary<string, object>()
                      .ID("col/123 a");
@@ -136,6 +142,16 @@ namespace Arango.Tests
             Assert.Throws<ArgumentException>(() => {
                  var doc1 = new Dictionary<string, object>()
                      .Rev("123a");
+            });
+
+            Assert.Throws<ArgumentException>(() => {
+                var doc1 = new Dictionary<string, object>()
+                    .From("col2/456 a");
+            });
+
+            Assert.Throws<ArgumentException>(() => {
+                var doc1 = new Dictionary<string, object>()
+                    .To("col3/789 a");
             });
         }
     }

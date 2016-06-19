@@ -64,11 +64,13 @@ namespace Arango.Tests
             var db = new ADatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
+                .From(_documents[0].String("_id"))
+                .To(_documents[1].String("_id"))
         		.String("foo", "foo string value")
         		.Int("bar", 12345);
 
             var createResult = db.Edge
-                .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .Create(Database.TestEdgeCollectionName, document);
             
             Assert.AreEqual(202, createResult.StatusCode);
             Assert.IsTrue(createResult.Success);
@@ -859,6 +861,8 @@ namespace Arango.Tests
                 .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var newDocument = new Dictionary<string, object>()
+                .From(_documents[0].String("_id"))
+                .To(_documents[1].String("_id"))
                 .String("foo", "some other new string")
                 .Int("baz", 54321);
             
@@ -901,6 +905,8 @@ namespace Arango.Tests
                 .Create(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
             
             var newDocument = new Dictionary<string, object>()
+                .From(_documents[0].String("_id"))
+                .To(_documents[1].String("_id"))
                 .String("foo", "some other new string")
                 .Int("baz", 54321);
             
@@ -946,6 +952,8 @@ namespace Arango.Tests
             document.Merge(createResult.Value);
             
             var newDocument = new Dictionary<string, object>()
+                .From(_documents[0].String("_id"))
+                .To(_documents[1].String("_id"))
                 .String("foo", "some other new string")
                 .Int("baz", 54321);
             
@@ -991,6 +999,8 @@ namespace Arango.Tests
             document.Merge(createResult.Value);
             
             var newDocument = new Dictionary<string, object>()
+                .From(_documents[0].String("_id"))
+                .To(_documents[1].String("_id"))
                 .String("foo", "some other new string")
                 .Int("baz", 54321);
             
@@ -1024,7 +1034,7 @@ namespace Arango.Tests
             dummy.Baz = 54321;
             
             var replaceResult = db.Edge
-                .Replace(createResult.Value.String("_id"), dummy);
+                .Replace(createResult.Value.String("_id"), _documents[0].String("_id"), _documents[1].String("_id"), dummy);
             
             Assert.AreEqual(202, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
