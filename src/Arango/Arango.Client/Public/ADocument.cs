@@ -18,17 +18,6 @@ namespace Arango.Client
         #region Parameters
         
         /// <summary>
-        /// Determines whether collection should be created if it does not exist. Default value: false.
-        /// </summary>
-        public ADocument CreateCollection(bool value)
-        {
-            // needs to be string value
-            _parameters.String(ParameterName.CreateCollection, value.ToString().ToLower());
-        	
-        	return this;
-        }
-        
-        /// <summary>
         /// Determines whether or not to wait until data are synchronised to disk. Default value: false.
         /// </summary>
         public ADocument WaitForSync(bool value)
@@ -106,8 +95,6 @@ namespace Arango.Client
             
             // required
             request.QueryString.Add(ParameterName.Collection, collectionName);
-            // optional
-            request.TrySetQueryStringParameter(ParameterName.CreateCollection, _parameters);
             // optional
             request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
 
