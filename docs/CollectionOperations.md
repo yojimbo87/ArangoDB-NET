@@ -7,8 +7,6 @@
 - [Retrieve collection figures](#retrieve-collection-figures)
 - [Retrieve collection revision](#retrieve-collection-revision)
 - [Retrieve collection checksum](#retrieve-collection-checksum)
-- [Retrieve all documents](#retrieve-all-documents)
-- [Retrieve all edges](#retrieve-all-edges)
 - [Retrieve all indexes](#retrieve-all-indexes)
 - [Truncate collection](#truncate-collection)
 - [Load collection](#load-collection)
@@ -207,54 +205,6 @@ if (getCollectionResult.Success)
     var type = getCollectionResult.Value.Enum<ACollectionType>("type");
     var revision = getCollectionResult.Value.String("revision");
     var checksum = getCollectionResult.Value.Long("checksum");
-}
-```
-
-## Retrieve all documents
-
-Retrieves list of keys, IDs, or URI paths for all documents in the specified collection.
-
-Applicable optional parameters available through fluent API:
-
-- `ReturnListType(AReturnListType value)` - Determines which attribute will be retuned in the list. Default value: Path.
-
-```csharp
-var db = new ADatabase("myDatabaseAlias");
-
-var getDocumentsResult = db.Collection
-    .ReturnListType(AReturnListType.Key)
-    .GetAllDocuments("MyDocumentCollection");
-
-if (getDocumentsResult.Success)
-{
-    foreach (var item in getDocumentsResult.Value)
-    {
-        var key = item;
-    }
-}
-```
-
-## Retrieve all edges
-
-Retrieves list of URIs for all edges in specified collection.
-
-Applicable optional parameters available through fluent API:
-
-- `ReturnListType(AReturnListType value)` - Determines which attribute will be retuned in the list. Default value: Path.
-
-```csharp
-var db = new ADatabase("myDatabaseAlias");
-
-var getEdgesResult = db.Collection
-    .ReturnListType(AReturnListType.Key)
-    .GetAllEdges("MyEdgeCollection");
-
-if (getEdgesResult.Success)
-{
-    foreach (var item in getEdgesResult.Value)
-    {
-        var key = item;
-    }
 }
 ```
 
