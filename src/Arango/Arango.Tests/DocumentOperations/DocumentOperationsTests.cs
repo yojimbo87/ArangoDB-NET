@@ -49,7 +49,7 @@ namespace Arango.Tests
                 .Int("bar", 12345);
 
             var createResult = db.Document
-                .ReturnNew(true)
+                .ReturnNew()
                 .Create(Database.TestDocumentCollectionName, document);
 
             Assert.AreEqual(202, createResult.StatusCode);
@@ -376,7 +376,55 @@ namespace Arango.Tests
             Assert.AreEqual(getResult.Value.Int("bar"), document.Int("bar"));
             Assert.AreEqual(getResult.Value.Int("baz"), document.Int("baz"));
         }
-        
+
+        [Test()]
+        public void Should_update_document_with_returnOld()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ADatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Int("bar", 54321)
+                .Int("baz", 12345);
+
+            var updateResult = db.Document
+                .ReturnOld()
+                .Update(documents[0].String("_id"), document);
+
+            Assert.AreEqual(202, updateResult.StatusCode);
+            Assert.IsTrue(updateResult.Success);
+            Assert.IsTrue(updateResult.HasValue);
+            Assert.AreEqual(updateResult.Value.String("_id"), documents[0].String("_id"));
+            Assert.AreEqual(updateResult.Value.String("_key"), documents[0].String("_key"));
+            Assert.AreNotEqual(updateResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.IsTrue(updateResult.Value.Has("old"));
+        }
+
+        [Test()]
+        public void Should_update_document_with_returnNew()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ADatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Int("bar", 54321)
+                .Int("baz", 12345);
+
+            var updateResult = db.Document
+                .ReturnNew()
+                .Update(documents[0].String("_id"), document);
+
+            Assert.AreEqual(202, updateResult.StatusCode);
+            Assert.IsTrue(updateResult.Success);
+            Assert.IsTrue(updateResult.HasValue);
+            Assert.AreEqual(updateResult.Value.String("_id"), documents[0].String("_id"));
+            Assert.AreEqual(updateResult.Value.String("_key"), documents[0].String("_key"));
+            Assert.AreNotEqual(updateResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.IsTrue(updateResult.Value.Has("new"));
+        }
+
         [Test()]
         public void Should_update_document_with_waitForSync()
         {
@@ -413,7 +461,31 @@ namespace Arango.Tests
             Assert.AreEqual(getResult.Value.Int("bar"), document.Int("bar"));
             Assert.AreEqual(getResult.Value.Int("baz"), document.Int("baz"));
         }
-        
+
+        [Test()]
+        public void Should_update_document_with_ignoreRevs_set_to_false()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ADatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .Rev(documents[0].Rev())
+                .String("foo", "some other new string")
+                .Int("bar", 54321)
+                .Int("baz", 12345);
+
+            var updateResult = db.Document
+                .IgnoreRevs(false)
+                .Update(documents[0].String("_id"), document);
+
+            Assert.AreEqual(202, updateResult.StatusCode);
+            Assert.IsTrue(updateResult.Success);
+            Assert.IsTrue(updateResult.HasValue);
+            Assert.AreEqual(updateResult.Value.String("_id"), documents[0].String("_id"));
+            Assert.AreEqual(updateResult.Value.String("_key"), documents[0].String("_key"));
+            Assert.AreNotEqual(updateResult.Value.String("_rev"), documents[0].String("_rev"));
+        }
+
         [Test()]
         public void Should_update_document_with_ifMatch()
         {
@@ -680,7 +752,55 @@ namespace Arango.Tests
             
             Assert.IsFalse(getResult.Value.Has("bar"));
         }
-        
+
+        [Test()]
+        public void Should_replace_document_with_returnOld()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ADatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Int("baz", 54321);
+
+            var replaceResult = db
+                .Document
+                .ReturnOld()
+                .Replace(documents[0].String("_id"), document);
+
+            Assert.AreEqual(202, replaceResult.StatusCode);
+            Assert.IsTrue(replaceResult.Success);
+            Assert.IsTrue(replaceResult.HasValue);
+            Assert.AreEqual(replaceResult.Value.String("_id"), documents[0].String("_id"));
+            Assert.AreEqual(replaceResult.Value.String("_key"), documents[0].String("_key"));
+            Assert.AreNotEqual(replaceResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.IsTrue(replaceResult.Value.Has("old"));
+        }
+
+        [Test()]
+        public void Should_replace_document_with_returnNew()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ADatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Int("baz", 54321);
+
+            var replaceResult = db
+                .Document
+                .ReturnNew()
+                .Replace(documents[0].String("_id"), document);
+
+            Assert.AreEqual(202, replaceResult.StatusCode);
+            Assert.IsTrue(replaceResult.Success);
+            Assert.IsTrue(replaceResult.HasValue);
+            Assert.AreEqual(replaceResult.Value.String("_id"), documents[0].String("_id"));
+            Assert.AreEqual(replaceResult.Value.String("_key"), documents[0].String("_key"));
+            Assert.AreNotEqual(replaceResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.IsTrue(replaceResult.Value.Has("new"));
+        }
+
         [Test()]
         public void Should_replace_document_with_waitForSync()
         {
@@ -716,7 +836,30 @@ namespace Arango.Tests
             
             Assert.IsFalse(getResult.Value.Has("bar"));
         }
-        
+
+        [Test()]
+        public void Should_replace_document_with_ignoreRevs_set_to_false()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ADatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .Rev(documents[0].Rev())
+                .String("foo", "some other new string")
+                .Int("baz", 54321);
+
+            var replaceResult = db.Document
+                .IgnoreRevs(false)
+                .Replace(documents[0].String("_id"), document);
+
+            Assert.AreEqual(202, replaceResult.StatusCode);
+            Assert.IsTrue(replaceResult.Success);
+            Assert.IsTrue(replaceResult.HasValue);
+            Assert.AreEqual(replaceResult.Value.String("_id"), documents[0].String("_id"));
+            Assert.AreEqual(replaceResult.Value.String("_key"), documents[0].String("_key"));
+            Assert.AreNotEqual(replaceResult.Value.String("_rev"), documents[0].String("_rev"));
+        }
+
         [Test()]
         public void Should_replace_document_with_ifMatch()
         {
@@ -883,9 +1026,27 @@ namespace Arango.Tests
             Assert.AreEqual(deleteResult.Value.String("_key"), documents[0].String("_key"));
             Assert.AreEqual(deleteResult.Value.String("_rev"), documents[0].String("_rev"));
         }
-        
+
+        [Test()]
+        public void Should_delete_document_with_returnOld()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ADatabase(Database.Alias);
+
+            var deleteResult = db.Document
+                .ReturnOld()
+                .Delete(documents[0].String("_id"));
+
+            Assert.AreEqual(202, deleteResult.StatusCode);
+            Assert.IsTrue(deleteResult.Success);
+            Assert.AreEqual(deleteResult.Value.String("_id"), documents[0].String("_id"));
+            Assert.AreEqual(deleteResult.Value.String("_key"), documents[0].String("_key"));
+            Assert.AreEqual(deleteResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.IsTrue(deleteResult.Value.Has("old"));
+        }
+
         #endregion
-        
+
         public void Dispose()
         {
             Database.DeleteTestDatabase(Database.TestDatabaseGeneral);

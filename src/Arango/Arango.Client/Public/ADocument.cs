@@ -47,7 +47,18 @@ namespace Arango.Client
         	
         	return this;
         }
-        
+
+        /// <summary>
+        /// Determines whether to '_rev' field in the given document is ignored. If this is set to false, then the '_rev' attribute given in the body document is taken as a precondition. The document is only replaced if the current revision is the one specified.
+        /// </summary>
+        public ADocument IgnoreRevs(bool value)
+        {
+            // needs to be string value
+            _parameters.String(ParameterName.IgnoreRevs, value.ToString().ToLower());
+
+            return this;
+        }
+
         /// <summary>
         /// Determines whether to keep any attributes from existing document that are contained in the patch document which contains null value. Default value: true.
         /// </summary>
@@ -71,12 +82,23 @@ namespace Arango.Client
         }
 
         /// <summary>
-        /// Determines whether to return additionally the complete new document under the attribute new in the result. Default value: false.
+        /// Determines whether to return additionally the complete new document under the attribute 'new' in the result.
         /// </summary>
-        public ADocument ReturnNew(bool value)
+        public ADocument ReturnNew()
         {
             // needs to be string value
-            _parameters.String(ParameterName.ReturnNew, value.ToString().ToLower());
+            _parameters.String(ParameterName.ReturnNew, true.ToString().ToLower());
+
+            return this;
+        }
+
+        /// <summary>
+        /// Determines whether to return additionally the complete previous revision of the changed document under the attribute 'old' in the result.
+        /// </summary>
+        public ADocument ReturnOld()
+        {
+            // needs to be string value
+            _parameters.String(ParameterName.ReturnOld, true.ToString().ToLower());
 
             return this;
         }
@@ -403,11 +425,17 @@ namespace Arango.Client
             // optional
             request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
             // optional
-            request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
-            // optional
             request.TrySetQueryStringParameter(ParameterName.KeepNull, _parameters);
             // optional
             request.TrySetQueryStringParameter(ParameterName.MergeObjects, _parameters);
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.IgnoreRevs, _parameters);
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.ReturnNew, _parameters);
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.ReturnOld, _parameters);
+            // optional
+            request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
 
             request.Body = json;
             
@@ -475,6 +503,12 @@ namespace Arango.Client
             
             // optional
             request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.IgnoreRevs, _parameters);
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.ReturnNew, _parameters);
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.ReturnOld, _parameters);
             // optional
             request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
             
@@ -594,6 +628,8 @@ namespace Arango.Client
             
             // optional
             request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.ReturnOld, _parameters);
             // optional
             request.TrySetHeaderParameter(ParameterName.IfMatch, _parameters);
             

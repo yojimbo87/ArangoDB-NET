@@ -21,6 +21,7 @@ namespace Arango.Client.Protocol
         internal const string Group = "group";
         internal const string IfMatch = "If-Match";
         internal const string IfNoneMatch = "If-None-Match";
+        internal const string IgnoreRevs = "ignoreRevs";
         internal const string IsDeterministic = "isDeterministic";
         internal const string IsSystem = "isSystem";
         internal const string IsVolatile = "isVolatile";
@@ -42,6 +43,7 @@ namespace Arango.Client.Protocol
         internal const string Params = "params";
         internal const string Query = "query";
         internal const string ReturnNew = "returnNew";
+        internal const string ReturnOld = "returnOld";
         internal const string ShardKeys = "shardKeys";
         internal const string Size = "size";
         internal const string Sparse = "sparse";

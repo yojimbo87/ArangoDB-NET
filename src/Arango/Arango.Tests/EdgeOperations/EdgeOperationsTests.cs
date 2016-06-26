@@ -112,7 +112,7 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .ReturnNew(true)
+                .ReturnNew()
                 .CreateEdge(Database.TestEdgeCollectionName, document);
 
             Assert.AreEqual(202, createResult.StatusCode);
@@ -612,7 +612,73 @@ namespace Arango.Tests
             // by default JSON integers are deserialized to long type
             Assert.IsTrue(getResult.Value.IsLong("baz"));
         }
-        
+
+        [Test()]
+        public void Should_update_edge_with_returnOld()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+            var db = new ADatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+
+            var createResult = db
+                .Document
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+
+            var newDocument = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Int("bar", 54321)
+                .Int("baz", 12345);
+
+            var updateResult = db
+                .Document
+                .ReturnOld()
+                .Update(createResult.Value.String("_id"), newDocument);
+
+            Assert.AreEqual(202, updateResult.StatusCode);
+            Assert.IsTrue(updateResult.Success);
+            Assert.IsTrue(updateResult.HasValue);
+            Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
+            Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
+            Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.IsTrue(updateResult.Value.Has("old"));
+        }
+
+        [Test()]
+        public void Should_update_edge_with_returnNew()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+            var db = new ADatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+
+            var createResult = db
+                .Document
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+
+            var newDocument = new Dictionary<string, object>()
+                .String("foo", "some other new string")
+                .Int("bar", 54321)
+                .Int("baz", 12345);
+
+            var updateResult = db
+                .Document
+                .ReturnNew()
+                .Update(createResult.Value.String("_id"), newDocument);
+
+            Assert.AreEqual(202, updateResult.StatusCode);
+            Assert.IsTrue(updateResult.Success);
+            Assert.IsTrue(updateResult.HasValue);
+            Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
+            Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
+            Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.IsTrue(updateResult.Value.Has("new"));
+        }
+
         [Test()]
         public void Should_update_edge_with_waitForSync()
         {
@@ -661,7 +727,40 @@ namespace Arango.Tests
             // by default JSON integers are deserialized to long type
             Assert.IsTrue(getResult.Value.IsLong("baz"));
         }
-        
+
+        [Test()]
+        public void Should_update_edge_with_ignoreRevs_set_to_false()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+            var db = new ADatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+
+            var createResult = db
+                .Document
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+
+            var newDocument = new Dictionary<string, object>()
+                .Rev(createResult.Value.Rev())
+                .String("foo", "some other new string")
+                .Int("bar", 54321)
+                .Int("baz", 12345);
+
+            var updateResult = db
+                .Document
+                .IgnoreRevs(false)
+                .Update(createResult.Value.String("_id"), newDocument);
+
+            Assert.AreEqual(202, updateResult.StatusCode);
+            Assert.IsTrue(updateResult.Success);
+            Assert.IsTrue(updateResult.HasValue);
+            Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
+            Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
+            Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
+        }
+
         [Test()]
         public void Should_update_edge_with_ifMatch()
         {
@@ -983,7 +1082,75 @@ namespace Arango.Tests
 
             Assert.IsFalse(getResult.Value.Has("bar"));
         }
-        
+
+        [Test()]
+        public void Should_replace_edge_with_returnOld()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+            var db = new ADatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+
+            var createResult = db
+                .Document
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+
+            var newDocument = new Dictionary<string, object>()
+                .From(_documents[0].String("_id"))
+                .To(_documents[1].String("_id"))
+                .String("foo", "some other new string")
+                .Int("baz", 54321);
+
+            var replaceResult = db
+                .Document
+                .ReturnOld()
+                .Replace(createResult.Value.String("_id"), newDocument);
+
+            Assert.AreEqual(202, replaceResult.StatusCode);
+            Assert.IsTrue(replaceResult.Success);
+            Assert.IsTrue(replaceResult.HasValue);
+            Assert.AreEqual(replaceResult.Value.String("_id"), createResult.Value.String("_id"));
+            Assert.AreEqual(replaceResult.Value.String("_key"), createResult.Value.String("_key"));
+            Assert.AreNotEqual(replaceResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.IsTrue(replaceResult.Value.Has("old"));
+        }
+
+        [Test()]
+        public void Should_replace_edge_with_returnNew()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+            var db = new ADatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+
+            var createResult = db
+                .Document
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+
+            var newDocument = new Dictionary<string, object>()
+                .From(_documents[0].String("_id"))
+                .To(_documents[1].String("_id"))
+                .String("foo", "some other new string")
+                .Int("baz", 54321);
+
+            var replaceResult = db
+                .Document
+                .ReturnNew()
+                .Replace(createResult.Value.String("_id"), newDocument);
+
+            Assert.AreEqual(202, replaceResult.StatusCode);
+            Assert.IsTrue(replaceResult.Success);
+            Assert.IsTrue(replaceResult.HasValue);
+            Assert.AreEqual(replaceResult.Value.String("_id"), createResult.Value.String("_id"));
+            Assert.AreEqual(replaceResult.Value.String("_key"), createResult.Value.String("_key"));
+            Assert.AreNotEqual(replaceResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.IsTrue(replaceResult.Value.Has("new"));
+        }
+
         [Test()]
         public void Should_replace_edge_with_waitForSync()
         {
@@ -1031,7 +1198,41 @@ namespace Arango.Tests
 
             Assert.IsFalse(getResult.Value.Has("bar"));
         }
-        
+
+        [Test()]
+        public void Should_replace_edge_with_ignoreRevs_set_to_false()
+        {
+            Database.ClearTestCollection(Database.TestEdgeCollectionName);
+            var db = new ADatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+
+            var createResult = db
+                .Document
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+
+            var newDocument = new Dictionary<string, object>()
+                .From(_documents[0].String("_id"))
+                .To(_documents[1].String("_id"))
+                .Rev(createResult.Value.Rev())
+                .String("foo", "some other new string")
+                .Int("baz", 54321);
+
+            var replaceResult = db
+                .Document
+                .IgnoreRevs(false)
+                .Replace(createResult.Value.String("_id"), newDocument);
+
+            Assert.AreEqual(202, replaceResult.StatusCode);
+            Assert.IsTrue(replaceResult.Success);
+            Assert.IsTrue(replaceResult.HasValue);
+            Assert.AreEqual(replaceResult.Value.String("_id"), createResult.Value.String("_id"));
+            Assert.AreEqual(replaceResult.Value.String("_key"), createResult.Value.String("_key"));
+            Assert.AreNotEqual(replaceResult.Value.String("_rev"), createResult.Value.String("_rev"));
+        }
+
         [Test()]
         public void Should_replace_edge_with_ifMatch()
         {
@@ -1268,9 +1469,35 @@ namespace Arango.Tests
             Assert.AreEqual(deleteResult.Value.String("_key"), createResult.Value.String("_key"));
             Assert.AreEqual(deleteResult.Value.String("_rev"), createResult.Value.String("_rev"));
         }
-        
+
+        [Test()]
+        public void Should_delete_edge_with_returnOld_parameter()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ADatabase(Database.Alias);
+
+            var document = new Dictionary<string, object>()
+                .String("foo", "some string")
+                .Int("bar", 12345);
+
+            var createResult = db
+                .Document
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+
+            var deleteResult = db.Document
+                .ReturnOld()
+                .Delete(createResult.Value.String("_id"));
+
+            Assert.AreEqual(202, deleteResult.StatusCode);
+            Assert.IsTrue(deleteResult.Success);
+            Assert.AreEqual(deleteResult.Value.String("_id"), createResult.Value.String("_id"));
+            Assert.AreEqual(deleteResult.Value.String("_key"), createResult.Value.String("_key"));
+            Assert.AreEqual(deleteResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.IsTrue(deleteResult.Value.Has("old"));
+        }
+
         #endregion
-        
+
         public void Dispose()
         {
             Database.DeleteTestDatabase(Database.TestDatabaseGeneral);
