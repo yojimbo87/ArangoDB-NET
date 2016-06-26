@@ -7,7 +7,6 @@ namespace Arango.Client.Protocol
         internal const string Action = "action";
         internal const string BatchSize = "batchSize";
         internal const string BindVars = "bindVars";
-        internal const string ByteSize = "byteSize";
         internal const string Collection = "collection";
         internal const string Collections = "collections";
         internal const string Code = "code";
@@ -45,7 +44,6 @@ namespace Arango.Client.Protocol
         internal const string ReturnNew = "returnNew";
         internal const string ReturnOld = "returnOld";
         internal const string ShardKeys = "shardKeys";
-        internal const string Size = "size";
         internal const string Sparse = "sparse";
         internal const string To = "to";
         internal const string TTL = "ttl";

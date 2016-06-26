@@ -18,16 +18,6 @@ namespace Arango.Client
         #region Parameters
         
         /// <summary>
-        /// Determines maximum size of the active document data (in bytes) in the collection with cap constraint. If specified, the value must be at least 16384.
-        /// </summary>
-        public AIndex ByteSize(long value)
-        {
-            _parameters.Long(ParameterName.ByteSize, value);
-        	
-        	return this;
-        }
-        
-        /// <summary>
         /// Determines an array of attribute paths in the collection with hash, fulltext, geo or skiplist indexes.
         /// </summary>
         public AIndex Fields(params string[] values)
@@ -53,16 +43,6 @@ namespace Arango.Client
         public AIndex MinLength(int value)
         {
             _parameters.Int(ParameterName.MinLength, value);
-        	
-        	return this;
-        }
-        
-        /// <summary>
-        /// Determines maximum number of documents for the collection with cap constraint.
-        /// </summary>
-        public AIndex Size(long value)
-        {
-            _parameters.Long(ParameterName.Size, value);
         	
         	return this;
         }
