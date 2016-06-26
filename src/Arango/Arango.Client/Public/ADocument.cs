@@ -580,7 +580,7 @@ namespace Arango.Client
         }
 
         /// <summary>
-        /// Completely replaces existing edge identified by its handle with new edge data.
+        /// Completely replaces existing edge identified by its handle with new edge data. This helper method injects 'fromID' and 'toID' fields into given document to construct valid edge document.
         /// </summary>
         /// <exception cref="ArgumentException">Specified 'from' or 'to' ID values have invalid format.</exception>
         public AResult<Dictionary<string, object>> ReplaceEdge(string id, string fromID, string toID, Dictionary<string, object> document)
@@ -602,7 +602,7 @@ namespace Arango.Client
         }
 
         /// <summary>
-        /// Completely replaces existing edge identified by its handle with new edge data.
+        /// Completely replaces existing edge identified by its handle with new edge data. This helper method injects 'fromID' and 'toID' fields into given document to construct valid edge document.
         /// </summary>
         public AResult<Dictionary<string, object>> ReplaceEdge<T>(string id, string fromID, string toID, T obj)
         {
