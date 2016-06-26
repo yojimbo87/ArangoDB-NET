@@ -59,9 +59,9 @@ namespace Arango.Tests
             Assert.IsTrue(createResult.Value.IsString("_key"));
             Assert.IsTrue(createResult.Value.IsString("_rev"));
             Assert.IsTrue(createResult.Value.Has("new"));
-            Assert.AreEqual(createResult.Value.String("_id"), createResult.Value.String("new._id"));
-            Assert.AreEqual(createResult.Value.String("_key"), createResult.Value.String("new._key"));
-            Assert.AreEqual(createResult.Value.String("_rev"), createResult.Value.String("new._rev"));
+            Assert.AreEqual(createResult.Value.ID(), createResult.Value.String("new._id"));
+            Assert.AreEqual(createResult.Value.Key(), createResult.Value.String("new._key"));
+            Assert.AreEqual(createResult.Value.Rev(), createResult.Value.String("new._rev"));
             Assert.AreEqual(document.String("foo"), createResult.Value.String("new.foo"));
             Assert.AreEqual(document.Int("bar"), createResult.Value.Int("new.bar"));
         }
@@ -109,11 +109,11 @@ namespace Arango.Tests
             Assert.IsTrue(createResult.Value.IsString("_rev"));
             
             var getResult = db.Document
-                .Get(createResult.Value.String("_id"));
+                .Get(createResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), createResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), createResult.Value.Rev());
             Assert.AreEqual(getResult.Value.String("foo"), dummy.Foo);
             Assert.AreEqual(getResult.Value.Int("bar"), dummy.Bar);
             Assert.AreEqual(0, dummy.Baz);
@@ -136,8 +136,8 @@ namespace Arango.Tests
             Assert.AreEqual(202, createResult.StatusCode);
             Assert.IsTrue(createResult.Success);
             Assert.IsTrue(createResult.HasValue);
-            Assert.AreEqual(Database.TestDocumentCollectionName + "/" + document.String("_key"), createResult.Value.String("_id"));
-            Assert.AreEqual(document.String("_key"), createResult.Value.String("_key"));
+            Assert.AreEqual(Database.TestDocumentCollectionName + "/" + document.Key(), createResult.Value.ID());
+            Assert.AreEqual(document.Key(), createResult.Value.Key());
             Assert.IsTrue(createResult.Value.IsString("_rev"));
         }
         
@@ -152,12 +152,12 @@ namespace Arango.Tests
             var db = new ADatabase(Database.Alias);
             
             var checkResult = db.Document
-                .Check(documents[0].String("_id"));
+                .Check(documents[0].ID());
             
             Assert.AreEqual(200, checkResult.StatusCode);
             Assert.IsTrue(checkResult.Success);
             Assert.IsTrue(checkResult.HasValue);
-            Assert.AreEqual(checkResult.Value, documents[0].String("_rev"));
+            Assert.AreEqual(checkResult.Value, documents[0].Rev());
         }
         
         [Test()]
@@ -167,13 +167,13 @@ namespace Arango.Tests
             var db = new ADatabase(Database.Alias);
             
             var checkResult = db.Document
-                .IfMatch(documents[0].String("_rev"))
-                .Check(documents[0].String("_id"));
+                .IfMatch(documents[0].Rev())
+                .Check(documents[0].ID());
             
             Assert.AreEqual(200, checkResult.StatusCode);
             Assert.IsTrue(checkResult.Success);
             Assert.IsTrue(checkResult.HasValue);
-            Assert.AreEqual(checkResult.Value, documents[0].String("_rev"));
+            Assert.AreEqual(checkResult.Value, documents[0].Rev());
         }
         
         [Test()]
@@ -184,12 +184,12 @@ namespace Arango.Tests
             
             var checkResult = db.Document
                 .IfMatch("123456789")
-                .Check(documents[0].String("_id"));
+                .Check(documents[0].ID());
             
             Assert.AreEqual(412, checkResult.StatusCode);
             Assert.IsFalse(checkResult.Success);
             Assert.IsTrue(checkResult.HasValue);
-            Assert.AreEqual(checkResult.Value, documents[0].String("_rev"));
+            Assert.AreEqual(checkResult.Value, documents[0].Rev());
         }
         
         [Test()]
@@ -200,12 +200,12 @@ namespace Arango.Tests
             
             var checkResult = db.Document
                 .IfNoneMatch("123456789")
-                .Check(documents[0].String("_id"));
+                .Check(documents[0].ID());
             
             Assert.AreEqual(200, checkResult.StatusCode);
             Assert.IsTrue(checkResult.Success);
             Assert.IsTrue(checkResult.HasValue);
-            Assert.AreEqual(checkResult.Value, documents[0].String("_rev"));
+            Assert.AreEqual(checkResult.Value, documents[0].Rev());
         }
         
         [Test()]
@@ -215,13 +215,13 @@ namespace Arango.Tests
             var db = new ADatabase(Database.Alias);
             
             var checkResult = db.Document
-                .IfNoneMatch(documents[0].String("_rev"))
-                .Check(documents[0].String("_id"));
+                .IfNoneMatch(documents[0].Rev())
+                .Check(documents[0].ID());
             
             Assert.AreEqual(304, checkResult.StatusCode);
             Assert.IsFalse(checkResult.Success);
             Assert.IsTrue(checkResult.HasValue);
-            Assert.AreEqual(checkResult.Value, documents[0].String("_rev"));
+            Assert.AreEqual(checkResult.Value, documents[0].Rev());
         }
         
         #endregion
@@ -235,14 +235,14 @@ namespace Arango.Tests
         	var db = new ADatabase(Database.Alias);
         	
             var getResult = db.Document
-                .Get(documents[0].String("_id"));
+                .Get(documents[0].ID());
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
             Assert.IsTrue(getResult.HasValue);
-            Assert.AreEqual(getResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(getResult.Value.Key(), documents[0].Key());
+            Assert.AreEqual(getResult.Value.Rev(), documents[0].Rev());
             Assert.AreEqual(getResult.Value.String("foo"), documents[0].String("foo"));
             Assert.AreEqual(getResult.Value.String("bar"), documents[0].String("bar"));
         }
@@ -254,15 +254,15 @@ namespace Arango.Tests
         	var db = new ADatabase(Database.Alias);
         	
             var getResult = db.Document
-                .IfMatch(documents[0].String("_rev"))
-                .Get(documents[0].String("_id"));
+                .IfMatch(documents[0].Rev())
+                .Get(documents[0].ID());
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
             Assert.IsTrue(getResult.HasValue);
-            Assert.AreEqual(getResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(getResult.Value.Key(), documents[0].Key());
+            Assert.AreEqual(getResult.Value.Rev(), documents[0].Rev());
             Assert.AreEqual(getResult.Value.String("foo"), documents[0].String("foo"));
             Assert.AreEqual(getResult.Value.String("bar"), documents[0].String("bar"));
         }
@@ -275,14 +275,14 @@ namespace Arango.Tests
         	
             var getResult = db.Document
                 .IfMatch("123456789")
-                .Get(documents[0].String("_id"));
+                .Get(documents[0].ID());
             
             Assert.AreEqual(412, getResult.StatusCode);
             Assert.IsFalse(getResult.Success);
             Assert.IsTrue(getResult.HasValue);
-            Assert.AreEqual(getResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(getResult.Value.Key(), documents[0].Key());
+            Assert.AreEqual(getResult.Value.Rev(), documents[0].Rev());
         }
         
         [Test()]
@@ -293,14 +293,14 @@ namespace Arango.Tests
         	
             var getResult = db.Document
                 .IfNoneMatch("123456789")
-                .Get(documents[0].String("_id"));
+                .Get(documents[0].ID());
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
             Assert.IsTrue(getResult.HasValue);
-            Assert.AreEqual(getResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(getResult.Value.Key(), documents[0].Key());
+            Assert.AreEqual(getResult.Value.Rev(), documents[0].Rev());
             Assert.AreEqual(getResult.Value.String("foo"), documents[0].String("foo"));
             Assert.AreEqual(getResult.Value.String("bar"), documents[0].String("bar"));
         }
@@ -312,8 +312,8 @@ namespace Arango.Tests
         	var db = new ADatabase(Database.Alias);
         	
             var getResult = db.Document
-                .IfNoneMatch(documents[0].String("_rev"))
-                .Get(documents[0].String("_id"));
+                .IfNoneMatch(documents[0].Rev())
+                .Get(documents[0].ID());
             
             Assert.AreEqual(304, getResult.StatusCode);
             Assert.IsFalse(getResult.Success);
@@ -327,7 +327,7 @@ namespace Arango.Tests
         	var db = new ADatabase(Database.Alias);
         	
             var getResult = db.Document
-                .Get<Dummy>(documents[0].String("_id"));
+                .Get<Dummy>(documents[0].ID());
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
@@ -353,21 +353,21 @@ namespace Arango.Tests
                 .Int("baz", 12345);
             
             var updateResult = db.Document
-                .Update(documents[0].String("_id"), document);
+                .Update(documents[0].ID(), document);
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(updateResult.Value.Key(), documents[0].Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), documents[0].Rev());
             
             var getResult = db.Document
-                .Get(updateResult.Value.String("_id"));
+                .Get(updateResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), updateResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), updateResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), updateResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), documents[0].String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), document.String("foo"));
@@ -390,14 +390,14 @@ namespace Arango.Tests
 
             var updateResult = db.Document
                 .ReturnOld()
-                .Update(documents[0].String("_id"), document);
+                .Update(documents[0].ID(), document);
 
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(updateResult.Value.Key(), documents[0].Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), documents[0].Rev());
             Assert.IsTrue(updateResult.Value.Has("old"));
         }
 
@@ -414,14 +414,14 @@ namespace Arango.Tests
 
             var updateResult = db.Document
                 .ReturnNew()
-                .Update(documents[0].String("_id"), document);
+                .Update(documents[0].ID(), document);
 
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(updateResult.Value.Key(), documents[0].Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), documents[0].Rev());
             Assert.IsTrue(updateResult.Value.Has("new"));
         }
 
@@ -438,21 +438,21 @@ namespace Arango.Tests
             
             var updateResult = db.Document
                 .WaitForSync(true)
-                .Update(documents[0].String("_id"), document);
+                .Update(documents[0].ID(), document);
             
             Assert.AreEqual(201, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(updateResult.Value.Key(), documents[0].Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), documents[0].Rev());
             
             var getResult = db.Document
-                .Get(updateResult.Value.String("_id"));
+                .Get(updateResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), updateResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), updateResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), updateResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), documents[0].String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), document.String("foo"));
@@ -476,14 +476,14 @@ namespace Arango.Tests
 
             var updateResult = db.Document
                 .IgnoreRevs(false)
-                .Update(documents[0].String("_id"), document);
+                .Update(documents[0].ID(), document);
 
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(updateResult.Value.Key(), documents[0].Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), documents[0].Rev());
         }
 
         [Test()]
@@ -498,22 +498,22 @@ namespace Arango.Tests
                 .Int("baz", 12345);
             
             var updateResult = db.Document
-                .IfMatch(documents[0].String("_rev"))
-                .Update(documents[0].String("_id"), document);
+                .IfMatch(documents[0].Rev())
+                .Update(documents[0].ID(), document);
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(updateResult.Value.Key(), documents[0].Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), documents[0].Rev());
             
             var getResult = db.Document
-                .Get(updateResult.Value.String("_id"));
+                .Get(updateResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), updateResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), updateResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), updateResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), documents[0].String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), document.String("foo"));
@@ -536,14 +536,14 @@ namespace Arango.Tests
             
             var updateResult = db.Document
                 .IfMatch("123456789")
-                .Update(documents[0].String("_id"), document);
+                .Update(documents[0].ID(), document);
             
             Assert.AreEqual(412, updateResult.StatusCode);
             Assert.IsFalse(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreEqual(updateResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(updateResult.Value.Key(), documents[0].Key());
+            Assert.AreEqual(updateResult.Value.Rev(), documents[0].Rev());
         }
         
         [Test()]
@@ -566,21 +566,21 @@ namespace Arango.Tests
             
             var updateResult = db.Document
                 .KeepNull(false)
-                .Update(newDocument.String("_id"), document);
+                .Update(newDocument.ID(), document);
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), newDocument.String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), newDocument.String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), newDocument.String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), newDocument.ID());
+            Assert.AreEqual(updateResult.Value.Key(), newDocument.Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), newDocument.Rev());
             
             var getResult = db.Document
-                .Get(updateResult.Value.String("_id"));
+                .Get(updateResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), updateResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), updateResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), updateResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), newDocument.String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), document.String("foo"));
@@ -610,21 +610,21 @@ namespace Arango.Tests
             
             var updateResult = db.Document
                 .MergeObjects(true) // this is also default behavior
-                .Update(newDocument.String("_id"), document);
+                .Update(newDocument.ID(), document);
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), newDocument.String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), newDocument.String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), newDocument.String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), newDocument.ID());
+            Assert.AreEqual(updateResult.Value.Key(), newDocument.Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), newDocument.Rev());
             
             var getResult = db.Document
-                .Get(updateResult.Value.String("_id"));
+                .Get(updateResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), updateResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), updateResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), updateResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), newDocument.String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), document.String("foo"));
@@ -654,21 +654,21 @@ namespace Arango.Tests
             
             var updateResult = db.Document
                 .MergeObjects(false)
-                .Update(newDocument.String("_id"), document);
+                .Update(newDocument.ID(), document);
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), newDocument.String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), newDocument.String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), newDocument.String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), newDocument.ID());
+            Assert.AreEqual(updateResult.Value.Key(), newDocument.Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), newDocument.Rev());
             
             var getResult = db.Document
-                .Get(updateResult.Value.String("_id"));
+                .Get(updateResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), updateResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), updateResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), updateResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), newDocument.String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), document.String("foo"));
@@ -690,21 +690,21 @@ namespace Arango.Tests
             dummy.Baz = 12345;
             
             var updateResult = db.Document
-                .Update(documents[0].String("_id"), dummy);
+                .Update(documents[0].ID(), dummy);
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(updateResult.Value.Key(), documents[0].Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), documents[0].Rev());
             
             var getResult = db.Document
-                .Get(updateResult.Value.String("_id"));
+                .Get(updateResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), updateResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), updateResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), updateResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), documents[0].String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), dummy.Foo);
@@ -729,21 +729,21 @@ namespace Arango.Tests
                 .Int("baz", 54321);
             
             var replaceResult = db.Document
-                .Replace(documents[0].String("_id"), document);
+                .Replace(documents[0].ID(), document);
             
             Assert.AreEqual(202, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
             Assert.IsTrue(replaceResult.HasValue);
-            Assert.AreEqual(replaceResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(replaceResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreNotEqual(replaceResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(replaceResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(replaceResult.Value.Key(), documents[0].Key());
+            Assert.AreNotEqual(replaceResult.Value.Rev(), documents[0].Rev());
             
             var getResult = db.Document
-                .Get(replaceResult.Value.String("_id"));
+                .Get(replaceResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), replaceResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), replaceResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), replaceResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), replaceResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), replaceResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), replaceResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), documents[0].String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), document.String("foo"));
@@ -766,14 +766,14 @@ namespace Arango.Tests
             var replaceResult = db
                 .Document
                 .ReturnOld()
-                .Replace(documents[0].String("_id"), document);
+                .Replace(documents[0].ID(), document);
 
             Assert.AreEqual(202, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
             Assert.IsTrue(replaceResult.HasValue);
-            Assert.AreEqual(replaceResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(replaceResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreNotEqual(replaceResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(replaceResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(replaceResult.Value.Key(), documents[0].Key());
+            Assert.AreNotEqual(replaceResult.Value.Rev(), documents[0].Rev());
             Assert.IsTrue(replaceResult.Value.Has("old"));
         }
 
@@ -790,14 +790,14 @@ namespace Arango.Tests
             var replaceResult = db
                 .Document
                 .ReturnNew()
-                .Replace(documents[0].String("_id"), document);
+                .Replace(documents[0].ID(), document);
 
             Assert.AreEqual(202, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
             Assert.IsTrue(replaceResult.HasValue);
-            Assert.AreEqual(replaceResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(replaceResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreNotEqual(replaceResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(replaceResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(replaceResult.Value.Key(), documents[0].Key());
+            Assert.AreNotEqual(replaceResult.Value.Rev(), documents[0].Rev());
             Assert.IsTrue(replaceResult.Value.Has("new"));
         }
 
@@ -813,21 +813,21 @@ namespace Arango.Tests
             
             var replaceResult = db.Document
                 .WaitForSync(true)
-                .Replace(documents[0].String("_id"), document);
+                .Replace(documents[0].ID(), document);
             
             Assert.AreEqual(201, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
             Assert.IsTrue(replaceResult.HasValue);
-            Assert.AreEqual(replaceResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(replaceResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreNotEqual(replaceResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(replaceResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(replaceResult.Value.Key(), documents[0].Key());
+            Assert.AreNotEqual(replaceResult.Value.Rev(), documents[0].Rev());
             
             var getResult = db.Document
-                .Get(replaceResult.Value.String("_id"));
+                .Get(replaceResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), replaceResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), replaceResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), replaceResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), replaceResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), replaceResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), replaceResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), documents[0].String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), document.String("foo"));
@@ -850,14 +850,14 @@ namespace Arango.Tests
 
             var replaceResult = db.Document
                 .IgnoreRevs(false)
-                .Replace(documents[0].String("_id"), document);
+                .Replace(documents[0].ID(), document);
 
             Assert.AreEqual(202, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
             Assert.IsTrue(replaceResult.HasValue);
-            Assert.AreEqual(replaceResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(replaceResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreNotEqual(replaceResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(replaceResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(replaceResult.Value.Key(), documents[0].Key());
+            Assert.AreNotEqual(replaceResult.Value.Rev(), documents[0].Rev());
         }
 
         [Test()]
@@ -871,22 +871,22 @@ namespace Arango.Tests
                 .Int("baz", 54321);
             
             var replaceResult = db.Document
-                .IfMatch(documents[0].String("_rev"))
-                .Replace(documents[0].String("_id"), document);
+                .IfMatch(documents[0].Rev())
+                .Replace(documents[0].ID(), document);
             
             Assert.AreEqual(202, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
             Assert.IsTrue(replaceResult.HasValue);
-            Assert.AreEqual(replaceResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(replaceResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreNotEqual(replaceResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(replaceResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(replaceResult.Value.Key(), documents[0].Key());
+            Assert.AreNotEqual(replaceResult.Value.Rev(), documents[0].Rev());
             
             var getResult = db.Document
-                .Get(replaceResult.Value.String("_id"));
+                .Get(replaceResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), replaceResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), replaceResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), replaceResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), replaceResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), replaceResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), replaceResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), documents[0].String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), document.String("foo"));
@@ -908,14 +908,14 @@ namespace Arango.Tests
             
             var replaceResult = db.Document
                 .IfMatch("123456789")
-                .Replace(documents[0].String("_id"), document);
+                .Replace(documents[0].ID(), document);
             
             Assert.AreEqual(412, replaceResult.StatusCode);
             Assert.IsFalse(replaceResult.Success);
             Assert.IsTrue(replaceResult.HasValue);
-            Assert.AreEqual(replaceResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(replaceResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreEqual(replaceResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(replaceResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(replaceResult.Value.Key(), documents[0].Key());
+            Assert.AreEqual(replaceResult.Value.Rev(), documents[0].Rev());
         }
         
         [Test()]
@@ -929,21 +929,21 @@ namespace Arango.Tests
             dummy.Baz = 54321;
             
             var replaceResult = db.Document
-                .Replace(documents[0].String("_id"), dummy);
+                .Replace(documents[0].ID(), dummy);
             
             Assert.AreEqual(202, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
             Assert.IsTrue(replaceResult.HasValue);
-            Assert.AreEqual(replaceResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(replaceResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreNotEqual(replaceResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(replaceResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(replaceResult.Value.Key(), documents[0].Key());
+            Assert.AreNotEqual(replaceResult.Value.Rev(), documents[0].Rev());
             
             var getResult = db.Document
-                .Get(replaceResult.Value.String("_id"));
+                .Get(replaceResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), replaceResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), replaceResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), replaceResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), replaceResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), replaceResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), replaceResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), documents[0].String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), dummy.Foo);
@@ -964,14 +964,14 @@ namespace Arango.Tests
             var db = new ADatabase(Database.Alias);
             
             var deleteResult = db.Document
-                .Delete(documents[0].String("_id"));
+                .Delete(documents[0].ID());
             
             Assert.AreEqual(202, deleteResult.StatusCode);
             Assert.IsTrue(deleteResult.Success);
             Assert.IsTrue(deleteResult.HasValue);
-            Assert.AreEqual(deleteResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(deleteResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreEqual(deleteResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(deleteResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(deleteResult.Value.Key(), documents[0].Key());
+            Assert.AreEqual(deleteResult.Value.Rev(), documents[0].Rev());
         }
         
         [Test()]
@@ -982,14 +982,14 @@ namespace Arango.Tests
             
             var deleteResult = db.Document
                 .WaitForSync(true)
-                .Delete(documents[0].String("_id"));
+                .Delete(documents[0].ID());
             
             Assert.AreEqual(200, deleteResult.StatusCode);
             Assert.IsTrue(deleteResult.Success);
             Assert.IsTrue(deleteResult.HasValue);
-            Assert.AreEqual(deleteResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(deleteResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreEqual(deleteResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(deleteResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(deleteResult.Value.Key(), documents[0].Key());
+            Assert.AreEqual(deleteResult.Value.Rev(), documents[0].Rev());
         }
         
         [Test()]
@@ -999,15 +999,15 @@ namespace Arango.Tests
             var db = new ADatabase(Database.Alias);
             
             var deleteResult = db.Document
-                .IfMatch(documents[0].String("_rev"))
-                .Delete(documents[0].String("_id"));
+                .IfMatch(documents[0].Rev())
+                .Delete(documents[0].ID());
             
             Assert.AreEqual(202, deleteResult.StatusCode);
             Assert.IsTrue(deleteResult.Success);
             Assert.IsTrue(deleteResult.HasValue);
-            Assert.AreEqual(deleteResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(deleteResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreEqual(deleteResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(deleteResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(deleteResult.Value.Key(), documents[0].Key());
+            Assert.AreEqual(deleteResult.Value.Rev(), documents[0].Rev());
         }
         
         [Test()]
@@ -1018,13 +1018,13 @@ namespace Arango.Tests
 
             var deleteResult = db.Document
                 .IfMatch("123456789")
-                .Delete(documents[0].String("_id"));
+                .Delete(documents[0].ID());
             
             Assert.AreEqual(412, deleteResult.StatusCode);
             Assert.IsFalse(deleteResult.Success);
-            Assert.AreEqual(deleteResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(deleteResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreEqual(deleteResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(deleteResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(deleteResult.Value.Key(), documents[0].Key());
+            Assert.AreEqual(deleteResult.Value.Rev(), documents[0].Rev());
         }
 
         [Test()]
@@ -1035,13 +1035,13 @@ namespace Arango.Tests
 
             var deleteResult = db.Document
                 .ReturnOld()
-                .Delete(documents[0].String("_id"));
+                .Delete(documents[0].ID());
 
             Assert.AreEqual(202, deleteResult.StatusCode);
             Assert.IsTrue(deleteResult.Success);
-            Assert.AreEqual(deleteResult.Value.String("_id"), documents[0].String("_id"));
-            Assert.AreEqual(deleteResult.Value.String("_key"), documents[0].String("_key"));
-            Assert.AreEqual(deleteResult.Value.String("_rev"), documents[0].String("_rev"));
+            Assert.AreEqual(deleteResult.Value.ID(), documents[0].ID());
+            Assert.AreEqual(deleteResult.Value.Key(), documents[0].Key());
+            Assert.AreEqual(deleteResult.Value.Rev(), documents[0].Rev());
             Assert.IsTrue(deleteResult.Value.Has("old"));
         }
 

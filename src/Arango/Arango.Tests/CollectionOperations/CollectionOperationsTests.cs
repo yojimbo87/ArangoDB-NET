@@ -91,9 +91,9 @@ namespace Arango.Tests
             Assert.AreEqual(202, doc1Result.StatusCode);
             Assert.IsTrue(doc1Result.Success);
             Assert.IsTrue(doc1Result.HasValue);
-            Assert.AreEqual(Database.TestDocumentCollectionName + "/" + 1, doc1Result.Value.String("_id"));
-            Assert.AreEqual("1", doc1Result.Value.String("_key"));
-            Assert.IsFalse(string.IsNullOrEmpty(doc1Result.Value.String("_rev")));
+            Assert.AreEqual(Database.TestDocumentCollectionName + "/" + 1, doc1Result.Value.ID());
+            Assert.AreEqual("1", doc1Result.Value.Key());
+            Assert.IsFalse(string.IsNullOrEmpty(doc1Result.Value.Rev()));
             
             var doc2Result = db.Document
                 .Create(Database.TestDocumentCollectionName, newDocument);
@@ -101,9 +101,9 @@ namespace Arango.Tests
             Assert.AreEqual(202, doc2Result.StatusCode);
             Assert.IsTrue(doc2Result.Success);
             Assert.IsTrue(doc2Result.HasValue);
-            Assert.AreEqual(Database.TestDocumentCollectionName + "/" + 2, doc2Result.Value.String("_id"));
-            Assert.AreEqual("2", doc2Result.Value.String("_key"));
-            Assert.IsFalse(string.IsNullOrEmpty(doc2Result.Value.String("_rev")));
+            Assert.AreEqual(Database.TestDocumentCollectionName + "/" + 2, doc2Result.Value.ID());
+            Assert.AreEqual("2", doc2Result.Value.Key());
+            Assert.IsFalse(string.IsNullOrEmpty(doc2Result.Value.Rev()));
         }
         
         #endregion

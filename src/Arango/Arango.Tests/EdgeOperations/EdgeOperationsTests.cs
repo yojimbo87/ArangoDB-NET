@@ -30,7 +30,7 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"));
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID());
             
             Assert.AreEqual(202, createResult.StatusCode);
             Assert.IsTrue(createResult.Success);
@@ -49,7 +49,7 @@ namespace Arango.Tests
             var createResult = db
                 .Document
                 .WaitForSync(true)
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"));
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID());
             
             Assert.AreEqual(201, createResult.StatusCode);
             Assert.IsTrue(createResult.Success);
@@ -66,8 +66,8 @@ namespace Arango.Tests
             var db = new ADatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
-                .From(_documents[0].String("_id"))
-                .To(_documents[1].String("_id"))
+                .From(_documents[0].ID())
+                .To(_documents[1].ID())
         		.String("foo", "foo string value")
         		.Int("bar", 12345);
 
@@ -84,14 +84,14 @@ namespace Arango.Tests
             
             var getResult = db
                 .Document
-                .Get(createResult.Value.String("_id"));
+                .Get(createResult.Value.ID());
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
             Assert.IsTrue(getResult.HasValue);
-            Assert.AreEqual(getResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), createResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), createResult.Value.Rev());
             Assert.IsTrue(getResult.Value.IsString("_from"));
             Assert.IsTrue(getResult.Value.IsString("_to"));
             Assert.AreEqual(getResult.Value.String("foo"), document.String("foo"));
@@ -105,8 +105,8 @@ namespace Arango.Tests
             var db = new ADatabase(Database.Alias);
 
             var document = new Dictionary<string, object>()
-                .From(_documents[0].String("_id"))
-                .To(_documents[1].String("_id"))
+                .From(_documents[0].ID())
+                .To(_documents[1].ID())
                 .String("foo", "foo string value")
                 .Int("bar", 12345);
 
@@ -122,9 +122,9 @@ namespace Arango.Tests
             Assert.IsTrue(createResult.Value.IsString("_key"));
             Assert.IsTrue(createResult.Value.IsString("_rev"));
             Assert.IsTrue(createResult.Value.Has("new"));
-            Assert.AreEqual(createResult.Value.String("_id"), createResult.Value.String("new._id"));
-            Assert.AreEqual(createResult.Value.String("_key"), createResult.Value.String("new._key"));
-            Assert.AreEqual(createResult.Value.String("_rev"), createResult.Value.String("new._rev"));
+            Assert.AreEqual(createResult.Value.ID(), createResult.Value.String("new._id"));
+            Assert.AreEqual(createResult.Value.Key(), createResult.Value.String("new._key"));
+            Assert.AreEqual(createResult.Value.Rev(), createResult.Value.String("new._rev"));
             Assert.AreEqual(document.String("_from"), createResult.Value.String("new._from"));
             Assert.AreEqual(document.String("_to"), createResult.Value.String("new._to"));
             Assert.AreEqual(document.String("foo"), createResult.Value.String("new.foo"));
@@ -143,7 +143,7 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), dummy);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), dummy);
             
             Assert.AreEqual(202, createResult.StatusCode);
             Assert.IsTrue(createResult.Success);
@@ -154,14 +154,14 @@ namespace Arango.Tests
             
             var getResult = db
                 .Document
-                .Get(createResult.Value.String("_id"));
+                .Get(createResult.Value.ID());
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
             Assert.IsTrue(getResult.HasValue);
-            Assert.AreEqual(getResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), createResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), createResult.Value.Rev());
             Assert.IsTrue(getResult.Value.IsString("_from"));
             Assert.IsTrue(getResult.Value.IsString("_to"));
             Assert.AreEqual(getResult.Value.String("foo"), dummy.Foo);
@@ -185,16 +185,16 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var checkResult = db
                 .Document
-                .Check(createResult.Value.String("_id"));
+                .Check(createResult.Value.ID());
             
             Assert.AreEqual(200, checkResult.StatusCode);
             Assert.IsTrue(checkResult.Success);
             Assert.IsTrue(checkResult.HasValue);
-            Assert.AreEqual(checkResult.Value, createResult.Value.String("_rev"));
+            Assert.AreEqual(checkResult.Value, createResult.Value.Rev());
         }
         
         [Test()]
@@ -209,17 +209,17 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var checkResult = db
                 .Document
-                .IfMatch(createResult.Value.String("_rev"))
-                .Check(createResult.Value.String("_id"));
+                .IfMatch(createResult.Value.Rev())
+                .Check(createResult.Value.ID());
             
             Assert.AreEqual(200, checkResult.StatusCode);
             Assert.IsTrue(checkResult.Success);
             Assert.IsTrue(checkResult.HasValue);
-            Assert.AreEqual(checkResult.Value, createResult.Value.String("_rev"));
+            Assert.AreEqual(checkResult.Value, createResult.Value.Rev());
         }
         
         [Test()]
@@ -234,17 +234,17 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var checkResult = db
                 .Document
                 .IfMatch("123456789")
-                .Check(createResult.Value.String("_id"));
+                .Check(createResult.Value.ID());
             
             Assert.AreEqual(412, checkResult.StatusCode);
             Assert.IsFalse(checkResult.Success);
             Assert.IsTrue(checkResult.HasValue);
-            Assert.AreEqual(checkResult.Value, createResult.Value.String("_rev"));
+            Assert.AreEqual(checkResult.Value, createResult.Value.Rev());
         }
         
         [Test()]
@@ -259,17 +259,17 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var checkResult = db
                 .Document
                 .IfNoneMatch("123456789")
-                .Check(createResult.Value.String("_id"));
+                .Check(createResult.Value.ID());
             
             Assert.AreEqual(200, checkResult.StatusCode);
             Assert.IsTrue(checkResult.Success);
             Assert.IsTrue(checkResult.HasValue);
-            Assert.AreEqual(checkResult.Value, createResult.Value.String("_rev"));
+            Assert.AreEqual(checkResult.Value, createResult.Value.Rev());
         }
         
         [Test()]
@@ -284,17 +284,17 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var checkResult = db
                 .Document
-                .IfNoneMatch(createResult.Value.String("_rev"))
-                .Check(createResult.Value.String("_id"));
+                .IfNoneMatch(createResult.Value.Rev())
+                .Check(createResult.Value.ID());
             
             Assert.AreEqual(304, checkResult.StatusCode);
             Assert.IsFalse(checkResult.Success);
             Assert.IsTrue(checkResult.HasValue);
-            Assert.AreEqual(checkResult.Value, createResult.Value.String("_rev"));
+            Assert.AreEqual(checkResult.Value, createResult.Value.Rev());
         }
         
         #endregion
@@ -313,18 +313,18 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var getResult = db
                 .Document
-                .Get(createResult.Value.String("_id"));
+                .Get(createResult.Value.ID());
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
             Assert.IsTrue(getResult.HasValue);
-            Assert.AreEqual(getResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), createResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), createResult.Value.Rev());
             Assert.IsTrue(getResult.Value.IsString("_from"));
             Assert.IsTrue(getResult.Value.IsString("_to"));
             Assert.IsTrue(getResult.Value.IsString("foo"));
@@ -344,19 +344,19 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var getResult = db
                 .Document
-                .IfMatch(createResult.Value.String("_rev"))
-                .Get(createResult.Value.String("_id"));
+                .IfMatch(createResult.Value.Rev())
+                .Get(createResult.Value.ID());
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
             Assert.IsTrue(getResult.HasValue);
-            Assert.AreEqual(getResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), createResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), createResult.Value.Rev());
             Assert.IsTrue(getResult.Value.IsString("_from"));
             Assert.IsTrue(getResult.Value.IsString("_to"));
             Assert.IsTrue(getResult.Value.IsString("foo"));
@@ -376,19 +376,19 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var getResult = db
                 .Document
                 .IfMatch("123456789")
-                .Get(createResult.Value.String("_id"));
+                .Get(createResult.Value.ID());
             
             Assert.AreEqual(412, getResult.StatusCode);
             Assert.IsFalse(getResult.Success);
             Assert.IsTrue(getResult.HasValue);
-            Assert.AreEqual(getResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), createResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), createResult.Value.Rev());
         }
         
         [Test()]
@@ -403,19 +403,19 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var getResult = db
                 .Document
                 .IfNoneMatch("123456789")
-                .Get(createResult.Value.String("_id"));
+                .Get(createResult.Value.ID());
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
             Assert.IsTrue(getResult.HasValue);
-            Assert.AreEqual(getResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), createResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), createResult.Value.Rev());
             Assert.IsTrue(getResult.Value.IsString("_from"));
             Assert.IsTrue(getResult.Value.IsString("_to"));
             Assert.IsTrue(getResult.Value.IsString("foo"));
@@ -435,12 +435,12 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var getResult = db
                 .Document
-                .IfNoneMatch(createResult.Value.String("_rev"))
-                .Get(createResult.Value.String("_id"));
+                .IfNoneMatch(createResult.Value.Rev())
+                .Get(createResult.Value.ID());
             
             Assert.AreEqual(304, getResult.StatusCode);
             Assert.IsFalse(getResult.Success);
@@ -459,11 +459,11 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var getResult = db
                 .Document
-                .Get<Dummy>(createResult.Value.String("_id"));
+                .Get<Dummy>(createResult.Value.ID());
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
@@ -489,20 +489,20 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[1].String("_id"), _documents[0].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[1].ID(), _documents[0].ID(), document);
             
             var getResult = db
                 .Document
-                .GetEdges(Database.TestEdgeCollectionName, _documents[0].String("_id"), ADirection.In);
+                .GetEdges(Database.TestEdgeCollectionName, _documents[0].ID(), ADirection.In);
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
             Assert.IsTrue(getResult.HasValue);
             Assert.AreEqual(getResult.Value.Count, 1);
             
-            Assert.AreEqual(getResult.Value[0].String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value[0].String("_key"), createResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value[0].String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value[0].ID(), createResult.Value.ID());
+            Assert.AreEqual(getResult.Value[0].Key(), createResult.Value.Key());
+            Assert.AreEqual(getResult.Value[0].Rev(), createResult.Value.Rev());
         }
         
         [Test()]
@@ -517,20 +517,20 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var getResult = db
                 .Document
-                .GetEdges(Database.TestEdgeCollectionName, _documents[0].String("_id"), ADirection.Out);
+                .GetEdges(Database.TestEdgeCollectionName, _documents[0].ID(), ADirection.Out);
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
             Assert.IsTrue(getResult.HasValue);
             Assert.AreEqual(getResult.Value.Count, 1);
             
-            Assert.AreEqual(getResult.Value[0].String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value[0].String("_key"), createResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value[0].String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value[0].ID(), createResult.Value.ID());
+            Assert.AreEqual(getResult.Value[0].Key(), createResult.Value.Key());
+            Assert.AreEqual(getResult.Value[0].Rev(), createResult.Value.Rev());
         }
         
         [Test()]
@@ -545,20 +545,20 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var getResult = db
                 .Document
-                .GetEdges(Database.TestEdgeCollectionName, _documents[0].String("_id"), ADirection.Any);
+                .GetEdges(Database.TestEdgeCollectionName, _documents[0].ID(), ADirection.Any);
             
             Assert.AreEqual(200, getResult.StatusCode);
             Assert.IsTrue(getResult.Success);
             Assert.IsTrue(getResult.HasValue);
             Assert.AreEqual(getResult.Value.Count, 1);
             
-            Assert.AreEqual(getResult.Value[0].String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value[0].String("_key"), createResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value[0].String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value[0].ID(), createResult.Value.ID());
+            Assert.AreEqual(getResult.Value[0].Key(), createResult.Value.Key());
+            Assert.AreEqual(getResult.Value[0].Rev(), createResult.Value.Rev());
         }
         
         #endregion
@@ -577,7 +577,7 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var newDocument = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -586,22 +586,22 @@ namespace Arango.Tests
             
             var updateResult = db
                 .Document
-                .Update(createResult.Value.String("_id"), newDocument);
+                .Update(createResult.Value.ID(), newDocument);
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(updateResult.Value.Key(), createResult.Value.Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), createResult.Value.Rev());
             
             var getResult = db
                 .Document
-                .Get(updateResult.Value.String("_id"));
+                .Get(updateResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), updateResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), updateResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), updateResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
@@ -625,7 +625,7 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
 
             var newDocument = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -635,14 +635,14 @@ namespace Arango.Tests
             var updateResult = db
                 .Document
                 .ReturnOld()
-                .Update(createResult.Value.String("_id"), newDocument);
+                .Update(createResult.Value.ID(), newDocument);
 
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(updateResult.Value.Key(), createResult.Value.Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), createResult.Value.Rev());
             Assert.IsTrue(updateResult.Value.Has("old"));
         }
 
@@ -658,7 +658,7 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
 
             var newDocument = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -668,14 +668,14 @@ namespace Arango.Tests
             var updateResult = db
                 .Document
                 .ReturnNew()
-                .Update(createResult.Value.String("_id"), newDocument);
+                .Update(createResult.Value.ID(), newDocument);
 
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(updateResult.Value.Key(), createResult.Value.Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), createResult.Value.Rev());
             Assert.IsTrue(updateResult.Value.Has("new"));
         }
 
@@ -691,7 +691,7 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var newDocument = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -701,22 +701,22 @@ namespace Arango.Tests
             var updateResult = db
                 .Document
                 .WaitForSync(true)
-                .Update(createResult.Value.String("_id"), newDocument);
+                .Update(createResult.Value.ID(), newDocument);
             
             Assert.AreEqual(201, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(updateResult.Value.Key(), createResult.Value.Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), createResult.Value.Rev());
             
             var getResult = db
                 .Document
-                .Get(updateResult.Value.String("_id"));
+                .Get(updateResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), updateResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), updateResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), updateResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
@@ -740,7 +740,7 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
 
             var newDocument = new Dictionary<string, object>()
                 .Rev(createResult.Value.Rev())
@@ -751,14 +751,14 @@ namespace Arango.Tests
             var updateResult = db
                 .Document
                 .IgnoreRevs(false)
-                .Update(createResult.Value.String("_id"), newDocument);
+                .Update(createResult.Value.ID(), newDocument);
 
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(updateResult.Value.Key(), createResult.Value.Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), createResult.Value.Rev());
         }
 
         [Test()]
@@ -773,7 +773,7 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var newDocument = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -782,23 +782,23 @@ namespace Arango.Tests
             
             var updateResult = db
                 .Document
-                .IfMatch(createResult.Value.String("_rev"))
-                .Update(createResult.Value.String("_id"), newDocument);
+                .IfMatch(createResult.Value.Rev())
+                .Update(createResult.Value.ID(), newDocument);
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(updateResult.Value.Key(), createResult.Value.Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), createResult.Value.Rev());
             
             var getResult = db
                 .Document
-                .Get(updateResult.Value.String("_id"));
+                .Get(updateResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), updateResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), updateResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), updateResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
@@ -822,7 +822,7 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var newDocument = new Dictionary<string, object>()
                 .String("foo", "some other new string")
@@ -832,14 +832,14 @@ namespace Arango.Tests
             var updateResult = db
                 .Document
                 .IfMatch("123456789")
-                .Update(createResult.Value.String("_id"), newDocument);
+                .Update(createResult.Value.ID(), newDocument);
             
             Assert.AreEqual(412, updateResult.StatusCode);
             Assert.IsFalse(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(updateResult.Value.Key(), createResult.Value.Key());
+            Assert.AreEqual(updateResult.Value.Rev(), createResult.Value.Rev());
         }
         
         [Test()]
@@ -854,7 +854,7 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             document.Merge(createResult.Value);
             
@@ -865,22 +865,22 @@ namespace Arango.Tests
             var updateResult = db
                 .Document
                 .KeepNull(false)
-                .Update(createResult.Value.String("_id"), newDocument);
+                .Update(createResult.Value.ID(), newDocument);
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), document.String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), document.String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), document.String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), document.ID());
+            Assert.AreEqual(updateResult.Value.Key(), document.Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), document.Rev());
             
             var getResult = db
                 .Document
-                .Get(updateResult.Value.String("_id"));
+                .Get(updateResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), updateResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), updateResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), updateResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
@@ -902,7 +902,7 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             document.Merge(createResult.Value);
             
@@ -913,22 +913,22 @@ namespace Arango.Tests
             var updateResult = db
                 .Document
                 .MergeObjects(true) // this is also default behavior
-                .Update(createResult.Value.String("_id"), newDocument);
+                .Update(createResult.Value.ID(), newDocument);
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), document.String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), document.String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), document.String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), document.ID());
+            Assert.AreEqual(updateResult.Value.Key(), document.Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), document.Rev());
             
             var getResult = db
                 .Document
-                .Get(updateResult.Value.String("_id"));
+                .Get(updateResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), updateResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), updateResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), updateResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
@@ -950,7 +950,7 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             document.Merge(createResult.Value);
             
@@ -961,22 +961,22 @@ namespace Arango.Tests
             var updateResult = db
                 .Document
                 .MergeObjects(false)
-                .Update(createResult.Value.String("_id"), newDocument);
+                .Update(createResult.Value.ID(), newDocument);
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), document.String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), document.String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), document.String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), document.ID());
+            Assert.AreEqual(updateResult.Value.Key(), document.Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), document.Rev());
             
             var getResult = db
                 .Document
-                .Get(updateResult.Value.String("_id"));
+                .Get(updateResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), updateResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), updateResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), updateResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
@@ -998,7 +998,7 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var dummy = new Dummy();
             dummy.Foo = "some other new string";
@@ -1007,22 +1007,22 @@ namespace Arango.Tests
             
             var updateResult = db
                 .Document
-                .Update(createResult.Value.String("_id"), dummy);
+                .Update(createResult.Value.ID(), dummy);
             
             Assert.AreEqual(202, updateResult.StatusCode);
             Assert.IsTrue(updateResult.Success);
             Assert.IsTrue(updateResult.HasValue);
-            Assert.AreEqual(updateResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(updateResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreNotEqual(updateResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(updateResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(updateResult.Value.Key(), createResult.Value.Key());
+            Assert.AreNotEqual(updateResult.Value.Rev(), createResult.Value.Rev());
             
             var getResult = db
                 .Document
-                .Get(updateResult.Value.String("_id"));
+                .Get(updateResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), updateResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), updateResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), updateResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), updateResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), updateResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), updateResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), dummy.Foo);
@@ -1048,32 +1048,32 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var newDocument = new Dictionary<string, object>()
-                .From(_documents[0].String("_id"))
-                .To(_documents[1].String("_id"))
+                .From(_documents[0].ID())
+                .To(_documents[1].ID())
                 .String("foo", "some other new string")
                 .Int("baz", 54321);
             
             var replaceResult = db
                 .Document
-                .Replace(createResult.Value.String("_id"), newDocument);
+                .Replace(createResult.Value.ID(), newDocument);
             
             Assert.AreEqual(202, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
             Assert.IsTrue(replaceResult.HasValue);
-            Assert.AreEqual(replaceResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(replaceResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreNotEqual(replaceResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(replaceResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(replaceResult.Value.Key(), createResult.Value.Key());
+            Assert.AreNotEqual(replaceResult.Value.Rev(), createResult.Value.Rev());
             
             var getResult = db
                 .Document
-                .Get(replaceResult.Value.String("_id"));
+                .Get(replaceResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), replaceResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), replaceResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), replaceResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), replaceResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), replaceResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), replaceResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
@@ -1095,25 +1095,25 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
 
             var newDocument = new Dictionary<string, object>()
-                .From(_documents[0].String("_id"))
-                .To(_documents[1].String("_id"))
+                .From(_documents[0].ID())
+                .To(_documents[1].ID())
                 .String("foo", "some other new string")
                 .Int("baz", 54321);
 
             var replaceResult = db
                 .Document
                 .ReturnOld()
-                .Replace(createResult.Value.String("_id"), newDocument);
+                .Replace(createResult.Value.ID(), newDocument);
 
             Assert.AreEqual(202, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
             Assert.IsTrue(replaceResult.HasValue);
-            Assert.AreEqual(replaceResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(replaceResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreNotEqual(replaceResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(replaceResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(replaceResult.Value.Key(), createResult.Value.Key());
+            Assert.AreNotEqual(replaceResult.Value.Rev(), createResult.Value.Rev());
             Assert.IsTrue(replaceResult.Value.Has("old"));
         }
 
@@ -1129,25 +1129,25 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
 
             var newDocument = new Dictionary<string, object>()
-                .From(_documents[0].String("_id"))
-                .To(_documents[1].String("_id"))
+                .From(_documents[0].ID())
+                .To(_documents[1].ID())
                 .String("foo", "some other new string")
                 .Int("baz", 54321);
 
             var replaceResult = db
                 .Document
                 .ReturnNew()
-                .Replace(createResult.Value.String("_id"), newDocument);
+                .Replace(createResult.Value.ID(), newDocument);
 
             Assert.AreEqual(202, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
             Assert.IsTrue(replaceResult.HasValue);
-            Assert.AreEqual(replaceResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(replaceResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreNotEqual(replaceResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(replaceResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(replaceResult.Value.Key(), createResult.Value.Key());
+            Assert.AreNotEqual(replaceResult.Value.Rev(), createResult.Value.Rev());
             Assert.IsTrue(replaceResult.Value.Has("new"));
         }
 
@@ -1163,33 +1163,33 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var newDocument = new Dictionary<string, object>()
-                .From(_documents[0].String("_id"))
-                .To(_documents[1].String("_id"))
+                .From(_documents[0].ID())
+                .To(_documents[1].ID())
                 .String("foo", "some other new string")
                 .Int("baz", 54321);
             
             var replaceResult = db
                 .Document
                 .WaitForSync(true)
-                .Replace(createResult.Value.String("_id"), newDocument);
+                .Replace(createResult.Value.ID(), newDocument);
             
             Assert.AreEqual(201, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
             Assert.IsTrue(replaceResult.HasValue);
-            Assert.AreEqual(replaceResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(replaceResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreNotEqual(replaceResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(replaceResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(replaceResult.Value.Key(), createResult.Value.Key());
+            Assert.AreNotEqual(replaceResult.Value.Rev(), createResult.Value.Rev());
             
             var getResult = db
                 .Document
-                .Get(replaceResult.Value.String("_id"));
+                .Get(replaceResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), replaceResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), replaceResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), replaceResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), replaceResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), replaceResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), replaceResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
@@ -1211,11 +1211,11 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
 
             var newDocument = new Dictionary<string, object>()
-                .From(_documents[0].String("_id"))
-                .To(_documents[1].String("_id"))
+                .From(_documents[0].ID())
+                .To(_documents[1].ID())
                 .Rev(createResult.Value.Rev())
                 .String("foo", "some other new string")
                 .Int("baz", 54321);
@@ -1223,14 +1223,14 @@ namespace Arango.Tests
             var replaceResult = db
                 .Document
                 .IgnoreRevs(false)
-                .Replace(createResult.Value.String("_id"), newDocument);
+                .Replace(createResult.Value.ID(), newDocument);
 
             Assert.AreEqual(202, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
             Assert.IsTrue(replaceResult.HasValue);
-            Assert.AreEqual(replaceResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(replaceResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreNotEqual(replaceResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(replaceResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(replaceResult.Value.Key(), createResult.Value.Key());
+            Assert.AreNotEqual(replaceResult.Value.Rev(), createResult.Value.Rev());
         }
 
         [Test()]
@@ -1245,35 +1245,35 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             document.Merge(createResult.Value);
             
             var newDocument = new Dictionary<string, object>()
-                .From(_documents[0].String("_id"))
-                .To(_documents[1].String("_id"))
+                .From(_documents[0].ID())
+                .To(_documents[1].ID())
                 .String("foo", "some other new string")
                 .Int("baz", 54321);
             
             var replaceResult = db
                 .Document
-                .IfMatch(document.String("_rev"))
-                .Replace(createResult.Value.String("_id"), newDocument);
+                .IfMatch(document.Rev())
+                .Replace(createResult.Value.ID(), newDocument);
             
             Assert.AreEqual(202, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
             Assert.IsTrue(replaceResult.HasValue);
-            Assert.AreEqual(replaceResult.Value.String("_id"), document.String("_id"));
-            Assert.AreEqual(replaceResult.Value.String("_key"), document.String("_key"));
-            Assert.AreNotEqual(replaceResult.Value.String("_rev"), document.String("_rev"));
+            Assert.AreEqual(replaceResult.Value.ID(), document.ID());
+            Assert.AreEqual(replaceResult.Value.Key(), document.Key());
+            Assert.AreNotEqual(replaceResult.Value.Rev(), document.Rev());
             
             var getResult = db
                 .Document
-                .Get(replaceResult.Value.String("_id"));
+                .Get(replaceResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), replaceResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), replaceResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), replaceResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), replaceResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), replaceResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), replaceResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), newDocument.String("foo"));
@@ -1295,27 +1295,27 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             document.Merge(createResult.Value);
             
             var newDocument = new Dictionary<string, object>()
-                .From(_documents[0].String("_id"))
-                .To(_documents[1].String("_id"))
+                .From(_documents[0].ID())
+                .To(_documents[1].ID())
                 .String("foo", "some other new string")
                 .Int("baz", 54321);
             
             var replaceResult = db
                 .Document
                 .IfMatch("123456789")
-                .Replace(createResult.Value.String("_id"), newDocument);
+                .Replace(createResult.Value.ID(), newDocument);
             
             Assert.AreEqual(412, replaceResult.StatusCode);
             Assert.IsFalse(replaceResult.Success);
             Assert.IsTrue(replaceResult.HasValue);
-            Assert.AreEqual(replaceResult.Value.String("_id"), document.String("_id"));
-            Assert.AreEqual(replaceResult.Value.String("_key"), document.String("_key"));
-            Assert.AreEqual(replaceResult.Value.String("_rev"), document.String("_rev"));
+            Assert.AreEqual(replaceResult.Value.ID(), document.ID());
+            Assert.AreEqual(replaceResult.Value.Key(), document.Key());
+            Assert.AreEqual(replaceResult.Value.Rev(), document.Rev());
         }
         
         [Test()]
@@ -1330,7 +1330,7 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var dummy = new Dummy();
             dummy.Foo = "some other new string";
@@ -1338,22 +1338,22 @@ namespace Arango.Tests
             
             var replaceResult = db
                 .Document
-                .ReplaceEdge(createResult.Value.String("_id"), _documents[0].String("_id"), _documents[1].String("_id"), dummy);
+                .ReplaceEdge(createResult.Value.ID(), _documents[0].ID(), _documents[1].ID(), dummy);
             
             Assert.AreEqual(202, replaceResult.StatusCode);
             Assert.IsTrue(replaceResult.Success);
             Assert.IsTrue(replaceResult.HasValue);
-            Assert.AreEqual(replaceResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(replaceResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreNotEqual(replaceResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(replaceResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(replaceResult.Value.Key(), createResult.Value.Key());
+            Assert.AreNotEqual(replaceResult.Value.Rev(), createResult.Value.Rev());
             
             var getResult = db
                 .Document
-                .Get(replaceResult.Value.String("_id"));
+                .Get(replaceResult.Value.ID());
             
-            Assert.AreEqual(getResult.Value.String("_id"), replaceResult.Value.String("_id"));
-            Assert.AreEqual(getResult.Value.String("_key"), replaceResult.Value.String("_key"));
-            Assert.AreEqual(getResult.Value.String("_rev"), replaceResult.Value.String("_rev"));
+            Assert.AreEqual(getResult.Value.ID(), replaceResult.Value.ID());
+            Assert.AreEqual(getResult.Value.Key(), replaceResult.Value.Key());
+            Assert.AreEqual(getResult.Value.Rev(), replaceResult.Value.Rev());
             
             Assert.AreNotEqual(getResult.Value.String("foo"), document.String("foo"));
             Assert.AreEqual(getResult.Value.String("foo"), dummy.Foo);
@@ -1379,17 +1379,17 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var deleteResult = db.Document
-                .Delete(createResult.Value.String("_id"));
+                .Delete(createResult.Value.ID());
             
             Assert.AreEqual(202, deleteResult.StatusCode);
             Assert.IsTrue(deleteResult.Success);
             Assert.IsTrue(deleteResult.HasValue);
-            Assert.AreEqual(deleteResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(deleteResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreEqual(deleteResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(deleteResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(deleteResult.Value.Key(), createResult.Value.Key());
+            Assert.AreEqual(deleteResult.Value.Rev(), createResult.Value.Rev());
         }
         
         [Test()]
@@ -1404,18 +1404,18 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var deleteResult = db.Document
                 .WaitForSync(true)
-                .Delete(createResult.Value.String("_id"));
+                .Delete(createResult.Value.ID());
             
             Assert.AreEqual(200, deleteResult.StatusCode);
             Assert.IsTrue(deleteResult.Success);
             Assert.IsTrue(deleteResult.HasValue);
-            Assert.AreEqual(deleteResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(deleteResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreEqual(deleteResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(deleteResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(deleteResult.Value.Key(), createResult.Value.Key());
+            Assert.AreEqual(deleteResult.Value.Rev(), createResult.Value.Rev());
         }
         
         [Test()]
@@ -1430,18 +1430,18 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var deleteResult = db.Document
-                .IfMatch(createResult.Value.String("_rev"))
-                .Delete(createResult.Value.String("_id"));
+                .IfMatch(createResult.Value.Rev())
+                .Delete(createResult.Value.ID());
             
             Assert.AreEqual(202, deleteResult.StatusCode);
             Assert.IsTrue(deleteResult.Success);
             Assert.IsTrue(deleteResult.HasValue);
-            Assert.AreEqual(deleteResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(deleteResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreEqual(deleteResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(deleteResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(deleteResult.Value.Key(), createResult.Value.Key());
+            Assert.AreEqual(deleteResult.Value.Rev(), createResult.Value.Rev());
         }
         
         [Test()]
@@ -1456,18 +1456,18 @@ namespace Arango.Tests
             
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
             
             var deleteResult = db.Document
                 .IfMatch("123456789")
-                .Delete(createResult.Value.String("_id"));
+                .Delete(createResult.Value.ID());
             
             Assert.AreEqual(412, deleteResult.StatusCode);
             Assert.IsFalse(deleteResult.Success);
             Assert.IsTrue(deleteResult.HasValue);
-            Assert.AreEqual(deleteResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(deleteResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreEqual(deleteResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(deleteResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(deleteResult.Value.Key(), createResult.Value.Key());
+            Assert.AreEqual(deleteResult.Value.Rev(), createResult.Value.Rev());
         }
 
         [Test()]
@@ -1482,17 +1482,17 @@ namespace Arango.Tests
 
             var createResult = db
                 .Document
-                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].String("_id"), _documents[1].String("_id"), document);
+                .CreateEdge(Database.TestEdgeCollectionName, _documents[0].ID(), _documents[1].ID(), document);
 
             var deleteResult = db.Document
                 .ReturnOld()
-                .Delete(createResult.Value.String("_id"));
+                .Delete(createResult.Value.ID());
 
             Assert.AreEqual(202, deleteResult.StatusCode);
             Assert.IsTrue(deleteResult.Success);
-            Assert.AreEqual(deleteResult.Value.String("_id"), createResult.Value.String("_id"));
-            Assert.AreEqual(deleteResult.Value.String("_key"), createResult.Value.String("_key"));
-            Assert.AreEqual(deleteResult.Value.String("_rev"), createResult.Value.String("_rev"));
+            Assert.AreEqual(deleteResult.Value.ID(), createResult.Value.ID());
+            Assert.AreEqual(deleteResult.Value.Key(), createResult.Value.Key());
+            Assert.AreEqual(deleteResult.Value.Rev(), createResult.Value.Rev());
             Assert.IsTrue(deleteResult.Value.Has("old"));
         }
 
