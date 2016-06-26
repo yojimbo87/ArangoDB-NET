@@ -1,3 +1,5 @@
+**This branch is compatible with ArangoDB 2.x. For ArangoDB 3.x compatible driver checkout [this](https://github.com/yojimbo87/ArangoDB-NET/tree/3.x) branch.**
+
 # ArangoDB-NET
 
 ArangoDB-NET is a C# driver for [ArangoDB](https://www.arangodb.com/) NoSQL multi-model database. Driver implements and communicates with database backend through its [HTTP API](https://docs.arangodb.com/HttpApi/index.html) interface and runs on Microsoft .NET and mono framework.
