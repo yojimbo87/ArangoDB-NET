@@ -2,13 +2,21 @@
 
 ## Current stable release
 
+### 0.10.0
+
+Tested against ArangoDB 3.0.0, 3.0.1
+
+- Implement [incompatible changes in ArangoDB 3.0](https://docs.arangodb.com/devel/Manual/ReleaseNotes/UpgradingChanges30.html).
+- AEdge class was removed and its functionality is now part of ADocument class.
+- This is release is not backwards compatible with ArangoDB 2.x versions.
+
+## Previous releases
+
 ### 0.9.4
 
 Tested against ArangoDB 2.8.1
 
 - ~50% performance increase when creating, updating and replacing documents/edges from generic object.
-
-## Previous releases
 
 ### 0.9.3
 
