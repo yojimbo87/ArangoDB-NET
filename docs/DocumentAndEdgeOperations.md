@@ -2,14 +2,40 @@
 
 - [Create document](#create-document)
 - [Create document with user defined key](#create-document-with-user-defined-key)
+- [Create edge](#create-edge)
 - [Check document existence](#check-document-existence)
 - [Retrieve document](#retrieve-document)
+- [Retrieve vertex edges](#retrieve-vertex-edges)
 - [Update document](#update-document)
 - [Replace document](#replace-document)
+- [Replace edge](#replace-edge)
 - [Delete document](#delete-document)
 - [More examples](#more-examples)
 
-Document operations are focused on management of documents in document type collections. These operations are accessible through `Document` property in database context object.
+## Retrieve vertex edges
+
+Retrieves list of edges from specified edge type collection to specified document vertex with given direction.
+
+```csharp
+var db = new ADatabase("myDatabaseAlias");
+
+var getEdgesResult = db.Edge
+    .Get("MyEdgeCollection", "MyDocumentCollection/123", ADirection.In);
+    
+if (getEdgesResult.Success)
+{
+    foreach (var edge in getEdgesResult.Value)
+    {
+        var id = edge.String("_id");
+        var key = edge.String("_key");
+        var revision = edge.String("_rev");
+        var fromVertex = edge.String("_from");
+        var toVertex = edge.String("_to");
+    }
+}
+```
+
+Document and edge operations are focused on management of documents in document and edge type collections. These operations are accessible through `Document` property in database context object. The API for documents and edges have been unified in ArangoDB 3.0. For CRUD operations there is no distinction anymore between documents and edges API-wise.
 
 ## Create document
 
@@ -17,8 +43,8 @@ Creates new document within specified collection in current database context.
 
 Applicable optional parameters available through fluent API:
 
-- `CreateCollection(bool value)` - Determines whether collection should be created if it does not exist. Default value: false.
 - `WaitForSync(bool value)` - Determines whether to wait until data are synchronised to disk. Default value: false.
+- `ReturnNew()` - Determines whether to return additionally the complete new document under the attribute 'new' in the result.
 
 ```csharp
 var db = new ArangoDatabase("myDatabaseAlias");
@@ -86,6 +112,51 @@ if (createDocumentResult.Success)
 }
 ```
 
+## Create edge
+
+Creates new edge within specified collection between two document vertices in current database context.
+
+```csharp
+var db = new ADatabase("myDatabaseAlias");
+
+var edgeData = new Dictionary<string, object>()
+    .String("foo", "foo string value")
+    .Int("bar", 12345);
+
+var createEdgeResult = db.Document
+    .WaitForSync(true)
+    .CreateEdge("MyEdgeCollection", "MyDocumentCollection/123", "MyDocumentCollection/456", edgeData);
+    
+if (createEdgeResult.Success)
+{
+    var id = createEdgeResult.Value.String("_id");
+    var key = createEdgeResult.Value.String("_key");
+    var revision = createEdgeResult.Value.String("_rev");
+}
+```
+
+Generic version:
+
+```csharp
+var db = new ADatabase("myDatabaseAlias");
+
+var dummy = new Dummy();
+dummy.Foo = "foo string value";
+dummy.Bar = 12345;
+
+// creates new edge
+var createEdgeResult = db.Document
+    .WaitForSync(true)
+    .CreateEdge("MyEdgeCollection", "MyDocumentCollection/123", "MyDocumentCollection/456", dummy);
+    
+if (createEdgeResult.Success)
+{
+    var id = createEdgeResult.Value.String("_id");
+    var key = createEdgeResult.Value.String("_key");
+    var revision = createEdgeResult.Value.String("_rev");
+}
+```
+
 ## Check document existence
 
 Checks for existence of specified document.
@@ -93,7 +164,6 @@ Checks for existence of specified document.
 Applicable optional parameters available through fluent API:
 
 - `IfMatch(string revision)` - Conditionally operate on document with specified revision.
-- `IfMatch(string revision, AUpdatePolicy updatePolicy)` - Conditionally operate on document with specified revision and update policy.
 - `IfNoneMatch(string revision)` - Conditionally operate on document which current revision does not match specified revision.
 
 ```csharp
@@ -150,6 +220,29 @@ if (getDocumentResult.Success)
 }
 ```
 
+## Retrieve vertex edges
+
+Retrieves list of edges from specified edge type collection to specified document vertex with given direction.
+
+```csharp
+var db = new ADatabase("myDatabaseAlias");
+
+var getEdgesResult = db.Document
+    .GetEdges("MyEdgeCollection", "MyDocumentCollection/123", ADirection.In);
+    
+if (getEdgesResult.Success)
+{
+    foreach (var edge in getEdgesResult.Value)
+    {
+        var id = edge.String("_id");
+        var key = edge.String("_key");
+        var revision = edge.String("_rev");
+        var fromVertex = edge.String("_from");
+        var toVertex = edge.String("_to");
+    }
+}
+```
+
 ## Update document
 
 Updates existing document identified by its handle with new document data.
@@ -157,9 +250,11 @@ Updates existing document identified by its handle with new document data.
 Applicable optional parameters available through fluent API:
 
 - `IfMatch(string revision)` - Conditionally operate on document with specified revision.
-- `IfMatch(string revision, AUpdatePolicy updatePolicy)` - Conditionally operate on document with specified revision and update policy.
 - `KeepNull(bool value)` - Determines whether to keep any attributes from existing document that are contained in the patch document which contains null value. Default value: true.
 - `MergeObjects(bool value)` - Determines whether the value in the patch document will overwrite the existing document's value. Default value: true.
+- `IgnoreRevs()` - Determines whether to '_rev' field in the given document is ignored. If this is set to false, then the '_rev' attribute given in the body document is taken as a precondition. The document is only replaced if the current revision is the one specified.
+- `ReturnNew()` - Determines whether to return additionally the complete new document under the attribute 'new' in the result.
+- `ReturnOld()` - Determines whether to return additionally the complete previous revision of the changed document under the attribute 'old' in the result.
 
 ```csharp
 var db = new ADatabase("myDatabaseAlias");
@@ -207,7 +302,9 @@ Applicable optional parameters available through fluent API:
 
 - `WaitForSync(bool value)` - Determines whether to wait until data are synchronised to disk. Default value: false.
 - `IfMatch(string revision)` - Conditionally operate on document with specified revision.
-- `IfMatch(string revision, AUpdatePolicy updatePolicy)` - Conditionally operate on document with specified revision and update policy.
+- `IgnoreRevs()` - Determines whether to '_rev' field in the given document is ignored. If this is set to false, then the '_rev' attribute given in the body document is taken as a precondition. The document is only replaced if the current revision is the one specified.
+- `ReturnNew()` - Determines whether to return additionally the complete new document under the attribute 'new' in the result.
+- `ReturnOld()` - Determines whether to return additionally the complete previous revision of the changed document under the attribute 'old' in the result.
 
 ```csharp
 var db = new ADatabase("myDatabaseAlias");
@@ -247,13 +344,55 @@ if (replaceDocumentResult.Success)
 }
 ```
 
+## Replace edge
+
+Completely replaces existing edge identified by its handle with new edge data. This helper method injects 'fromID' and 'toID' fields into given document to construct valid edge document. 
+
+```csharp
+var db = new ADatabase("myDatabaseAlias");
+
+var edgeData = new Dictionary<string, object>()
+    .String("foo", "other foo string value")
+    .Int("baz", 123);
+
+var replaceEdgeResult = db.Document
+    .ReplaceEdge("MyEdgeCollection/123", "MyDocumentCollection/456", "MyDocumentCollection/789", edgeData);
+    
+if (replaceEdgeResult.Success)
+{
+    var id = replaceEdgeResult.Value.String("_id");
+    var key = replaceEdgeResult.Value.String("_key");
+    var revision = replaceEdgeResult.Value.String("_rev");
+}
+```
+
+Generic version:
+
+```csharp
+var db = new ADatabase("myDatabaseAlias");
+
+var dummy = new Dummy();
+dummy.Foo = "some other new string";
+dummy.Baz = 123;
+
+var replaceEdgeResult = db.Edge
+    .ReplaceEdge("MyEdgeCollection/123", "MyDocumentCollection/456", "MyDocumentCollection/789", dummy);
+    
+if (replaceEdgeResult.Success)
+{
+    var id = replaceEdgeResult.Value.String("_id");
+    var key = replaceEdgeResult.Value.String("_key");
+    var revision = replaceEdgeResult.Value.String("_rev");
+}
+```
+
 ## Delete document
 
 Deletes specified document.
 
 - `WaitForSync(bool value)` - Determines whether to wait until data are synchronised to disk. Default value: false.
 - `IfMatch(string revision)` - Conditionally operate on document with specified revision.
-- `IfMatch(string revision, AUpdatePolicy updatePolicy)` - Conditionally operate on document with specified revision and update policy.
+- `ReturnOld()` - Determines whether to return additionally the complete previous revision of the changed document under the attribute 'old' in the result.
 
 ```csharp
 var db = new ADatabase("myDatabaseAlias");

@@ -7,12 +7,10 @@ namespace Arango.Client.Protocol
         internal const string Action = "action";
         internal const string BatchSize = "batchSize";
         internal const string BindVars = "bindVars";
-        internal const string ByteSize = "byteSize";
         internal const string Collection = "collection";
         internal const string Collections = "collections";
         internal const string Code = "code";
         internal const string Count = "count";
-        internal const string CreateCollection = "createCollection";
         internal const string DoCompact = "doCompact";
         internal const string Direction = "direction";
         internal const string ExcludeSystem = "excludeSystem";
@@ -22,6 +20,7 @@ namespace Arango.Client.Protocol
         internal const string Group = "group";
         internal const string IfMatch = "If-Match";
         internal const string IfNoneMatch = "If-None-Match";
+        internal const string IgnoreRevs = "ignoreRevs";
         internal const string IsDeterministic = "isDeterministic";
         internal const string IsSystem = "isSystem";
         internal const string IsVolatile = "isVolatile";
@@ -41,10 +40,10 @@ namespace Arango.Client.Protocol
         internal const string OptionsMaxPlans = "options.maxPlans";
         internal const string OptionsOptimizerRules = "options.optimizer.rules";
         internal const string Params = "params";
-        internal const string Policy = "policy";
         internal const string Query = "query";
+        internal const string ReturnNew = "returnNew";
+        internal const string ReturnOld = "returnOld";
         internal const string ShardKeys = "shardKeys";
-        internal const string Size = "size";
         internal const string Sparse = "sparse";
         internal const string To = "to";
         internal const string TTL = "ttl";

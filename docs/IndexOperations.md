@@ -13,11 +13,9 @@ Creates index within specified collection in current database context.
 
 Applicable optional parameters available through fluent API:
 
-- `ByteSize(long value)` - Determines maximum size of the active document data (in bytes) in the collection with cap constraint. If specified, the value must be at least 16384.
 - `Fields(params string[] values)` - Determines an array of attribute paths in the collection with hash, fulltext, geo or skiplist indexes.
 - `GeoJson(bool value)` - Determines if the order within the array is longitude followed by latitude in geo index.
 - `MinLength(int value)` - Determines minimum character length of words for fulltext index. Will default to a server-defined value if unspecified. It is thus recommended to set this value explicitly when creating the index.
-- `Size(long value)` - Determines maximum number of documents for the collection with cap constraint.
 - `Sparse(bool value)` - Determines if the hash or skiplist index should be sparse.
 - `Type(AIndexType value)` - Determines type of the index.
 - `Unique(bool value)` - Determines if the hash or skiplist index should be unique.
