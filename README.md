@@ -1,4 +1,4 @@
-**This branch is compatible with ArangoDB 2.x. For ArangoDB 3.x compatible driver checkout [this](https://github.com/yojimbo87/ArangoDB-NET/tree/3.x) branch.**
+**This branch is compatible with ArangoDB 2.x. For ArangoDB 3.x compatible driver checkout [this](https://github.com/yojimbo87/ArangoDB-NET/tree/master) branch.**
 
 # ArangoDB-NET
 
