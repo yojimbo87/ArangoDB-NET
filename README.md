@@ -1,6 +1,8 @@
+**This branch is compatible with ArangoDB 3.x. For more information about incompatible changes with previous branches read [release notes](https://docs.arangodb.com/devel/Manual/ReleaseNotes/UpgradingChanges30.html). For ArangoDB 2.x compatible driver checkout [this](https://github.com/yojimbo87/ArangoDB-NET/tree/2.x) branch.**
+
 # ArangoDB-NET
 
-ArangoDB-NET is a C# driver for [ArangoDB](https://www.arangodb.com/) NoSQL multi-model database. Driver implements and communicates with database backend through its [HTTP API](https://docs.arangodb.com/HttpApi/index.html) interface and runs on Microsoft .NET and mono framework.
+ArangoDB-NET is a C# driver for [ArangoDB](https://www.arangodb.com/) NoSQL multi-model database. Driver implements and communicates with database backend through its [HTTP API](https://docs.arangodb.com/3.0/HTTP/index.html) interface and runs on Microsoft .NET and mono framework.
 
 ## Installation
 
@@ -37,8 +39,6 @@ There are following ways to install the driver:
   - [Retrieve collection figures](docs/CollectionOperations.md#retrieve-collection-figures)
   - [Retrieve collection revision](docs/CollectionOperations.md#retrieve-collection-revision)
   - [Retrieve collection checksum](docs/CollectionOperations.md#retrieve-collection-checksum)
-  - [Retrieve all documents](docs/CollectionOperations.md#retrieve-all-documents)
-  - [Retrieve all edges](docs/CollectionOperations.md#retrieve-all-edges)
   - [Retrieve all indexes](docs/CollectionOperations.md#retrieve-all-indexes)
   - [Truncate collection](docs/CollectionOperations.md#truncate-collection)
   - [Load collection](docs/CollectionOperations.md#load-collection)
@@ -48,24 +48,18 @@ There are following ways to install the driver:
   - [Rotate collection journal](docs/CollectionOperations.md#rotate-collection-journal)
   - [Delete collection](docs/CollectionOperations.md#delete-collection)
   - [More examples](docs/CollectionOperations.md#more-examples)
-- [Document operations](docs/DocumentOperations.md)
-  - [Create document](docs/DocumentOperations.md#create-document)
-  - [Create document with user defined key](docs/DocumentOperations.md#create-document-with-user-defined-key)
-  - [Check document existence](docs/DocumentOperations.md#check-document-existence)
-  - [Retrieve document](docs/DocumentOperations.md#retrieve-document)
-  - [Update document](docs/DocumentOperations.md#update-document)
-  - [Replace document](docs/DocumentOperations.md#replace-document)
-  - [Delete document](docs/DocumentOperations.md#delete-document)
-  - [More examples](docs/DocumentOperations.md#more-examples)
-- [Edge operations](docs/EdgeOperations.md)
-  - [Create edge](docs/EdgeOperations.md#create-edge)
-  - [Check edge existence](docs/EdgeOperations.md#check-edge-existence)
-  - [Retrieve edge](docs/EdgeOperations.md#retrieve-edge)
-  - [Retrieve vertex edges](docs/EdgeOperations.md#retrieve-vertex-edges)
-  - [Update edge](docs/EdgeOperations.md#update-edge)
-  - [Replace edge](docs/EdgeOperations.md#replace-edge)
-  - [Delete edge](docs/EdgeOperations.md#delete-edge)
-  - [More examples](docs/EdgeOperations.md#more-examples)
+- [Document and edge operations](docs/DocumentAndEdgeOperations.md)
+  - [Create document](docs/DocumentAndEdgeOperations.md#create-document)
+  - [Create document with user defined key](docs/DocumentAndEdgeOperations.md#create-document-with-user-defined-key)
+  - [Create edge](docs/DocumentAndEdgeOperations.md#create-edge)
+  - [Check document existence](docs/DocumentAndEdgeOperations.md#check-document-existence)
+  - [Retrieve document](docs/DocumentAndEdgeOperations.md#retrieve-document)
+  - [Retrieve vertex edges](docs/DocumentAndEdgeOperations.md#retrieve-vertex-edges)
+  - [Update document](docs/DocumentAndEdgeOperations.md#update-document)
+  - [Replace document](docs/DocumentAndEdgeOperations.md#replace-document)
+  - [Replace edge](docs/DocumentAndEdgeOperations.md#replace-edge)
+  - [Delete document](docs/DocumentAndEdgeOperations.md#delete-document)
+  - [More examples](docs/DocumentAndEdgeOperations.md#more-examples)
 - [AQL query operations](docs/QueryOperations.md)
   - [Query operation parameters](docs/QueryOperations.md#query-operation-parameters)
   - [Executing simple query](docs/QueryOperations.md#executing-simple-query)

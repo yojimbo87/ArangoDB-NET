@@ -91,9 +91,9 @@ namespace Arango.Tests
             Assert.AreEqual(202, doc1Result.StatusCode);
             Assert.IsTrue(doc1Result.Success);
             Assert.IsTrue(doc1Result.HasValue);
-            Assert.AreEqual(Database.TestDocumentCollectionName + "/" + 1, doc1Result.Value.String("_id"));
-            Assert.AreEqual("1", doc1Result.Value.String("_key"));
-            Assert.IsFalse(string.IsNullOrEmpty(doc1Result.Value.String("_rev")));
+            Assert.AreEqual(Database.TestDocumentCollectionName + "/" + 1, doc1Result.Value.ID());
+            Assert.AreEqual("1", doc1Result.Value.Key());
+            Assert.IsFalse(string.IsNullOrEmpty(doc1Result.Value.Rev()));
             
             var doc2Result = db.Document
                 .Create(Database.TestDocumentCollectionName, newDocument);
@@ -101,9 +101,9 @@ namespace Arango.Tests
             Assert.AreEqual(202, doc2Result.StatusCode);
             Assert.IsTrue(doc2Result.Success);
             Assert.IsTrue(doc2Result.HasValue);
-            Assert.AreEqual(Database.TestDocumentCollectionName + "/" + 2, doc2Result.Value.String("_id"));
-            Assert.AreEqual("2", doc2Result.Value.String("_key"));
-            Assert.IsFalse(string.IsNullOrEmpty(doc2Result.Value.String("_rev")));
+            Assert.AreEqual(Database.TestDocumentCollectionName + "/" + 2, doc2Result.Value.ID());
+            Assert.AreEqual("2", doc2Result.Value.Key());
+            Assert.IsFalse(string.IsNullOrEmpty(doc2Result.Value.Rev()));
         }
         
         #endregion
@@ -271,93 +271,7 @@ namespace Arango.Tests
             Assert.AreEqual(createResult.Value.Int("status"), getResult.Value.Int("status"));
             Assert.AreEqual(createResult.Value.Int("type"), getResult.Value.Int("type"));
             Assert.IsTrue(getResult.Value.IsString("revision"));
-            Assert.IsTrue(getResult.Value.IsLong("checksum"));
-        }
-        
-        [Test()]
-        public void Should_get_all_documents_in_collection()
-        {
-            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-            Database.CreateTestCollection(Database.TestDocumentCollectionName, ACollectionType.Document);
-            Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-
-            var db = new ADatabase(Database.Alias);
-            
-            var operationResult = db.Collection
-                .GetAllDocuments(Database.TestDocumentCollectionName);
-            
-            Assert.AreEqual(200, operationResult.StatusCode);
-            Assert.IsTrue(operationResult.Success);
-            Assert.IsTrue(operationResult.HasValue);
-            Assert.AreEqual(operationResult.Value.Count, 2);
-            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
-            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
-        }
-        
-        [Test()]
-        public void Should_get_all_document_IDs_in_collection()
-        {
-            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-            Database.CreateTestCollection(Database.TestDocumentCollectionName, ACollectionType.Document);
-            Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-
-            var db = new ADatabase(Database.Alias);
-            
-            var operationResult = db.Collection
-                .ReturnListType(AReturnListType.ID)
-                .GetAllDocuments(Database.TestDocumentCollectionName);
-            
-            Assert.AreEqual(200, operationResult.StatusCode);
-            Assert.IsTrue(operationResult.Success);
-            Assert.IsTrue(operationResult.HasValue);
-            Assert.AreEqual(operationResult.Value.Count, 2);
-            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
-            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
-        }
-        
-        [Test()]
-        public void Should_get_all_document_keys_in_collection()
-        {
-            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-            Database.CreateTestCollection(Database.TestDocumentCollectionName, ACollectionType.Document);
-            Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-
-            var db = new ADatabase(Database.Alias);
-            
-            var operationResult = db.Collection
-                .ReturnListType(AReturnListType.Key)
-                .GetAllDocuments(Database.TestDocumentCollectionName);
-            
-            Assert.AreEqual(200, operationResult.StatusCode);
-            Assert.IsTrue(operationResult.Success);
-            Assert.IsTrue(operationResult.HasValue);
-            Assert.AreEqual(operationResult.Value.Count, 2);
-            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
-            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
-        }
-        
-        [Test()]
-        public void Should_get_all_edges_in_collection()
-        {
-            Database.CreateTestDatabase(Database.TestDatabaseGeneral);
-            Database.CreateTestCollection(Database.TestDocumentCollectionName, ACollectionType.Document);
-            Database.CreateTestCollection(Database.TestEdgeCollectionName, ACollectionType.Edge);
-            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
-
-            var db = new ADatabase(Database.Alias);
-            
-            db.Edge.Create(Database.TestEdgeCollectionName, documents[0].String("_id"), documents[1].String("_id"));
-            db.Edge.Create(Database.TestEdgeCollectionName, documents[1].String("_id"), documents[0].String("_id"));
-            
-            var operationResult = db.Collection
-                .GetAllEdges(Database.TestEdgeCollectionName);
-            
-            Assert.AreEqual(200, operationResult.StatusCode);
-            Assert.IsTrue(operationResult.Success);
-            Assert.IsTrue(operationResult.HasValue);
-            Assert.AreEqual(operationResult.Value.Count, 2);
-            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[0]));
-            Assert.IsFalse(string.IsNullOrEmpty(operationResult.Value[1]));
+            Assert.IsTrue(getResult.Value.IsString("checksum"));
         }
         
         [Test()]

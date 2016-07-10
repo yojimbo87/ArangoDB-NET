@@ -75,7 +75,7 @@ namespace Arango.Tests
         
                 //var updateDocument = new Dictionary<string, object>()
                 //    .String("DocumentId", "SomeId");
-                //db2.Document.Update(result.Value.String("_id"), updateDocument);
+                //db2.Document.Update(result.Value.ID(), updateDocument);
             }
             
             /*var tasks = new Task[10];

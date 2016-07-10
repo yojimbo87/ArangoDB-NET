@@ -84,7 +84,6 @@
     <Compile Include="Public\ADatabase.cs" />
     <Compile Include="Public\ADirection.cs" />
     <Compile Include="Public\ADocument.cs" />
-    <Compile Include="Public\AEdge.cs" />
     <Compile Include="Public\AError.cs" />
     <Compile Include="Public\AFunction.cs" />
     <Compile Include="Public\AGraph.cs" />
@@ -96,7 +95,6 @@
     <Compile Include="Public\AReturnListType.cs" />
     <Compile Include="Public\ASettings.cs" />
     <Compile Include="Public\ATransaction.cs" />
-    <Compile Include="Public\AUpdatePolicy.cs" />
     <Compile Include="Public\AUser.cs" />
     <Compile Include="Public\DictionaryExtensions.cs" />
   </ItemGroup>

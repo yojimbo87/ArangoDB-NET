@@ -60,10 +60,11 @@ namespace Arango.Tests
             Assert.IsTrue(listResult.Success);
             Assert.IsTrue(listResult.HasValue);
             Assert.AreEqual(2, listResult.Value.Count);
-            Assert.AreEqual(name1, listResult.Value[0].String("name"));
-            Assert.AreEqual(code1, listResult.Value[0].String("code"));
-            Assert.AreEqual(name2, listResult.Value[1].String("name"));
-            Assert.AreEqual(code2, listResult.Value[1].String("code"));
+            // retrieved order of the functions seems to be reversed
+            Assert.AreEqual(name2, listResult.Value[0].String("name"));
+            Assert.AreEqual(code2, listResult.Value[0].String("code"));
+            Assert.AreEqual(name1, listResult.Value[1].String("name"));
+            Assert.AreEqual(code1, listResult.Value[1].String("code"));
         }
         
         [Test()]

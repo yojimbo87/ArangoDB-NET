@@ -6,7 +6,7 @@ namespace Arango.Client
     // contains ArangoDB specific extension methods, Dictator implementation code can be found in external libraries
     public static partial class DictionaryExtensions
     {
-        #region _id
+        #region Field _id
         
         /// <summary>
         /// Checks if `_id` field is present and has valid format.
@@ -58,7 +58,7 @@ namespace Arango.Client
         
         #endregion
         
-        #region _key
+        #region Field _key
         
         /// <summary>
         /// Checks if `_key` field is present and has valid format.
@@ -110,7 +110,7 @@ namespace Arango.Client
         
         #endregion
         
-        #region _rev
+        #region Field _rev
         
         /// <summary>
         /// Checks if `_rev` field is present and has valid format.
@@ -159,9 +159,113 @@ namespace Arango.Client
             
             return dictionary;
         }
-        
+
         #endregion
-        
+
+        #region Field _from
+
+        /// <summary>
+        /// Checks if `_from` field is present and has valid format.
+        /// </summary>
+        public static bool HasFrom(this Dictionary<string, object> dictionary)
+        {
+            return !string.IsNullOrEmpty(From(dictionary));
+        }
+
+        /// <summary>
+        /// Retrieves value of `_from` field. If the field is missing or has invalid format null value is returned.
+        /// </summary>
+        public static string From(this Dictionary<string, object> dictionary)
+        {
+            string from;
+
+            try
+            {
+                from = String(dictionary, "_from");
+
+                if (!ADocument.IsID(from))
+                {
+                    from = null;
+                }
+            }
+            catch (Exception)
+            {
+                from = null;
+            }
+
+            return from;
+        }
+
+        /// <summary>
+        /// Stores `_from` field value.
+        /// </summary>
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public static Dictionary<string, object> From(this Dictionary<string, object> dictionary, string id)
+        {
+            if (!ADocument.IsID(id))
+            {
+                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
+            }
+
+            SetFieldValue(dictionary, "_from", id);
+
+            return dictionary;
+        }
+
+        #endregion
+
+        #region Field _to
+
+        /// <summary>
+        /// Checks if `_to` field is present and has valid format.
+        /// </summary>
+        public static bool HasTo(this Dictionary<string, object> dictionary)
+        {
+            return !string.IsNullOrEmpty(To(dictionary));
+        }
+
+        /// <summary>
+        /// Retrieves value of `_to` field. If the field is missing or has invalid format null value is returned.
+        /// </summary>
+        public static string To(this Dictionary<string, object> dictionary)
+        {
+            string to;
+
+            try
+            {
+                to = String(dictionary, "_to");
+
+                if (!ADocument.IsID(to))
+                {
+                    to = null;
+                }
+            }
+            catch (Exception)
+            {
+                to = null;
+            }
+
+            return to;
+        }
+
+        /// <summary>
+        /// Stores `_to` field value.
+        /// </summary>
+        /// <exception cref="ArgumentException">Specified id value has invalid format.</exception>
+        public static Dictionary<string, object> To(this Dictionary<string, object> dictionary, string id)
+        {
+            if (!ADocument.IsID(id))
+            {
+                throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
+            }
+
+            SetFieldValue(dictionary, "_to", id);
+
+            return dictionary;
+        }
+
+        #endregion
+
         /// <summary>
         /// Checks if specified field path has valid document ID value in the format of `collection/key`.
         /// </summary>
