@@ -2,7 +2,7 @@
 
 # ArangoDB-NET
 
-ArangoDB-NET is a C# driver for [ArangoDB](https://www.arangodb.com/) NoSQL multi-model database. Driver implements and communicates with database backend through its [HTTP API](https://docs.arangodb.com/HttpApi/index.html) interface and runs on Microsoft .NET and mono framework.
+ArangoDB-NET is a C# driver for [ArangoDB](https://www.arangodb.com/) NoSQL multi-model database. Driver implements and communicates with database backend through its [HTTP API](https://docs.arangodb.com/3.0/HTTP/index.html) interface and runs on Microsoft .NET and mono framework.
 
 ## Installation
 
