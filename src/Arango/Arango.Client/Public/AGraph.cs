@@ -46,7 +46,7 @@ namespace Arango.Client
 
         #endregion
 
-        #region Create (POST)
+        #region Create graph (POST)
 
         /// <summary>
         /// Creates new graph in current database context.
@@ -58,6 +58,8 @@ namespace Arango.Client
 
             // required
             bodyDocument.String(ParameterName.Name, graphName);
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
             // optional
             Request.TrySetBodyParameter(ParameterName.EdgeDefinitions, _parameters, bodyDocument);
             // TODO: orphan collection optional parameter
@@ -92,7 +94,53 @@ namespace Arango.Client
 
         #endregion
 
-        #region Get (GET)
+        #region Add vertex collection (POST)
+
+        /// <summary>
+        /// Adds new vertex collection to the graph.
+        /// </summary>
+        public AResult<Dictionary<string, object>> AddVertexCollection(string graphName)
+        {
+            var request = new Request(HttpMethod.POST, ApiBaseUri.Gharial, $"/{graphName}/vertex");
+            var bodyDocument = new Dictionary<string, object>();
+
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.WaitForSync, _parameters);
+            // required
+            bodyDocument.String(ParameterName.Collection, graphName);
+
+            request.Body = JSON.ToJSON(bodyDocument, ASettings.JsonParameters);
+
+            var response = _connection.Send(request);
+            var result = new AResult<Dictionary<string, object>>(response);
+
+            switch (response.StatusCode)
+            {
+                case 201:
+                case 202:
+                    var body = response.ParseBody<Dictionary<string, object>>();
+
+                    result.Success = (body != null) && body.Has("graph");
+
+                    if (body.Has("graph"))
+                    {
+                        result.Value = body.Object<Dictionary<string, object>>("graph");
+                    }
+                    break;
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+
+            _parameters.Clear();
+
+            return result;
+        }
+
+        #endregion
+
+        #region Get graph(s) (GET)
 
         /// <summary>
         /// Retrieves list of all graphs.
@@ -137,6 +185,37 @@ namespace Arango.Client
 
                     result.Success = (body != null);
                     result.Value = body.Object<Dictionary<string, object>>("graph");
+                    break;
+                case 404:
+                default:
+                    // Arango error
+                    break;
+            }
+
+            return result;
+        }
+
+        #endregion
+
+        #region Get vertex collections (GET)
+
+        /// <summary>
+        /// Retrieves list of vertex collections.
+        /// </summary>
+        public AResult<List<string>> GetVertexCollections(string graphName)
+        {
+            var request = new Request(HttpMethod.GET, ApiBaseUri.Gharial, $"/{graphName}/vertex");
+
+            var response = _connection.Send(request);
+            var result = new AResult<List<string>>(response);
+
+            switch (response.StatusCode)
+            {
+                case 200:
+                    var body = response.ParseBody<Dictionary<string, object>>();
+
+                    result.Success = (body != null);
+                    result.Value = body.List<string>("collections");
                     break;
                 case 404:
                 default:
