@@ -2,6 +2,14 @@
 
 ## Current stable release
 
+### 0.10.1
+
+Tested against ArangoDB 3.0.3
+
+- Fixed issue [#34](https://github.com/yojimbo87/ArangoDB-NET/issues/34).
+
+## Previous releases
+
 ### 0.10.0
 
 Tested against ArangoDB 3.0.0, 3.0.1
@@ -9,8 +17,6 @@ Tested against ArangoDB 3.0.0, 3.0.1
 - Implement [incompatible changes in ArangoDB 3.0](https://docs.arangodb.com/devel/Manual/ReleaseNotes/UpgradingChanges30.html).
 - AEdge class was removed and its functionality is now part of ADocument class.
 - This is release is not backwards compatible with ArangoDB 2.x versions.
-
-## Previous releases
 
 ### 0.9.4
 
