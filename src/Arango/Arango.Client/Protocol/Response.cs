@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using Arango.fastJSON;
 
@@ -47,7 +47,7 @@ namespace Arango.Client.Protocol
             {
                 return default(T);
             }
-            
+
             return JSON.ToObject<T>(Body);
         }
     }

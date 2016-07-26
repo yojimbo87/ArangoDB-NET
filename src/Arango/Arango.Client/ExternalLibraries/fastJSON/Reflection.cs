@@ -189,7 +189,7 @@ namespace Arango.fastJSON
             }
         }
 
-        private myPropInfo CreateMyProp(Type t, string name, bool customType)
+        public myPropInfo CreateMyProp(Type t, string name, bool customType)
         {
             myPropInfo d = new myPropInfo();
             myPropInfoType d_type = myPropInfoType.Unknown;

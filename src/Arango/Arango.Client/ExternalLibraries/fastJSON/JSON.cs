@@ -9,6 +9,8 @@ using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Collections.Specialized;
+using Arango.Client;
+using System.Linq;
 
 namespace Arango.fastJSON
 {
@@ -605,8 +607,30 @@ namespace Arango.fastJSON
                     continue;
                 }
                 myPropInfo pi;
+                // object doesn't contain property of specified name
                 if (props.TryGetValue(name, out pi) == false)
-                    continue;
+                {
+                    // we need to look if it has alias field
+                    var aliasFieldProperty = type
+                        .GetProperties()
+                        .FirstOrDefault(
+                            property => 
+                                Attribute.IsDefined(property, typeof(AliasField)) && 
+                                property.GetCustomAttribute<AliasField>().Alias == name
+                        );
+
+                    if (aliasFieldProperty == null)
+                    {
+                        continue;
+                    }
+
+                    // alias field is present - set it up so it can be processed
+                    pi = Reflection.Instance.CreateMyProp(aliasFieldProperty.PropertyType, aliasFieldProperty.Name, false);
+                    pi.setter = Reflection.CreateSetMethod(aliasFieldProperty.PropertyType, aliasFieldProperty);
+                    if (pi.setter != null)
+                        pi.CanWrite = true;
+                    pi.getter = Reflection.CreateGetMethod(aliasFieldProperty.PropertyType, aliasFieldProperty);
+                }
                 if (pi.CanWrite)
                 {
                     //object v = d[n];
