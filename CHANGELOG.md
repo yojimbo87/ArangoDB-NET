@@ -2,13 +2,20 @@
 
 ## Current stable release
 
+### 0.10.2
+
+Tested against ArangoDB 3.0.8
+
+- Support of serialization and deserialization for nullable types.
+- Added option to create connection which enables to use web proxy.
+
+## Previous releases
+
 ### 0.10.1
 
 Tested against ArangoDB 3.0.3
 
 - Fixed issue [#34](https://github.com/yojimbo87/ArangoDB-NET/issues/34).
-
-## Previous releases
 
 ### 0.10.0
 
