@@ -1689,6 +1689,20 @@ namespace Arango.Client
                             propertyInfo.SetValue(stronglyTypedObject, fieldValue, null);
                         }
                     }
+                    // property is nullable type
+                    else if (propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                    {
+                        var propertyType = propertyInfo.PropertyType.GetGenericArguments()[0];
+
+                        if ((fieldValue == null) || (propertyType == fieldType))
+                        {
+                            propertyInfo.SetValue(stronglyTypedObject, fieldValue, null);
+                        }
+                        else
+                        {
+                            propertyInfo.SetValue(stronglyTypedObject, Convert.ChangeType(fieldValue, propertyType), null);
+                        }
+                    }
                     // property is basic type
                     else
                     {
