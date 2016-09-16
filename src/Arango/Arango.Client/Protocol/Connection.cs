@@ -28,30 +28,29 @@ namespace Arango.Client.Protocol
 
         internal Uri BaseUri { get; set; }
 
+        internal bool UseWebProxy { get; set; }
+
         #endregion
         
-        internal Connection(string alias, string hostname, int port, bool isSecured, string username, string password)
+        internal Connection(string alias, string hostname, int port, bool isSecured, string userName, string password, bool useWebProxy = false)
         {
             Alias = alias;
             Hostname = hostname;
             Port = port;
             IsSecured = isSecured;
-            Username = username;
+            Username = userName;
             Password = password;
+
+            UseWebProxy = useWebProxy;
 
             BaseUri = new Uri((isSecured ? "https" : "http") + "://" + hostname + ":" + port + "/");
         }
 
-        internal Connection(string alias, string hostname, int port, bool isSecured, string databaseName, string userName, string password)
+        internal Connection(string alias, string hostname, int port, bool isSecured, string databaseName, string userName, string password, bool useWebProxy = false)
+            : this(alias, hostname, port, isSecured, userName, password, useWebProxy)
         {
-            Alias = alias;
-            Hostname = hostname;
-            Port = port;
-            IsSecured = isSecured;
             DatabaseName = databaseName;
-            Username = userName;
-            Password = password;
-
+            
             BaseUri = new Uri((isSecured ? "https" : "http") + "://" + hostname + ":" + port + "/_db/" + databaseName + "/");
         }
 
@@ -65,7 +64,10 @@ namespace Arango.Client.Protocol
             }
 
             httpRequest.KeepAlive = true;
-            httpRequest.Proxy = null;
+            if (!UseWebProxy)
+            {
+                httpRequest.Proxy = null;
+            }
             httpRequest.SendChunked = false;
             httpRequest.Method = request.HttpMethod.ToString();
             httpRequest.UserAgent = ASettings.DriverName + "/" + ASettings.DriverVersion;
