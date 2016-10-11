@@ -300,9 +300,34 @@ namespace Arango.Tests
             Assert.AreEqual(documents[1].String("foo"), queryResult.Value[1].Foo);
             Assert.AreEqual(documents[1].Int("bar"), queryResult.Value[1].Bar);
         }
-        
+
         #endregion
-        
+
+        #region ExecuteNonQuery
+
+        [Test()]
+        public void Should_execute_non_query_result()
+        {
+            var documents = Database.ClearCollectionAndFetchTestDocumentData(Database.TestDocumentCollectionName);
+            var db = new ADatabase(Database.Alias);
+
+            var queryResult = db.Query
+                .Aql(string.Format(@"
+                UPSERT {{ bar: 1 }}
+                INSERT {{ foo: 'some string value', bar: 1 }} 
+                UPDATE {{ foo: 'some string value updated', bar: 2 }}
+                IN {0}
+                ", Database.TestDocumentCollectionName))
+                .ExecuteNonQuery();
+
+            Assert.AreEqual(201, queryResult.StatusCode);
+            Assert.IsTrue(queryResult.Success);
+            Assert.IsFalse(queryResult.HasValue);
+            Assert.IsNull(queryResult.Value);
+        }
+
+        #endregion
+
         [Test()]
         public void Should_execute_AQL_query_with_count()
         {

@@ -256,11 +256,32 @@ namespace Arango.Client
             
             return result;
         }
-        
+
         #endregion
-        
+
+        #region Retrieve non-query result (POST)
+
+        /// <summary>
+        /// Retrieves result which does not contain value. This can be used to execute non-query operations where only success information is relevant.
+        /// </summary>
+        public AResult<object> ExecuteNonQuery()
+        {
+            var listResult = ToList<Dictionary<string, object>>();
+            var result = new AResult<object>();
+
+            result.StatusCode = listResult.StatusCode;
+            result.Success = listResult.Success;
+            result.Extra = listResult.Extra;
+            result.Error = listResult.Error;
+            result.Value = null;
+
+            return result;
+        }
+
+        #endregion
+
         #region More results in cursor (PUT)
-        
+
         internal AResult<List<T>> Put<T>(string cursorID)
         {
             var request = new Request(HttpMethod.PUT, ApiBaseUri.Cursor, "/" + cursorID);
