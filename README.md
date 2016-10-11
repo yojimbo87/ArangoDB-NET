@@ -64,6 +64,7 @@ There are following ways to install the driver:
   - [Query operation parameters](docs/QueryOperations.md#query-operation-parameters)
   - [Executing simple query](docs/QueryOperations.md#executing-simple-query)
   - [Executing query with bind variables](docs/QueryOperations.md#executing-query-with-bind-variables)
+  - [Executing non-query operation](docs/QueryOperations.md#executing-non-query-operation)
   - [Result format options](docs/QueryOperations.md#result-format-options)
   - [Parse query](docs/QueryOperations.md#parse-query)
   - [Minify query](docs/QueryOperations.md#minify-query)
