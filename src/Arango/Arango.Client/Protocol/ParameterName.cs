@@ -7,6 +7,7 @@ namespace Arango.Client.Protocol
         internal const string Action = "action";
         internal const string BatchSize = "batchSize";
         internal const string BindVars = "bindVars";
+        internal const string Body = "body";
         internal const string Collection = "collection";
         internal const string Collections = "collections";
         internal const string Code = "code";
