@@ -4,8 +4,9 @@
 
 ### 0.10.2
 
-Tested against ArangoDB 3.0.8
+Tested against ArangoDB 3.0.10
 
+- Implement ExecuteNonQuery operation [#40](https://github.com/yojimbo87/ArangoDB-NET/issues/40).
 - Support of serialization and deserialization for nullable types.
 - Added option to create connection which enables to use web proxy.
 
