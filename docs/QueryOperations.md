@@ -88,6 +88,7 @@ if (queryResult.Success)
 {
     // operation executed successfuly with queryResult.HasValue == false and queryResult.Value == null
 }
+```
 
 ## Result format options
 
