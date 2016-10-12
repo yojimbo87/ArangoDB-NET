@@ -61,6 +61,7 @@
     <Compile Include="Entities\IssueNo9Entity.cs" />
     <Compile Include="Entities\PerformanceEntity.cs" />
     <Compile Include="Entities\TransactionEntity.cs" />
+    <Compile Include="FoxxOperations\FoxxOperationsTests.cs" />
     <Compile Include="FunctionOperations\FunctionOperationsTests.cs" />
     <Compile Include="IndexOperations\IndexOperationsTests.cs" />
     <Compile Include="Issues\IssueTests.cs" />

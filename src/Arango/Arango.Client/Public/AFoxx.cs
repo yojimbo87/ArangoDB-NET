@@ -17,7 +17,7 @@ namespace Arango.Client
         #region Parameters
 
         /// <summary>
-        /// 
+        /// Serializes specified value as JSON object into request body.
         /// </summary>
         public AFoxx Body(object value)
         {
@@ -29,27 +29,48 @@ namespace Arango.Client
         #endregion
 
         /// <summary>
-        /// 
+        /// Sends GET request to specified foxx service location.
         /// </summary>
         public AResult<T> Get<T>(string relativeUri)
         {
-            var request = new Request(HttpMethod.GET, relativeUri);
-            var response = _connection.Send(request);
-            var result = new AResult<T>(response);
-
-            result.Value = response.ParseBody<T>();
-
-            _parameters.Clear();
-
-            return result;
+            return Request<T>(HttpMethod.GET, relativeUri);
         }
 
         /// <summary>
-        /// 
+        /// Sends POST request to specified foxx service location.
         /// </summary>
         public AResult<T> Post<T>(string relativeUri)
         {
-            var request = new Request(HttpMethod.POST, relativeUri);
+            return Request<T>(HttpMethod.POST, relativeUri);
+        }
+
+        /// <summary>
+        /// Sends PUT request to specified foxx service location.
+        /// </summary>
+        public AResult<T> Put<T>(string relativeUri)
+        {
+            return Request<T>(HttpMethod.PUT, relativeUri);
+        }
+
+        /// <summary>
+        /// Sends PATCH request to specified foxx service location.
+        /// </summary>
+        public AResult<T> Patch<T>(string relativeUri)
+        {
+            return Request<T>(HttpMethod.PATCH, relativeUri);
+        }
+
+        /// <summary>
+        /// Sends DELETE request to specified foxx service location.
+        /// </summary>
+        public AResult<T> Delete<T>(string relativeUri)
+        {
+            return Request<T>(HttpMethod.DELETE, relativeUri);
+        }
+
+        private AResult<T> Request<T>(HttpMethod httpMethod, string relativeUri)
+        {
+            var request = new Request(httpMethod, relativeUri);
 
             if (_parameters.Has(ParameterName.Body))
             {
