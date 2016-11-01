@@ -12,29 +12,6 @@
 - [Delete document](#delete-document)
 - [More examples](#more-examples)
 
-## Retrieve vertex edges
-
-Retrieves list of edges from specified edge type collection to specified document vertex with given direction.
-
-```csharp
-var db = new ADatabase("myDatabaseAlias");
-
-var getEdgesResult = db.Edge
-    .Get("MyEdgeCollection", "MyDocumentCollection/123", ADirection.In);
-    
-if (getEdgesResult.Success)
-{
-    foreach (var edge in getEdgesResult.Value)
-    {
-        var id = edge.String("_id");
-        var key = edge.String("_key");
-        var revision = edge.String("_rev");
-        var fromVertex = edge.String("_from");
-        var toVertex = edge.String("_to");
-    }
-}
-```
-
 Document and edge operations are focused on management of documents in document and edge type collections. These operations are accessible through `Document` property in database context object. The API for documents and edges have been unified in ArangoDB 3.0. For CRUD operations there is no distinction anymore between documents and edges API-wise.
 
 ## Create document
