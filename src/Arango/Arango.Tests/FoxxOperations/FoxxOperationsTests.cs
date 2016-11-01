@@ -4,6 +4,7 @@ using Arango.Client;
 
 namespace Arango.Tests
 {
+    [Ignore]
     [TestFixture()]
     public class FoxxOperationsTests
     {
