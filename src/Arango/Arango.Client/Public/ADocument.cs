@@ -706,9 +706,7 @@ namespace Arango.Client
                 return false;
             }
             
-            long outRev;
-
-            return long.TryParse(revision, out outRev);
+            return true;
         }
         
         /// <summary>

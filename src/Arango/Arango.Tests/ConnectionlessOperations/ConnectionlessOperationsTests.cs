@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using Arango.Client;
 
@@ -39,7 +38,7 @@ namespace Arango.Tests
             
             // _rev validation
             Assert.IsTrue(ADocument.IsRev("123"));
-            Assert.IsFalse(ADocument.IsRev("123a"));
+            Assert.IsTrue(ADocument.IsRev("123aBc-"));
             Assert.IsFalse(ADocument.IsRev(""));
         }
         
@@ -141,7 +140,7 @@ namespace Arango.Tests
             
             Assert.Throws<ArgumentException>(() => {
                  var doc1 = new Dictionary<string, object>()
-                     .Rev("123a");
+                     .Rev("");
             });
 
             Assert.Throws<ArgumentException>(() => {

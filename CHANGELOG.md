@@ -4,11 +4,13 @@
 
 ### 0.10.2
 
-Tested against ArangoDB 3.0.10
+Tested against ArangoDB 3.0.10 and 3.1.rc3
 
 - Implement Foxx operations [#38](https://github.com/yojimbo87/ArangoDB-NET/issues/38).
 - Implement ExecuteNonQuery operation [#40](https://github.com/yojimbo87/ArangoDB-NET/issues/40).
 - Support of serialization and deserialization for nullable types.
+- Support of ArangoDB 3.1 changes to revision values.
+- Addes isSystem optional parameter to delete collection operation.
 - Added option to create connection which enables to use web proxy.
 
 ## Previous releases
