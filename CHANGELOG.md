@@ -6,6 +6,7 @@
 
 Tested against ArangoDB 3.0.10
 
+- Implement Foxx operations [#38](https://github.com/yojimbo87/ArangoDB-NET/issues/38).
 - Implement ExecuteNonQuery operation [#40](https://github.com/yojimbo87/ArangoDB-NET/issues/40).
 - Support of serialization and deserialization for nullable types.
 - Added option to create connection which enables to use web proxy.
