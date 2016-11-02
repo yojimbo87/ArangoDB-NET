@@ -100,7 +100,18 @@ namespace Arango.Client
                 return new ATransaction(_connection);
             }
         }
-        
+
+        /// <summary>
+        /// Provides access to foxx services in current database context.
+        /// </summary>
+        public AFoxx Foxx
+        {
+            get
+            {
+                return new AFoxx(_connection);
+            }
+        }
+
         /// <summary>
         /// Initializes new database context to perform operations on remote database identified by specified alias.
         /// </summary>

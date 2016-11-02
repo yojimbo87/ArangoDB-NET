@@ -725,7 +725,10 @@ namespace Arango.Client
         public AResult<Dictionary<string, object>> Delete(string collectionName)
         {
             var request = new Request(HttpMethod.DELETE, ApiBaseUri.Collection, "/" + collectionName);
-            
+
+            // optional
+            request.TrySetQueryStringParameter(ParameterName.IsSystem, _parameters);
+
             var response = _connection.Send(request);
             var result = new AResult<Dictionary<string, object>>(response);
             

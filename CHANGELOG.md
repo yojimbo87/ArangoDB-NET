@@ -2,6 +2,25 @@
 
 ## Current stable release
 
+### 0.10.2
+
+Tested against ArangoDB 3.0.10 and 3.1.rc3
+
+- Implement Foxx operations [#38](https://github.com/yojimbo87/ArangoDB-NET/issues/38).
+- Implement ExecuteNonQuery operation [#40](https://github.com/yojimbo87/ArangoDB-NET/issues/40).
+- Support of serialization and deserialization for nullable types.
+- Support of ArangoDB 3.1 changes to revision values.
+- Addes isSystem optional parameter to delete collection operation.
+- Added option to create connection which enables to use web proxy.
+
+## Previous releases
+
+### 0.10.1
+
+Tested against ArangoDB 3.0.3
+
+- Fixed issue [#34](https://github.com/yojimbo87/ArangoDB-NET/issues/34).
+
 ### 0.10.0
 
 Tested against ArangoDB 3.0.0, 3.0.1
@@ -9,8 +28,6 @@ Tested against ArangoDB 3.0.0, 3.0.1
 - Implement [incompatible changes in ArangoDB 3.0](https://docs.arangodb.com/devel/Manual/ReleaseNotes/UpgradingChanges30.html).
 - AEdge class was removed and its functionality is now part of ADocument class.
 - This is release is not backwards compatible with ArangoDB 2.x versions.
-
-## Previous releases
 
 ### 0.9.4
 

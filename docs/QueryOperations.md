@@ -3,6 +3,7 @@
 - [Query operation parameters](#query-operation-parameters)
 - [Executing simple query](#executing-simple-query)
 - [Executing query with bind variables](#executing-query-with-bind-variables)
+- [Executing non-query operation](#executing-non-query-operation)
 - [Result format options](#result-format-options)
 - [Parse query](#parse-query)
 - [Minify query](#minify-query)
@@ -64,6 +65,28 @@ if (queryResult.Success)
         var foo = document.String("foo");
         var bar = document.Int("bar");
     }
+}
+```
+
+## Executing non-query operation
+
+Result of the non-query operation does not contain value information and is intended for queries that do not return any data.
+
+```csharp
+var db = new ADatabase("myDatabaseAlias");
+
+var queryResult = db.Query
+    .Aql(@"
+    UPSERT { bar: 1 }
+    INSERT { foo: 'some string value', bar: 1 }
+    UPDATE { foo: 'some string value updated', bar: 2 }
+    IN MyCollection
+    ")
+    .ExecuteNonQuery();
+    
+if (queryResult.Success)
+{
+    // operation executed successfuly with queryResult.HasValue == false and queryResult.Value == null
 }
 ```
 

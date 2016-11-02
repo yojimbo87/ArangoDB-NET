@@ -56,10 +56,12 @@
     <Compile Include="Entities\Dummy.cs" />
     <Compile Include="Entities\IssueNo15Entity.cs" />
     <Compile Include="Entities\IssueNo16Entity.cs" />
+    <Compile Include="Entities\IssueNo34Entity.cs" />
     <Compile Include="Entities\IssueNo8Entity.cs" />
     <Compile Include="Entities\IssueNo9Entity.cs" />
     <Compile Include="Entities\PerformanceEntity.cs" />
     <Compile Include="Entities\TransactionEntity.cs" />
+    <Compile Include="FoxxOperations\FoxxOperationsTests.cs" />
     <Compile Include="FunctionOperations\FunctionOperationsTests.cs" />
     <Compile Include="GraphOperations\GraphOperationsTests.cs" />
     <Compile Include="IndexOperations\IndexOperationsTests.cs" />

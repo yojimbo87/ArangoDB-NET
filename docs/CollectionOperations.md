@@ -360,6 +360,10 @@ var rotateJournalResult = db.Collection
 
 Deletes specified collection.
 
+Applicable optional parameters available through fluent API:
+
+- `IsSystem(bool value)` - Determines whether the collection is a system collection. Default value: false.
+
 ```csharp
 var db = new ADatabase("myDatabaseAlias");
 

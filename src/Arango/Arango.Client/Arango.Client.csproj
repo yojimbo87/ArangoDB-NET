@@ -85,6 +85,7 @@
     <Compile Include="Public\ADirection.cs" />
     <Compile Include="Public\ADocument.cs" />
     <Compile Include="Public\AError.cs" />
+    <Compile Include="Public\AFoxx.cs" />
     <Compile Include="Public\AFunction.cs" />
     <Compile Include="Public\AGraph.cs" />
     <Compile Include="Public\AIndex.cs" />

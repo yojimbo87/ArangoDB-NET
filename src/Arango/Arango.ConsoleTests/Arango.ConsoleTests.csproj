@@ -55,6 +55,7 @@
     <Compile Include="Database.cs" />
     <Compile Include="Entities\PerformanceEntity.cs" />
     <Compile Include="Entities\Release.cs" />
+    <Compile Include="FoxxPerformance.cs" />
     <Compile Include="Performance.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -69,8 +70,6 @@
       <Name>Arango.Client</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Entities" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
