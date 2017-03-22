@@ -18,6 +18,7 @@ namespace Arango.Tests
             Assert.IsTrue(ADocument.IsID("col/a123:a"));
             Assert.IsTrue(ADocument.IsID("col/a123_a"));
             Assert.IsTrue(ADocument.IsID("col/a123_a:b-c"));
+            Assert.IsTrue(ADocument.IsID("col/xYz09_-:.@()+,=;$!*'%"));
             Assert.IsFalse(ADocument.IsID("/123"));
             Assert.IsFalse(ADocument.IsID("col/"));
             Assert.IsFalse(ADocument.IsID("col/123/111"));
@@ -31,6 +32,7 @@ namespace Arango.Tests
             Assert.IsTrue(ADocument.IsKey("a123:a"));
             Assert.IsTrue(ADocument.IsKey("a123_a"));
             Assert.IsTrue(ADocument.IsKey("a123_a:b-c"));
+            Assert.IsTrue(ADocument.IsKey("xYz09_-:.@()+,=;$!*'%"));
             Assert.IsFalse(ADocument.IsKey("123/111"));
             Assert.IsFalse(ADocument.IsKey("123 111"));
             Assert.IsFalse(ADocument.IsKey("a123_a :b-c"));
@@ -48,15 +50,15 @@ namespace Arango.Tests
             var doc1 = new Dictionary<string, object>()
                 .String("id1", "myCollection/123")
                 .String("id2", "myCollection/a123-4:5_6")
-                .String("id3", "myCollection/1.23")
+                .String("id3", "myCollection/xYz09_-:.@()+,=;$!*'%")
                 .Long("id4", 123)
                 .Object("id5", null)
                 .String("id6", "");
             
             Assert.IsTrue(doc1.IsID("id1"));
             Assert.IsTrue(doc1.IsID("id2"));
-            
-            Assert.IsFalse(doc1.IsID("id3"));
+            Assert.IsTrue(doc1.IsID("id3"));
+
             Assert.IsFalse(doc1.IsID("id4"));
             Assert.IsFalse(doc1.IsID("id5"));
             Assert.IsFalse(doc1.IsID("id6"));
@@ -69,15 +71,15 @@ namespace Arango.Tests
             var doc1 = new Dictionary<string, object>()
                 .String("key1", "123")
                 .String("key2", "a123-4:5_6")
-                .String("key3", "1.23")
+                .String("key3", "xYz09_-:.@()+,=;$!*'%")
                 .Long("key4", 123)
                 .Object("key5", null)
                 .String("key6", "");
             
             Assert.IsTrue(doc1.IsKey("key1"));
             Assert.IsTrue(doc1.IsKey("key2"));
-            
-            Assert.IsFalse(doc1.IsKey("key3"));
+            Assert.IsTrue(doc1.IsKey("key3"));
+
             Assert.IsFalse(doc1.IsKey("key4"));
             Assert.IsFalse(doc1.IsKey("key5"));
             Assert.IsFalse(doc1.IsKey("key6"));

@@ -9,7 +9,7 @@ namespace Arango.Client
     {
         static readonly Dictionary<string, Connection> _connections = new Dictionary<string, Connection>();
         
-        internal readonly static Regex KeyRegex = new Regex(@"^[a-zA-Z0-9_:-]*$");
+        internal readonly static Regex KeyRegex = new Regex(@"^[a-zA-Z0-9_\-:.@()+,=;$!*'%]*$");
         
         /// <summary>
         /// Determines driver name.
