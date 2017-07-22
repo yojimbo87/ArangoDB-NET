@@ -70,25 +70,51 @@ namespace Arango.fastJSON
                 _output.Append(((bool)obj) ? "true" : "false"); // conform to standard
 
             else if (
-                obj is int || obj is long || obj is double ||
-                obj is decimal || obj is float ||
+                obj is int || obj is long ||
+                obj is decimal ||
                 obj is byte || obj is short ||
                 obj is sbyte || obj is ushort ||
                 obj is uint || obj is ulong
             )
                 _output.Append(((IConvertible)obj).ToString(NumberFormatInfo.InvariantInfo));
 
+            else if (obj is double || obj is Double)
+            {
+                double d = (double)obj;
+                if (double.IsNaN(d))
+                    _output.Append("\"NaN\"");
+                else
+                    _output.Append(((IConvertible)obj).ToString(NumberFormatInfo.InvariantInfo));
+            }
+            else if (obj is float || obj is Single)
+            {
+                float d = (float)obj;
+                if (float.IsNaN(d))
+                    _output.Append("\"NaN\"");
+                else
+                    _output.Append(((IConvertible)obj).ToString(NumberFormatInfo.InvariantInfo));
+            }
+
             else if (obj is DateTime)
                 WriteDateTime((DateTime)obj);
+
+            else if (obj is DateTimeOffset)
+                WriteDateTimeOffset((DateTimeOffset)obj);
+
+            else if (obj is TimeSpan)
+                _output.Append(((TimeSpan)obj).Ticks);
+
+#if net4
+            else if (_params.KVStyleStringDictionary == false &&
+                obj is IEnumerable<KeyValuePair<string, object>>)
+
+                WriteStringDictionary((IEnumerable<KeyValuePair<string, object>>)obj);
+#endif
 
             else if (_params.KVStyleStringDictionary == false && obj is IDictionary &&
                 obj.GetType().IsGenericType && obj.GetType().GetGenericArguments()[0] == typeof(string))
 
                 WriteStringDictionary((IDictionary)obj);
-#if net4
-            else if (_params.KVStyleStringDictionary == false && obj is System.Dynamic.ExpandoObject)
-                WriteStringDictionary((IDictionary<string, object>)obj);
-#endif
             else if (obj is IDictionary)
                 WriteDictionary((IDictionary)obj);
 #if !SILVERLIGHT
@@ -118,6 +144,32 @@ namespace Arango.fastJSON
 
             else
                 WriteObject(obj);
+        }
+
+        private void WriteDateTimeOffset(DateTimeOffset d)
+        {
+            DateTime dt = _params.UseUTCDateTime ? d.UtcDateTime : d.DateTime;
+
+            write_date_value(dt);
+
+            var ticks = dt.Ticks % TimeSpan.TicksPerSecond;
+            _output.Append('.');
+            _output.Append(ticks.ToString("0000000", NumberFormatInfo.InvariantInfo));
+
+            if (_params.UseUTCDateTime)
+                _output.Append('Z');
+            else
+            {
+                if (d.Offset.Hours > 0)
+                    _output.Append("+");
+                else
+                    _output.Append("-");
+                _output.Append(d.Offset.Hours.ToString("00", NumberFormatInfo.InvariantInfo));
+                _output.Append(":");
+                _output.Append(d.Offset.Minutes.ToString("00", NumberFormatInfo.InvariantInfo));
+            }
+
+            _output.Append('\"');
         }
 
         private void WriteNV(NameValueCollection nameValueCollection)
@@ -179,7 +231,7 @@ namespace Arango.fastJSON
 
         private void WriteEnum(Enum e)
         {
-            // TODO : optimize enum write
+            // FEATURE : optimize enum write
             if (_params.UseValuesOfEnums)
                 WriteValue(Convert.ToInt32(e));
             else
@@ -210,6 +262,22 @@ namespace Arango.fastJSON
             if (_params.UseUTCDateTime)
                 dt = dateTime.ToUniversalTime();
 
+            write_date_value(dt);
+
+            if (_params.DateTimeMilliseconds)
+            {
+                _output.Append('.');
+                _output.Append(dt.Millisecond.ToString("000", NumberFormatInfo.InvariantInfo));
+            }
+
+            if (_params.UseUTCDateTime)
+                _output.Append('Z');
+
+            _output.Append('\"');
+        }
+
+        private void write_date_value(DateTime dt)
+        {
             _output.Append('\"');
             _output.Append(dt.Year.ToString("0000", NumberFormatInfo.InvariantInfo));
             _output.Append('-');
@@ -222,15 +290,6 @@ namespace Arango.fastJSON
             _output.Append(dt.Minute.ToString("00", NumberFormatInfo.InvariantInfo));
             _output.Append(':');
             _output.Append(dt.Second.ToString("00", NumberFormatInfo.InvariantInfo));
-            if (_params.DateTimeMilliseconds)
-            {
-                _output.Append('.');
-                _output.Append(dt.Millisecond.ToString("000", NumberFormatInfo.InvariantInfo));
-            }
-            if (_params.UseUTCDateTime)
-                _output.Append('Z');
-
-            _output.Append('\"');
         }
 
 #if !SILVERLIGHT
@@ -449,7 +508,7 @@ namespace Arango.fastJSON
 
         private void WritePair(string name, object value)
         {
-            WriteStringFast(name);
+            WriteString(name);
 
             _output.Append(':');
 
@@ -499,7 +558,7 @@ namespace Arango.fastJSON
             _output.Append('}');
         }
 
-        private void WriteStringDictionary(IDictionary<string, object> dic)
+        private void WriteStringDictionary(IEnumerable<KeyValuePair<string, object>> dic)
         {
             _output.Append('{');
             bool pendingSeparator = false;
