@@ -6,7 +6,7 @@ using System.Text;
 namespace Arango.Client.Protocol
 {
     /// <summary>
-    /// Represents connection to specific endpoint and sends low level HTTP requests from client to server.
+    /// Represents client connection to specific endpoint with low level HTTP requests functionality.
     /// </summary>
     internal class Connection
     {
@@ -149,6 +149,15 @@ namespace Arango.Client.Protocol
                         response.Error.StatusCode = response.StatusCode;
                         response.Error.Number = 0;
                         response.Error.Message = "Protocol error: " + webException.Message;
+                    }
+
+                    if (ASettings.ThrowExceptions)
+                    {
+                        var arangoException = new AException(response.Error.Message, response.Error.Exception);
+                        arangoException.StatusCode = response.Error.StatusCode;
+                        arangoException.Number = response.Error.Number;
+
+                        throw arangoException;
                     }
                 }
                 else
