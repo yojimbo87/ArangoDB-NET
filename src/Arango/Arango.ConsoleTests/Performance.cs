@@ -168,7 +168,7 @@ namespace Arango.ConsoleTests
 
             var responseBody = "";
             //var httpRequest = HttpWebRequest.CreateHttp(uri);
-            var httpRequest = HttpWebRequest.CreateHttp(new Uri(uriString));
+            var httpRequest = WebRequest.CreateHttp(new Uri(uriString));
 
             httpRequest.KeepAlive = true;
             httpRequest.SendChunked = false;

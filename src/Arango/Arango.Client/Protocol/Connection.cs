@@ -6,19 +6,13 @@ using System.Text;
 namespace Arango.Client.Protocol
 {
     /// <summary>
-    /// Stores data about single endpoint and processes communication between client and server.
+    /// Represents connection to specific endpoint and sends low level HTTP requests from client to server.
     /// </summary>
     internal class Connection
     {
-        #region Properties
-
         internal string Alias { get; set; }
 
-        internal string Hostname { get; set; }
-
-        internal int Port { get; set; }
-
-        internal bool IsSecured { get; set; }
+        internal string Endpoint { get; set; }
 
         internal string DatabaseName { get; set; }
 
@@ -26,37 +20,27 @@ namespace Arango.Client.Protocol
 
         internal string Password { get; set; }
 
-        internal Uri BaseUri { get; set; }
-
         internal bool UseWebProxy { get; set; }
-
-        #endregion
         
-        internal Connection(string alias, string hostname, int port, bool isSecured, string userName, string password, bool useWebProxy = false)
+        internal Connection(string alias, string endpoint, string username, string password, bool useWebProxy = false)
         {
             Alias = alias;
-            Hostname = hostname;
-            Port = port;
-            IsSecured = isSecured;
-            Username = userName;
+            Endpoint = endpoint.EndsWith("/") ? endpoint : endpoint + "/";
+            Username = username;
             Password = password;
-
             UseWebProxy = useWebProxy;
-
-            BaseUri = new Uri((isSecured ? "https" : "http") + "://" + hostname + ":" + port + "/");
         }
 
-        internal Connection(string alias, string hostname, int port, bool isSecured, string databaseName, string userName, string password, bool useWebProxy = false)
-            : this(alias, hostname, port, isSecured, userName, password, useWebProxy)
+        internal Connection(string alias, string Endpoint, string databaseName, string username, string password, bool useWebProxy = false)
+            : this(alias, Endpoint, username, password, useWebProxy)
         {
             DatabaseName = databaseName;
-            
-            BaseUri = new Uri((isSecured ? "https" : "http") + "://" + hostname + ":" + port + "/_db/" + databaseName + "/");
         }
 
         internal Response Send(Request request)
         {
-            var httpRequest = HttpWebRequest.CreateHttp(BaseUri + request.GetRelativeUri());
+            var requestUriString = Endpoint + (string.IsNullOrEmpty(DatabaseName) ? "" : "_db/" + DatabaseName + "/") + request.GetRelativeUri();
+            var httpRequest = WebRequest.CreateHttp(requestUriString);
 
             if (request.Headers.Count > 0)
             {

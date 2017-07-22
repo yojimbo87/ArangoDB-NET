@@ -33,26 +33,26 @@ namespace Arango.Client
         
         #region AddConnection
         
-        public static void AddConnection(string alias, string hostname, int port, bool isSecured, bool useWebProxy = false)
+        public static void AddConnection(string alias, string endpoint, bool useWebProxy = false)
         {
-            AddConnection(alias, hostname, port, isSecured, "", "", useWebProxy);
+            AddConnection(alias, endpoint, "", "", useWebProxy);
         }
 
-        public static void AddConnection(string alias, string hostname, int port, bool isSecured, string username, string password, bool useWebProxy = false)
+        public static void AddConnection(string alias, string endpoint, string username, string password, bool useWebProxy = false)
         {
-            var connection = new Connection(alias, hostname, port, isSecured, username, password, useWebProxy);
+            var connection = new Connection(alias, endpoint, username, password, useWebProxy);
 
             _connections.Add(alias, connection);
         }
         
-        public static void AddConnection(string alias, string hostname, int port, bool isSecured, string databaseName, bool useWebProxy = false)
+        public static void AddConnection(string alias, string endpoint, string databaseName, bool useWebProxy = false)
         {
-            AddConnection(alias, hostname, port, isSecured, databaseName, "", "", useWebProxy);
+            AddConnection(alias, endpoint, databaseName, "", "", useWebProxy);
         }
         
-        public static void AddConnection(string alias, string hostname, int port, bool isSecured, string databaseName, string username, string password, bool useWebProxy = false)
+        public static void AddConnection(string alias, string endpoint, string databaseName, string username, string password, bool useWebProxy = false)
         {
-            var connection = new Connection(alias, hostname, port, isSecured, databaseName, username, password, useWebProxy);
+            var connection = new Connection(alias, endpoint, databaseName, username, password, useWebProxy);
 
             _connections.Add(alias, connection);
         }

@@ -14,10 +14,8 @@ namespace Arango.Tests
         public static string Alias { get; set; }
         public static string SystemAlias { get; set; }
 
-        public static string Hostname { get; set; }
-        public static int Port { get; set; }
-        public static bool IsSecured { get; set; }
-        public static string UserName { get; set; }
+        public static string Endpoint { get; set; }
+        public static string Username { get; set; }
         public static string Password { get; set; }
         
         static Database()
@@ -30,29 +28,23 @@ namespace Arango.Tests
             
             Alias = "testAlias";
             SystemAlias = "systemAlias";
-            Hostname = "localhost";
-            Port = 8529;
-            IsSecured = false;
-            UserName = "";
+            Endpoint = "http://127.0.0.1:8529";
+            Username = "";
             Password = "";
 
             ASettings.AddConnection(
                 SystemAlias,
-                Hostname,
-                Port,
-                IsSecured,
+                Endpoint,
                 "_system",
-                UserName,
+                Username,
                 Password
             );
 
             ASettings.AddConnection(
                 Alias,
-                Hostname,
-                Port,
-                IsSecured,
+                Endpoint,
                 TestDatabaseGeneral,
-                UserName,
+                Username,
                 Password
             );
         }
@@ -61,7 +53,7 @@ namespace Arango.Tests
         {	
             DeleteTestDatabase(databaseName);
 
-            var db = new ADatabase(Database.SystemAlias);
+            var db = new ADatabase(SystemAlias);
             
             var resultList = db.GetAccessibleDatabases();
 
@@ -75,7 +67,7 @@ namespace Arango.Tests
 
         public static void DeleteTestDatabase(string databaseName)
         {
-            var db = new ADatabase(Database.SystemAlias);
+            var db = new ADatabase(SystemAlias);
             
             var resultList = db.GetAccessibleDatabases();
 
@@ -87,15 +79,15 @@ namespace Arango.Tests
 
         public static void CleanupTestDatabases()
         {
-            Database.DeleteTestDatabase(Database.TestDatabaseGeneral);
-            Database.DeleteTestDatabase(Database.TestDatabaseOneTime);
+            DeleteTestDatabase(TestDatabaseGeneral);
+            DeleteTestDatabase(TestDatabaseOneTime);
         }
         
         public static void CreateTestCollection(string collectionName, ACollectionType collectionType)
         {
         	DeleteTestCollection(collectionName);
         	
-            var db = new ADatabase(Database.Alias);
+            var db = new ADatabase(Alias);
 
             var createResult = db.Collection
                 .Type(collectionType)
@@ -104,7 +96,7 @@ namespace Arango.Tests
         
         public static void ClearTestCollection(string collectionName)
         {
-            var db = new ADatabase(Database.Alias);
+            var db = new ADatabase(Alias);
 
             var createResult = db.Collection
                 .Truncate(collectionName);
@@ -141,7 +133,7 @@ namespace Arango.Tests
 
         public static void DeleteTestCollection(string collectionName)
         {
-            var db = new ADatabase(Database.Alias);
+            var db = new ADatabase(Alias);
 
             var resultGet = db.Collection.Get(collectionName);
             
