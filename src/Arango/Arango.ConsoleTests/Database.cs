@@ -29,7 +29,7 @@ namespace Arango.ConsoleTests
             Alias = "testAlias";
             SystemAlias = "systemAlias";
             Endpoint = "http://127.0.0.1:8529";
-            Username = "";
+            Username = "root";
             Password = "";
 
             ASettings.AddConnection(

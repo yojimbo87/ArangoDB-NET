@@ -56,7 +56,7 @@ namespace Arango.Client.Protocol
             httpRequest.Method = request.HttpMethod.ToString();
             httpRequest.UserAgent = ASettings.DriverName + "/" + ASettings.DriverVersion;
 
-            if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
+            if (!string.IsNullOrEmpty(Username) && (Password != null))
             {
                 httpRequest.Headers.Add(
                     "Authorization", 
