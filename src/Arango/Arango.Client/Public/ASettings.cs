@@ -19,7 +19,7 @@ namespace Arango.Client
         /// <summary>
         /// Determines driver version.
         /// </summary>
-        public const string DriverVersion = "0.10.2";
+        public const string DriverVersion = "0.11.0";
         
         /// <summary>
         /// Determines JSON serialization options.
