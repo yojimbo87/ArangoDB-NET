@@ -176,7 +176,7 @@ namespace Arango.fastJSON
         {
             return new JsonParser(json).Decode();
         }
-#if net4
+
         /// <summary>
         /// Create a .net4 dynamic object from the json string
         /// </summary>
@@ -186,7 +186,6 @@ namespace Arango.fastJSON
         {
             return new DynamicJson(json);
         }
-#endif
         /// <summary>
         /// Create a typed generic object from the json
         /// </summary>
