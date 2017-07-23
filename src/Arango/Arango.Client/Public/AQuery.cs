@@ -43,7 +43,7 @@ namespace Arango.Client
         /// </summary>
         public AQuery BindVar(string key, object value)
         {
-            _bindVars.Object(key, value);
+            _bindVars.Object(key, value.GetType().IsClass ? Dictator.ToDocument(value) : value);
             
             return this;
         }
