@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Arango.Client.Protocol;
 using Arango.fastJSON;
+using System.Collections;
 
 namespace Arango.Client
 {
@@ -43,7 +44,18 @@ namespace Arango.Client
         /// </summary>
         public AQuery BindVar(string key, object value)
         {
-            _bindVars.Object(key, value);
+            object varValue;
+            
+            if (IsSimpleType(value.GetType()) || IsList(value))
+            {
+                varValue = value;
+            } 
+            else
+            {
+                varValue = Dictator.ToDocument(value);
+            }
+
+            _bindVars.Object(key, varValue);
             
             return this;
         }
@@ -462,7 +474,31 @@ namespace Arango.Client
         	
         	return cleanQuery.ToString();
         }
-        
+
+        private static bool IsSimpleType(Type type)
+        {
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                // nullable type, check if the nested type is simple.
+                return IsSimpleType(type.GetGenericArguments()[0]);
+            }
+            return type.IsPrimitive
+              || type.IsEnum
+              || type.Equals(typeof(string))
+              || type.Equals(typeof(decimal));
+        }
+
+        private static bool IsList(object o)
+        {
+            if (o == null)
+            {
+                return false;
+            }
+            return o is IList &&
+                   o.GetType().IsGenericType &&
+                   o.GetType().GetGenericTypeDefinition().IsAssignableFrom(typeof(List<>));
+        }
+
         private void CopyExtraBodyFields<T>(Body<T> source, Dictionary<string, object> destination)
         {
             destination.String("id", source.ID);

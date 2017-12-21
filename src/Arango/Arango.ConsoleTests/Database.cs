@@ -14,10 +14,8 @@ namespace Arango.ConsoleTests
         public static string Alias { get; set; }
         public static string SystemAlias { get; set; }
 
-        public static string Hostname { get; set; }
-        public static int Port { get; set; }
-        public static bool IsSecured { get; set; }
-        public static string UserName { get; set; }
+        public static string Endpoint { get; set; }
+        public static string Username { get; set; }
         public static string Password { get; set; }
         
         static Database()
@@ -30,29 +28,23 @@ namespace Arango.ConsoleTests
             
             Alias = "testAlias";
             SystemAlias = "systemAlias";
-            Hostname = "localhost";
-            Port = 8529;
-            IsSecured = false;
-            UserName = "";
+            Endpoint = "http://127.0.0.1:8529";
+            Username = "root";
             Password = "";
 
             ASettings.AddConnection(
                 SystemAlias,
-                Hostname,
-                Port,
-                IsSecured,
+                Endpoint,
                 "_system",
-                UserName,
+                Username,
                 Password
             );
 
             ASettings.AddConnection(
                 Alias,
-                Hostname,
-                Port,
-                IsSecured,
+                Endpoint,
                 TestDatabaseGeneral,
-                UserName,
+                Username,
                 Password
             );
         }
