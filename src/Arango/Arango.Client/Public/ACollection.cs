@@ -22,7 +22,7 @@ namespace Arango.Client
         public ACollection Type(ACollectionType value)
         {
             // set enum format explicitely to override global setting
-            _parameters.Enum(ParameterName.Type, value, EnumFormat.Object);
+            _parameters.Enum(ParameterName.Type, value, EnumFormat.Integer);
         	
         	return this;
         }
