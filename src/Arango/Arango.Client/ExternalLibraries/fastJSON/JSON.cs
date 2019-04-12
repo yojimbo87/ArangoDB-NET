@@ -638,8 +638,8 @@ namespace Arango.fastJSON
                     if (v != null)
                     {
                         object oset = null;
-
-                        switch (pi.Type)
+						try {
+							switch (pi.Type)
                         {
                             case myPropInfoType.Int: oset = (int)((long)v); break;
                             case myPropInfoType.Long: oset = (long)v; break;
@@ -685,8 +685,10 @@ namespace Arango.fastJSON
                                 }
                                 break;
                         }
-
-                        o = pi.setter(o, oset);
+						} catch (Exception ex) {
+							throw new Exception("Invalid Value: " + v, ex);
+						}
+						o = pi.setter(o, oset);
                     }
                 }
             }
