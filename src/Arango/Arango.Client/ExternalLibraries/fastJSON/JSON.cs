@@ -638,8 +638,8 @@ namespace Arango.fastJSON
                     if (v != null)
                     {
                         object oset = null;
-
-                        switch (pi.Type)
+						try {
+							switch (pi.Type)
                         {
                             case myPropInfoType.Int: oset = (int)((long)v); break;
                             case myPropInfoType.Long: oset = (long)v; break;
@@ -654,7 +654,9 @@ namespace Arango.fastJSON
                                     oset = CreateArray((List<object>)v, pi.pt, pi.bt, globaltypes);
                                 // what about 'else'?
                                 break;
-                            case myPropInfoType.ByteArray: oset = Convert.FromBase64String((string)v); break;
+                            case myPropInfoType.ByteArray:
+                                    oset = CreateArray((List<object>)v, pi.pt, pi.bt, globaltypes);
+								break;
 #if !SILVERLIGHT
                             case myPropInfoType.DataSet: oset = CreateDataset((Dictionary<string, object>)v, globaltypes); break;
                             case myPropInfoType.DataTable: oset = CreateDataTable((Dictionary<string, object>)v, globaltypes); break;
@@ -685,8 +687,10 @@ namespace Arango.fastJSON
                                 }
                                 break;
                         }
-
-                        o = pi.setter(o, oset);
+						} catch (Exception ex) {
+							throw new Exception("Invalid Value: " + v, ex);
+						}
+						o = pi.setter(o, oset);
                     }
                 }
             }
