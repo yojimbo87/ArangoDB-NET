@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Arango.Client
+namespace Arango.Client.ExternalLibraries.dictator
 {
     /// <summary>
     /// Ignores property if it contains null value when converting object to or from document format.

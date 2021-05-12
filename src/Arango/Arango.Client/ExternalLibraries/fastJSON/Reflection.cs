@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Reflection.Emit;
-using System.Reflection;
 using System.Collections;
-#if !SILVERLIGHT
-using System.Data;
-#endif
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Data;
+using System.Reflection;
+using System.Reflection.Emit;
+#if !SILVERLIGHT
+#endif
 
-namespace Arango.fastJSON
+namespace Arango.Client.ExternalLibraries.fastJSON
 {
     internal struct Getters
     {

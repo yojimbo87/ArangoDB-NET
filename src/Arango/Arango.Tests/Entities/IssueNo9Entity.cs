@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Arango.Tests
+namespace Arango.Tests.Entities
 {
     public class IssueNo9Entity
     {

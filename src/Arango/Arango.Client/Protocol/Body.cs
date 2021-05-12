@@ -1,6 +1,4 @@
-﻿using Arango.fastJSON;
-
-namespace Arango.Client.Protocol
+﻿namespace Arango.Client.Protocol
 {
     public class Body<T>
     {

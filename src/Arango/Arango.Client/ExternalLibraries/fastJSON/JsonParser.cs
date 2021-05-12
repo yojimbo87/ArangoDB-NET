@@ -1,10 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
-namespace Arango.fastJSON
+namespace Arango.Client.ExternalLibraries.fastJSON
 {
 
     /// <summary>

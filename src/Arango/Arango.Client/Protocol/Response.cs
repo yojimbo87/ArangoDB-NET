@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
-using Arango.fastJSON;
+using Arango.Client.ExternalLibraries.fastJSON;
+using Arango.Client.Public;
 
 namespace Arango.Client.Protocol
 {

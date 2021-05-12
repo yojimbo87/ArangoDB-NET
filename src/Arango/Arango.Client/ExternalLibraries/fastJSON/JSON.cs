@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-#if !SILVERLIGHT
+using System.Collections.Specialized;
 using System.Data;
-#endif
 using System.Globalization;
 using System.IO;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Collections.Specialized;
-using Arango.Client;
 using System.Linq;
+using System.Reflection;
+using Arango.Client.ExternalLibraries.dictator;
+#if !SILVERLIGHT
+#endif
 
-namespace Arango.fastJSON
+namespace Arango.Client.ExternalLibraries.fastJSON
 {
     public delegate string Serialize(object data);
     public delegate object Deserialize(string data);

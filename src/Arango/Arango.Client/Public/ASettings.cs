@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Arango.fastJSON;
+using Arango.Client.ExternalLibraries.fastJSON;
 using Arango.Client.Protocol;
 
-namespace Arango.Client
+namespace Arango.Client.Public
 {
     public static class ASettings
     {

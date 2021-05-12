@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Arango.Client.ExternalLibraries.dictator;
+using Arango.Client.Public;
+using Arango.Tests.Entities;
 using NUnit.Framework;
-using Arango.Client;
 
-namespace Arango.Tests
+namespace Arango.Tests.QueryOperations
 {
     [TestFixture()]
     public class QueryOperationsTests : IDisposable

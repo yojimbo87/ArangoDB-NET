@@ -1,6 +1,6 @@
 ﻿
 
-namespace Arango.Client
+namespace Arango.Client.Public
 {
     public enum AIndexType
     {

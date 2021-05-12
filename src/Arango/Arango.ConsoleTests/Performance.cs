@@ -6,8 +6,9 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Arango.Client;
-using Arango.fastJSON;
+using Arango.Client.ExternalLibraries.fastJSON;
+using Arango.Client.Public;
+using Arango.ConsoleTests.Entities;
 using RestSharp;
 
 namespace Arango.ConsoleTests
@@ -122,7 +123,7 @@ namespace Arango.ConsoleTests
             var client = new RestClient("http://localhost:8529");
             var request = new RestRequest("_db/" + Database.TestDatabaseGeneral + "/_api/document", Method.POST);
             request.AddParameter("collection", Database.TestDocumentCollectionName);
-            request.AddBody(jsonEntity);
+            request.AddJsonBody(jsonEntity);
             
             Stopwatch stopwatch = Stopwatch.StartNew();
             

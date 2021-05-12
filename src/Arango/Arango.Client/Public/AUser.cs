@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Arango.Client
+namespace Arango.Client.Public
 {
     public class AUser
     {

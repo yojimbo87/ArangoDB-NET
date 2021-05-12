@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Arango.Client
+namespace Arango.Client.ExternalLibraries.dictator
 {
 	public class NonExistingFieldException : Exception
 	{

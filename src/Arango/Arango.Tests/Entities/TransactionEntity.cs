@@ -1,5 +1,5 @@
 ﻿
-namespace Arango.Tests
+namespace Arango.Tests.Entities
 {
     public class TransactionEntity
     {

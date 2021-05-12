@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using Arango.Client.ExternalLibraries.dictator;
+using Arango.Client.ExternalLibraries.fastJSON;
 using Arango.Client.Protocol;
-using Arango.fastJSON;
 
-namespace Arango.Client
+namespace Arango.Client.Public
 {
     public class ATransaction
     {

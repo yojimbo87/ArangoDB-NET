@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Arango.Client
+namespace Arango.Client.ExternalLibraries.dictator
 {
     /// <summary>
     /// Specified alias will be used as field name to convert property to or from document format.

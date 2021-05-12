@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Arango.Client
+namespace Arango.Client.Public
 {
     // contains ArangoDB specific extension methods, Dictator implementation code can be found in external libraries
     public static partial class DictionaryExtensions
@@ -25,7 +25,7 @@ namespace Arango.Client
             
             try
             {
-                id = String(dictionary, "_id");
+                id = ExternalLibraries.dictator.DictionaryExtensions.String(dictionary, "_id");
                 
                 if (!ADocument.IsID(id))
                 {
@@ -51,7 +51,7 @@ namespace Arango.Client
                 throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
             }
             
-            SetFieldValue(dictionary, "_id", id);
+            ExternalLibraries.dictator.DictionaryExtensions.SetFieldValue(dictionary, "_id", id);
             
             return dictionary;
         }
@@ -77,7 +77,7 @@ namespace Arango.Client
             
             try
             {
-                key = String(dictionary, "_key");
+                key = ExternalLibraries.dictator.DictionaryExtensions.String(dictionary, "_key");
                 
                 if (!ADocument.IsKey(key))
                 {
@@ -103,7 +103,7 @@ namespace Arango.Client
                 throw new ArgumentException("Specified key value (" + key + ") has invalid format.");
             }
             
-            SetFieldValue(dictionary, "_key", key);
+            ExternalLibraries.dictator.DictionaryExtensions.SetFieldValue(dictionary, "_key", key);
             
             return dictionary;
         }
@@ -129,7 +129,7 @@ namespace Arango.Client
             
             try
             {
-                rev = String(dictionary, "_rev");
+                rev = ExternalLibraries.dictator.DictionaryExtensions.String(dictionary, "_rev");
                 
                 if (!ADocument.IsRev(rev))
                 {
@@ -155,7 +155,7 @@ namespace Arango.Client
                 throw new ArgumentException("Specified rev value (" + rev + ") has invalid format.");
             }   
             
-            SetFieldValue(dictionary, "_rev", rev);
+            ExternalLibraries.dictator.DictionaryExtensions.SetFieldValue(dictionary, "_rev", rev);
             
             return dictionary;
         }
@@ -181,7 +181,7 @@ namespace Arango.Client
 
             try
             {
-                from = String(dictionary, "_from");
+                from = ExternalLibraries.dictator.DictionaryExtensions.String(dictionary, "_from");
 
                 if (!ADocument.IsID(from))
                 {
@@ -207,7 +207,7 @@ namespace Arango.Client
                 throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
             }
 
-            SetFieldValue(dictionary, "_from", id);
+            ExternalLibraries.dictator.DictionaryExtensions.SetFieldValue(dictionary, "_from", id);
 
             return dictionary;
         }
@@ -233,7 +233,7 @@ namespace Arango.Client
 
             try
             {
-                to = String(dictionary, "_to");
+                to = ExternalLibraries.dictator.DictionaryExtensions.String(dictionary, "_to");
 
                 if (!ADocument.IsID(to))
                 {
@@ -259,7 +259,7 @@ namespace Arango.Client
                 throw new ArgumentException("Specified id value (" + id + ") has invalid format.");
             }
 
-            SetFieldValue(dictionary, "_to", id);
+            ExternalLibraries.dictator.DictionaryExtensions.SetFieldValue(dictionary, "_to", id);
 
             return dictionary;
         }
@@ -275,7 +275,7 @@ namespace Arango.Client
             
             try
             {
-                var fieldValue = GetFieldValue(dictionary, fieldPath);
+                var fieldValue = ExternalLibraries.dictator.DictionaryExtensions.GetFieldValue(dictionary, fieldPath);
                 
                 if (fieldValue is string)
                 {
@@ -299,7 +299,7 @@ namespace Arango.Client
             
             try
             {
-                var fieldValue = GetFieldValue(dictionary, fieldPath);
+                var fieldValue = ExternalLibraries.dictator.DictionaryExtensions.GetFieldValue(dictionary, fieldPath);
                 
                 if (fieldValue is string)
                 {

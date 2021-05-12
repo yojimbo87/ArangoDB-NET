@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using Arango.Client.ExternalLibraries.dictator;
 
 namespace Arango.Client.Protocol
 {

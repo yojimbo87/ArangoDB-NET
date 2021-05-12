@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Arango.ConsoleTests
+﻿namespace Arango.ConsoleTests.Entities
 {
     public class Release
     {

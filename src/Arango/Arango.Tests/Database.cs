@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using Arango.Client;
+using Arango.Client.ExternalLibraries.dictator;
+using Arango.Client.Public;
 
 namespace Arango.Tests
 {

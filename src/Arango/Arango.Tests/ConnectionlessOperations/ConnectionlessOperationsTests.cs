@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Arango.Client.ExternalLibraries.dictator;
+using Arango.Client.Public;
 using NUnit.Framework;
-using Arango.Client;
 
-namespace Arango.Tests
+namespace Arango.Tests.ConnectionlessOperations
 {
     [TestFixture()]
     public class ConnectionlessOperationsTests

@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Arango.fastJSON
+namespace Arango.Client.ExternalLibraries.fastJSON
 {
     public sealed class SafeDictionary<TKey, TValue>
     {

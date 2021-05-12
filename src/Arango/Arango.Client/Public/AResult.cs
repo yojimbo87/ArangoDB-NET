@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Arango.Client.Protocol;
 
-namespace Arango.Client
+namespace Arango.Client.Public
 {
     public class AResult<T>
     {

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Text;
+using Arango.Client.Public;
 
 namespace Arango.Client.Protocol
 {

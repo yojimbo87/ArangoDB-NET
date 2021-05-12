@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
+using Arango.Client.ExternalLibraries.fastJSON;
+using Arango.Client.Public;
+using Arango.Tests.Entities;
 using NUnit.Framework;
-using Arango.Client;
-using Arango.fastJSON;
 
-namespace Arango.Tests
+namespace Arango.Tests.Performance
 {
     [TestFixture()]
     public class PerformanceTests : IDisposable

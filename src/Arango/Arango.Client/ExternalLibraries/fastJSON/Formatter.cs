@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
-namespace Arango.fastJSON
+namespace Arango.Client.ExternalLibraries.fastJSON
 {
     internal static class Formatter
     {

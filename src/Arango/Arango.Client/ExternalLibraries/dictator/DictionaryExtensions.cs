@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
-namespace Arango.Client
+namespace Arango.Client.ExternalLibraries.dictator
 {
     public static partial class DictionaryExtensions
     {
@@ -1389,7 +1389,7 @@ namespace Arango.Client
         /// </summary>
         /// <exception cref="NonExistingFieldException">Field does not exist in specified path.</exception>
         /// <exception cref="InvalidFieldException">Field path contains field which is not traversable.</exception>
-        static object GetFieldValue(Dictionary<string, object> dictionary, string fieldPath)
+        public static object GetFieldValue(Dictionary<string, object> dictionary, string fieldPath)
         {
             object fieldValue = null;
             var fieldNames = new [] { fieldPath };
@@ -1473,7 +1473,7 @@ namespace Arango.Client
         /// <summary>
         /// Stores given value to specified field path.
         /// </summary>
-        static void SetFieldValue(Dictionary<string, object> dictionary, string fieldPath, object fieldValue)
+        public static void SetFieldValue(Dictionary<string, object> dictionary, string fieldPath, object fieldValue)
         {
             var fieldNames = new [] { fieldPath };
             var parentDictionary = dictionary;

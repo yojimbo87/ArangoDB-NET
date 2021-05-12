@@ -1,7 +1,7 @@
 ﻿
 using System.Collections.Generic;
 
-namespace Arango.Tests
+namespace Arango.Tests.Entities
 {
     public class IssueNo16Entity
     {

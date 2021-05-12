@@ -1,6 +1,6 @@
-﻿using Arango.Client;
+﻿using Arango.Client.ExternalLibraries.dictator;
 
-namespace Arango.Tests
+namespace Arango.Tests.Entities
 {
     public class Dummy
     {

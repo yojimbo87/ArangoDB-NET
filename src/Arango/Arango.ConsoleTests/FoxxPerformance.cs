@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Arango.Client;
+using Arango.Client.ExternalLibraries.dictator;
+using Arango.Client.Public;
 
 namespace Arango.ConsoleTests
 {

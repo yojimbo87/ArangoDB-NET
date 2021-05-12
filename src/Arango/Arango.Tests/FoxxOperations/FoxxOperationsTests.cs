@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using Arango.Client.ExternalLibraries.dictator;
+using Arango.Client.Public;
 using NUnit.Framework;
-using Arango.Client;
 
-namespace Arango.Tests
+namespace Arango.Tests.FoxxOperations
 {
-    [Ignore]
+    [Ignore("Not sure why the original developer wants this ignored but NUnit requires this text to do it")]
     [TestFixture()]
     public class FoxxOperationsTests
     {

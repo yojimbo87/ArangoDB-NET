@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-#if !SILVERLIGHT
+using System.Collections.Specialized;
 using System.Data;
-#endif
 using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Collections.Specialized;
+#if !SILVERLIGHT
+#endif
 
-namespace Arango.fastJSON
+namespace Arango.Client.ExternalLibraries.fastJSON
 {
     internal sealed class JSONSerializer
     {
